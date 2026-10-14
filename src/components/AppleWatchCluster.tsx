@@ -258,23 +258,21 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
   const isInteractingRef = useRef<boolean>(false)
 
   // ───────────────────────────────────────────────────────────────────────────
-  // HOVER CARD MUST BE STABLE AND REACHABLE
-  // Freeze lens when card is open; compute fixed card position once; intent & grace timers
+  // DYNAMIC HOVER CARD & SEAMLESS FISHEYE TRACKING
+  // Physics runs continuously; hover card smoothly tracks active bubble in 60fps loop
   // ───────────────────────────────────────────────────────────────────────────
-  const isLensFrozenRef = useRef<boolean>(false)
   const hoverIntentTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const cardRef = useRef<HTMLDivElement | null>(null)
 
   const [activeCardMember, setActiveCardMember] = useState<ActiveCardState | null>(null)
   const activeMemberIdRef = useRef<string | null>(null)
 
-  // Open card for a member and freeze lens
+  // Open card for a member (physics continues dynamically without freezing)
   const openCardForMember = useCallback((member: TeamMemberEntity) => {
     const node = nodesRef.current.find(n => n.member.id === member.id)
     if (!node) return
 
-    // Freeze lens immediately so bubbles and card remain rock-solid
-    isLensFrozenRef.current = true
     activeMemberIdRef.current = member.id
 
     const baseBubbleSize = layout.baseBubbleSize
@@ -283,18 +281,15 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
 
     const cardWidth = 232
     const cardHeight = 144
-    const overlap = 8 // 8px overlap ensures zero dead zone between bubble and card
+    const overlap = 8
 
     const halfW = containerSize.width / 2
     const halfH = containerSize.height / 2
 
-    // Compute fixed horizontal card position
     let cardLeft: number
     let isLeftAligned = false
     if (node.currentX >= 0) {
-      // Bubble on right half -> position card to the left of the bubble
       cardLeft = node.currentX - renderedRadius - cardWidth + overlap
-      // If card clips container left wall, flip to right
       if (cardLeft < -halfW + 16) {
         cardLeft = node.currentX + renderedRadius - overlap
         isLeftAligned = false
@@ -302,9 +297,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
         isLeftAligned = true
       }
     } else {
-      // Bubble on left half -> position card to the right of the bubble
       cardLeft = node.currentX + renderedRadius - overlap
-      // If card clips container right wall, flip to left
       if (cardLeft + cardWidth > halfW - 16) {
         cardLeft = node.currentX - renderedRadius - cardWidth + overlap
         isLeftAligned = true
@@ -313,7 +306,6 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
       }
     }
 
-    // Compute fixed vertical position (centered with bubble)
     let cardTop = node.currentY - cardHeight / 2
     const minTop = -halfH + 16
     const maxTop = halfH - cardHeight - 16
@@ -327,7 +319,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
     })
   }, [layout.baseBubbleSize, containerSize])
 
-  // Close card and unfreeze lens
+  // Close card
   const closeCard = useCallback(() => {
     if (hoverIntentTimerRef.current) {
       clearTimeout(hoverIntentTimerRef.current)
@@ -339,7 +331,6 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
     }
     setActiveCardMember(null)
     activeMemberIdRef.current = null
-    isLensFrozenRef.current = false
   }, [])
 
   // Clean up timers on unmount
@@ -351,12 +342,9 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
   }, [])
 
   // ───────────────────────────────────────────────────────────────────────────
-  // PHYSICS ENGINE: Radial Fisheye Distortion (FROZEN when card is open)
+  // PHYSICS ENGINE: Radial Fisheye Distortion (Continuous 60FPS fluid motion)
   // ───────────────────────────────────────────────────────────────────────────
   const updatePhysics = useCallback(() => {
-    // When lens is frozen (card open / user on card or bubble), DO NOT shift nodes
-    if (isLensFrozenRef.current) return
-
     const nodes = nodesRef.current
     if (nodes.length <= 1) return
 
@@ -432,6 +420,37 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
         el.style.transform = `translate3d(calc(-50% + ${tx}px), calc(-50% + ${ty}px), 0px) scale(${sc})`
       }
     }
+
+    // Smoothly track active bubble with hover card during full cursor travel
+    if (activeMemberIdRef.current && cardRef.current) {
+      const activeNode = nodes.find(n => n.member.id === activeMemberIdRef.current)
+      if (activeNode) {
+        const renderedRadius = (baseBubbleSize * activeNode.currentScale) / 2
+        const cardWidth = 232
+        const cardHeight = 144
+        const overlap = 8
+        const halfW = containerSize.width / 2
+        const halfH = containerSize.height / 2
+
+        let cardLeft: number
+        if (activeNode.currentX >= 0) {
+          cardLeft = activeNode.currentX - renderedRadius - cardWidth + overlap
+          if (cardLeft < -halfW + 16) {
+            cardLeft = activeNode.currentX + renderedRadius - overlap
+          }
+        } else {
+          cardLeft = activeNode.currentX + renderedRadius - overlap
+          if (cardLeft + cardWidth > halfW - 16) {
+            cardLeft = activeNode.currentX - renderedRadius - cardWidth + overlap
+          }
+        }
+
+        let cardTop = activeNode.currentY - cardHeight / 2
+        cardTop = Math.max(-halfH + 16, Math.min(halfH - cardHeight - 16, cardTop))
+
+        cardRef.current.style.transform = `translate3d(calc(50% + ${Math.round(cardLeft)}px), calc(50% + ${Math.round(cardTop)}px), 0px)`
+      }
+    }
   }, [layout, containerSize])
 
   // 60fps RAF Loop
@@ -447,9 +466,8 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
     return () => cancelAnimationFrame(animId)
   }, [updatePhysics, prefersReducedMotion])
 
-  // Container interaction handlers: mouse behavior unchanged
+  // Container interaction handlers: continuous distortion tracking across full cursor travel
   const handleContainerMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (isLensFrozenRef.current) return
     if (!containerRef.current) return
 
     const rect = containerRef.current.getBoundingClientRect()
@@ -469,7 +487,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
 
   // Touch handlers for mobile: allows touch-action: pan-y page scrolling
   const handleContainerTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (isLensFrozenRef.current || !containerRef.current) return
+    if (!containerRef.current) return
     if (e.touches.length > 0) {
       const touch = e.touches[0]
       const rect = containerRef.current.getBoundingClientRect()
@@ -495,11 +513,6 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
         clearTimeout(closeTimerRef.current)
         closeTimerRef.current = null
       }
-      isLensFrozenRef.current = true
-      return
-    }
-
-    if (activeMemberIdRef.current !== null) {
       return
     }
 
@@ -522,8 +535,6 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
       closeTimerRef.current = setTimeout(() => {
         closeCard()
-        isInteractingRef.current = false
-        targetFocalRef.current = { x: 0, y: 0 }
       }, CLOSE_GRACE_DELAY_MS)
     }
   }
@@ -534,19 +545,23 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
       clearTimeout(closeTimerRef.current)
       closeTimerRef.current = null
     }
-    isLensFrozenRef.current = true
+    // Keep focal point smoothly focused on the active member while interacting with the card
+    if (activeMemberIdRef.current) {
+      const node = nodesRef.current.find(n => n.member.id === activeMemberIdRef.current)
+      if (node) {
+        targetFocalRef.current = { x: node.baseX, y: node.baseY }
+      }
+    }
   }
 
   const handleCardMouseLeave = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
     closeTimerRef.current = setTimeout(() => {
       closeCard()
-      isInteractingRef.current = false
-      targetFocalRef.current = { x: 0, y: 0 }
     }, CLOSE_GRACE_DELAY_MS)
   }
 
-  // Touch & Click handler: on tap, open card and freeze; tap outside closes
+  // Touch & Click handler: on tap, open card; tap outside closes
   const handleBubbleClick = (member: TeamMemberEntity) => {
     if (activeMemberIdRef.current === member.id) {
       onSelectMember(member)
@@ -722,107 +737,114 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
           })}
         </div>
 
-        {/* ── Dedicated Sibling Hover Card Layer (Never clipped, zero dead zone, frozen lens) ── */}
+        {/* ── Dedicated Sibling Hover Card Layer (Never clipped, zero dead zone) ── */}
         <div className="absolute inset-0 pointer-events-none z-50">
           <AnimatePresence>
             {activeCardMember && (
-              <motion.div
-                key={activeCardMember.member.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.12, ease: 'easeOut' }}
+              <div
+                ref={cardRef}
                 style={{
                   position: 'absolute',
-                  left: `calc(50% + ${activeCardMember.left}px)`,
-                  top: `calc(50% + ${activeCardMember.top}px)`,
+                  left: 0,
+                  top: 0,
+                  transform: `translate3d(calc(50% + ${activeCardMember.left}px), calc(50% + ${activeCardMember.top}px), 0px)`,
                   width: '232px',
                   pointerEvents: 'auto',
                   zIndex: 90,
+                  willChange: 'transform',
                 }}
-                className="p-3.5 rounded-[6px] bg-[var(--bg-surface)]/98 backdrop-blur-md border border-[var(--border-hairline)] shadow-2xl text-left cursor-default hover:border-[var(--accent-orange)] transition-colors relative"
-                onMouseEnter={handleCardMouseEnter}
-                onMouseLeave={handleCardMouseLeave}
-                onClick={e => e.stopPropagation()}
+                onMouseMove={e => e.stopPropagation()}
               >
-                {/* Invisible Hover-Bridge Extension to guarantee 100% gapless mouse travel */}
-                <div
-                  className="absolute inset-y-0 pointer-events-auto"
-                  style={{
-                    [activeCardMember.isLeftAligned ? 'right' : 'left']: '-16px',
-                    width: '20px',
-                  }}
-                  aria-hidden="true"
-                />
-
-                {/* Role Badge */}
-                <div className="text-[9.5px] font-mono font-bold text-[var(--accent-orange)] uppercase tracking-wider mb-0.5">
-                  {activeCardMember.member.role}
-                </div>
-
-                {/* Name */}
-                <div className="text-[14px] font-semibold text-[var(--text-primary)] leading-tight font-head">
-                  {activeCardMember.member.name}
-                </div>
-
-                {/* Department */}
-                <div className="text-[11px] text-[var(--text-muted)] font-mono mt-0.5 line-clamp-1">
-                  {activeCardMember.member.department}
-                </div>
-
-                {/* Research Focus */}
-                {activeCardMember.member.researchFocus && (
-                  <div className="mt-1.5 text-[10px] font-medium text-[var(--accent-purple)] bg-[var(--accent-purple-light)] py-0.5 px-2 rounded-[2px] leading-tight line-clamp-2">
-                    {activeCardMember.member.researchFocus}
-                  </div>
-                )}
-
-                {/* Tenure */}
-                {activeCardMember.member.tenure && (
-                  <div className="text-[10px] text-[var(--text-subtle)] font-mono mt-1">
-                    Tenure: {activeCardMember.member.tenure}
-                  </div>
-                )}
-
-                {/* Actions (LinkedIn, Email, View Card) */}
-                <div className="flex items-center justify-between gap-1 mt-3 pt-2 border-t border-[var(--border-hairline)]">
-                  <div className="flex items-center gap-1.5">
-                    {activeCardMember.member.hasLinkedIn() && (
-                      <a
-                        href={activeCardMember.member.getLinkedInUrl()!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="LinkedIn Profile"
-                        onClick={e => e.stopPropagation()}
-                        className="w-6.5 h-6.5 rounded-[2px] bg-[var(--bg-page)] hover:bg-[var(--accent-orange)] text-[var(--text-muted)] hover:text-white flex items-center justify-center transition-colors shadow-2xs"
-                      >
-                        <LinkedinIcon className="w-2.5 h-2.5" />
-                      </a>
-                    )}
-                    {activeCardMember.member.hasEmail() && (
-                      <a
-                        href={activeCardMember.member.getEmailFallback()!}
-                        title="Email member"
-                        onClick={e => e.stopPropagation()}
-                        className="w-6.5 h-6.5 rounded-[2px] bg-[var(--bg-page)] hover:bg-[var(--accent-purple)] text-[var(--text-muted)] hover:text-white flex items-center justify-center transition-colors shadow-2xs"
-                      >
-                        <Mail className="w-3 h-3" />
-                      </a>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSelectMember(activeCardMember.member)
-                      closeCard()
+                <motion.div
+                  key={activeCardMember.member.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.12, ease: 'easeOut' }}
+                  className="p-3.5 rounded-[6px] bg-[var(--bg-surface)]/98 backdrop-blur-md border border-[var(--border-hairline)] shadow-2xl text-left cursor-default hover:border-[var(--accent-orange)] transition-colors relative"
+                  onMouseEnter={handleCardMouseEnter}
+                  onMouseLeave={handleCardMouseLeave}
+                  onClick={e => e.stopPropagation()}
+                >
+                  {/* Invisible Hover-Bridge Extension to guarantee 100% gapless mouse travel */}
+                  <div
+                    className="absolute inset-y-0 pointer-events-auto"
+                    style={{
+                      [activeCardMember.isLeftAligned ? 'right' : 'left']: '-16px',
+                      width: '20px',
                     }}
-                    className="text-[10.5px] font-semibold text-[var(--accent-orange)] flex items-center gap-1 hover:underline cursor-pointer"
-                  >
-                    <span>Card</span>
-                    <ExternalLink className="w-2.5 h-2.5" />
-                  </button>
-                </div>
-              </motion.div>
+                    aria-hidden="true"
+                  />
+
+                  {/* Role Badge */}
+                  <div className="text-[9.5px] font-mono font-bold text-[var(--accent-orange)] uppercase tracking-wider mb-0.5">
+                    {activeCardMember.member.role}
+                  </div>
+
+                  {/* Name */}
+                  <div className="text-[14px] font-semibold text-[var(--text-primary)] leading-tight font-head">
+                    {activeCardMember.member.name}
+                  </div>
+
+                  {/* Department */}
+                  <div className="text-[11px] text-[var(--text-muted)] font-mono mt-0.5 line-clamp-1">
+                    {activeCardMember.member.department}
+                  </div>
+
+                  {/* Research Focus */}
+                  {activeCardMember.member.researchFocus && (
+                    <div className="mt-1.5 text-[10px] font-medium text-[var(--accent-purple)] bg-[var(--accent-purple-light)] py-0.5 px-2 rounded-[2px] leading-tight line-clamp-2">
+                      {activeCardMember.member.researchFocus}
+                    </div>
+                  )}
+
+                  {/* Tenure */}
+                  {activeCardMember.member.tenure && (
+                    <div className="text-[10px] text-[var(--text-subtle)] font-mono mt-1">
+                      Tenure: {activeCardMember.member.tenure}
+                    </div>
+                  )}
+
+                  {/* Actions (LinkedIn, Email, View Card) */}
+                  <div className="flex items-center justify-between gap-1 mt-3 pt-2 border-t border-[var(--border-hairline)]">
+                    <div className="flex items-center gap-1.5">
+                      {activeCardMember.member.hasLinkedIn() && (
+                        <a
+                          href={activeCardMember.member.getLinkedInUrl()!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="LinkedIn Profile"
+                          onClick={e => e.stopPropagation()}
+                          className="w-6.5 h-6.5 rounded-[2px] bg-[var(--bg-page)] hover:bg-[var(--accent-orange)] text-[var(--text-muted)] hover:text-white flex items-center justify-center transition-colors shadow-2xs"
+                        >
+                          <LinkedinIcon className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                      {activeCardMember.member.hasEmail() && (
+                        <a
+                          href={activeCardMember.member.getEmailFallback()!}
+                          title="Email member"
+                          onClick={e => e.stopPropagation()}
+                          className="w-6.5 h-6.5 rounded-[2px] bg-[var(--bg-page)] hover:bg-[var(--accent-purple)] text-[var(--text-muted)] hover:text-white flex items-center justify-center transition-colors shadow-2xs"
+                        >
+                          <Mail className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectMember(activeCardMember.member)
+                        closeCard()
+                      }}
+                      className="text-[10.5px] font-semibold text-[var(--accent-orange)] flex items-center gap-1 hover:underline cursor-pointer"
+                    >
+                      <span>Card</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
             )}
           </AnimatePresence>
         </div>
