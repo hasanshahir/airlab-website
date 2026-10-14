@@ -1,0 +1,66 @@
+[
+  {
+    "id": "perf-1",
+    "rank": 1,
+    "name": "Muhammad Shaheer Khan",
+    "role": "Research Intern",
+    "month": "October 2026",
+    "title": "Lead Student Author — Multimodal RAG & Embedding Models",
+    "achievement": "Spearheaded high-performance RAG pipeline benchmarks and embedding fine-tuning across multimodal regional corpora.",
+    "metrics": {
+      "citations": "142+",
+      "modelDownloads": "28.5k",
+      "hIndex": 4
+    },
+    "tags": ["RAG Systems", "Embedding Models", "Computer Vision", "AI Automation"],
+    "image": "./pfp/shaheer.png"
+  },
+  {
+    "id": "perf-2",
+    "rank": 2,
+    "name": "Mureed Hussain",
+    "role": "Undergraduate Team Lead (CT-23036)",
+    "month": "September 2026",
+    "title": "Project Lead — Naqshkaar Constraint-Aware 3D Interior AI",
+    "achievement": "Architected Pakistan's first indigenous 3D generative interior design pipeline combining local furniture catalogues with spatial room constraints.",
+    "metrics": {
+      "citations": "38+",
+      "fps": "Interactive 3D",
+      "patents": 1
+    },
+    "tags": ["3D Generative AI", "Spatial Constraints", "Multimodal AI"],
+    "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80"
+  },
+  {
+    "id": "perf-3",
+    "rank": 3,
+    "name": "Laibah Shahid",
+    "role": "Project Lead (CT-22061)",
+    "month": "August 2026",
+    "title": "Project Lead — NEDAASC Funded Agentic Travel Assistant",
+    "achievement": "Successfully secured competitive NEDAASC grant funding and led multi-modal travel itinerary synthesis across Pakistan.",
+    "metrics": {
+      "citations": "26+",
+      "accuracy": "97.4%",
+      "grant": "NEDAASC Funded"
+    },
+    "tags": ["Agentic AI", "Travel Intelligence", "NEDAASC Grant"],
+    "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80"
+  },
+  {
+    "id": "perf-4",
+    "rank": 4,
+    "name": "Duaa Salman",
+    "role": "Project Lead (CT-22009)",
+    "month": "July 2026",
+    "title": "Project Lead — AutoGradeHub Automated Assessment Engine",
+    "achievement": "Engineered sandbox code execution architecture and automated semantic code feedback deployed for university coursework.",
+    "metrics": {
+      "citations": "42+",
+      "evalSpeed": "< 2.5s",
+      "studentsServed": "500+"
+    },
+    "tags": ["Automated Grading", "Code Evaluation", "Pedagogy AI"],
+    "image": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80"
+  }
+]

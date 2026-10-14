@@ -1,0 +1,68 @@
+[
+  {
+    "id": "intern-1",
+    "name": "Muhammad Shaheer Khan",
+    "term": "2025 – Present",
+    "project": "Computer Vision, RAG Systems & Embedding Models",
+    "university": "NED University (CSIT Department)",
+    "currentRole": "Lead Research Fellow — Multimodal RAG & AI Automation",
+    "quote": "AIR Lab gives us direct access to high-performance GPU clusters, empowering us to build foundational and retrieval systems tailored for regional languages.",
+    "paper": "Automated Multimodal Benchmarks for Low-Resource Languages",
+    "image": "./pfp/shaheer.png"
+  },
+  {
+    "id": "intern-2",
+    "name": "Kashaf Zia",
+    "term": "2025 – Present",
+    "project": "Web & Mobile Development, AI/ML and Generative AI",
+    "university": "NED University (CSIT Department)",
+    "currentRole": "Research Fellow — Generative Interfaces & Edge Perception",
+    "quote": "Working on real-world generative pipelines alongside faculty supervisors has elevated our engineering discipline and research capabilities.",
+    "paper": "Real-Time Mobile Perception with Lightweight Neural Backbones",
+    "image": "./pfp/kashaf.png"
+  },
+  {
+    "id": "intern-3",
+    "name": "Syed Shujauddin Hashmi",
+    "term": "2025 – Present",
+    "project": "Malware Analysis, Reverse Engineering & Multi-Agent Frameworks",
+    "university": "NED University (CSIT Department)",
+    "currentRole": "Research Fellow — Cyberthreat Intelligence & Vulnerability Research",
+    "quote": "Developing multi-agent frameworks for automated binary analysis has allowed us to tackle modern digital forensics challenges head-on.",
+    "paper": "Agentic Frameworks for Accelerated Malware Provenance & Reverse Engineering",
+    "image": "./pfp/shujauddin.png"
+  },
+  {
+    "id": "intern-4",
+    "name": "Roshaan Tahir",
+    "term": "2025 – Present",
+    "project": "Deep Learning, Multi-Agent Systems & Distributed Systems",
+    "university": "NED University (CSIT Department)",
+    "currentRole": "Research Fellow — Distributed Neural Acceleration & Data Engineering",
+    "quote": "The collaborative culture and compute facilities at AIR Lab enable us to deploy and evaluate complex distributed architectures seamlessly.",
+    "paper": "High-Throughput Distributed Token Processing on Campus Clusters",
+    "image": "./pfp/roshaan.jpg"
+  },
+  {
+    "id": "intern-5",
+    "name": "Muhammad Hammad Khan",
+    "term": "2025 – Present",
+    "project": "Data Science, RAG Systems & Agentic AI",
+    "university": "NED University (CSIT Department)",
+    "currentRole": "Research Fellow — AI Engineering & Knowledge Graphs",
+    "quote": "From fine-tuning small language models to deploying enterprise RAG pipelines, our work at AIR bridges academic theory and national impact.",
+    "paper": "Locally Hosted SLM Pipelines for Academic Document Synthesis",
+    "image": "./pfp/hammad.jpg"
+  },
+  {
+    "id": "intern-6",
+    "name": "Areeba Zehra Jafri",
+    "term": "2025 – Present",
+    "project": "Cybersecurity, Adversarial ML & Network Security",
+    "university": "NED University (CSIT Department)",
+    "currentRole": "Research Fellow — AI Safety & Memory Poisoning Defense",
+    "quote": "Our research addresses vulnerabilities in AI agents, pioneering lifecycle-aware provenance tracking to ensure secure and trustworthy autonomous systems.",
+    "paper": "Lifecycle-Aware Provenance for Mitigating Persistent Memory Poisoning",
+    "image": "./pfp/areeba.jpeg"
+  }
+]

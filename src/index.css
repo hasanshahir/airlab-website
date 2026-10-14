@@ -1,0 +1,361 @@
+/* AIR Lab — Unified Cruzeon Design System: Neo-Grotesk, Comprehensive Tokenized Palette */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300..800;1,300..800&display=swap');
+@import "tailwindcss";
+
+/* ── 1. DESIGN TOKENS (Source of Truth) ── */
+:root {
+  /* ── Coherent Typography Token (Single Unified Family Globally) ── */
+  --font-family-base: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-family-base);
+  --font-head: var(--font-family-base);
+  --font-display: var(--font-family-base);
+  --font-mono: var(--font-family-base);
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* ── Primary Palette Scale (Vivid Red-Orange) ── */
+  --color-primary-50: #FFF5F2;
+  --color-primary-100: #FFE8E1;
+  --color-primary-200: #FFD2C4;
+  --color-primary-300: #FFAE97;
+  --color-primary-400: #FF7E5F;
+  --color-primary-500: #F04E1F; /* Brand Primary */
+  --color-primary-600: #D83F12;
+  --color-primary-700: #B4300B;
+  --color-primary-800: #8E2609;
+  --color-primary-900: #681B05;
+
+  /* ── Accent Palette Scale (Electric Violet) ── */
+  --color-accent-50: #F6F3FE;
+  --color-accent-100: #EDE6FD;
+  --color-accent-200: #DCCDFB;
+  --color-accent-300: #C3AAF8;
+  --color-accent-400: #A47EF3;
+  --color-accent-500: #6B3FE6; /* Brand Accent */
+  --color-accent-600: #5A2FD4;
+  --color-accent-700: #4822B0;
+  --color-accent-800: #37188D;
+  --color-accent-900: #260F68;
+
+  /* ── Neutral Palette Scale (Refined Lavender Slate) ── */
+  --color-neutral-50: #FAF9FC;
+  --color-neutral-100: #F3F1F7;
+  --color-neutral-200: #E5E1EA;
+  --color-neutral-300: #D4CEDC;
+  --color-neutral-400: #A29DAE;
+  --color-neutral-500: #7A7585;
+  --color-neutral-600: #524E5B;
+  --color-neutral-700: #2C2933;
+  --color-neutral-800: #1E1B24;
+  --color-neutral-900: #121017;
+  --color-neutral-950: #0A090D;
+
+  /* ── Semantic Colors: Success (Emerald) ── */
+  --color-success-50: #ECFDF5;
+  --color-success-100: #D1FAE5;
+  --color-success-200: #A7F3D0;
+  --color-success-300: #6EE7B7;
+  --color-success-400: #34D399;
+  --color-success-500: #10B981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065F46;
+  --color-success-900: #064E3B;
+
+  /* ── Semantic Colors: Warning (Amber) ── */
+  --color-warning-50: #FFFBEB;
+  --color-warning-100: #FEF3C7;
+  --color-warning-200: #FDE68A;
+  --color-warning-300: #FCD34D;
+  --color-warning-400: #FBBF24;
+  --color-warning-500: #F59E0B;
+  --color-warning-600: #D97706;
+  --color-warning-700: #B45309;
+  --color-warning-800: #92400E;
+  --color-warning-900: #78350F;
+
+  /* ── Semantic Colors: Error / Danger (Rose) ── */
+  --color-error-50: #FFF1F2;
+  --color-error-100: #FFE4E6;
+  --color-error-200: #FECDD3;
+  --color-error-300: #FDA4AF;
+  --color-error-400: #FB7185;
+  --color-error-500: #F43F5E;
+  --color-error-600: #E11D48;
+  --color-error-700: #BE123C;
+  --color-error-800: #9F1239;
+  --color-error-900: #881337;
+
+  /* ── Semantic Colors: Info (Sky) ── */
+  --color-info-50: #F0F9FF;
+  --color-info-100: #E0F2FE;
+  --color-info-200: #BAE6FD;
+  --color-info-300: #7DD3FC;
+  --color-info-400: #38BDF8;
+  --color-info-500: #0EA5E9;
+  --color-info-600: #0284C7;
+  --color-info-700: #0369A1;
+  --color-info-800: #075985;
+  --color-info-900: #0C4A6E;
+
+  /* ── Surface & Canvas Mappings (Light Mode) ── */
+  --bg-page: var(--color-neutral-50);
+  --bg-backdrop: #ECE7F2;
+  --bg-surface: #FFFFFF;
+  --bg-surface-glass: rgba(255, 255, 255, 0.96);
+
+  /* Vivid Accents */
+  --accent-orange: var(--color-primary-500);
+  --accent-orange-hover: var(--color-primary-600);
+  --accent-orange-light: var(--color-primary-50);
+  --accent-purple: var(--color-accent-500);
+  --accent-purple-hover: var(--color-accent-600);
+  --accent-purple-light: var(--color-accent-50);
+
+  /* Semantic State Aliases */
+  --success: var(--color-success-600);
+  --warning: var(--color-warning-600);
+  --error: var(--color-error-600);
+  --info: var(--color-info-600);
+
+  /* Ecosystem Aliases */
+  --primary: var(--accent-orange);
+  --primary-hover: var(--accent-orange-hover);
+  --primary-light: var(--accent-orange-light);
+  --secondary: var(--accent-purple);
+  --secondary-hover: var(--accent-purple-hover);
+  --secondary-light: var(--accent-purple-light);
+
+  --bg: var(--bg-page);
+  --surface: var(--bg-surface);
+  --surface-alt: var(--color-neutral-100);
+
+  /* Typography Colors */
+  --text-primary: var(--color-neutral-900);
+  --text-muted: var(--color-neutral-600);
+  --text-subtle: var(--color-neutral-500);
+
+  --ink: var(--text-primary);
+  --ink-2: var(--text-muted);
+  --ink-3: var(--text-subtle);
+
+  /* Borders */
+  --border-hairline: var(--color-neutral-200);
+  --border-hairline-dark: var(--color-neutral-300);
+  --line: var(--border-hairline);
+  --line-strong: var(--text-primary);
+
+  /* Sharp Rectangular Geometry */
+  --radius-btn: 2px;
+  --radius-card: 4px;
+  --radius-inner: 2px;
+  --radius-pill: 2px;
+
+  --shadow-sm: 0 1px 2px rgba(17, 17, 17, 0.04);
+  --shadow-card: 0 1px 3px rgba(17, 17, 17, 0.03), 0 8px 24px rgba(197, 185, 206, 0.10);
+  --shadow-hover: 0 4px 12px rgba(17, 17, 17, 0.06), 0 14px 30px rgba(240, 78, 31, 0.10);
+}
+
+/* ── Dark Theme Overrides ── */
+.dark, [data-theme="dark"] {
+  --bg-page: var(--color-neutral-900);
+  --bg-backdrop: var(--color-neutral-950);
+  --bg-surface: var(--color-neutral-800);
+  --bg-surface-glass: rgba(30, 27, 36, 0.96);
+
+  --text-primary: var(--color-neutral-50);
+  --text-muted: var(--color-neutral-300);
+  --text-subtle: var(--color-neutral-400);
+
+  --border-hairline: var(--color-neutral-700);
+  --border-hairline-dark: var(--color-neutral-600);
+  --surface-alt: var(--color-neutral-800);
+
+  --accent-orange-light: rgba(240, 78, 31, 0.15);
+  --accent-purple-light: rgba(107, 63, 230, 0.15);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 4px 14px rgba(0, 0, 0, 0.4), 0 14px 30px rgba(240, 78, 31, 0.15);
+}
+
+/* ── Tailwind Theme Mapping ── */
+@theme inline {
+  --color-bg-page: var(--bg-page);
+  --color-bg-backdrop: var(--bg-backdrop);
+  --color-bg-surface: var(--bg-surface);
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-orange-hover: var(--accent-orange-hover);
+  --color-accent-orange-light: var(--accent-orange-light);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-purple-hover: var(--accent-purple-hover);
+  --color-accent-purple-light: var(--accent-purple-light);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-border-hairline: var(--border-hairline);
+
+  --color-bg: var(--bg-page);
+  --color-surface: var(--bg-surface);
+  --color-primary: var(--accent-orange);
+  --color-secondary: var(--accent-purple);
+  --color-ink: var(--text-primary);
+  --color-ink-2: var(--text-muted);
+  --color-ink-3: var(--text-subtle);
+  --color-line: var(--border-hairline);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+
+  --font-sans: var(--font-sans);
+  --font-head: var(--font-head);
+  --font-mono: var(--font-mono);
+}
+
+/* ── Base Styling (Clean Neo-Grotesk Typography & Contrast) ── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    background-color: var(--bg-backdrop);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Display & Wordmarks: Weight 700, Tight Tracking -0.04em, line-height 1.0 */
+  .display-wordmark, .hero-display {
+    font-family: var(--font-head);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.0;
+    color: var(--text-primary);
+  }
+
+  /* Section Headings: Weight 300 to 400, 36 to 48px, Tracking -0.02em, line-height 1.1 */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-head);
+    color: var(--text-primary);
+  }
+
+  h1 {
+    font-weight: 400;
+    font-size: clamp(38px, 5.5vw, 64px);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+  }
+
+  h2 {
+    font-weight: 400;
+    font-size: clamp(30px, 3.8vw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h3 {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+
+  button, input, select, textarea {
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background: var(--accent-orange);
+    color: #FFFFFF;
+  }
+}
+
+/* ── Reference Components & Utilities ── */
+@layer utilities {
+  .ft-container {
+    max-width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  /* Sharp rectangular cards with hairline border */
+  .craftly-card, .ft-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  .craftly-card:hover, .ft-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--border-hairline-dark);
+  }
+
+  /* Dotted grid canvas */
+  .ft-dotted-grid {
+    background-image: radial-gradient(circle, #D8D4DD 1.1px, transparent 1.1px);
+    background-size: 16px 16px;
+  }
+
+  /* Full-width CTA / Newsletter Band (Vivid Red-Orange with White Text) */
+  .cta-orange-band {
+    background-color: var(--accent-orange);
+    color: #FFFFFF;
+  }
+
+  /* Electric Purple Highlight Card */
+  .highlight-purple-card {
+    background-color: var(--accent-purple);
+    color: #FFFFFF;
+  }
+
+  /* Subtle Hero Ambient Aura (Orange to Purple) */
+  .hero-ambient-glow {
+    background: radial-gradient(circle at 50% 30%, rgba(240, 78, 31, 0.12) 0%, rgba(107, 63, 230, 0.08) 45%, transparent 70%);
+  }
+
+  /* Sharp rectangular mock window */
+  .ft-window {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(17, 17, 17, 0.05);
+  }
+
+  .portrait-grayscale {
+    filter: none;
+    transition: transform 300ms ease;
+  }
+}

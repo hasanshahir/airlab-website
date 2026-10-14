@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "How We Built UrduBERT in 6 Months with Limited GPU Budget",
+    "author": "Bilal Ahmed",
+    "date": "Sep 2026",
+    "excerpt": "Building a competitive language model from scratch on a shoestring compute budget — lessons from the AIR Lab trenches.",
+    "tag": "Engineering"
+  },
+  {
+    "id": 2,
+    "title": "Why Pakistani Sign Language Deserves More AI Research Attention",
+    "author": "Aiman Siddiqui",
+    "date": "Aug 2026",
+    "excerpt": "With 1.5 million deaf individuals in Pakistan, sign language recognition is not just a research problem — it is a social imperative.",
+    "tag": "Research"
+  },
+  {
+    "id": 3,
+    "title": "Edge AI in the Wild: Deploying Models on Resource-Constrained Hardware",
+    "author": "Hina Farooq",
+    "date": "Jul 2026",
+    "excerpt": "From PyTorch prototypes to TFLite deployments on Raspberry Pi 4 — our end-to-end edge AI workflow.",
+    "tag": "Tutorial"
+  }
+]

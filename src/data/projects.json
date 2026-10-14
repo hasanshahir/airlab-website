@@ -1,0 +1,259 @@
+[
+  {
+    "id": 1,
+    "title": "Connected Identity Intelligence Platform for Digital Investigation",
+    "category": "Funded",
+    "description": "This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.",
+    "funding": "Government of Sindh — Sindh Higher Education Commission (Sindh HEC)",
+    "grantSupplier": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
+    "grantAmount": "Rs. 5 million",
+    "pi": "Dr. Murk Marvi",
+    "funderUrl": "https://sindhhec.gov.pk/",
+    "programTitle": "Sindh Research Support Program",
+    "timeTaken": "June 26 - Present",
+    "grantId": "grant-sindh-hec-identity",
+    "status": "Ongoing",
+    "startDate": "June 2026",
+    "endDate": "Present",
+    "coverImage": "https://i.ibb.co/0pLB2b49/project-04.jpg",
+    "images": [
+      "https://i.ibb.co/0pLB2b49/project-04.jpg"
+    ],
+    "tags": ["Multilingual NER", "Identity Intelligence", "Urdu NLP", "Face Matching", "Sindh HEC"],
+    "memberIds": ["f1", "ri1", "ri3"],
+    "placeholder": false
+  },
+  {
+    "id": 2,
+    "title": "Integrated Information Discovery System for Digital Investigation",
+    "category": "Funded",
+    "description": "This project builds an on-premises investigation workspace for regulatory, compliance, audit, and journalistic work. Investigators usually start with little information about a subject and spend hours gathering and cross-checking public data from disconnected sites and tools. The platform cuts that work to minutes while keeping every result traceable to its source and a human in control.",
+    "funding": "Government of Sindh — Sindh Higher Education Commission (Sindh HEC)",
+    "grantSupplier": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
+    "grantAmount": "Rs. 5 million",
+    "pi": "Prof. Dr. Muhammad Mubashir Khan",
+    "funderUrl": "https://sindhhec.gov.pk/",
+    "programTitle": "Sindh Research Support Program",
+    "timeTaken": "June 26 - Present",
+    "grantId": "grant-sindh-hec-discovery",
+    "status": "Ongoing",
+    "startDate": "June 2026",
+    "endDate": "Present",
+    "coverImage": "https://i.ibb.co/gML0Tzsv/project-05.jpg",
+    "images": [
+      "https://i.ibb.co/gML0Tzsv/project-05.jpg"
+    ],
+    "tags": ["Digital Forensics", "Information Discovery", "OSINT", "Audit & Compliance", "Sindh HEC"],
+    "memberIds": ["f2", "ri6", "ri8"],
+    "placeholder": false
+  },
+  {
+    "id": 3,
+    "title": "AutoGradeHub – Automated Assignment Grading and Feedback System",
+    "category": "Undergraduate",
+    "description": "AutoGradeHub is an AI-powered system that automatically grades programming assignments by running code in a secure environment against predefined test cases. It gives students detailed feedback, flags plagiarism, and gives teachers analytics on class performance. This saves teachers grading time and helps students learn from consistent, timely feedback.",
+    "funding": "Undergraduate FYDP",
+    "grantSupplier": "NA",
+    "grantAmount": "NA",
+    "timeTaken": "Aug 25 - May 26",
+    "teamMembers": [
+      "Duaa Salman (CT-22009)",
+      "Maryam Shaikh (CT-22012)",
+      "Muhammad Ali (CT-22044)",
+      "Zaid Rahman (CT-22047)"
+    ],
+    "status": "Finished",
+    "startDate": "Aug 2025",
+    "endDate": "May 2026",
+    "coverImage": "https://i.ibb.co/hx2y1jNQ/project-01.jpg",
+    "images": [
+      "https://i.ibb.co/hx2y1jNQ/project-01.jpg"
+    ],
+    "tags": ["Automated Grading", "Code Analysis", "Plagiarism Detection", "Pedagogy AI"],
+    "memberIds": ["ri1", "ri2"],
+    "placeholder": false
+  },
+  {
+    "id": 4,
+    "title": "Development of Voice Based Agent for Collecting Post-Ambulance Service Feedback",
+    "category": "Undergraduate",
+    "description": "This project builds a fully offline, locally run voice agent that automates post-ambulance feedback calls for emergency medical services (SIEHS). Manual feedback collection is costly and ties up call agents who should be available for emergencies, and keeping everything local protects patient privacy.",
+    "funding": "Undergraduate FYDP (in collaboration with SIEHS)",
+    "grantSupplier": "NA",
+    "grantAmount": "NA",
+    "timeTaken": "Aug 25 - May 26",
+    "teamMembers": [
+      "Hasan Mohi Uddin (CT-22024)",
+      "Kumel Ahmed (CT-22034)",
+      "Muhammad Azlan Asim (CT-22036)",
+      "Shahzaib Ahmed (CT-22042)"
+    ],
+    "status": "Finished",
+    "startDate": "Aug 2025",
+    "endDate": "May 2026",
+    "coverImage": "https://i.ibb.co/Ym6hVqj/project-02.jpg",
+    "images": [
+      "https://i.ibb.co/Ym6hVqj/project-02.jpg"
+    ],
+    "tags": ["Voice Agent", "Speech-to-Text", "Healthcare AI", "SIEHS Emergency Services", "Privacy AI"],
+    "memberIds": ["ri3", "ri7"],
+    "placeholder": false
+  },
+  {
+    "id": 5,
+    "title": "Strategic Agent – Real-Time Market Intelligence System for Smart Insights",
+    "category": "Undergraduate",
+    "description": "Strategic Agent is an AI platform that replaces the manual tracking B2B teams do on their competitors. Price changes, leadership news, product launches and hiring surges appear across dozens of sources, and people can’t follow them all by hand.",
+    "funding": "Undergraduate FYDP",
+    "grantSupplier": "NA",
+    "grantAmount": "NA",
+    "timeTaken": "Aug 25 - May 26",
+    "teamMembers": [
+      "Syed Anas Ahmed (AI-22013)",
+      "Fareeha Fatima (AI-22023)",
+      "Faraz Ahmed (AI-22028)",
+      "Sajeel Tariq (AI-22029)"
+    ],
+    "status": "Finished",
+    "startDate": "Aug 2025",
+    "endDate": "May 2026",
+    "coverImage": "https://i.ibb.co/b5h1NMbT/project-03.jpg",
+    "images": [
+      "https://i.ibb.co/b5h1NMbT/project-03.jpg"
+    ],
+    "tags": ["Market Intelligence", "B2B Analytics", "Competitive Intel", "AI Agents"],
+    "memberIds": ["ri4", "ri5"],
+    "placeholder": false
+  },
+  {
+    "id": 6,
+    "title": "An Agentic AI-Powered Tour Guide for Safer and Smarter Travel in Pakistan",
+    "category": "Undergraduate",
+    "description": "The Intelligent Travel Agent is an AI platform from NED University of Engineering and Technology (NEDUET) that automates family holiday planning in Pakistan. Planning a trip today means manually comparing many separate sources for tickets, hotels, activities, weather and road conditions. That is stressful, slow and risky, and families often miss better budget options or end up paying for traditional tour guides.",
+    "funding": "NEDAASC Funded",
+    "grantSupplier": "NEDAASC",
+    "grantAmount": "Rs. 97,000",
+    "grantId": "grant-nedaasc-travel",
+    "timeTaken": "Aug 25 - May 26",
+    "teamMembers": [
+      "Laibah Shahid (CT-22061)",
+      "Tooba Kashaf (CT-22068)",
+      "Haiqa Siddiqua (CT-22071)",
+      "Muhammad Zohaib Khan (CT-22072)"
+    ],
+    "status": "Finished",
+    "startDate": "Aug 2025",
+    "endDate": "May 2026",
+    "coverImage": "https://i.ibb.co/7JvNqgD4/project-06.jpg",
+    "images": [
+      "https://i.ibb.co/7JvNqgD4/project-06.jpg"
+    ],
+    "tags": ["Agentic AI", "Travel Assistant", "Pakistan Tourism", "Budget Optimization", "NEDAASC"],
+    "memberIds": ["ri2", "ri9"],
+    "placeholder": false
+  },
+  {
+    "id": 7,
+    "title": "Familiar: Quality-Aware Face Recognition System for Pakistani Subjects",
+    "category": "Undergraduate",
+    "description": "This project builds a quality-aware face retrieval system for Pakistani subjects, using face embeddings and a two-stage search: fast vector indexing to shortlist candidates, then AI-based refinement of the Top-K matches. It aims to stay accurate under challenging conditions like blur, low resolution, pose, lighting, glasses and facial hair, while remaining efficient on large databases. The prototype is intended for authorized uses such as searching campus camera footage, with humans making the final decision.",
+    "funding": "Indigenous Dataset Collection & Research Project",
+    "grantSupplier": "NA",
+    "grantAmount": "NA",
+    "timeTaken": "Aug 26 - May 27",
+    "teamMembers": [
+      "Muhammad Obaid (CT-23025)",
+      "Akhyar Ahmed Turk (CT-23034)",
+      "Muhammad Rehan (CT-23039)",
+      "Qazi Asim Kamal (CT-23044)"
+    ],
+    "status": "Ongoing",
+    "startDate": "Aug 2026",
+    "endDate": "May 2027",
+    "coverImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
+    ],
+    "tags": ["Biometrics", "Face Recognition", "Pakistani Demographics", "Vector Indexing", "Computer Vision"],
+    "memberIds": ["ri1", "ri3"],
+    "placeholder": false
+  },
+  {
+    "id": 8,
+    "title": "ScholarX: Locally Hosted SLM-Powered Platform for End-to-End Academic Research",
+    "category": "Undergraduate",
+    "description": "This project proposes a locally hosted, web-based research assistant for NED UET that uses small language models to summarize papers, compare them thematically and methodologically, and help draft new papers with LaTeX support. Because everything runs on campus hardware, unpublished research never leaves the institution, which avoids the privacy and IP risks of cloud LLMs while still delivering competitive quality.",
+    "funding": "On-Premises SLM Infrastructure",
+    "grantSupplier": "NA",
+    "grantAmount": "NA",
+    "timeTaken": "Aug 26 - May 27",
+    "teamMembers": [
+      "Muhammad Ahmed Hasan (DT-23014)",
+      "Muhammad Raahim Rizwan (DT-23015)",
+      "Muhammad Huzaifa Baig (DT-23018)",
+      "Muhammad Uzaim Naseem (DT-23047)"
+    ],
+    "status": "Ongoing",
+    "startDate": "Aug 2026",
+    "endDate": "May 2027",
+    "coverImage": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80"
+    ],
+    "tags": ["SLM", "Academic Research", "Local Inference", "LaTeX Compilation", "Data Sovereignty"],
+    "memberIds": ["ri8", "ri9"],
+    "placeholder": false
+  },
+  {
+    "id": 9,
+    "title": "MemTrace: Lifecycle-Aware Provenance for Detecting and Mitigating Memory Poisoning Attacks in LLM Agents",
+    "category": "Undergraduate",
+    "description": "MemTrace is a security framework that protects LLM agents’ persistent memory from poisoning, where false or malicious information gets stored and later influences the agent across sessions. Instead of checking memory at only one stage, it tracks each entry’s origin, trust level and history through six lifecycle stages (write, store, retrieve, use, propagate, forget/rollback) and uses that provenance to flag, isolate, delete or roll back suspicious memories.",
+    "funding": "LLM Security & Agent Provenance Research",
+    "grantSupplier": "NA",
+    "grantAmount": "NA",
+    "timeTaken": "Aug 26 - May 27",
+    "teamMembers": [
+      "Rameen (CT-23004)",
+      "Tooba Rehman (CT-23011)",
+      "Fatima (CT-23012)",
+      "Huda Imran (CT-23015)"
+    ],
+    "status": "Ongoing",
+    "startDate": "Aug 2026",
+    "endDate": "May 2027",
+    "coverImage": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80"
+    ],
+    "tags": ["LLM Security", "Memory Poisoning", "AI Safety", "Agent Provenance", "Adversarial AI"],
+    "memberIds": ["ri6", "ri10"],
+    "placeholder": false
+  },
+  {
+    "id": 10,
+    "title": "Naqshkaar: A Multimodal AI System for Constraint-Aware 3D Interior Design Generation",
+    "category": "Undergraduate",
+    "description": "Naqshkaar is an AI interior design platform for Pakistan that generates 3D room designs from a real catalogue of purchasable local products, scaled to true room dimensions and checked against space and budget limits. Unlike tools such as Planner 5D or RoomGPT, it uses PKR prices, accounts for local needs like ceiling-fan clearance, AC and UPS placement, and prayer space, and lets users pick each item from AI-shortlisted options. The result is a design they can visualize and buy, with an itemised cost estimate and direct purchase links.",
+    "funding": "Multimodal Generative 3D Platform",
+    "grantSupplier": "NA",
+    "grantAmount": "NA",
+    "timeTaken": "Aug 26 - May 27",
+    "teamMembers": [
+      "Mureed Hussain (Team Lead - CT-23036)",
+      "Muhammad Sami (CT-23027)",
+      "Faiq Ahmed (CT-23030)",
+      "Muhammad Sameed (CT-23046)"
+    ],
+    "status": "Ongoing",
+    "startDate": "Aug 2026",
+    "endDate": "May 2027",
+    "coverImage": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80"
+    ],
+    "tags": ["3D Interior Design", "Generative AI", "Multimodal AI", "PKR Catalogue", "Spatial Constraints"],
+    "memberIds": ["ri4", "ri7"],
+    "placeholder": false
+  }
+]
