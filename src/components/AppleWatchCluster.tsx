@@ -54,7 +54,8 @@ interface ActiveCardState {
   member: TeamMemberEntity
   left: number
   top: number
-  isLeftAligned: boolean
+  isAbove: boolean
+  arrowLeft: number
 }
 
 const LinkedinIcon = ({ className = 'w-3 h-3' }: { className?: string }) => (
@@ -279,46 +280,40 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
     const currentScale = node.currentScale
     const renderedRadius = (baseBubbleSize * currentScale) / 2
 
-    const cardWidth = 260
-    const cardHeight = 150
-    const gap = 14
+    const cardWidth = 240
+    const cardHeight = 138
+    const gap = 12
 
     const halfW = containerSize.width / 2
     const halfH = containerSize.height / 2
 
-    let cardLeft: number
-    let isLeftAligned = false
-
-    if (node.currentX >= 0) {
-      // Bubble on right side -> place card to the left
-      cardLeft = node.currentX - renderedRadius - cardWidth - gap
-      if (cardLeft < -halfW + 16) {
-        cardLeft = node.currentX + renderedRadius + gap
-        isLeftAligned = false
-      } else {
-        isLeftAligned = true
+    let isAbove = node.currentY >= 0
+    let cardTop: number
+    if (isAbove) {
+      cardTop = node.currentY - renderedRadius - cardHeight - gap
+      if (cardTop < -halfH + 12) {
+        cardTop = node.currentY + renderedRadius + gap
+        isAbove = false
       }
     } else {
-      // Bubble on left side -> place card to the right
-      cardLeft = node.currentX + renderedRadius + gap
-      if (cardLeft + cardWidth > halfW - 16) {
-        cardLeft = node.currentX - renderedRadius - cardWidth - gap
-        isLeftAligned = true
-      } else {
-        isLeftAligned = false
+      cardTop = node.currentY + renderedRadius + gap
+      if (cardTop + cardHeight > halfH - 12) {
+        cardTop = node.currentY - renderedRadius - cardHeight - gap
+        isAbove = true
       }
     }
 
-    let cardTop = node.currentY - cardHeight / 2
-    const minTop = -halfH + 16
-    const maxTop = halfH - cardHeight - 16
-    cardTop = Math.max(minTop, Math.min(maxTop, cardTop))
+    let cardLeft = node.currentX - cardWidth / 2
+    cardLeft = Math.max(-halfW + 12, Math.min(halfW - cardWidth - 12, cardLeft))
+
+    const arrowLeft = Math.max(16, Math.min(cardWidth - 16, node.currentX - cardLeft))
 
     setActiveCardMember({
       member,
       left: Math.round(cardLeft),
       top: Math.round(cardTop),
-      isLeftAligned,
+      isAbove,
+      arrowLeft: Math.round(arrowLeft),
     })
   }, [layout.baseBubbleSize, containerSize])
 
@@ -429,27 +424,30 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
       const activeNode = nodes.find(n => n.member.id === activeMemberIdRef.current)
       if (activeNode) {
         const renderedRadius = (baseBubbleSize * activeNode.currentScale) / 2
-        const cardWidth = 260
-        const cardHeight = 150
-        const gap = 14
+        const cardWidth = 240
+        const cardHeight = 138
+        const gap = 12
         const halfW = containerSize.width / 2
         const halfH = containerSize.height / 2
 
-        let cardLeft: number
-        if (activeNode.currentX >= 0) {
-          cardLeft = activeNode.currentX - renderedRadius - cardWidth - gap
-          if (cardLeft < -halfW + 16) {
-            cardLeft = activeNode.currentX + renderedRadius + gap
+        let isAbove = activeNode.currentY >= 0
+        let cardTop: number
+        if (isAbove) {
+          cardTop = activeNode.currentY - renderedRadius - cardHeight - gap
+          if (cardTop < -halfH + 12) {
+            cardTop = activeNode.currentY + renderedRadius + gap
+            isAbove = false
           }
         } else {
-          cardLeft = activeNode.currentX + renderedRadius + gap
-          if (cardLeft + cardWidth > halfW - 16) {
-            cardLeft = activeNode.currentX - renderedRadius - cardWidth - gap
+          cardTop = activeNode.currentY + renderedRadius + gap
+          if (cardTop + cardHeight > halfH - 12) {
+            cardTop = activeNode.currentY - renderedRadius - cardHeight - gap
+            isAbove = true
           }
         }
 
-        let cardTop = activeNode.currentY - cardHeight / 2
-        cardTop = Math.max(-halfH + 16, Math.min(halfH - cardHeight - 16, cardTop))
+        let cardLeft = activeNode.currentX - cardWidth / 2
+        cardLeft = Math.max(-halfW + 12, Math.min(halfW - cardWidth - 12, cardLeft))
 
         cardRef.current.style.transform = `translate3d(${Math.round(cardLeft)}px, ${Math.round(cardTop)}px, 0px)`
       }
@@ -740,7 +738,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
           })}
         </div>
 
-        {/* ── Dedicated Sibling Hover Card Layer (Directly adjacent to bubble) ── */}
+        {/* ── Dedicated Sibling Hover Card Layer (Directly adjacent popover with pointer) ── */}
         <div className="absolute inset-0 pointer-events-none z-50">
           <AnimatePresence>
             {activeCardMember && (
@@ -751,7 +749,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                   left: '50%',
                   top: '50%',
                   transform: `translate3d(${activeCardMember.left}px, ${activeCardMember.top}px, 0px)`,
-                  width: '260px',
+                  width: '240px',
                   pointerEvents: 'auto',
                   zIndex: 90,
                   willChange: 'transform',
@@ -764,52 +762,61 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.12, ease: 'easeOut' }}
-                  className="p-4 rounded-[8px] bg-[var(--bg-surface)]/98 backdrop-blur-md border border-[var(--border-hairline)] shadow-2xl text-left cursor-default hover:border-[var(--accent-orange)] transition-colors relative"
+                  className="p-3.5 rounded-[8px] bg-[var(--bg-surface)]/98 backdrop-blur-md border border-[var(--border-hairline)] shadow-2xl text-left cursor-default hover:border-[var(--accent-orange)] transition-colors relative"
                   onMouseEnter={handleCardMouseEnter}
                   onMouseLeave={handleCardMouseLeave}
                   onClick={e => e.stopPropagation()}
                 >
                   {/* Invisible Hover-Bridge Extension to guarantee 100% gapless mouse travel */}
                   <div
-                    className="absolute inset-y-0 pointer-events-auto"
-                    style={{
-                      [activeCardMember.isLeftAligned ? 'right' : 'left']: '-20px',
-                      width: '24px',
-                    }}
+                    className={`absolute inset-x-0 h-4 pointer-events-auto ${
+                      activeCardMember.isAbove ? '-bottom-4' : '-top-4'
+                    }`}
+                    aria-hidden="true"
+                  />
+
+                  {/* Popover Arrow Indicator pointing to the active bubble */}
+                  <div
+                    className={`absolute w-2.5 h-2.5 bg-[var(--bg-surface)] border-[var(--border-hairline)] rotate-45 pointer-events-none ${
+                      activeCardMember.isAbove
+                        ? '-bottom-1.5 border-r border-b'
+                        : '-top-1.5 border-l border-t'
+                    }`}
+                    style={{ left: `${activeCardMember.arrowLeft - 5}px` }}
                     aria-hidden="true"
                   />
 
                   {/* Role Badge */}
-                  <div className="text-[10px] font-mono font-bold text-[var(--accent-orange)] uppercase tracking-wider mb-0.5">
+                  <div className="text-[9.5px] font-mono font-bold text-[var(--accent-orange)] uppercase tracking-wider mb-0.5">
                     {activeCardMember.member.role}
                   </div>
 
                   {/* Name */}
-                  <div className="text-[14.5px] font-bold text-[var(--text-primary)] leading-tight font-head tracking-tight">
+                  <div className="text-[14px] font-bold text-[var(--text-primary)] leading-tight font-head tracking-tight">
                     {activeCardMember.member.name}
                   </div>
 
                   {/* Department */}
-                  <div className="text-[11.5px] text-[var(--text-muted)] font-mono mt-0.5 line-clamp-1">
+                  <div className="text-[11px] text-[var(--text-muted)] font-mono mt-0.5 line-clamp-1">
                     {activeCardMember.member.department}
                   </div>
 
                   {/* Research Focus */}
                   {activeCardMember.member.researchFocus && (
-                    <div className="mt-2 text-[11px] font-medium text-[var(--accent-purple)] bg-[var(--accent-purple-light)] py-1 px-2.5 rounded-[4px] leading-snug line-clamp-2">
+                    <div className="mt-1.5 text-[10.5px] font-medium text-[var(--accent-purple)] bg-[var(--accent-purple-light)] py-0.5 px-2 rounded-[3px] leading-tight line-clamp-2">
                       {activeCardMember.member.researchFocus}
                     </div>
                   )}
 
                   {/* Tenure */}
                   {activeCardMember.member.tenure && (
-                    <div className="text-[10.5px] text-[var(--text-subtle)] font-mono mt-1.5">
+                    <div className="text-[10px] text-[var(--text-subtle)] font-mono mt-1">
                       Tenure: {activeCardMember.member.tenure}
                     </div>
                   )}
 
                   {/* Actions (LinkedIn, Email, View Card) */}
-                  <div className="flex items-center justify-between gap-1 mt-3.5 pt-2.5 border-t border-[var(--border-hairline)]">
+                  <div className="flex items-center justify-between gap-1 mt-3 pt-2 border-t border-[var(--border-hairline)]">
                     <div className="flex items-center gap-1.5">
                       {activeCardMember.member.hasLinkedIn() && (
                         <a
@@ -818,9 +825,9 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                           rel="noopener noreferrer"
                           title="LinkedIn Profile"
                           onClick={e => e.stopPropagation()}
-                          className="w-7 h-7 rounded-[4px] bg-[var(--bg-page)] hover:bg-[var(--accent-orange)] text-[var(--text-muted)] hover:text-white flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+                          className="w-6.5 h-6.5 rounded-[3px] bg-[var(--bg-page)] hover:bg-[var(--accent-orange)] text-[var(--text-muted)] hover:text-white flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
                         >
-                          <LinkedinIcon className="w-3 h-3" />
+                          <LinkedinIcon className="w-2.5 h-2.5" />
                         </a>
                       )}
                       {activeCardMember.member.hasEmail() && (
@@ -828,9 +835,9 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                           href={activeCardMember.member.getEmailFallback()!}
                           title="Email member"
                           onClick={e => e.stopPropagation()}
-                          className="w-7 h-7 rounded-[4px] bg-[var(--bg-page)] hover:bg-[var(--accent-purple)] text-[var(--text-muted)] hover:text-white flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+                          className="w-6.5 h-6.5 rounded-[3px] bg-[var(--bg-page)] hover:bg-[var(--accent-purple)] text-[var(--text-muted)] hover:text-white flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
                         >
-                          <Mail className="w-3.5 h-3.5" />
+                          <Mail className="w-3 h-3" />
                         </a>
                       )}
                     </div>
@@ -840,10 +847,10 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                         onSelectMember(activeCardMember.member)
                         closeCard()
                       }}
-                      className="text-[11px] font-semibold text-[var(--accent-orange)] flex items-center gap-1 hover:underline cursor-pointer"
+                      className="text-[10.5px] font-semibold text-[var(--accent-orange)] flex items-center gap-1 hover:underline cursor-pointer"
                     >
                       <span>Full Bio</span>
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-2.5 h-2.5" />
                     </button>
                   </div>
                 </motion.div>
