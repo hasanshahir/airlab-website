@@ -1,0 +1,56 @@
+[
+  {
+    "id": "g-1",
+    "title": "Connected Identity Intelligence Platform",
+    "cat": "Research & Grants",
+    "date": "June 2026 — Present",
+    "desc": "Sindh Research Support Program funded project developing multilingual entity resolution, Urdu name variant generation, and face matching.",
+    "url": "https://i.ibb.co/0pLB2b49/project-04.jpg",
+    "span": "md:col-span-2 md:row-span-2"
+  },
+  {
+    "id": "g-2",
+    "title": "Integrated Information Discovery System",
+    "cat": "Digital Forensics",
+    "date": "June 2026 — Present",
+    "desc": "On-premises digital investigation workspace built for compliance and regulatory discovery, funded by Sindh Higher Education Commission.",
+    "url": "https://i.ibb.co/gML0Tzsv/project-05.jpg",
+    "span": "md:col-span-1 md:row-span-1"
+  },
+  {
+    "id": "g-3",
+    "title": "AutoGradeHub – Automated Code Grading Engine",
+    "cat": "Undergraduate",
+    "date": "Aug 2025 — May 2026",
+    "desc": "AI-powered automated programming assessment and instant semantic feedback platform developed by undergraduate researchers at NED CSIT.",
+    "url": "https://i.ibb.co/hx2y1jNQ/project-01.jpg",
+    "span": "md:col-span-1 md:row-span-2"
+  },
+  {
+    "id": "g-4",
+    "title": "Voice Based Agent for Post-Ambulance Feedback",
+    "cat": "Healthcare AI",
+    "date": "Aug 2025 — May 2026",
+    "desc": "Offline localized voice agent automating post-service emergency calls for medical dispatch in partnership with SIEHS.",
+    "url": "https://i.ibb.co/Ym6hVqj/project-02.jpg",
+    "span": "md:col-span-1 md:row-span-1"
+  },
+  {
+    "id": "g-5",
+    "title": "Strategic Agent – Real-Time Market Intelligence",
+    "cat": "Agentic AI",
+    "date": "Aug 2025 — May 2026",
+    "desc": "B2B competitive intelligence system autonomously tracking price shifts, executive moves, and product releases.",
+    "url": "https://i.ibb.co/b5h1NMbT/project-03.jpg",
+    "span": "md:col-span-1 md:row-span-1"
+  },
+  {
+    "id": "g-6",
+    "title": "Agentic AI-Powered Tour Guide for Pakistan",
+    "cat": "Funded",
+    "date": "Aug 2025 — May 2026",
+    "desc": "NEDAASC funded intelligent holiday planner optimizing family travel, weather forecasts, and route hazards in Pakistan.",
+    "url": "https://i.ibb.co/7JvNqgD4/project-06.jpg",
+    "span": "md:col-span-2 md:row-span-1"
+  }
+]

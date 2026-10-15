@@ -1,0 +1,50 @@
+[
+  {
+    "id": "collab-1",
+    "partner": "Google DeepMind",
+    "type": "Global Research Grant",
+    "focus": "Low-Resource Multilingual Foundation Models",
+    "period": "2024 — Present",
+    "description": "Joint initiative investigating transfer learning dynamics from high-resource Indo-Aryan languages to regional dialects, co-funded under Google Academic Research Awards.",
+    "grantAmount": "$120,000",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
+    "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
+    "outcomes": ["2 Joint Papers", "Open-source Dataset", "Compute Allocation"]
+  },
+  {
+    "id": "collab-2",
+    "partner": "Stanford HAI",
+    "type": "Academic Exchange & Advisory",
+    "focus": "Human-Centered AI & Healthcare Diagnostics",
+    "period": "2025 — Present",
+    "description": "Collaborative clinical validation framework applying vision-language models to resource-constrained regional clinical diagnostics in South Asia.",
+    "grantAmount": "Visiting Fellowship",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Seal_of_Leland_Stanford_Junior_University.svg",
+    "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
+    "outcomes": ["Clinical Trials", "Ethical AI Framework", "Faculty Sabbatical"]
+  },
+  {
+    "id": "collab-3",
+    "partner": "Ignite National Technology Fund",
+    "type": "Government Grant",
+    "focus": "NCBC National Center of Big Data & Cloud Computing",
+    "period": "2023 — 2026",
+    "description": "Anchor national laboratory grant supporting high-density GPU computing infrastructure, undergraduate fellowship stipends, and patent filings.",
+    "grantAmount": "PKR 45M",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Pakistan.svg",
+    "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+    "outcomes": ["GPU Cluster", "8 Sponsored PhDs", "3 Provisional Patents"]
+  },
+  {
+    "id": "collab-4",
+    "partner": "Meta AI (PyTorch Foundation)",
+    "type": "Open Source Ecosystem",
+    "focus": "Quantization & On-Device Neural Acceleration",
+    "period": "2025 — Present",
+    "description": "Benchmarking low-bit FP4 and INT4 quantization kernels for edge robotics platforms on ARM/RISC-V architectures.",
+    "grantAmount": "Hardware Grants",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80",
+    "outcomes": ["PyTorch Contrib", "Edge Runtime", "40+ Devices Deployed"]
+  }
+]

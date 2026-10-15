@@ -1,0 +1,83 @@
+[
+  {
+    "id": "grant-sindh-hec-identity",
+    "title": "Connected Identity Intelligence Platform for Digital Investigation",
+    "programTitle": "Sindh Research Support Program",
+    "funder": "Government of Sindh — Sindh Higher Education Commission (Sindh HEC)",
+    "amount": "Rs. 5.0 Million (PKR 5M)",
+    "duration": "June 2026 — Present",
+    "status": "Active",
+    "leadInvestigator": "Dr. Murk Marvi (PI)",
+    "description": "Addresses three under-studied identity resolution problems in Pakistan: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants with confidence scores, and demographic-fairness audited face matching on a regionally representative test set. Deliverables include trained models, annotated benchmark datasets, model cards, and an open API specification.",
+    "url": "https://sindhhec.gov.pk/",
+    "image": "https://i.ibb.co/0pLB2b49/project-04.jpg",
+    "placeholder": false
+  },
+  {
+    "id": "grant-sindh-hec-discovery",
+    "title": "Integrated Information Discovery System for Digital Investigation",
+    "programTitle": "Sindh Research Support Program",
+    "funder": "Government of Sindh — Sindh Higher Education Commission (Sindh HEC)",
+    "amount": "Rs. 5.0 Million (PKR 5M)",
+    "duration": "June 2026 — Present",
+    "status": "Active",
+    "leadInvestigator": "Prof. Dr. Muhammad Mubashir Khan (PI)",
+    "description": "An on-premises investigation workspace for regulatory, compliance, audit, and journalistic work. Cuts hours of manual gathering and cross-checking public data from disconnected sites down to minutes while keeping every result traceable to its source with human oversight.",
+    "url": "https://sindhhec.gov.pk/",
+    "image": "https://i.ibb.co/gML0Tzsv/project-05.jpg",
+    "placeholder": false
+  },
+  {
+    "id": "grant-nedaasc-travel",
+    "title": "An Agentic AI-Powered Tour Guide for Safer and Smarter Travel in Pakistan",
+    "programTitle": "NEDAASC Funded Initiative",
+    "funder": "NED Alumni Association of Southern California (NEDAASC)",
+    "amount": "Rs. 97,000",
+    "duration": "Aug 2025 — May 2026",
+    "status": "Completed",
+    "leadInvestigator": "Laibah Shahid (CT-22061) & Team",
+    "description": "An agentic AI holiday planning platform developed at NED University that automates family travel across Pakistan by synthesizing flights, hotels, live weather forecasts, road hazards, and regional budget optimization.",
+    "url": "https://nedaasc.org/",
+    "image": "https://i.ibb.co/7JvNqgD4/project-06.jpg",
+    "placeholder": false
+  },
+  {
+    "id": "grant-ignite-ncbc",
+    "title": "National Center of Big Data & Cloud Computing (NCBC) Testbed",
+    "programTitle": "National Computing Infrastructure",
+    "funder": "Ignite National Technology Fund",
+    "amount": "PKR 45.0M",
+    "duration": "2023 — 2026",
+    "status": "Active",
+    "leadInvestigator": "Dr. Murk Marvi",
+    "description": "GPU cluster infrastructure compute grant supporting federated multi-modal clinical diagnostic models and high-performance neural workloads across NED departments.",
+    "url": "https://ignite.org.pk",
+    "placeholder": false
+  },
+  {
+    "id": "grant-google-academic",
+    "title": "Low-Resource Regional Language Knowledge Distillation",
+    "programTitle": "Google Academic Research Awards",
+    "funder": "Google Research",
+    "amount": "$120,000",
+    "duration": "2024 — Present",
+    "status": "Active",
+    "leadInvestigator": "Dr. Murk Marvi",
+    "description": "Cross-lingual parameter-efficient fine-tuning exploring transfer from high-resource Indo-Aryan languages to regional scripts and vernacular low-resource Urdu NLP tasks.",
+    "url": "https://research.google",
+    "placeholder": false
+  },
+  {
+    "id": "grant-meta-pytorch",
+    "title": "Sub-4-Bit Quantized Edge Robotics Acceleration",
+    "programTitle": "PyTorch Hardware Initiative",
+    "funder": "PyTorch Foundation / Meta AI Hardware Grant",
+    "amount": "Hardware Compute Grant ($35,000 Equiv.)",
+    "duration": "2025 — Present",
+    "status": "Active",
+    "leadInvestigator": "Dr. Murk Marvi",
+    "description": "Edge deployment kernels testing INT4/FP4 quantization for embedded aerial UAV spatial visual odometry on embedded Jetson Orin boards.",
+    "url": "https://pytorch.org",
+    "placeholder": false
+  }
+]

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "sp-sindh-hec",
+    "name": "Sindh Higher Education Commission",
+    "type": "Sindh Research Support Program (SRSP)",
+    "tier": "Government & National",
+    "url": "https://sindhhec.gov.pk/",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Flag_of_Pakistan.svg/320px-Flag_of_Pakistan.svg.png",
+    "placeholder": false
+  },
+  {
+    "id": "sp-nedaasc",
+    "name": "NEDAASC (NED Alumni Association of Southern California)",
+    "type": "Student Innovation & Research Grants",
+    "tier": "Academic",
+    "url": "https://nedaasc.org/",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Seal_of_Leland_Stanford_Junior_University.svg",
+    "placeholder": false
+  },
+  {
+    "id": "sp-siehs",
+    "name": "SIEHS (Sindh Integrated Emergency & Health Services)",
+    "type": "Clinical Feedback & Voice Agent Deployment Partner",
+    "tier": "Government & National",
+    "url": "https://siehs.org/",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Flag_of_Pakistan.svg/320px-Flag_of_Pakistan.svg.png",
+    "placeholder": false
+  },
+  {
+    "id": "sp-ned",
+    "name": "NED University of Engg & Tech (CSIT)",
+    "type": "Host University & Research Computing Facilities",
+    "tier": "Academic",
+    "url": "https://www.neduet.edu.pk",
+    "logo": "https://cct.neduet.edu.pk/AIR/assets/img/ned-logo.png",
+    "placeholder": false
+  },
+  {
+    "id": "sp-hec",
+    "name": "Higher Education Commission (HEC Pakistan)",
+    "type": "National Research Programs for Universities (NRPU)",
+    "tier": "Government & National",
+    "url": "https://www.hec.gov.pk",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Flag_of_Pakistan.svg/320px-Flag_of_Pakistan.svg.png",
+    "placeholder": false
+  },
+  {
+    "id": "sp-ignite",
+    "name": "Ignite National Technology Fund",
+    "type": "NCBC Center of Big Data & Cloud Computing",
+    "tier": "Government & National",
+    "url": "https://ignite.org.pk",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Flag_of_Pakistan.svg/320px-Flag_of_Pakistan.svg.png",
+    "placeholder": false
+  },
+  {
+    "id": "sp-google",
+    "name": "Google Research",
+    "type": "Regional NLP Research & Academic Grants",
+    "tier": "Strategic Compute",
+    "url": "https://research.google",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
+    "placeholder": false
+  },
+  {
+    "id": "sp-meta",
+    "name": "Meta AI (PyTorch Foundation)",
+    "type": "Hardware Compute Grant & Open Frameworks",
+    "tier": "Strategic Compute",
+    "url": "https://ai.meta.com",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
+    "placeholder": false
+  },
+  {
+    "id": "sp-hf",
+    "name": "Hugging Face",
+    "type": "Open Model Hub & Evaluation Benchmarks",
+    "tier": "Strategic Compute",
+    "url": "https://huggingface.co",
+    "logo": "https://huggingface.co/front/assets/huggingface_logo-noborder.svg",
+    "placeholder": false
+  }
+]
