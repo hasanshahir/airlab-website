@@ -35,7 +35,11 @@ async function main() {
       continue
     }
 
-    const raw = JSON.parse(await readFile(file, 'utf8')) as Record<string, unknown>[]
+    let content = await readFile(file, 'utf8')
+    if (content.charCodeAt(0) === 0xfeff) {
+      content = content.slice(1)
+    }
+    const raw = JSON.parse(content) as Record<string, unknown>[]
     if (!Array.isArray(raw)) throw new Error(`${def.seedFile} is not a JSON array`)
 
     // Preserve the original array order (the site currently relies on it) unless an explicit order exists.
