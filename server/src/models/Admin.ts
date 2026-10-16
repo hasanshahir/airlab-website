@@ -13,4 +13,4 @@ const AdminSchema = new Schema(
 )
 
 export type Admin = InferSchemaType<typeof AdminSchema>
-export const AdminModel = mongoose.models.Admin ?? mongoose.model('Admin', AdminSchema)
+export const AdminModel: mongoose.Model<any> = mongoose.models.Admin || mongoose.model('Admin', AdminSchema)

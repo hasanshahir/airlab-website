@@ -18,4 +18,4 @@ const PositionSchema = new Schema(
 )
 
 export type Position = InferSchemaType<typeof PositionSchema>
-export const PositionModel = mongoose.models.Position ?? mongoose.model('Position', PositionSchema)
+export const PositionModel: mongoose.Model<any> = mongoose.models.Position || mongoose.model('Position', PositionSchema)

@@ -28,4 +28,4 @@ const ApplicationSchema = new Schema(
 )
 
 export type Application = InferSchemaType<typeof ApplicationSchema>
-export const ApplicationModel = mongoose.models.Application ?? mongoose.model('Application', ApplicationSchema)
+export const ApplicationModel: mongoose.Model<any> = mongoose.models.Application || mongoose.model('Application', ApplicationSchema)

@@ -55,7 +55,8 @@ function buildSchema(def: CollectionDef): Schema {
 
   // Items created in the admin panel get a stable public id automatically.
   schema.pre('validate', function () {
-    if (this.get('id') === undefined || this.get('id') === null || this.get('id') === '') {
+    const currentId = this.get('id')
+    if (currentId === undefined || currentId === null || String(currentId).trim() === '') {
       this.set('id', String(this._id))
     }
   })
