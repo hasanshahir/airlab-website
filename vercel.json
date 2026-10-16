@@ -1,31 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/api(/.*)?",
-      "destination": {
-        "type": "service",
-        "service": "airlab-backend"
-      }
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
     },
     {
       "source": "/(.*)",
-      "destination": {
-        "type": "service",
-        "service": "airlab-frontend"
-      }
+      "destination": "/index.html"
     }
-  ],
-  "services": {
-    "airlab-backend": {
-      "root": "server",
-      "entrypoint": "src/app.ts",
-      "buildCommand": "npm install && npm run build"
-    },
-    "airlab-frontend": {
-      "root": ".",
-      "framework": "vite",
-      "buildCommand": "npm install && npm run build",
-      "outputDirectory": "dist"
-    }
-  }
+  ]
 }
