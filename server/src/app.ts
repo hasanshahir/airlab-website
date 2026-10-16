@@ -7,6 +7,9 @@ import mongoose from 'mongoose'
 import { env, isProd } from './config/env.js'
 import { contentRouter } from './routes/content.js'
 import { positionsRouter } from './routes/positions.js'
+import { authRouter } from './routes/auth.js'
+import { applicationsRouter } from './routes/applications.js'
+import { adminCrudRouter } from './routes/admin.js'
 import { errorHandler, notFound } from './middleware/errors.js'
 
 export function createApp() {
@@ -23,7 +26,7 @@ export function createApp() {
       credentials: true, // admin auth will use httpOnly cookies
     }),
   )
-  app.use(express.json({ limit: '1mb' }))
+  app.use(express.json({ limit: '10mb' }))
   app.use(cookieParser())
   app.use(morgan(isProd ? 'combined' : 'dev'))
 
@@ -36,8 +39,11 @@ export function createApp() {
     })
   })
 
+  app.use('/api/auth', authRouter)
   app.use('/api/content', contentRouter)
   app.use('/api/positions', positionsRouter)
+  app.use('/api/applications', applicationsRouter)
+  app.use('/api/admin', adminCrudRouter)
 
   app.use('/api', notFound)
   app.use(errorHandler)

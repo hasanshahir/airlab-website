@@ -1,0 +1,113 @@
+import { Router } from 'express'
+import multer from 'multer'
+import { ApplicationModel } from '../models/Application.js'
+import { PositionModel } from '../models/Position.js'
+import { HttpError } from '../middleware/errors.js'
+import { requireAdmin } from '../middleware/auth.js'
+
+export const applicationsRouter = Router()
+
+// Memory storage keeps file buffers accessible for serverless / cloud deployment
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype === 'application/pdf' || file.originalname.endsWith('.pdf')) {
+      cb(null, true)
+    } else {
+      cb(new HttpError(400, 'Only PDF resumes/CVs are accepted'))
+    }
+  },
+})
+
+// Public endpoint for submitting applications
+applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
+  try {
+    const { positionId, name, email, phone, university, degreeYear, coverNote, github, linkedin } = req.body
+
+    if (!name || !email || !phone || !university || !degreeYear) {
+      throw new HttpError(400, 'Missing required applicant fields')
+    }
+
+    // Verify position or select default
+    let assignedPosition = positionId
+    if (!assignedPosition) {
+      const defaultPos = await PositionModel.findOne({ isOpen: true })
+      if (defaultPos) assignedPosition = defaultPos._id
+    }
+
+    // Convert file to base64 data URI storage key if uploaded
+    let cvData = {
+      key: req.body.resumeUrl || 'attached',
+      originalName: req.file ? req.file.originalname : 'resume.pdf',
+      size: req.file ? req.file.size : 0,
+    }
+
+    if (req.file) {
+      const base64 = req.file.buffer.toString('base64')
+      cvData.key = `data:application/pdf;base64,${base64}`
+    }
+
+    const application = await ApplicationModel.create({
+      position: assignedPosition,
+      name,
+      email,
+      phone,
+      university,
+      degreeYear,
+      coverNote,
+      github,
+      linkedin,
+      cv: cvData,
+      status: 'New',
+    })
+
+    console.log(`📩 New Application received from ${name} (${email}) for position ${assignedPosition}`)
+
+    res.status(201).json({
+      success: true,
+      message: 'Application successfully received by the AIR Lab committee!',
+      id: application._id,
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Protected Admin endpoints
+applicationsRouter.get('/admin', requireAdmin, async (_req, res, next) => {
+  try {
+    const applications = await ApplicationModel.find()
+      .populate('position', 'title track')
+      .sort({ createdAt: -1 })
+      .lean()
+    res.json(applications)
+  } catch (err) {
+    next(err)
+  }
+})
+
+applicationsRouter.patch('/admin/:id/status', requireAdmin, async (req, res, next) => {
+  try {
+    const { status, adminNotes } = req.body
+    const app = await ApplicationModel.findByIdAndUpdate(
+      req.params.id,
+      { ...(status && { status }), ...(adminNotes !== undefined && { adminNotes }) },
+      { new: true }
+    )
+    if (!app) throw new HttpError(404, 'Application not found')
+    res.json(app)
+  } catch (err) {
+    next(err)
+  }
+})
+
+applicationsRouter.delete('/admin/:id', requireAdmin, async (req, res, next) => {
+  try {
+    const deleted = await ApplicationModel.findByIdAndDelete(req.params.id)
+    if (!deleted) throw new HttpError(404, 'Application not found')
+    res.json({ success: true, message: 'Application deleted' })
+  } catch (err) {
+    next(err)
+  }
+})

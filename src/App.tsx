@@ -1,4 +1,4 @@
-﻿import { HashRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './components/ThemeProvider'
 import Layout from './components/Layout'
 import Home from './pages/Home'
@@ -10,6 +10,7 @@ import Contact from './pages/Contact'
 import Gallery from './pages/Gallery'
 import Performers from './pages/Performers'
 import Interns from './pages/Interns'
+import AdminDashboard from './pages/Admin'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="performers" element={<Performers />} />
             <Route path="collaborations" element={<Home />} />
             <Route path="interns" element={<Interns />} />
+            <Route path="admin" element={<AdminDashboard />} />
             <Route path="*" element={<Home />} />
           </Route>
         </Routes>
