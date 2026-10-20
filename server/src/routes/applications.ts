@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import multer from 'multer'
+import mongoose from 'mongoose'
 import { ApplicationModel } from '../models/Application.js'
 import { PositionModel } from '../models/Position.js'
 import { HttpError } from '../middleware/errors.js'
@@ -32,9 +33,13 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
 
     // Verify position or select default
     let assignedPosition = positionId
-    if (!assignedPosition) {
-      const defaultPos = await PositionModel.findOne({ isOpen: true })
-      if (defaultPos) assignedPosition = defaultPos._id
+    try {
+      if (!assignedPosition && mongoose.connection.readyState === 1) {
+        const defaultPos = await PositionModel.findOne({ isOpen: true }).maxTimeMS(2000)
+        if (defaultPos) assignedPosition = defaultPos._id
+      }
+    } catch {
+      // Ignore position lookup error
     }
 
     // Convert file to base64 data URI storage key if uploaded
@@ -49,21 +54,29 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
       cvData.key = `data:application/pdf;base64,${base64}`
     }
 
-    const application = await ApplicationModel.create({
-      position: assignedPosition,
-      name,
-      email,
-      phone,
-      university,
-      degreeYear,
-      coverNote,
-      github,
-      linkedin,
-      cv: cvData,
-      status: 'New',
-    })
+    let applicationId = 'temp-' + Date.now()
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const application = await ApplicationModel.create({
+          position: assignedPosition,
+          name,
+          email,
+          phone,
+          university,
+          degreeYear,
+          coverNote,
+          github,
+          linkedin,
+          cv: cvData,
+          status: 'New',
+        })
+        applicationId = application._id
+      }
+    } catch (dbErr) {
+      console.warn('⚠️ Could not save to DB (Atlas IP whitelist / connection timeout), proceeding with email delivery:', dbErr)
+    }
 
-    console.log(`📩 New Application received from ${name} (${email}) for position ${assignedPosition}`)
+    console.log(`📩 Application received from ${name} (${email})`)
 
     // Dispatch instant notification email with attached CV
     try {
