@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ExternalLink, Mail } from 'lucide-react'
 import AirLabLogo from './AirLabLogo'
@@ -11,6 +11,30 @@ export default function Layout() {
   const [applyModalOpen, setApplyModalOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+
+  // Secret 7-tap easter egg to open Admin Login
+  const tapCountRef = useRef(0)
+  const tapTimerRef = useRef<number | null>(null)
+
+  const handleLogoTap = (e: React.MouseEvent) => {
+    tapCountRef.current += 1
+
+    if (tapTimerRef.current) {
+      clearTimeout(tapTimerRef.current)
+    }
+
+    // Reset tap sequence if idle for more than 2 seconds
+    tapTimerRef.current = setTimeout(() => {
+      tapCountRef.current = 0
+    }, 2000)
+
+    if (tapCountRef.current >= 7) {
+      e.preventDefault()
+      tapCountRef.current = 0
+      navigate('/admin')
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,7 +107,7 @@ export default function Layout() {
           }`}
         >
           <div className="max-w-[1200px] h-full mx-auto px-6 flex items-center justify-between gap-4">
-            <Link to="/" className="flex items-center gap-2 group shrink-0">
+            <Link to="/" onClick={handleLogoTap} className="flex items-center gap-2 group shrink-0 select-none">
               <AirLabLogo height={34} />
             </Link>
 
