@@ -12,7 +12,9 @@ import {
   Eye,
   FileSpreadsheet,
   Sparkles,
-  Download
+  Download,
+  Upload,
+  ImageIcon
 } from 'lucide-react'
 
 export default function AdminDashboard() {
@@ -498,6 +500,64 @@ export default function AdminDashboard() {
                               placeholder="comma-separated values"
                               className="w-full px-3 py-2 text-xs rounded border border-[var(--border-hairline)] bg-[var(--bg-page)]"
                             />
+                          ) : /image|photo|avatar|thumbnail|cover|logo/i.test(field) ? (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-3">
+                                {editingItem[field] ? (
+                                  <img
+                                    src={editingItem[field]}
+                                    alt="Preview"
+                                    className="w-12 h-12 object-cover rounded border border-[var(--border-hairline)] bg-[var(--bg-surface)] shrink-0"
+                                    onError={e => {
+                                      // Hide preview if broken
+                                      ;(e.target as HTMLElement).style.display = 'none'
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 rounded border border-dashed border-[var(--border-hairline)] flex items-center justify-center bg-[var(--bg-page)] shrink-0 text-[var(--text-subtle)]">
+                                    <ImageIcon className="w-5 h-5 opacity-40" />
+                                  </div>
+                                )}
+
+                                <div className="flex-1 space-y-1.5">
+                                  <div className="flex items-center gap-2">
+                                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] bg-[var(--accent-orange)]/10 hover:bg-[var(--accent-orange)]/20 text-[var(--accent-orange)] text-xs font-medium cursor-pointer transition-colors border border-[var(--accent-orange)]/30">
+                                      <Upload className="w-3.5 h-3.5" />
+                                      <span>Upload Image</span>
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={e => {
+                                          const file = e.target.files?.[0]
+                                          if (file) {
+                                            if (file.size > 2 * 1024 * 1024) {
+                                              alert('Image size exceeds 2MB limit. Please upload a smaller image.')
+                                              return
+                                            }
+                                            const reader = new FileReader()
+                                            reader.onload = ev => {
+                                              const base64 = ev.target?.result as string
+                                              setEditingItem({ ...editingItem, [field]: base64 })
+                                            }
+                                            reader.readAsDataURL(file)
+                                          }
+                                        }}
+                                      />
+                                    </label>
+                                    <span className="text-[11px] text-[var(--text-subtle)]">or enter URL below</span>
+                                  </div>
+
+                                  <input
+                                    type="text"
+                                    value={editingItem[field] ?? ''}
+                                    onChange={e => setEditingItem({ ...editingItem, [field]: e.target.value })}
+                                    placeholder="e.g. ./pfp/kashaf.png or data:image/..."
+                                    className="w-full px-3 py-1.5 text-xs rounded border border-[var(--border-hairline)] bg-[var(--bg-page)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-orange)]"
+                                  />
+                                </div>
+                              </div>
+                            </div>
                           ) : (
                             <input
                               type="text"
