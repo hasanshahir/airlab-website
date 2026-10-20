@@ -4,6 +4,7 @@ import { ApplicationModel } from '../models/Application.js'
 import { PositionModel } from '../models/Position.js'
 import { HttpError } from '../middleware/errors.js'
 import { requireAdmin } from '../middleware/auth.js'
+import { sendApplicationNotification } from '../services/email.js'
 
 export const applicationsRouter = Router()
 
@@ -63,6 +64,36 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
     })
 
     console.log(`📩 New Application received from ${name} (${email}) for position ${assignedPosition}`)
+
+    // Dispatch instant notification email with attached CV
+    try {
+      let positionTitle: string | undefined
+      if (assignedPosition) {
+        const posDoc = await PositionModel.findById(assignedPosition).lean()
+        if (posDoc) positionTitle = posDoc.title
+      }
+
+      await sendApplicationNotification({
+        applicantName: name,
+        applicantEmail: email,
+        applicantPhone: phone,
+        university,
+        degreeYear,
+        positionTitle,
+        coverNote,
+        github,
+        linkedin,
+        cvFile: req.file
+          ? {
+              originalName: req.file.originalname,
+              buffer: req.file.buffer,
+              contentType: req.file.mimetype,
+            }
+          : undefined,
+      })
+    } catch (mailErr) {
+      console.error('⚠️ Failed to dispatch application notification email:', mailErr)
+    }
 
     res.status(201).json({
       success: true,

@@ -16,6 +16,11 @@ const EnvSchema = z.object({
     .string()
     .default('http://localhost:5173')
     .transform((v) => v.split(',').map((s) => s.trim()).filter(Boolean)),
+  SMTP_HOST: z.string().default('smtp.gmail.com'),
+  SMTP_PORT: z.coerce.number().default(465),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  ADMIN_NOTIFICATION_EMAIL: z.string().default('hf.alihasan0@gmail.com'),
 })
 
 const parsed = EnvSchema.safeParse(process.env)
