@@ -111,7 +111,7 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: 'Application successfully received by the AIR Lab committee!',
-      id: application._id,
+      id: applicationId,
     })
   } catch (err) {
     next(err)
