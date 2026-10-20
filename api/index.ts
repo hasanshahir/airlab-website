@@ -14,5 +14,15 @@ export default async function handler(req: any, res: any) {
       // Allow request to continue (e.g. master admin auth or health check)
     }
   }
+
+  // In Vercel serverless functions, req.body is often pre-parsed as an object or string
+  if (req.body && typeof req.body === 'string') {
+    try {
+      req.body = JSON.parse(req.body)
+    } catch {
+      // Keep as-is if not valid JSON
+    }
+  }
+
   return app(req, res)
 }

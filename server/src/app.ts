@@ -26,7 +26,12 @@ export function createApp() {
       credentials: true, // admin auth will use httpOnly cookies
     }),
   )
-  app.use(express.json({ limit: '10mb' }))
+  app.use((req, res, next) => {
+    if (req.body !== undefined && typeof req.body === 'object') {
+      return next()
+    }
+    express.json({ limit: '10mb' })(req, res, next)
+  })
   app.use(cookieParser())
   app.use(morgan(isProd ? 'combined' : 'dev'))
 
