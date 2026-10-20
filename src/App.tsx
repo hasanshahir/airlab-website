@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './components/ThemeProvider'
 import Layout from './components/Layout'
 import Home from './pages/Home'
+import About from './pages/About'
 import Team from './pages/Team'
 import Projects from './pages/Projects'
 import Publications from './pages/Publications'
@@ -9,6 +10,7 @@ import Grants from './pages/Grants'
 import Contact from './pages/Contact'
 import Gallery from './pages/Gallery'
 import Performers from './pages/Performers'
+import Collaborations from './pages/Collaborations'
 import Interns from './pages/Interns'
 import AdminDashboard from './pages/Admin'
 
@@ -19,7 +21,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="about" element={<Home />} />
+            <Route path="about" element={<About />} />
             <Route path="team" element={<Team />} />
             <Route path="projects" element={<Projects />} />
             <Route path="grants" element={<Grants />} />
@@ -27,7 +29,7 @@ export default function App() {
             <Route path="contact" element={<Contact />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="performers" element={<Performers />} />
-            <Route path="collaborations" element={<Home />} />
+            <Route path="collaborations" element={<Collaborations />} />
             <Route path="interns" element={<Interns />} />
             <Route path="admin" element={<AdminDashboard />} />
             <Route path="*" element={<Home />} />

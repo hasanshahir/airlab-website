@@ -258,6 +258,7 @@ export default function Layout() {
                   Research
                 </h5>
                 <ul className="space-y-2.5 text-[13.5px] text-[var(--text-muted)]">
+                  <li><Link to="/about" className="hover:text-[var(--accent-orange)] transition-colors">About AIR Lab</Link></li>
                   <li><Link to="/projects" className="hover:text-[var(--accent-orange)] transition-colors">Projects Catalog</Link></li>
                   <li><Link to="/grants" className="hover:text-[var(--accent-orange)] transition-colors">Active Grants</Link></li>
                   <li><Link to="/publications" className="hover:text-[var(--accent-orange)] transition-colors">Publications</Link></li>
@@ -268,10 +269,11 @@ export default function Layout() {
               {/* Column 3 */}
               <div>
                 <h5 className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-4 font-head">
-                  People
+                  People & Partners
                 </h5>
                 <ul className="space-y-2.5 text-[13.5px] text-[var(--text-muted)]">
                   <li><Link to="/team" className="hover:text-[var(--accent-orange)] transition-colors">Faculty & Scholars</Link></li>
+                  <li><Link to="/collaborations" className="hover:text-[var(--accent-orange)] transition-colors">Collaborations & Industry</Link></li>
                   <li><Link to="/performers" className="hover:text-[var(--accent-orange)] transition-colors">Performers of the Month</Link></li>
                   <li><Link to="/interns" className="hover:text-[var(--accent-orange)] transition-colors">Research Interns</Link></li>
                   <li><Link to="/contact" className="hover:text-[var(--accent-orange)] transition-colors">Contact Coordination</Link></li>
