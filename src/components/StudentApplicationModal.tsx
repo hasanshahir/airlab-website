@@ -43,6 +43,10 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
       data.append('resumeUrl', formData.resumeUrl)
 
       if (cvFile) {
+        // Vercel serverless functions hard-cap request payloads at 4.5MB
+        if (cvFile.size > 4 * 1024 * 1024) {
+          throw new Error('Resume PDF is too large. Please upload a file smaller than 4MB, or paste your Google Drive / LinkedIn link in the Portfolio field.')
+        }
         data.append('cv', cvFile)
       }
 
@@ -289,7 +293,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-medium text-[var(--text-primary)] mb-1.5">
-                        Upload CV / Resume (PDF)
+                        Upload CV / Resume (PDF) <span className="text-[var(--text-subtle)] font-normal">(Max 4MB)</span>
                       </label>
                       <input
                         type="file"
