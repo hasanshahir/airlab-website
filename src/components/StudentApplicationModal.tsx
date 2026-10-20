@@ -52,8 +52,14 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
       })
 
       if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}))
-        throw new Error(errJson.error || 'Failed to submit application')
+        const text = await res.text()
+        let errJson: any
+        try {
+          errJson = JSON.parse(text)
+        } catch {
+          // fallback
+        }
+        throw new Error(errJson?.error || text || `Server error (${res.status})`)
       }
 
       setSubmitted(true)

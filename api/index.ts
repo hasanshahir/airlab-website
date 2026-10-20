@@ -4,6 +4,12 @@ import { connectDB } from '../server/src/db.js'
 let isConnected = false
 const app = createApp()
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
+
 export default async function handler(req: any, res: any) {
   if (!isConnected) {
     try {

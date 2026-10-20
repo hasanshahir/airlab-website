@@ -5,7 +5,7 @@ export const APPLICATION_STATUSES = ['New', 'Shortlisted', 'Rejected', 'Accepted
 /** An intern application submitted through the website form. */
 const ApplicationSchema = new Schema(
   {
-    position: { type: Schema.Types.ObjectId, ref: 'Position', required: true, index: true },
+    position: { type: Schema.Types.ObjectId, ref: 'Position', required: false, index: true },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
     phone: { type: String, required: true, trim: true },
