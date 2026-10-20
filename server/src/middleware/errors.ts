@@ -44,11 +44,16 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     details = 'keyValue' in err ? err.keyValue : undefined
   }
 
-  if (status >= 500) console.error(err)
+  if (status >= 500) {
+    console.error('Unhandled server error:', err)
+    if (err instanceof Error) {
+      message = err.message || message
+    }
+  }
 
   res.status(status).json({
     error: message,
     ...(details !== undefined && { details }),
-    ...(!isProd && status >= 500 && err instanceof Error && { stack: err.stack }),
+    ...(err instanceof Error && { stack: err.stack }),
   })
 }
