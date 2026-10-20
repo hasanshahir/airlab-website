@@ -75,7 +75,15 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
-      const data = await res.json()
+
+      const text = await res.text()
+      let data: any
+      try {
+        data = JSON.parse(text)
+      } catch {
+        throw new Error(text || `Server returned ${res.status}`)
+      }
+
       if (!res.ok) throw new Error(data.error || 'Login failed')
 
       localStorage.setItem('airlab_admin_token', data.token)

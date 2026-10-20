@@ -6,8 +6,13 @@ const app = createApp()
 
 export default async function handler(req: any, res: any) {
   if (!isConnected) {
-    await connectDB()
-    isConnected = true
+    try {
+      await connectDB()
+      isConnected = true
+    } catch (dbErr: any) {
+      console.error('⚠️ MongoDB connection warning in serverless handler:', dbErr?.message || dbErr)
+      // Allow request to continue (e.g. master admin auth or health check)
+    }
   }
   return app(req, res)
 }
