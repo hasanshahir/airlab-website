@@ -58,28 +58,35 @@ export default function Team() {
     return allMembers.filter(m => m.category === 'Research Interns')
   }, [allMembers])
 
-  // Extract all unique research area tags across active members
-  const allTags = useMemo(() => {
-    const set = new Set<string>()
-    allMembersRaw.forEach(m => {
-      if (Array.isArray(m.tags)) {
-        m.tags.forEach(t => set.add(t))
-      }
-    })
-    return ['All', ...Array.from(set).sort()]
-  }, [allMembersRaw])
+  // Curated 5 Core Research Domains for clean, professional filtering
+  const coreTags = [
+    'All',
+    'Machine Learning',
+    'Computer Vision',
+    'Generative AI',
+    'Cybersecurity',
+    'NLP & LLMs',
+  ]
 
   const filteredInterns = useMemo(() => {
     return internMembers.filter(intern => {
       const raw = allMembersRaw.find(m => m.id === intern.id)
+      const tags = (raw?.tags && Array.isArray(raw.tags)) ? raw.tags : []
+
       const matchesTag =
         selectedTag === 'All' ||
-        (raw?.tags && Array.isArray(raw.tags) && raw.tags.includes(selectedTag))
+        tags.includes(selectedTag) ||
+        (selectedTag === 'Machine Learning' && tags.some(t => /machine learning|deep learning|data science|adversarial ml|pipelines/i.test(t))) ||
+        (selectedTag === 'Computer Vision' && tags.some(t => /computer vision|multimodal/i.test(t))) ||
+        (selectedTag === 'Generative AI' && tags.some(t => /generative|rag|agent|embedding/i.test(t))) ||
+        (selectedTag === 'Cybersecurity' && tags.some(t => /security|cyber|malware|reverse engineering|intelligence/i.test(t))) ||
+        (selectedTag === 'NLP & LLMs' && tags.some(t => /nlp|llm/i.test(t)))
+
       const matchesSearch =
         searchQuery === '' ||
         intern.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (intern.researchFocus && intern.researchFocus.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (raw?.tags && raw.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())))
+        (tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())))
       return matchesTag && matchesSearch
     })
   }, [internMembers, allMembersRaw, selectedTag, searchQuery])
@@ -187,17 +194,17 @@ export default function Team() {
 
       {/* Tag Filter Pills (shown in interns tab) */}
       {activeTab === 'interns' && (
-        <div className="mb-8 flex flex-wrap items-center gap-1.5 text-left">
+        <div className="mb-8 flex flex-wrap items-center gap-2 text-left">
           <span className="text-xs font-mono text-[var(--text-subtle)] mr-1 flex items-center gap-1">
-            <Tag className="w-3 h-3 text-[var(--accent-purple)]" /> Filter Tag:
+            <Tag className="w-3 h-3 text-[var(--accent-purple)]" /> Filter:
           </span>
-          {allTags.map(tag => (
+          {coreTags.map(tag => (
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className={`px-2.5 py-1 rounded-[2px] text-xs font-mono transition-all cursor-pointer ${
+              className={`px-3 py-1 rounded-[2px] text-xs font-mono transition-all cursor-pointer ${
                 selectedTag === tag
-                  ? 'bg-[var(--accent-purple)] text-white shadow-xs'
+                  ? 'bg-[var(--accent-purple)] text-white shadow-xs font-semibold'
                   : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)]'
               }`}
             >
