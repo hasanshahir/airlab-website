@@ -91,22 +91,6 @@ export default function Team() {
     }
   }, [highlightedMemberId])
 
-  const alumniMembers = useMemo(() => {
-    return sortedPreviousInterns.map(
-      (p: any) =>
-        new TeamMemberEntity({
-          id: p.id,
-          name: p.name,
-          role: 'Research Alumni',
-          category: 'Alumni Interns',
-          image: '',
-          email: p.email,
-          linkedin: p.linkedin,
-          tenure: p.tenure,
-          department: p.department,
-        })
-    )
-  }, [sortedPreviousInterns])
 
   const tabs: { id: TabType; label: string; count?: number }[] = [
     { id: 'all', label: 'Overview', count: allMembers.length },
@@ -127,15 +111,6 @@ export default function Team() {
     }, 150)
   }
 
-  const handleScrollToMember = (member: TeamMemberEntity) => {
-    setHighlightedMemberId(member.id)
-    setTimeout(() => {
-      const el = document.getElementById(`member-${member.id}`)
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
-    }, 150)
-  }
 
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-6 max-w-[1200px] mx-auto relative font-sans text-[var(--text-primary)]">
@@ -261,11 +236,6 @@ export default function Team() {
             transition={{ duration: 0.25 }}
             className="space-y-8"
           >
-            <AppleWatchCluster
-              members={facultyMembers}
-              onSelectMember={handleScrollToMember}
-            />
-
             <div className="max-w-4xl mx-auto space-y-6">
               {facultyMembers.map(f => {
                 const raw = allMembersRaw.find(m => m.id === f.id)
@@ -381,11 +351,6 @@ export default function Team() {
             transition={{ duration: 0.25 }}
             className="space-y-8"
           >
-            <AppleWatchCluster
-              members={filteredInterns}
-              onSelectMember={handleScrollToMember}
-            />
-
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left">
               {filteredInterns.map(intern => {
                 const raw = allMembersRaw.find(m => m.id === intern.id)
@@ -505,11 +470,6 @@ export default function Team() {
             transition={{ duration: 0.25 }}
             className="space-y-8 text-left"
           >
-            <AppleWatchCluster
-              members={alumniMembers}
-              onSelectMember={handleScrollToMember}
-            />
-
             <div className="craftly-card overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[4px]">
               <div className="p-6 border-b border-[var(--border-hairline)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
