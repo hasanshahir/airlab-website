@@ -298,6 +298,11 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
 
   // Open card for a member (physics continues dynamically without freezing)
   const openCardForMember = useCallback((member: TeamMemberEntity) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+
     const node = nodesRef.current.find(n => n.member.id === member.id)
     if (!node) return
 
@@ -534,23 +539,23 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
     }
   }, [])
 
-  // Bubble hover handlers with Intent (80ms) and Grace Delay (250ms)
+  // Bubble hover handlers: instant open and reliable transition
   const handleMemberMouseEnter = (member: TeamMemberEntity) => {
-    if (activeMemberIdRef.current === member.id) {
-      if (closeTimerRef.current) {
-        clearTimeout(closeTimerRef.current)
-        closeTimerRef.current = null
-      }
-      return
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
     }
 
     if (hoverIntentTimerRef.current) {
       clearTimeout(hoverIntentTimerRef.current)
+      hoverIntentTimerRef.current = null
     }
 
-    hoverIntentTimerRef.current = setTimeout(() => {
-      openCardForMember(member)
-    }, HOVER_INTENT_DELAY_MS)
+    if (activeMemberIdRef.current === member.id) {
+      return
+    }
+
+    openCardForMember(member)
   }
 
   const handleMemberMouseLeave = (member: TeamMemberEntity) => {
@@ -563,7 +568,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
       closeTimerRef.current = setTimeout(() => {
         closeCard()
-      }, CLOSE_GRACE_DELAY_MS)
+      }, 300)
     }
   }
 
@@ -723,30 +728,31 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                   height: `${layout.baseBubbleSize}px`,
                   transform: `translate3d(calc(-50% + ${node.currentX}px), calc(-50% + ${node.currentY}px), 0px) scale(${node.currentScale})`,
                   willChange: 'transform',
-                  zIndex: isHovered ? 80 : isLead ? 30 : 20,
+                  zIndex: isHovered ? 80 : 20,
                   filter: isLead
                     ? 'drop-shadow(0 0 2px rgba(235, 94, 40, 0.8)) drop-shadow(0 4px 10px rgba(235, 94, 40, 0.45))'
                     : isHovered
                     ? 'drop-shadow(0 0 3px rgba(107, 70, 193, 0.8)) drop-shadow(0 6px 14px rgba(107, 70, 193, 0.45))'
                     : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12))',
+                  pointerEvents: 'none',
                 }}
-                tabIndex={0}
-                role="button"
-                aria-label={`${member.name}, ${member.role}`}
-                onMouseEnter={() => handleMemberMouseEnter(member)}
-                onMouseLeave={() => handleMemberMouseLeave(member)}
-                onClick={() => handleBubbleClick(member)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    openCardForMember(member)
-                  }
-                }}
-                className="group select-none pointer-events-auto cursor-pointer focus:outline-hidden"
+                className="group select-none"
               >
-                {/* Hexagonal Avatar Bubble Tile */}
+                {/* Hexagonal Avatar Bubble Tile with precise pointer-events clipping */}
                 <div
-                  className={`w-full h-full transition-all duration-200 flex items-center justify-center ${
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${member.name}, ${member.role}`}
+                  onMouseEnter={() => handleMemberMouseEnter(member)}
+                  onMouseLeave={() => handleMemberMouseLeave(member)}
+                  onClick={() => handleBubbleClick(member)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      openCardForMember(member)
+                    }
+                  }}
+                  className={`w-full h-full transition-all duration-200 flex items-center justify-center pointer-events-auto cursor-pointer focus:outline-hidden ${
                     isLead
                       ? 'p-[3.5px] bg-gradient-to-tr from-[var(--accent-orange)] via-[var(--accent-purple)] to-[var(--accent-orange)]'
                       : isHovered
