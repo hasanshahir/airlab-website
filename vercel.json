@@ -7,6 +7,32 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    },
+    {
+      "source": "/api(/.*)?",
+      "destination": {
+        "type": "service",
+        "service": "airlab-backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "airlab-frontend"
+      }
     }
-  ]
+  ],
+  "services": {
+    "airlab-backend": {
+      "root": "server",
+      "entrypoint": "src/app.ts",
+      "buildCommand": "npm install && npm run build"
+    },
+    "airlab-frontend": {
+      "root": ".",
+      "framework": "vite",
+      "buildCommand": "npm install && npm run build"
+    }
+  }
 }
