@@ -1,0 +1,29 @@
+services:
+  # 1. Express Backend Web Service
+  - type: web
+    name: airlab-backend
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false # Prompts you to paste your MongoDB Atlas URI in the dashboard
+      - key: CORS_ORIGINS
+        value: "*"
+
+  # 2. React Vite Frontend Static Site
+  - type: web
+    name: airlab-frontend
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

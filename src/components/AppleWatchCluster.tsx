@@ -13,6 +13,20 @@ export const RING_SPACING_RATIO = 1.18         // Tune spacing between rings (e.
 export const HOVER_INTENT_DELAY_MS = 80        // Short hover intent delay before card opens (in ms)
 export const CLOSE_GRACE_DELAY_MS = 250        // Grace delay after leaving bubble/card before closing (in ms)
 
+// Hexagonal Geometry
+export const HEX_CLIP_PATH = 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'
+
+export const getHexagonSvgPoints = (cx: number, cy: number, radius: number): string => {
+  const points: string[] = []
+  for (let i = 0; i < 6; i++) {
+    const angle = -Math.PI / 2 + (i * Math.PI) / 3
+    const x = cx + radius * Math.cos(angle)
+    const y = cy + radius * Math.sin(angle)
+    points.push(`${Math.round(x * 10) / 10},${Math.round(y * 10) / 10}`)
+  }
+  return points.join(' ')
+}
+
 // 3. Cluster Sizing & Scale Profile (Center is ~1.6x of outermost ring)
 export const CLUSTER_FILL_PERCENT = 0.70       // Target idle cluster diameter as % of container shorter side (~70%)
 export const IDLE_CENTER_SCALE = 1.25          // Scale of center bubble (Ring 0) at idle
@@ -158,7 +172,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
     const lensRadius = baseBubbleSize * LENS_RADIUS_MULTIPLE
     const clusterDiameter = Math.round(2 * (ringCount * ringSpacing + (baseBubbleSize * IDLE_EDGE_SCALE) / 2))
 
-    // Build raw circular positions
+    // Build raw hexagonal positions along concentric hexagonal perimeters
     const rawPositions: {
       member: TeamMemberEntity
       ring: number
@@ -187,24 +201,37 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
       const countInRing = Math.min(remaining, ringCapacity)
       const radius = k * ringSpacing
 
-      // Determine rotation offset for sunflower interlocking
-      const ringOffset = k === 1
-        ? -Math.PI / 2
-        : -Math.PI / 2 + Math.PI / countInRing
-
       // Idle scale for this ring
       const idleScale = k === 1
         ? (total <= 7 ? IDLE_EDGE_SCALE : IDLE_RING1_SCALE)
         : IDLE_EDGE_SCALE
 
-      // Place bubbles evenly spaced around the full 360 degrees
+      // Calculate 6 corners of the regular hexagon for ring k (pointy-topped)
+      const corners: { x: number; y: number }[] = []
+      for (let c = 0; c < 6; c++) {
+        const theta = -Math.PI / 2 + (c * Math.PI) / 3
+        corners.push({
+          x: Math.cos(theta) * radius,
+          y: Math.sin(theta) * radius,
+        })
+      }
+
+      // Distribute countInRing members evenly along the 6 straight sides of the hexagon
       for (let j = 0; j < countInRing; j++) {
-        const angle = ringOffset + (j / countInRing) * 2 * Math.PI
+        const tPerimeter = (j / countInRing) * 6
+        const sideIndex = Math.min(5, Math.floor(tPerimeter))
+        const tSide = tPerimeter - sideIndex
+        const p1 = corners[sideIndex]
+        const p2 = corners[(sideIndex + 1) % 6]
+
+        const px = p1.x + (p2.x - p1.x) * tSide
+        const py = p1.y + (p2.y - p1.y) * tSide
+
         rawPositions.push({
           member: otherMembers[memberIndex],
           ring: k,
-          x: Math.cos(angle) * radius,
-          y: Math.sin(angle) * radius,
+          x: px,
+          y: py,
           initialScale: idleScale,
           isLead: false,
         })
@@ -271,6 +298,11 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
 
   // Open card for a member (physics continues dynamically without freezing)
   const openCardForMember = useCallback((member: TeamMemberEntity) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+
     const node = nodesRef.current.find(n => n.member.id === member.id)
     if (!node) return
 
@@ -507,23 +539,23 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
     }
   }, [])
 
-  // Bubble hover handlers with Intent (80ms) and Grace Delay (250ms)
+  // Bubble hover handlers: instant open and reliable transition
   const handleMemberMouseEnter = (member: TeamMemberEntity) => {
-    if (activeMemberIdRef.current === member.id) {
-      if (closeTimerRef.current) {
-        clearTimeout(closeTimerRef.current)
-        closeTimerRef.current = null
-      }
-      return
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
     }
 
     if (hoverIntentTimerRef.current) {
       clearTimeout(hoverIntentTimerRef.current)
+      hoverIntentTimerRef.current = null
     }
 
-    hoverIntentTimerRef.current = setTimeout(() => {
-      openCardForMember(member)
-    }, HOVER_INTENT_DELAY_MS)
+    if (activeMemberIdRef.current === member.id) {
+      return
+    }
+
+    openCardForMember(member)
   }
 
   const handleMemberMouseLeave = (member: TeamMemberEntity) => {
@@ -536,7 +568,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
       closeTimerRef.current = setTimeout(() => {
         closeCard()
-      }, CLOSE_GRACE_DELAY_MS)
+      }, 300)
     }
   }
 
@@ -608,48 +640,54 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
         style={{ touchAction: 'pan-y' }}
         className="w-full h-[min(70vh,660px)] min-h-[460px] rounded-[4px] bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm relative overflow-hidden ft-dotted-grid flex items-center justify-center cursor-crosshair focus:outline-hidden"
         role="region"
-        aria-label="Interactive Team Bubble Grid"
+        aria-label="Interactive Team Hexagonal Grid"
       >
         {/* Soft Ambient Radial Glow Behind the Cluster */}
         <div
-          className="absolute rounded-full pointer-events-none transition-all duration-300 z-5"
+          className="absolute pointer-events-none transition-all duration-300 z-5"
           style={{
             left: '50%',
             top: '50%',
-            width: `${layout.clusterDiameter * 1.08}px`,
-            height: `${layout.clusterDiameter * 1.08}px`,
+            width: `${layout.clusterDiameter * 1.12}px`,
+            height: `${layout.clusterDiameter * 1.12}px`,
             transform: 'translate(-50%, -50%)',
+            clipPath: HEX_CLIP_PATH,
             background:
-              'radial-gradient(circle, rgba(107, 70, 193, 0.08) 0%, rgba(235, 94, 40, 0.05) 55%, transparent 72%)',
+              'radial-gradient(circle, rgba(107, 70, 193, 0.12) 0%, rgba(235, 94, 40, 0.06) 55%, transparent 75%)',
           }}
         />
 
-        {/* Faint Concentric Circular Guides (Visualizes True Round Outline) */}
+        {/* Faint Concentric Hexagonal Guides (Visualizes Hexagonal Lattice Outline) */}
         {layout.nodes.length > 1 && (
-          <>
-            <div
-              className="absolute rounded-full pointer-events-none z-5 transition-all duration-300"
-              style={{
-                left: '50%',
-                top: '50%',
-                width: `${layout.clusterDiameter}px`,
-                height: `${layout.clusterDiameter}px`,
-                transform: 'translate(-50%, -50%)',
-                border: '1px dashed rgba(107, 70, 193, 0.16)',
-              }}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none z-5"
+            style={{ overflow: 'visible' }}
+          >
+            {/* Outer Hexagon Guide */}
+            <polygon
+              points={getHexagonSvgPoints(
+                containerSize.width / 2,
+                containerSize.height / 2,
+                layout.clusterDiameter / 2
+              )}
+              fill="none"
+              stroke="rgba(107, 70, 193, 0.18)"
+              strokeWidth="1.2"
+              strokeDasharray="4 4"
             />
-            <div
-              className="absolute rounded-full pointer-events-none z-5 transition-all duration-300"
-              style={{
-                left: '50%',
-                top: '50%',
-                width: `${layout.ringSpacing * 2}px`,
-                height: `${layout.ringSpacing * 2}px`,
-                transform: 'translate(-50%, -50%)',
-                border: '1px dotted rgba(235, 94, 40, 0.12)',
-              }}
+            {/* Inner Hexagon Guide */}
+            <polygon
+              points={getHexagonSvgPoints(
+                containerSize.width / 2,
+                containerSize.height / 2,
+                layout.ringSpacing
+              )}
+              fill="none"
+              stroke="rgba(235, 94, 40, 0.14)"
+              strokeWidth="1.2"
+              strokeDasharray="2 3"
             />
-          </>
+          </svg>
         )}
 
         {/* Soft edge vignette */}
@@ -690,33 +728,45 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                   height: `${layout.baseBubbleSize}px`,
                   transform: `translate3d(calc(-50% + ${node.currentX}px), calc(-50% + ${node.currentY}px), 0px) scale(${node.currentScale})`,
                   willChange: 'transform',
-                  zIndex: isHovered ? 80 : isLead ? 30 : 20,
+                  zIndex: isHovered ? 80 : 20,
+                  filter: isLead
+                    ? 'drop-shadow(0 0 2px rgba(235, 94, 40, 0.8)) drop-shadow(0 4px 10px rgba(235, 94, 40, 0.45))'
+                    : isHovered
+                    ? 'drop-shadow(0 0 3px rgba(107, 70, 193, 0.8)) drop-shadow(0 6px 14px rgba(107, 70, 193, 0.45))'
+                    : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12))',
+                  pointerEvents: 'none',
                 }}
-                tabIndex={0}
-                role="button"
-                aria-label={`${member.name}, ${member.role}`}
-                onMouseEnter={() => handleMemberMouseEnter(member)}
-                onMouseLeave={() => handleMemberMouseLeave(member)}
-                onClick={() => handleBubbleClick(member)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    openCardForMember(member)
-                  }
-                }}
-                className="group select-none pointer-events-auto cursor-pointer focus:outline-hidden"
+                className="group select-none"
               >
-                {/* Circular Avatar Bubble Tile */}
+                {/* Hexagonal Avatar Bubble Tile with precise pointer-events clipping */}
                 <div
-                  className={`w-full h-full rounded-full p-[2.5px] transition-shadow duration-150 shadow-md ${
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${member.name}, ${member.role}`}
+                  onMouseEnter={() => handleMemberMouseEnter(member)}
+                  onMouseLeave={() => handleMemberMouseLeave(member)}
+                  onClick={() => handleBubbleClick(member)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      openCardForMember(member)
+                    }
+                  }}
+                  className={`w-full h-full transition-all duration-200 flex items-center justify-center pointer-events-auto cursor-pointer focus:outline-hidden ${
                     isLead
-                      ? 'bg-gradient-to-tr from-[var(--accent-orange)] via-[var(--accent-purple)] to-[var(--accent-orange)] shadow-lg ring-2 ring-[var(--accent-orange)]/50'
+                      ? 'p-[3.5px] bg-gradient-to-tr from-[var(--accent-orange)] via-[var(--accent-purple)] to-[var(--accent-orange)]'
                       : isHovered
-                      ? 'bg-gradient-to-tr from-[var(--accent-orange)] to-[var(--accent-purple)] shadow-xl ring-2 ring-[var(--accent-orange)]/60'
-                      : 'bg-[var(--bg-surface)] border-2 border-[var(--border-hairline)] hover:border-[var(--accent-orange)]'
+                      ? 'p-[2.5px] bg-gradient-to-tr from-[var(--accent-orange)] to-[var(--accent-purple)]'
+                      : 'p-[2px] bg-[var(--border-hairline)] group-hover:bg-[var(--accent-orange)]'
                   }`}
+                  style={{
+                    clipPath: HEX_CLIP_PATH,
+                  }}
                 >
-                  <div className="w-full h-full rounded-full overflow-hidden bg-[var(--accent-purple)] relative flex items-center justify-center">
+                  <div
+                    className="w-full h-full bg-[var(--accent-purple)] relative flex items-center justify-center overflow-hidden"
+                    style={{ clipPath: HEX_CLIP_PATH }}
+                  >
                     <span className="text-white text-xs sm:text-sm font-bold font-mono select-none">
                       {getInitials(member.name)}
                     </span>
@@ -724,7 +774,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                       <img
                         src={member.image}
                         alt={`${member.name} - ${member.role}`}
-                        className="absolute inset-0 w-full h-full object-cover object-center"
+                        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
                         loading="lazy"
                         onError={e => {
                           e.currentTarget.style.display = 'none'
