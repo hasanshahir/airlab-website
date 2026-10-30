@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, ExternalLink, GraduationCap, Users, Calendar, Tag, Search, Sparkles } from 'lucide-react'
+import { Mail, ExternalLink, GraduationCap, Users, Calendar, Search, Sparkles } from 'lucide-react'
 import { getTeamMembers, getPreviousInterns } from '../lib/data'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
 import Badge from '../components/ui/Badge'
@@ -22,7 +22,6 @@ export default function Team() {
   const [activeTab, setActiveTab] = useState<TabType>('all')
   const [applyModalOpen, setApplyModalOpen] = useState(false)
   const [highlightedMemberId, setHighlightedMemberId] = useState<string | null>(null)
-  const [selectedTag, setSelectedTag] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
@@ -58,38 +57,17 @@ export default function Team() {
     return allMembers.filter(m => m.category === 'Research Interns')
   }, [allMembers])
 
-  // Curated 5 Core Research Domains for clean, professional filtering
-  const coreTags = [
-    'All',
-    'Machine Learning',
-    'Computer Vision',
-    'Generative AI',
-    'Cybersecurity',
-    'NLP & LLMs',
-  ]
-
   const filteredInterns = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) return internMembers
+
     return internMembers.filter(intern => {
-      const raw = allMembersRaw.find(m => m.id === intern.id)
-      const tags = (raw?.tags && Array.isArray(raw.tags)) ? raw.tags : []
-
-      const matchesTag =
-        selectedTag === 'All' ||
-        tags.includes(selectedTag) ||
-        (selectedTag === 'Machine Learning' && tags.some(t => /machine learning|deep learning|data science|adversarial ml|pipelines/i.test(t))) ||
-        (selectedTag === 'Computer Vision' && tags.some(t => /computer vision|multimodal/i.test(t))) ||
-        (selectedTag === 'Generative AI' && tags.some(t => /generative|rag|agent|embedding/i.test(t))) ||
-        (selectedTag === 'Cybersecurity' && tags.some(t => /security|cyber|malware|reverse engineering|intelligence/i.test(t))) ||
-        (selectedTag === 'NLP & LLMs' && tags.some(t => /nlp|llm/i.test(t)))
-
-      const matchesSearch =
-        searchQuery === '' ||
-        intern.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (intern.researchFocus && intern.researchFocus.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())))
-      return matchesTag && matchesSearch
+      const matchName = intern.name.toLowerCase().includes(query)
+      const matchFocus = Boolean(intern.researchFocus && intern.researchFocus.toLowerCase().includes(query))
+      const matchDept = Boolean(intern.department && intern.department.toLowerCase().includes(query))
+      return matchName || matchFocus || matchDept
     })
-  }, [internMembers, allMembersRaw, selectedTag, searchQuery])
+  }, [internMembers, searchQuery])
 
   useEffect(() => {
     if (highlightedMemberId) {
@@ -97,7 +75,6 @@ export default function Team() {
       return () => clearTimeout(timer)
     }
   }, [highlightedMemberId])
-
 
   const tabs: { id: TabType; label: string; count?: number }[] = [
     { id: 'all', label: 'Overview', count: allMembers.length },
@@ -117,7 +94,6 @@ export default function Team() {
       }
     }, 150)
   }
-
 
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-6 max-w-[1200px] mx-auto relative font-sans text-[var(--text-primary)]">
@@ -183,7 +159,7 @@ export default function Team() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-subtle)]" />
             <input
               type="text"
-              placeholder="Filter by name or tag..."
+              placeholder="Search by name or focus area..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 h-8.5 rounded-[2px] border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-mono text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
@@ -191,28 +167,6 @@ export default function Team() {
           </div>
         )}
       </div>
-
-      {/* Tag Filter Pills (shown in interns tab) */}
-      {activeTab === 'interns' && (
-        <div className="mb-8 flex flex-wrap items-center gap-2 text-left">
-          <span className="text-xs font-mono text-[var(--text-subtle)] mr-1 flex items-center gap-1">
-            <Tag className="w-3 h-3 text-[var(--accent-purple)]" /> Filter:
-          </span>
-          {coreTags.map(tag => (
-            <button
-              key={tag}
-              onClick={() => setSelectedTag(tag)}
-              className={`px-3 py-1 rounded-[2px] text-xs font-mono transition-all cursor-pointer ${
-                selectedTag === tag
-                  ? 'bg-[var(--accent-purple)] text-white shadow-xs font-semibold'
-                  : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)]'
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-      )}
 
       {/* Tab Content Display */}
       <AnimatePresence mode="wait">
@@ -417,21 +371,6 @@ export default function Team() {
                           )}
                         </div>
                       </div>
-
-                      {/* Tags List */}
-                      {raw?.tags && (
-                        <div className="flex flex-wrap gap-1.5 mb-4">
-                          {raw.tags.map((t, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => setSelectedTag(t)}
-                              className="px-2 py-0.5 rounded-[2px] text-[10px] font-mono bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:border-[var(--accent-purple)] cursor-pointer"
-                            >
-                              #{t}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
 
                     {/* Contact Links */}
@@ -544,6 +483,7 @@ export default function Team() {
         )}
       </AnimatePresence>
 
+      {/* Student Fellowship Modal */}
       <StudentApplicationModal
         isOpen={applyModalOpen}
         onClose={() => setApplyModalOpen(false)}
