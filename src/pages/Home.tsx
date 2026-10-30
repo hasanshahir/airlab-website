@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Brain,
   Bot,
@@ -14,7 +14,7 @@ import {
 import Button from '../components/ui/Button'
 import SectionReveal from '../components/ui/SectionReveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
-import QuickDrawer from '../components/QuickDrawer'
+
 import SponsorsGrid from '../components/SponsorsGrid'
 import ContactSection from '../components/ContactSection'
 
@@ -58,52 +58,7 @@ const coreResearchAreas = [
 ]
 
 export default function Home() {
-  const navigate = useNavigate()
   const [applyModalOpen, setApplyModalOpen] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [drawerTab, setDrawerTab] = useState<'projects' | 'members'>('projects')
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const cancelCloseTimer = () => {
-    if (closeTimerRef.current) {
-      clearTimeout(closeTimerRef.current)
-      closeTimerRef.current = null
-    }
-  }
-
-  const scheduleCloseTimer = () => {
-    cancelCloseTimer()
-    closeTimerRef.current = setTimeout(() => {
-      setDrawerOpen(false)
-    }, 380) // 380ms grace window for smooth travel from button to drawer
-  }
-
-  useEffect(() => {
-    return () => {
-      cancelCloseTimer()
-    }
-  }, [])
-
-  const handleHoverTrigger = (tab: 'projects' | 'members') => {
-    cancelCloseTimer()
-    setDrawerTab(tab)
-    setDrawerOpen(true)
-  }
-
-  const handleDrawerClose = () => {
-    cancelCloseTimer()
-    setDrawerOpen(false)
-  }
-
-  const handleProjectButtonClick = () => {
-    handleDrawerClose()
-    navigate('/projects')
-  }
-
-  const handleMemberButtonClick = () => {
-    handleDrawerClose()
-    navigate('/team')
-  }
 
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] overflow-hidden">
@@ -137,29 +92,23 @@ export default function Home() {
               </h2>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-3">
-                <button
-                  type="button"
-                  onMouseEnter={() => handleHoverTrigger('projects')}
-                  onMouseLeave={scheduleCloseTimer}
-                  onClick={handleProjectButtonClick}
+                <Link
+                  to="/projects"
                   className="h-14 sm:h-16 px-8 sm:px-10 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-base sm:text-lg font-bold rounded-[2px] shadow-lg shadow-[var(--accent-orange)]/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
                 >
                   <Layers className="w-5 h-5 shrink-0" />
                   <span>Explore Projects</span>
                   <span className="font-mono text-xl group-hover:translate-x-0.5 transition-transform">↳</span>
-                </button>
+                </Link>
 
-                <button
-                  type="button"
-                  onMouseEnter={() => handleHoverTrigger('members')}
-                  onMouseLeave={scheduleCloseTimer}
-                  onClick={handleMemberButtonClick}
+                <Link
+                  to="/team"
                   className="h-14 sm:h-16 px-8 sm:px-10 bg-[var(--bg-surface)] hover:bg-[var(--bg-page)] text-[var(--text-primary)] border-2 border-[var(--text-primary)] text-base sm:text-lg font-bold rounded-[2px] shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
                 >
                   <Users className="w-5 h-5 text-[var(--accent-purple)] shrink-0" />
                   <span>Lab Members</span>
                   <span className="font-mono text-xl group-hover:translate-x-0.5 transition-transform">↳</span>
-                </button>
+                </Link>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono text-[var(--text-muted)] mt-2">
@@ -280,15 +229,6 @@ export default function Home() {
       <section className="py-6 px-6 max-w-[1140px] mx-auto text-left mb-20 relative z-10">
         <ContactSection />
       </section>
-
-      {/* Fast Directory Dropdown Drawer from Right */}
-      <QuickDrawer
-        isOpen={drawerOpen}
-        onClose={handleDrawerClose}
-        initialTab={drawerTab}
-        onMouseEnter={cancelCloseTimer}
-        onMouseLeave={scheduleCloseTimer}
-      />
 
       {/* Student Fellowship Modal */}
       <StudentApplicationModal
