@@ -22,26 +22,25 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const sizeStyles = {
-    sm: 'h-8 px-3 text-xs',
-    md: 'h-9 px-4 text-[13px]',
-    lg: 'h-11 px-5 text-sm',
+    sm: 'h-8 px-4 text-xs',
+    md: 'h-10 px-5 text-[13.5px]',
+    lg: 'h-12 px-7 text-sm',
   }
 
-  // Reference style: Vivid orange primary with white text, hairline secondary, weight 500
   const variantStyles = {
     primary:
-      'bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white border border-[var(--accent-orange)] font-medium shadow-xs transition-colors',
+      'bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white font-medium shadow-sm hover:shadow transition-all duration-150',
     secondary:
-      'bg-transparent hover:bg-[rgba(17,17,17,0.04)] text-[var(--text-primary)] border border-[var(--border-hairline)] font-medium transition-colors',
+      'bg-[var(--bg-surface)] hover:bg-[#E8E2D8] text-[var(--text-primary)] border border-[var(--border-hairline)] font-medium transition-all duration-150',
     outline:
-      'bg-transparent hover:bg-[rgba(17,17,17,0.04)] text-[var(--text-primary)] border border-[var(--border-hairline)] font-medium transition-colors',
+      'bg-transparent hover:bg-[rgba(10,50,53,0.06)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] font-medium transition-colors duration-150',
     ghost:
-      'bg-transparent hover:bg-[rgba(17,17,17,0.04)] text-[var(--text-primary)] font-medium transition-colors',
+      'bg-transparent hover:bg-[rgba(10,50,53,0.06)] text-[var(--text-primary)] font-medium transition-colors duration-150',
   }
 
   const showArrow = arrow !== undefined ? arrow : variant === 'primary'
 
-  const sharedClasses = `group inline-flex items-center justify-center gap-1.5 rounded-[2px] tracking-tight font-sans transition-all active:translate-y-[1px] select-none cursor-pointer whitespace-nowrap ${sizeStyles[size]} ${variantStyles[variant]} ${className}`
+  const sharedClasses = `group inline-flex items-center justify-center gap-2 rounded-full tracking-tight font-sans transition-all active:translate-y-[1px] select-none cursor-pointer whitespace-nowrap ${sizeStyles[size]} ${variantStyles[variant]} ${className}`
 
   const content = (
     <>

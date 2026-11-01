@@ -10,12 +10,12 @@ import {
   Layers,
   Users,
   Award,
+  ArrowRight,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import SectionReveal from '../components/ui/SectionReveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 import QuickDrawer from '../components/QuickDrawer'
-
 import SponsorsGrid from '../components/SponsorsGrid'
 import ContactSection from '../components/ContactSection'
 
@@ -71,23 +71,20 @@ export default function Home() {
 
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] overflow-hidden">
-      {/* ── Ambient Background Color Glows ── */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[720px] pointer-events-none overflow-hidden z-0 select-none" aria-hidden="true">
-        <div className="absolute top-12 right-[-6%] w-[540px] h-[540px] rounded-full bg-[var(--accent-orange)]/10 blur-[130px]" />
-        <div className="absolute top-20 left-[-8%] w-[500px] h-[500px] rounded-full bg-[var(--accent-purple)]/10 blur-[130px]" />
-        <div className="absolute top-44 left-[20%] w-[440px] h-[440px] rounded-full bg-[var(--bg-backdrop)]/35 blur-[120px]" />
-      </div>
-
-      {/* ── 1. HERO SECTION ── */}
-      <section className="pt-10 pb-12 sm:pt-16 sm:pb-16 px-4 sm:px-8 max-w-[1280px] mx-auto text-left relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start pb-12 border-b border-[var(--border-hairline)]">
+      {/* ── 1. HERO SECTION (High whitespace, calm editorial rhythm) ── */}
+      <section className="pt-16 pb-20 sm:pt-24 sm:pb-28 px-6 sm:px-10 max-w-[1240px] mx-auto text-left relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start pb-16 border-b border-[var(--border-hairline)]">
           {/* Left Column */}
-          <SectionReveal delay={0.06} className="lg:col-span-5">
+          <SectionReveal delay={0.05} className="lg:col-span-5">
             <div>
-              <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-[-0.04em] leading-[0.95] text-[var(--text-primary)] font-head">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-mono text-[var(--text-muted)] mb-6">
+                <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
+                <span>DEPARTMENT OF CSIT &bull; NED UNIVERSITY</span>
+              </div>
+              <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-[-0.035em] leading-[0.95] text-[var(--text-primary)] font-head">
                 AIR Lab
               </h1>
-              <p className="text-[13px] sm:text-[14px] text-[var(--text-muted)] max-w-sm leading-relaxed mt-5 font-normal">
+              <p className="text-[15px] sm:text-[16px] text-[var(--text-muted)] max-w-md leading-relaxed mt-6 font-normal">
                 The Artificial Intelligence Research Lab at NED University is pioneering foundational regional AI models, edge perception, and autonomous robotics benchmarks for national impact.
               </p>
             </div>
@@ -95,40 +92,40 @@ export default function Home() {
 
           {/* Right Column */}
           <SectionReveal delay={0.12} className="lg:col-span-7">
-            <div className="lg:pl-6 lg:border-l border-[var(--border-hairline)]">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-normal tracking-[-0.025em] leading-[1.12] text-[var(--text-primary)] mb-8 font-head">
+            <div className="lg:pl-8 lg:border-l border-[var(--border-hairline)] pt-2 lg:pt-0">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-normal tracking-[-0.02em] leading-[1.18] text-[var(--text-primary)] mb-10 font-head">
                 Ignite intelligence, computational strength, and breakthrough innovation on every research frontier, turning lab discoveries into impactful real-world systems.
               </h2>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-6">
                 <button
                   type="button"
                   onClick={() => openDrawer('projects')}
-                  className="h-14 sm:h-16 px-8 sm:px-10 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-base sm:text-lg font-bold rounded-[2px] shadow-lg shadow-[var(--accent-orange)]/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
+                  className="h-13 sm:h-14 px-8 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-base font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-[0.99]"
                 >
                   <Layers className="w-5 h-5 shrink-0" />
                   <span>Explore Projects</span>
-                  <span className="font-mono text-xl group-hover:translate-x-0.5 transition-transform">↳</span>
+                  <span className="text-sm font-mono group-hover:translate-x-0.5 transition-transform">↳</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => openDrawer('members')}
-                  className="h-14 sm:h-16 px-8 sm:px-10 bg-[var(--bg-surface)] hover:bg-[var(--bg-page)] text-[var(--text-primary)] border-2 border-[var(--text-primary)] text-base sm:text-lg font-bold rounded-[2px] shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
+                  className="h-13 sm:h-14 px-8 bg-[var(--bg-surface)] hover:bg-[#E8E2D8] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] text-base font-semibold rounded-full shadow-xs hover:shadow transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-[0.99]"
                 >
-                  <Users className="w-5 h-5 text-[var(--accent-purple)] shrink-0" />
+                  <Users className="w-5 h-5 text-[var(--ink-dark)] shrink-0" />
                   <span>Lab Members</span>
-                  <span className="font-mono text-xl group-hover:translate-x-0.5 transition-transform">↳</span>
+                  <span className="text-sm font-mono group-hover:translate-x-0.5 transition-transform">↳</span>
                 </button>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono text-[var(--text-muted)] mt-2">
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-xs font-mono text-[var(--text-muted)] pt-2">
                 <span className="text-[var(--text-subtle)]">Quick links:</span>
                 <Link to="/projects" className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1">
                   All Projects &rarr;
                 </Link>
                 <span>&bull;</span>
-                <Link to="/grants" className="text-[var(--accent-purple)] hover:underline font-semibold flex items-center gap-1">
+                <Link to="/grants" className="text-[var(--ink-dark)] hover:underline font-semibold flex items-center gap-1">
                   <Award className="w-3.5 h-3.5" />
                   Active Grants &rarr;
                 </Link>
@@ -142,18 +139,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 3. FULL-WIDTH ORANGE ABOUT AIR LAB SECTION ── */}
-      <section className="py-12 px-6 max-w-[1140px] mx-auto text-left mb-20 relative z-10">
-        <div className="bg-[var(--accent-orange)] text-white rounded-[4px] p-8 sm:p-12 relative overflow-hidden transition-all duration-200 shadow-xl border border-[var(--accent-orange)]">
+      {/* ── 2. ABOUT AIR LAB SECTION (Deep Ink Band with High Contrast) ── */}
+      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto text-left mb-24 relative z-10">
+        <div className="bg-[var(--ink-dark)] text-white rounded-3xl p-8 sm:p-14 relative overflow-hidden transition-all duration-200 shadow-xl border border-[var(--border-hairline)]">
           <div className="max-w-3xl relative z-10">
-            <div className="flex items-center gap-2 text-white/90 font-mono font-semibold uppercase text-xs mb-3">
-              <div className="w-6 h-[2px] bg-white" />
-              ABOUT AIR LAB · NED UNIVERSITY
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-mono font-semibold uppercase mb-5 tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)]" />
+              ABOUT AIR LAB &bull; NED UNIVERSITY
             </div>
-            <h2 className="text-2xl sm:text-4xl font-head font-normal text-white tracking-tight mb-4">
+
+            <h2 className="text-2xl sm:text-4xl lg:text-[42px] font-head font-medium text-white tracking-tight mb-6 leading-tight">
               Empowering Regional AI Innovation at NED University
             </h2>
-            <div className="space-y-4 text-sm sm:text-base text-white/90 leading-relaxed font-normal">
+
+            <div className="space-y-4 text-sm sm:text-base text-white/80 leading-relaxed font-normal">
               <p>
                 The Artificial Intelligence Research Lab (AIR Lab) at NED University is dedicated to pushing the boundaries of machine learning, natural language processing, and computer vision.
               </p>
@@ -162,32 +161,32 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-white/20 flex flex-wrap gap-4">
-              <Button to="/team" variant="secondary" size="md" className="bg-white text-[var(--text-primary)] hover:bg-gray-100 border-white">
+            <div className="mt-10 pt-6 border-t border-white/15 flex flex-wrap gap-4">
+              <Button to="/team" variant="secondary" size="md" className="bg-white text-[var(--ink-dark)] hover:bg-[#F0ECE4] border-transparent font-semibold">
                 Meet the Team
               </Button>
               <button
                 onClick={() => setApplyModalOpen(true)}
-                className="h-9 px-4 rounded-[2px] border border-white text-white hover:bg-white/10 text-[13px] font-medium tracking-tight transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                className="h-10 px-6 rounded-full border border-white/30 text-white hover:bg-white/10 text-[13.5px] font-medium tracking-tight transition-colors cursor-pointer inline-flex items-center gap-2"
               >
                 <span>Apply for Internship</span>
-                <span className="text-[12px] leading-none">&rarr;</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 4. RESEARCH INITIATIVES (6 Sharp Cards) ── */}
-      <section className="py-12 px-6 max-w-[1140px] mx-auto mb-20 text-left relative z-10">
-        <div className="max-w-2xl mb-12 relative z-10">
-          <span className="text-xs font-mono uppercase font-bold text-[var(--accent-purple)]">
+      {/* ── 3. CORE RESEARCH AREAS (Generous 24px Rounded Stone Cards) ── */}
+      <section className="py-16 px-6 sm:px-10 max-w-[1240px] mx-auto mb-24 text-left relative z-10">
+        <div className="max-w-2xl mb-14 relative z-10">
+          <span className="text-xs font-mono uppercase font-bold text-[var(--accent-orange)] tracking-wider">
             LAB INITIATIVES
           </span>
-          <h2 className="text-3xl sm:text-4xl font-head font-normal text-[var(--text-primary)] tracking-tight mt-1">
+          <h2 className="text-3xl sm:text-4xl font-head font-semibold text-[var(--text-primary)] tracking-tight mt-1.5 mb-3">
             Core Research Areas
           </h2>
-          <p className="text-sm sm:text-base text-[var(--text-muted)] mt-2">
+          <p className="text-base text-[var(--text-muted)] leading-relaxed">
             Exploring the frontiers of machine learning, natural language processing, edge computer vision, and autonomous robotics.
           </p>
         </div>
@@ -198,31 +197,31 @@ export default function Home() {
             return (
               <div
                 key={idx}
-                className="p-6 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[4px] flex flex-col justify-between hover:border-[var(--accent-purple)] hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02] transition-all duration-200 group cursor-pointer"
+                className="p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group cursor-pointer"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-[2px] bg-[var(--accent-purple-light)] text-[var(--accent-purple)] flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="w-11 h-11 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase px-2 py-0.5 bg-[var(--bg-page)] rounded-[2px] border border-[var(--border-hairline)]">
+                    <span className="text-[11px] font-mono text-[var(--text-muted)] uppercase px-3 py-1 bg-[var(--bg-page)] rounded-full border border-[var(--border-hairline)]">
                       {area.tag}
                     </span>
                   </div>
 
-                  <h3 className="font-head font-medium text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors mb-2">
+                  <h3 className="font-head font-semibold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors mb-2.5">
                     {area.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed font-normal">
+                  <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
                     {area.desc}
                   </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-mono font-medium text-[var(--accent-orange)]">
-                  <Link to="/projects" className="inline-flex items-center gap-1 hover:underline">
+                <div className="pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-mono font-medium text-[var(--accent-orange)]">
+                  <Link to="/projects" className="inline-flex items-center gap-1.5 hover:underline font-semibold">
                     <span>View Projects</span>
-                    <span className="text-[11px] leading-none">&rarr;</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
@@ -231,13 +230,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 5. SPONSORS & INSTITUTIONAL PARTNERS (Logo Grid + Linking Out) ── */}
-      <section className="py-12 px-6 max-w-[1140px] mx-auto text-left mb-20 relative z-10 border-t border-[var(--border-hairline)]">
+      {/* ── 4. SPONSORS & INSTITUTIONAL PARTNERS (Clean Rounded Cards Grid) ── */}
+      <section className="py-16 px-6 sm:px-10 max-w-[1240px] mx-auto text-left mb-24 relative z-10 border-t border-[var(--border-hairline)]">
         <SponsorsGrid />
       </section>
 
-      {/* ── 6. CONTACT SECTION ── */}
-      <section className="py-6 px-6 max-w-[1140px] mx-auto text-left mb-20 relative z-10">
+      {/* ── 5. CONTACT SECTION ── */}
+      <section className="py-10 px-6 sm:px-10 max-w-[1240px] mx-auto text-left mb-24 relative z-10">
         <ContactSection />
       </section>
 

@@ -15,15 +15,15 @@ export const Badge: React.FC<BadgeProps> = ({
   variant = 'white',
   dot = false,
 }) => {
-  const baseStyles = 'inline-flex items-center gap-1.5 h-6 px-2.5 rounded-[2px] text-[11px] font-medium tracking-tight transition-all duration-150 select-none'
+  const baseStyles = 'inline-flex items-center gap-1.5 h-6 px-3 rounded-full text-[11px] font-medium tracking-tight transition-all duration-150 select-none'
 
   const variantStyles = {
     white: 'bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-hairline)] shadow-xs',
-    dark: 'bg-[var(--text-primary)] text-white border border-transparent shadow-xs',
+    dark: 'bg-[var(--ink-dark)] text-white border border-transparent shadow-xs',
     outline: 'bg-transparent text-[var(--text-muted)] border border-[var(--border-hairline)]',
     orange: 'bg-[var(--accent-orange)] text-white border border-transparent shadow-xs',
-    purple: 'bg-[var(--accent-purple)] text-white border border-transparent shadow-xs',
-    aurora: 'bg-[var(--accent-purple-light)] text-[var(--accent-purple)] border border-[var(--accent-purple)]/20 shadow-xs',
+    purple: 'bg-[var(--ink-dark)] text-white border border-transparent shadow-xs',
+    aurora: 'bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 shadow-xs',
   }
 
   return (

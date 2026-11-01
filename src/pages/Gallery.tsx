@@ -28,9 +28,9 @@ export default function Gallery() {
   }, [selectedImage])
 
   return (
-    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-6 max-w-[1200px] mx-auto relative font-sans text-[var(--text-primary)]">
+    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
-      <div className="mb-12 text-left max-w-3xl">
+      <div className="mb-14 text-left max-w-3xl">
         <SectionReveal delay={0}>
           <div className="mb-4">
             <Badge variant="purple" icon={<Camera className="w-3.5 h-3.5 text-white" />}>
@@ -40,20 +40,20 @@ export default function Gallery() {
         </SectionReveal>
 
         <SectionReveal delay={0.08}>
-          <h1 className="font-head font-normal text-[var(--text-primary)] mb-3 tracking-tight">
+          <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
             Laboratory Gallery & Media
           </h1>
         </SectionReveal>
 
         <SectionReveal delay={0.16}>
-          <p className="text-[16px] sm:text-[18px] text-[var(--text-muted)] leading-relaxed font-normal">
+          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
             Visual documentation of supercomputer commissioning, outdoor drone flight trials, hardware prototyping, and hackathons.
           </p>
         </SectionReveal>
       </div>
 
-      {/* Simple, Filter-free Image Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 auto-rows-[280px] gap-6 text-left">
+      {/* Image Grid with 24px Rounded Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 auto-rows-[300px] gap-6 text-left">
         {galleryData.map((item, i) => (
           <div
             key={item.id}
@@ -61,7 +61,7 @@ export default function Gallery() {
           >
             <div
               onClick={() => setSelectedImage(item)}
-              className="h-full relative rounded-[4px] overflow-hidden border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer group shadow-sm hover:border-[var(--accent-purple)] transition-all"
+              className="h-full relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer group shadow-sm hover:border-[var(--accent-orange)]/50 hover:shadow-lg transition-all duration-300"
               style={{ transitionDelay: `${i * 30}ms` }}
             >
               <img
@@ -70,16 +70,16 @@ export default function Gallery() {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
 
               <div className="absolute top-4 right-4 pointer-events-none">
-                <span className="p-1.5 rounded-[2px] bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center">
+                <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center shadow-xs">
                   <Maximize2 className="w-3.5 h-3.5" />
                 </span>
               </div>
 
-              <div className="absolute bottom-4 left-4 right-4 pointer-events-none">
-                <h3 className="text-base sm:text-lg font-medium font-head text-white leading-tight mb-1">
+              <div className="absolute bottom-5 left-5 right-5 pointer-events-none">
+                <h3 className="text-base sm:text-lg font-semibold font-head text-white leading-tight mb-1">
                   {item.title}
                 </h3>
                 <p className="text-xs text-white/80 line-clamp-1">{item.desc}</p>
@@ -100,7 +100,7 @@ export default function Gallery() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setSelectedImage(null)}
-                  className="absolute inset-0 bg-black/70 backdrop-blur-[16px]"
+                  className="absolute inset-0 bg-black/75 backdrop-blur-md"
                 />
 
                 <motion.div
@@ -108,11 +108,11 @@ export default function Gallery() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className="relative max-w-4xl w-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[4px] overflow-hidden shadow-2xl z-10 text-left"
+                  className="relative max-w-4xl w-full bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl overflow-hidden shadow-2xl z-10 text-left"
                 >
                   <button
                     onClick={() => setSelectedImage(null)}
-                    className="absolute top-4 right-4 w-8 h-8 rounded-[2px] bg-black/60 text-white flex items-center justify-center hover:bg-black transition-colors z-20 cursor-pointer"
+                    className="absolute top-5 right-5 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black transition-colors z-20 cursor-pointer shadow-md"
                     aria-label="Close image modal"
                   >
                     <X className="w-4 h-4" />
@@ -126,11 +126,11 @@ export default function Gallery() {
                     />
                   </div>
 
-                  <div className="p-6">
-                    <h3 className="text-xl font-medium font-head text-[var(--text-primary)] mb-1">
+                  <div className="p-6 sm:p-8">
+                    <h3 className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)] mb-2">
                       {selectedImage.title}
                     </h3>
-                    <p className="text-sm text-[var(--text-muted)]">{selectedImage.desc}</p>
+                    <p className="text-sm text-[var(--text-muted)] leading-relaxed">{selectedImage.desc}</p>
                   </div>
                 </motion.div>
               </div>
