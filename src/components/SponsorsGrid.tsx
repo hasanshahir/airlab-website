@@ -61,7 +61,7 @@ export const SponsorsGrid: React.FC = () => {
             </div>
 
             <div className="pt-3 mt-3 border-t border-[var(--border-hairline)] flex items-center justify-between text-[11px] font-mono text-[var(--accent-orange)]">
-              <span>Visit Portal</span>
+              <span>Visit Website</span>
               <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </a>

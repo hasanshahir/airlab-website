@@ -92,7 +92,7 @@ export default function Layout() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-[11px] font-mono text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
               >
-                NED Portal <ExternalLink className="w-3 h-3" />
+                NED University <ExternalLink className="w-3 h-3" />
               </a>
             </div>
           </div>
@@ -288,7 +288,7 @@ export default function Layout() {
                 <ul className="space-y-2.5 text-[13.5px] text-[var(--text-muted)]">
                   <li>
                     <a href="https://cct.neduet.edu.pk/AIR" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-orange)] transition-colors inline-flex items-center gap-1">
-                      Official Portal <ExternalLink className="w-3 h-3 text-[var(--text-subtle)]" />
+                      Department Website <ExternalLink className="w-3 h-3 text-[var(--text-subtle)]" />
                     </a>
                   </li>
                   <li>
@@ -298,7 +298,7 @@ export default function Layout() {
                   </li>
                   <li>
                     <button onClick={() => setApplyModalOpen(true)} className="hover:text-[var(--accent-orange)] transition-colors cursor-pointer text-left">
-                      Internship Portal
+                      Apply for Internship
                     </button>
                   </li>
                   <li>

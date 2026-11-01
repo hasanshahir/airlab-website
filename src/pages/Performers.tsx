@@ -75,7 +75,7 @@ export default function Performers() {
             </div>
 
             <span className="text-xs font-mono text-[var(--text-subtle)]">
-              Verified by AIR Lab Academic Council
+              Recognized by AIR Lab
             </span>
           </div>
 
@@ -84,7 +84,7 @@ export default function Performers() {
             {/* Clickable Portrait Image */}
             <Link
               to={teamRedirectUrl}
-              title={`Click to view ${featuredPerformer.name} in Team Roster`}
+              title={`Click to view ${featuredPerformer.name} on Team page`}
               className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-[4px] overflow-hidden shrink-0 border-2 border-[var(--border-hairline)] shadow-sm group cursor-pointer bg-[var(--bg-page)] transition-transform duration-300 hover:scale-102"
             >
               <img
@@ -94,7 +94,7 @@ export default function Performers() {
               />
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <span className="px-2.5 py-1 rounded-[2px] bg-white text-gray-900 text-[10px] font-mono font-bold shadow-md">
-                  View Card
+                  View Profile
                 </span>
               </div>
             </Link>
@@ -184,8 +184,8 @@ export default function Performers() {
               to={teamRedirectUrl}
               className="h-10 px-5 rounded-[2px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-medium flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
             >
-              <span>View Full Profile in Research Interns</span>
-              <span>↳</span>
+              <span>View Full Profile on Team Page</span>
+              <span>&rarr;</span>
             </Link>
 
             <div className="flex items-center gap-2.5">

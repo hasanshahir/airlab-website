@@ -83,8 +83,8 @@ export default function Projects() {
       {/* ── Section Header ── */}
       <div className="mb-10 text-left max-w-3xl">
         <div className="mb-3">
-          <CornerBracket tag="Active Portfolio" tagColor="bg-[var(--accent-orange)] text-white">
-            Research Benchmarks
+          <CornerBracket tag="Projects" tagColor="bg-[var(--accent-orange)] text-white">
+            Featured Work
           </CornerBracket>
         </div>
 
@@ -277,10 +277,10 @@ export default function Projects() {
                 {/* Bottom Action Footer (SYS_ID removed as requested) */}
                 <div className="pt-3 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-mono">
                   <span className="text-[var(--text-subtle)] uppercase tracking-wider text-[11px]">
-                    {proj.category} Track
+                    {proj.category}
                   </span>
                   <span className="text-[var(--accent-orange)] font-medium inline-flex items-center gap-1 group-hover:underline">
-                    View Team & Details <span className="text-[11px]">↳</span>
+                    View Details <span className="text-[11px]">&rarr;</span>
                   </span>
                 </div>
               </div>
@@ -402,19 +402,19 @@ export default function Projects() {
                         <span className="font-semibold text-[var(--accent-orange)]">{selectedProject.status} Review</span>
                       </div>
                       <div className="p-3 bg-[var(--bg-page)] border border-[var(--border-hairline)] rounded-[2px]">
-                        <span className="text-[var(--text-subtle)] block mb-1">SYSTEM CLASSIFICATION</span>
-                        <span className="font-semibold text-[var(--text-primary)]">{selectedProject.category} Initiative</span>
+                        <span className="text-[var(--text-subtle)] block mb-1">PROJECT CATEGORY</span>
+                        <span className="font-semibold text-[var(--text-primary)]">{selectedProject.category}</span>
                       </div>
                       {selectedProject.funderUrl && (
                         <div className="p-3 bg-[var(--bg-page)] border border-[var(--border-hairline)] rounded-[2px]">
-                          <span className="text-[var(--text-subtle)] block mb-1">OFFICIAL SPONSOR PORTAL</span>
+                          <span className="text-[var(--text-subtle)] block mb-1">SPONSOR WEBSITE</span>
                           <a
                             href={selectedProject.funderUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[var(--accent-purple)] hover:underline font-semibold flex items-center gap-1"
                           >
-                            Visit Sponsor Site <ExternalLink className="w-3 h-3" />
+                            Visit Website <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
                       )}
@@ -446,7 +446,7 @@ export default function Projects() {
                     {projectMembers.length > 0 && (
                       <div className="mb-2 pt-5 border-t border-[var(--border-hairline)]">
                         <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-[var(--accent-purple)]" /> Project Investigators & Research Fellows
+                          <Users className="w-3.5 h-3.5 text-[var(--accent-purple)]" /> Project Leads & Team
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                           {projectMembers.map(member => (
@@ -501,9 +501,10 @@ export default function Projects() {
                   <div className="px-6 py-3.5 bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] flex items-center justify-end">
                     <button
                       onClick={() => setSelectedProject(null)}
-                      className="px-4 py-1.5 rounded-[2px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-mono font-medium transition-colors cursor-pointer"
+                      className="px-5 py-2 rounded-[2px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
                     >
-                      Close Inspection
+                      <X className="w-3.5 h-3.5" />
+                      <span>Close</span>
                     </button>
                   </div>
                 </motion.div>

@@ -167,7 +167,7 @@ export default function Grants() {
                             rel="noreferrer"
                             className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1 font-semibold"
                           >
-                            <span>Official Funder Portal</span>
+                            <span>Funder Website</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         )}

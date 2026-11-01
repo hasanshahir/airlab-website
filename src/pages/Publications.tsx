@@ -179,7 +179,7 @@ export default function Publications() {
                         rel="noopener noreferrer"
                         className="h-8.5 px-3.5 rounded-[2px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-medium shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                       >
-                        <span>Official Link</span>
+                        <span>Read Paper</span>
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
@@ -204,12 +204,12 @@ export default function Publications() {
                       {copiedId === pub.id ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                          <span className="text-[var(--accent-orange)] font-semibold">BibTeX Copied!</span>
+                          <span className="text-[var(--accent-orange)] font-semibold">Citation Copied!</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5 text-[var(--text-subtle)]" />
-                          <span>BibTeX Cite</span>
+                          <span>Copy Citation</span>
                         </>
                       )}
                     </button>

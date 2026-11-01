@@ -123,9 +123,9 @@ export default function Home() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono text-[var(--text-muted)] mt-2">
-                <span className="text-[var(--text-subtle)]">Direct navigation:</span>
+                <span className="text-[var(--text-subtle)]">Quick links:</span>
                 <Link to="/projects" className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1">
-                  Full Projects Page &rarr;
+                  All Projects &rarr;
                 </Link>
                 <span>&bull;</span>
                 <Link to="/grants" className="text-[var(--accent-purple)] hover:underline font-semibold flex items-center gap-1">
@@ -134,7 +134,7 @@ export default function Home() {
                 </Link>
                 <span>&bull;</span>
                 <Link to="/team" className="text-[var(--text-primary)] hover:underline font-semibold flex items-center gap-1">
-                  Full Team Directory &rarr;
+                  All Team Members &rarr;
                 </Link>
               </div>
             </div>
@@ -170,8 +170,8 @@ export default function Home() {
                 onClick={() => setApplyModalOpen(true)}
                 className="h-9 px-4 rounded-[2px] border border-white text-white hover:bg-white/10 text-[13px] font-medium tracking-tight transition-colors cursor-pointer inline-flex items-center gap-1.5"
               >
-                <span>Apply for Vacancy</span>
-                <span className="text-[12px] leading-none">↳</span>
+                <span>Apply for Internship</span>
+                <span className="text-[12px] leading-none">&rarr;</span>
               </button>
             </div>
           </div>
@@ -221,8 +221,8 @@ export default function Home() {
 
                 <div className="pt-4 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-mono font-medium text-[var(--accent-orange)]">
                   <Link to="/projects" className="inline-flex items-center gap-1 hover:underline">
-                    <span>Explore domain</span>
-                    <span className="text-[11px] leading-none">↳</span>
+                    <span>View Projects</span>
+                    <span className="text-[11px] leading-none">&rarr;</span>
                   </Link>
                 </div>
               </div>

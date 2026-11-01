@@ -234,7 +234,7 @@ export default function Team() {
                           </span>
                           <span className="px-2.5 py-1 rounded-[2px] text-xs font-mono font-medium bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)] flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
-                            Tenure: {raw?.tenure || '2020 — Present'}
+                            Active: {raw?.tenure || '2020 — Present'}
                           </span>
                         </div>
 
@@ -289,7 +289,7 @@ export default function Team() {
                             rel="noreferrer"
                             className="h-9 px-4 rounded-[2px] bg-[var(--text-primary)] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-xs"
                           >
-                            <span>Official CV</span>
+                            <span>View CV</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         )}
@@ -423,7 +423,7 @@ export default function Team() {
                     Previous Research Interns & Alumni
                   </h3>
                   <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5 font-normal">
-                    Scholars who completed applied AI and machine learning research tenures at AIR Lab.
+                    Researchers and interns who completed their research terms at AIR Lab.
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-[2px] text-xs font-mono font-medium bg-[var(--accent-purple-light)] text-[var(--accent-purple)] border border-[var(--accent-purple)]/20 shrink-0">
@@ -436,7 +436,7 @@ export default function Team() {
                   <thead>
                     <tr className="border-b border-[var(--border-hairline)] font-mono text-[11px] uppercase tracking-wider text-[var(--text-subtle)] bg-[var(--bg-page)]">
                       <th className="py-3.5 px-6 font-medium">Name</th>
-                      <th className="py-3.5 px-6 font-medium">Tenure & Department</th>
+                      <th className="py-3.5 px-6 font-medium">Period & Department</th>
                       <th className="py-3.5 px-6 font-medium">Email</th>
                       <th className="py-3.5 px-6 text-right font-medium">LinkedIn</th>
                     </tr>

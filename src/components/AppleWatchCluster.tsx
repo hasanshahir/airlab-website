@@ -861,7 +861,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                   {/* Tenure */}
                   {activeCardMember.member.tenure && (
                     <div className="text-[10px] text-[var(--text-subtle)] font-mono mt-1">
-                      Tenure: {activeCardMember.member.tenure}
+                      Active: {activeCardMember.member.tenure}
                     </div>
                   )}
 
@@ -899,7 +899,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                       }}
                       className="text-[10.5px] font-semibold text-[var(--accent-orange)] flex items-center gap-1 hover:underline cursor-pointer"
                     >
-                      <span>Full Bio</span>
+                      <span>View Profile</span>
                       <ExternalLink className="w-2.5 h-2.5" />
                     </button>
                   </div>

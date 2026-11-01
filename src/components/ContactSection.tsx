@@ -62,7 +62,7 @@ export const ContactSection: React.FC = () => {
                 rel="noreferrer"
                 className="text-xs font-mono text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1 self-center"
               >
-                <span>NED Portal</span>
+                <span>NED University Website</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>

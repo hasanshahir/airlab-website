@@ -134,7 +134,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                     onClick={handleReset}
                     className="h-10 px-8 rounded-[2px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-medium shadow-xs cursor-pointer transition-colors"
                   >
-                    Done ↳
+                    Done
                   </button>
                 </div>
               </div>

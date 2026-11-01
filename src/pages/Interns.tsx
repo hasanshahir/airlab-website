@@ -12,7 +12,7 @@ export default function Interns() {
         <SectionReveal delay={0}>
           <div className="mb-4">
             <Badge variant="purple" icon={<UserCheck className="w-3.5 h-3.5 text-white" />}>
-              ALUMNI TRAJECTORY & FELLOWS
+              ALUMNI & FORMER INTERNS
             </Badge>
           </div>
         </SectionReveal>
@@ -69,7 +69,7 @@ export default function Interns() {
                 {/* Where they are now pill */}
                 <div className="p-3.5 rounded-[2px] bg-[var(--bg-page)] border border-[var(--border-hairline)] mb-5 flex items-center justify-between">
                   <div className="text-xs font-mono">
-                    <span className="text-[var(--text-subtle)] block text-[10px]">CURRENT TRAJECTORY:</span>
+                    <span className="text-[var(--text-subtle)] block text-[10px]">CURRENT ROLE:</span>
                     <strong className="text-[var(--text-primary)] font-semibold">{intern.currentRole}</strong>
                   </div>
                   <Building2 className="w-4 h-4 text-[var(--text-subtle)] shrink-0" />
@@ -95,7 +95,7 @@ export default function Interns() {
 
               <div className="pt-4 border-t border-[var(--border-hairline)] mt-6 flex items-center justify-between text-xs font-mono text-[var(--text-subtle)]">
                 <span>Alumni Network: <strong className="text-[var(--accent-orange)] font-medium">Verified</strong></span>
-                <span className="text-[var(--text-primary)] font-semibold">AIR Lab Fellow</span>
+                <span className="text-[var(--text-primary)] font-semibold">Former Intern</span>
               </div>
             </div>
           </SectionReveal>
@@ -107,7 +107,7 @@ export default function Interns() {
         <div className="craftly-card p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 text-left relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[4px]">
           <div className="relative z-10">
             <span className="text-xs font-mono uppercase tracking-wider text-[var(--accent-orange)] font-semibold mb-2 block">
-              Join the Next Cohort
+              Join Our Team
             </span>
             <h3 className="text-2xl sm:text-3xl font-normal font-head text-[var(--text-primary)] mb-2">
               Summer 2026 Research Internships
@@ -124,7 +124,7 @@ export default function Interns() {
               size="md"
               arrow
             >
-              Apply for Summer '26
+              Apply for Summer 2026
             </Button>
           </div>
         </div>
