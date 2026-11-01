@@ -14,6 +14,7 @@ import {
 import Button from '../components/ui/Button'
 import SectionReveal from '../components/ui/SectionReveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
+import QuickDrawer from '../components/QuickDrawer'
 
 import SponsorsGrid from '../components/SponsorsGrid'
 import ContactSection from '../components/ContactSection'
@@ -59,6 +60,14 @@ const coreResearchAreas = [
 
 export default function Home() {
   const [applyModalOpen, setApplyModalOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [drawerTab, setDrawerTab] = useState<'projects' | 'members'>('projects')
+
+  // Side panel opens on click only (no hover trigger)
+  const openDrawer = (tab: 'projects' | 'members') => {
+    setDrawerTab(tab)
+    setDrawerOpen(true)
+  }
 
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] overflow-hidden">
@@ -92,23 +101,25 @@ export default function Home() {
               </h2>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-3">
-                <Link
-                  to="/projects"
+                <button
+                  type="button"
+                  onClick={() => openDrawer('projects')}
                   className="h-14 sm:h-16 px-8 sm:px-10 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-base sm:text-lg font-bold rounded-[2px] shadow-lg shadow-[var(--accent-orange)]/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
                 >
                   <Layers className="w-5 h-5 shrink-0" />
                   <span>Explore Projects</span>
                   <span className="font-mono text-xl group-hover:translate-x-0.5 transition-transform">↳</span>
-                </Link>
+                </button>
 
-                <Link
-                  to="/team"
+                <button
+                  type="button"
+                  onClick={() => openDrawer('members')}
                   className="h-14 sm:h-16 px-8 sm:px-10 bg-[var(--bg-surface)] hover:bg-[var(--bg-page)] text-[var(--text-primary)] border-2 border-[var(--text-primary)] text-base sm:text-lg font-bold rounded-[2px] shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
                 >
                   <Users className="w-5 h-5 text-[var(--accent-purple)] shrink-0" />
                   <span>Lab Members</span>
                   <span className="font-mono text-xl group-hover:translate-x-0.5 transition-transform">↳</span>
-                </Link>
+                </button>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono text-[var(--text-muted)] mt-2">
@@ -229,6 +240,13 @@ export default function Home() {
       <section className="py-6 px-6 max-w-[1140px] mx-auto text-left mb-20 relative z-10">
         <ContactSection />
       </section>
+
+      {/* Quick Directory Side Panel (opens on button click) */}
+      <QuickDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        initialTab={drawerTab}
+      />
 
       {/* Student Fellowship Modal */}
       <StudentApplicationModal
