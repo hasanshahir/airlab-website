@@ -65,16 +65,16 @@ export default function Performers() {
           {/* Top Banner Ribbon */}
           <div className="flex flex-wrap items-center justify-between gap-3 pb-8 border-b border-[var(--border-hairline)] mb-8">
             <div className="flex items-center gap-2.5">
-              <span className="px-4 py-1.5 rounded-full text-xs font-mono font-semibold bg-[var(--accent-orange)] text-white flex items-center gap-1.5 shadow-xs">
+              <span className="px-4 py-1.5 rounded-full text-xs font-sans font-semibold bg-[var(--accent-orange)] text-white flex items-center gap-1.5 shadow-xs">
                 <Medal className="w-4 h-4 text-white" />
                 Spotlight Award
               </span>
-              <span className="px-3.5 py-1 rounded-full text-xs font-mono font-medium bg-[var(--bg-page)] text-[var(--ink-dark)] border border-[var(--border-hairline)]">
+              <span className="px-3.5 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--ink-dark)] border border-[var(--border-hairline)]">
                 {featuredPerformer.month}
               </span>
             </div>
 
-            <span className="text-xs font-mono text-[var(--text-subtle)]">
+            <span className="text-xs font-sans text-[var(--text-subtle)]">
               Recognized by AIR Lab
             </span>
           </div>
@@ -96,13 +96,13 @@ export default function Performers() {
 
             <div className="flex-1 space-y-3 text-center md:text-left">
               <div>
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[var(--ink-dark)] text-white inline-block mb-2">
+                <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white inline-block mb-2">
                   {featuredPerformer.role}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-bold font-head text-[var(--text-primary)]">
                   {featuredPerformer.name}
                 </h2>
-                <p className="text-xs sm:text-sm text-[var(--text-muted)] font-mono mt-1">
+                <p className="text-xs sm:text-sm text-[var(--text-muted)] font-sans mt-1">
                   {featuredPerformer.department}
                 </p>
               </div>
@@ -112,7 +112,7 @@ export default function Performers() {
                 {featuredPerformer.tags.map((tag, idx) => (
                   <span
                     key={idx}
-                    className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
+                    className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
                   >
                     #{tag}
                   </span>
@@ -138,13 +138,13 @@ export default function Performers() {
               <div className="text-xl sm:text-2xl font-head font-bold text-[var(--accent-orange)]">
                 {featuredPerformer.metrics.citations}
               </div>
-              <div className="text-[11px] font-mono text-[var(--text-subtle)] mt-1">Academic Citations</div>
+              <div className="text-[11px] font-sans text-[var(--text-subtle)] mt-1">Academic Citations</div>
             </div>
             <div className="p-4 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] text-center shadow-xs">
               <div className="text-base sm:text-lg font-head font-bold text-[var(--text-primary)] truncate">
                 {featuredPerformer.metrics.paper}
               </div>
-              <div className="text-[11px] font-mono text-[var(--text-subtle)] mt-1 flex items-center justify-center gap-1">
+              <div className="text-[11px] font-sans text-[var(--text-subtle)] mt-1 flex items-center justify-center gap-1">
                 <BookOpen className="w-3 h-3 text-[var(--ink-dark)]" /> Accepted Venue
               </div>
             </div>
@@ -152,7 +152,7 @@ export default function Performers() {
               <div className="text-base sm:text-lg font-head font-bold text-[var(--text-primary)] truncate">
                 {featuredPerformer.metrics.compute}
               </div>
-              <div className="text-[11px] font-mono text-[var(--text-subtle)] mt-1 flex items-center justify-center gap-1">
+              <div className="text-[11px] font-sans text-[var(--text-subtle)] mt-1 flex items-center justify-center gap-1">
                 <Layers className="w-3 h-3 text-[var(--ink-dark)]" /> Infrastructure
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function Performers() {
               <div className="text-base sm:text-lg font-head font-bold text-[var(--accent-orange)] truncate">
                 {featuredPerformer.metrics.tokens}
               </div>
-              <div className="text-[11px] font-mono text-[var(--text-subtle)] mt-1 flex items-center justify-center gap-1">
+              <div className="text-[11px] font-sans text-[var(--text-subtle)] mt-1 flex items-center justify-center gap-1">
                 <Award className="w-3 h-3 text-[var(--accent-orange)]" /> Model Scale
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function Performers() {
                 href={featuredPerformer.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-10 px-4 rounded-full bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-page)] text-[var(--text-primary)] text-xs font-mono font-medium flex items-center gap-1.5 border border-[var(--border-hairline)] shadow-xs transition-colors"
+                className="h-10 px-4 rounded-full bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-page)] text-[var(--text-primary)] text-xs font-sans font-medium flex items-center gap-1.5 border border-[var(--border-hairline)] shadow-xs transition-colors"
               >
                 <Linkedin className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
                 <span>LinkedIn</span>
@@ -190,7 +190,7 @@ export default function Performers() {
 
               <a
                 href={`mailto:${featuredPerformer.email}`}
-                className="h-10 px-4 rounded-full bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-page)] text-[var(--text-primary)] text-xs font-mono font-medium flex items-center gap-1.5 border border-[var(--border-hairline)] shadow-xs transition-colors"
+                className="h-10 px-4 rounded-full bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-page)] text-[var(--text-primary)] text-xs font-sans font-medium flex items-center gap-1.5 border border-[var(--border-hairline)] shadow-xs transition-colors"
                 title={`Email ${featuredPerformer.email}`}
               >
                 <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />

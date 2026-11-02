@@ -45,11 +45,11 @@ export const ParticleField: React.FC = () => {
 
     // Reference palette: Vivid Red-Orange (#F04E1F), Electric Violet (#6B3FE6), Muted Mauve
     const colorPalette = [
-      'rgba(240, 78, 31, ',    // Vivid red-orange #F04E1F
+      'rgba(217, 83, 30, ',    // Terracotta orange #D9531E
       'rgba(107, 63, 230, ',   // Electric violet #6B3FE6
-      'rgba(197, 185, 206, ',  // Muted mauve #C5B9CE
-      'rgba(240, 78, 31, ',    // Orange accent
-      'rgba(107, 63, 230, ',   // Purple accent
+      'rgba(10, 50, 53, ',     // Deep pine teal #0A3235
+      'rgba(197, 185, 206, ',  // Soft mauve #C5B9CE
+      'rgba(217, 83, 30, ',    // Terracotta accent
     ]
 
     const resize = () => {
@@ -116,7 +116,7 @@ export const ParticleField: React.FC = () => {
         // Draw particle dot
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = p.color + '0.55)'
+        ctx.fillStyle = p.color + '0.28)'
         ctx.fill()
       }
 
@@ -128,7 +128,7 @@ export const ParticleField: React.FC = () => {
           const dist = Math.hypot(dx, dy)
 
           if (dist < 135) {
-            const alpha = (1 - dist / 135) * 0.22
+            const alpha = (1 - dist / 135) * 0.11
             ctx.beginPath()
             ctx.strokeStyle = `rgba(107, 63, 230, ${alpha.toFixed(3)})`
             ctx.lineWidth = 0.8
@@ -145,9 +145,9 @@ export const ParticleField: React.FC = () => {
           const mDist = Math.hypot(mdx, mdy)
 
           if (mDist < 180) {
-            const alpha = (1 - mDist / 180) * 0.45
+            const alpha = (1 - mDist / 180) * 0.25
             ctx.beginPath()
-            ctx.strokeStyle = `rgba(240, 78, 31, ${alpha.toFixed(3)})`
+            ctx.strokeStyle = `rgba(217, 83, 30, ${alpha.toFixed(3)})`
             ctx.lineWidth = 1.0
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(mouse.x, mouse.y)

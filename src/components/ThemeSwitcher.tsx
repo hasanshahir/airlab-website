@@ -27,7 +27,7 @@ export default function ThemeSwitcher() {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider font-mono">Lab Theme Interface</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider font-sans">Lab Theme Interface</h4>
                   <p className="text-[10px] text-[var(--fg-sub)]">Select engineering color palette</p>
                 </div>
               </div>
@@ -42,10 +42,10 @@ export default function ThemeSwitcher() {
 
             {/* Mode toggle */}
             <div className="flex items-center justify-between mb-3 px-2 py-1.5 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)]">
-              <span className="text-xs font-mono font-medium">Display Mode:</span>
+              <span className="text-xs font-sans font-medium">Display Mode:</span>
               <button
                 onClick={toggleDark}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono font-bold bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--primary)] transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-sans font-bold bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--primary)] transition-all cursor-pointer shadow-sm"
               >
                 {isDark ? (
                   <>
@@ -93,7 +93,7 @@ export default function ThemeSwitcher() {
                         />
                       </div>
                       <div>
-                        <div className="text-xs font-bold leading-tight font-mono flex items-center gap-1.5">
+                        <div className="text-xs font-bold leading-tight font-sans flex items-center gap-1.5">
                           {opt.name}
                           {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-ping" />}
                         </div>
@@ -127,7 +127,7 @@ export default function ThemeSwitcher() {
             style={{ backgroundColor: activeTheme.subAccent }}
           />
         </div>
-        <span className="text-xs font-mono font-bold tracking-tight text-[var(--fg)] group-hover:text-[var(--primary)] transition-colors">
+        <span className="text-xs font-sans font-bold tracking-tight text-[var(--fg)] group-hover:text-[var(--primary)] transition-colors">
           {activeTheme.name.split(' ')[0]}
         </span>
         <Palette className="w-3.5 h-3.5 text-[var(--fg-sub)] group-hover:text-[var(--primary)] transition-colors" />

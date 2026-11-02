@@ -33,7 +33,7 @@ export const CornerBracket: React.FC<CornerBracketProps> = ({
       {/* Signature Pill / Tag Next to it */}
       {tag && (
         <span
-          className={`ml-2 sm:ml-3 px-2 py-0.5 text-[10px] sm:text-[11px] font-mono font-medium rounded-[2px] tracking-tight shrink-0 select-none align-middle ${tagColor}`}
+          className={`ml-2 sm:ml-3 px-2 py-0.5 text-[10px] sm:text-[11px] font-sans font-medium rounded-[2px] tracking-tight shrink-0 select-none align-middle ${tagColor}`}
         >
           {tag}
         </span>

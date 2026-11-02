@@ -292,7 +292,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 bg-[var(--accent-orange)] rounded-full"></span>
-              <span className="font-mono text-xs tracking-wider uppercase text-[var(--text-muted)]">AIR Lab NED</span>
+              <span className="font-sans text-xs tracking-wider uppercase text-[var(--text-muted)]">AIR Lab NED</span>
             </div>
             <span className="inline-flex items-center gap-1 text-[11px] text-green-600 font-medium px-2 py-0.5 rounded bg-green-500/10">
               <ShieldCheck className="w-3.5 h-3.5" />
@@ -366,7 +366,7 @@ export default function AdminDashboard() {
           </form>
 
           <div className="mt-4 pt-4 border-t border-[var(--border-hairline)] text-center">
-            <span className="text-[11px] text-[var(--text-muted)] font-mono">
+            <span className="text-[11px] text-[var(--text-muted)] font-sans">
               Credentials: <strong>admin@airlab.neduet.edu.pk</strong> / <strong>airlab2026!</strong>
             </span>
           </div>
@@ -469,7 +469,7 @@ export default function AdminDashboard() {
         </header>
 
         {loading ? (
-          <div className="py-20 text-center text-xs text-[var(--text-muted)] font-mono">
+          <div className="py-20 text-center text-xs text-[var(--text-muted)] font-sans">
             Loading database records...
           </div>
         ) : activeTab === 'applications' ? (
@@ -488,7 +488,7 @@ export default function AdminDashboard() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-sm">{app.name}</span>
-                      <span className="text-xs text-[var(--text-muted)] font-mono">({app.university})</span>
+                      <span className="text-xs text-[var(--text-muted)] font-sans">({app.university})</span>
                       <span
                         className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
                           app.status === 'Accepted'
@@ -617,7 +617,7 @@ export default function AdminDashboard() {
                       .filter(k => !['_id', '__v', 'createdAt', 'updatedAt'].includes(k))
                       .map(field => (
                         <div key={field}>
-                          <label className="block text-xs font-mono uppercase text-[var(--text-muted)] mb-1">
+                          <label className="block text-xs font-sans uppercase text-[var(--text-muted)] mb-1">
                             {field}
                           </label>
                           {typeof editingItem[field] === 'boolean' ? (

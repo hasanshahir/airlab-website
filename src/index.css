@@ -1,5 +1,5 @@
 /* AIR Lab — Concept B Design System (Inspired by allenai.org / Strata) */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ── 1. DESIGN TOKENS (Source of Truth) ── */
@@ -9,7 +9,7 @@
   --font-sans: var(--font-family-base);
   --font-head: var(--font-family-base);
   --font-display: var(--font-family-base);
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-mono: var(--font-family-base);
 
   --font-weight-light: 300;
   --font-weight-normal: 400;
@@ -19,11 +19,11 @@
   --font-weight-extrabold: 800;
 
   /* ── Surface & Canvas (Light / Organic Warm Canvas) ── */
-  --bg-page: #FAF8F4;               /* Warm off-white page background */
-  --bg-backdrop: #F3EFE9;           /* Subtle outer canvas */
-  --bg-surface: #F0ECE4;            /* Secondary warm stone card surface */
+  --bg-page: #FCFBF9;               /* Luminous clean off-white page background */
+  --bg-backdrop: #F7F5F0;           /* Subtle outer canvas */
+  --bg-surface: #F2EFEA;            /* Secondary warm stone card surface */
   --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
-  --bg-surface-glass: rgba(250, 248, 244, 0.95);
+  --bg-surface-glass: rgba(252, 251, 249, 0.95);
 
   /* ── Deep Ink Surfaces (Full-bleed dark bands) ── */
   --ink-dark: #0A3235;              /* Deep pine teal-black */
@@ -209,7 +209,7 @@
     font-weight: 400;
     font-size: 14.5px;
     line-height: 1.6;
-    color: var(--text-muted);
+    color: inherit;
   }
 
   button, input, select, textarea {
@@ -251,6 +251,12 @@
   .dark-ink-band {
     background-color: var(--ink-dark);
     color: var(--text-on-dark);
+  }
+
+  .dark-ink-band p,
+  [class*="bg-[var(--ink-dark)]"] p,
+  .bg-\[var\(--ink-dark\)\] p {
+    color: rgba(255, 255, 255, 0.92) !important;
   }
 
   /* Pill button utility */

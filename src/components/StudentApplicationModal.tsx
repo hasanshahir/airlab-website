@@ -125,7 +125,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                   <p className="text-[14.5px] text-[var(--text-muted)] max-w-md mx-auto mb-6 leading-relaxed">
                     Thank you for applying to the Artificial Intelligence Research Lab at NED University. Your application has been stored in the database. Dr. Murk Marvi and the faculty review committee will review your record and contact you at <strong className="text-[var(--text-primary)]">{formData.email}</strong>.
                   </p>
-                  <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-mono text-[var(--text-muted)] text-left mb-6 max-w-md mx-auto space-y-2">
+                  <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] text-left mb-6 max-w-md mx-auto space-y-2">
                     <div><strong>Applicant:</strong> {formData.name} ({formData.rollNo})</div>
                     <div><strong>Department:</strong> {formData.department}</div>
                     <div><strong>Research Track:</strong> {formData.track}</div>
@@ -141,7 +141,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
             ) : (
               <div>
                 <div className="mb-6">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-[11px] font-mono font-semibold mb-3">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-[11px] font-sans font-semibold mb-3">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>RESEARCH FELLOWSHIP & INTERNSHIP ADMISSIONS</span>
                   </div>

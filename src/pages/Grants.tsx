@@ -47,7 +47,7 @@ export default function Grants() {
             <button
               key={tab}
               onClick={() => setFilter(tab)}
-              className={`px-4 py-2 rounded-full text-xs font-mono font-medium transition-all cursor-pointer ${filter === tab
+              className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${filter === tab
                   ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)]'
                 }`}
@@ -97,7 +97,7 @@ export default function Grants() {
                         <div>
                           <div className="flex flex-wrap items-center gap-2 mb-3">
                             <span
-                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-mono font-semibold ${isActive
+                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-sans font-semibold ${isActive
                                   ? 'bg-emerald-600 text-white'
                                   : 'bg-[var(--ink-dark)] text-white'
                                 }`}
@@ -107,13 +107,13 @@ export default function Grants() {
                             </span>
 
                             {grant.programTitle && (
-                              <span className="px-3 py-1 rounded-full text-xs font-mono text-[var(--ink-dark)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium">
+                              <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--ink-dark)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium">
                                 <Landmark className="w-3 h-3" />
                                 {grant.programTitle}
                               </span>
                             )}
 
-                            <span className="px-3 py-1 rounded-full text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)]">
+                            <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)]">
                               {grant.duration}
                             </span>
 
@@ -123,15 +123,15 @@ export default function Grants() {
                           <h2 className="text-xl sm:text-2xl font-head font-semibold text-[var(--text-primary)] leading-snug">
                             {grant.title}
                           </h2>
-                          <div className="text-sm font-semibold text-[var(--accent-orange)] font-mono mt-1.5">
+                          <div className="text-sm font-semibold text-[var(--accent-orange)] font-sans mt-1.5">
                             Grant Supplier: {grant.funder}
                           </div>
                         </div>
 
                         {grant.amount && (
                           <div className="px-4 py-2.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-left md:text-right shrink-0">
-                            <div className="text-[10px] font-mono text-[var(--text-subtle)] uppercase">Granted Amount</div>
-                            <div className="text-base sm:text-lg font-bold font-mono text-[var(--text-primary)] mt-0.5">
+                            <div className="text-[10px] font-sans text-[var(--text-subtle)] uppercase">Granted Amount</div>
+                            <div className="text-base sm:text-lg font-bold font-sans text-[var(--text-primary)] mt-0.5">
                               {grant.amount}
                             </div>
                           </div>
@@ -144,7 +144,7 @@ export default function Grants() {
                         </p>
                       )}
 
-                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-4 text-xs font-sans">
                         <div className="flex flex-wrap items-center gap-4 text-[var(--text-subtle)]">
                           {grant.leadInvestigator && (
                             <span className="flex items-center gap-1.5">

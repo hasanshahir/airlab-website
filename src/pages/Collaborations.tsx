@@ -59,7 +59,7 @@ export default function Collaborations() {
                 <span className="font-head text-[15px] sm:text-[16px] font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
                   {partner.name}
                 </span>
-                <span className="text-[11px] font-mono text-[var(--text-subtle)] mt-1">
+                <span className="text-[11px] font-sans text-[var(--text-subtle)] mt-1">
                   {partner.type}
                 </span>
               </div>
@@ -97,10 +97,10 @@ export default function Collaborations() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent pointer-events-none" />
 
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                      <span className="px-3 py-1 rounded-full text-xs font-mono font-medium bg-white/95 text-[var(--text-primary)] shadow-xs">
+                      <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-white/95 text-[var(--text-primary)] shadow-xs">
                         {collab.type}
                       </span>
-                      <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[var(--accent-orange)] text-white">
+                      <span className="px-3 py-1 rounded-full text-xs font-sans font-bold bg-[var(--accent-orange)] text-white">
                         {collab.grantAmount}
                       </span>
                     </div>
@@ -109,12 +109,12 @@ export default function Collaborations() {
                       <h3 className="text-xl font-bold font-head text-white leading-tight">
                         {collab.partner}
                       </h3>
-                      <p className="text-[11px] font-mono text-white/80">{collab.period}</p>
+                      <p className="text-[11px] font-sans text-white/80">{collab.period}</p>
                     </div>
                   </div>
 
                   {/* Focus & Description */}
-                  <div className="text-xs font-mono font-semibold text-[var(--text-subtle)] uppercase tracking-wider mb-2">
+                  <div className="text-xs font-sans font-semibold text-[var(--text-subtle)] uppercase tracking-wider mb-2">
                     Focus: <span className="text-[var(--text-primary)] font-sans font-medium">{collab.focus}</span>
                   </div>
                   <p className="text-[14.5px] text-[var(--text-muted)] leading-relaxed mb-6 font-normal">
@@ -123,7 +123,7 @@ export default function Collaborations() {
 
                   {/* Tangible Outcomes */}
                   <div className="rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] p-5 mb-5">
-                    <div className="text-xs font-mono font-semibold text-[var(--text-primary)] mb-2.5 flex items-center gap-1.5">
+                    <div className="text-xs font-sans font-semibold text-[var(--text-primary)] mb-2.5 flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-[var(--accent-orange)]" />
                       Key Joint Deliverables:
                     </div>
@@ -131,7 +131,7 @@ export default function Collaborations() {
                       {collab.outcomes.map((outcome, oIdx) => (
                         <span
                           key={oIdx}
-                          className="px-3 py-1 rounded-full text-[11px] font-mono bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium"
+                          className="px-3 py-1 rounded-full text-[11px] font-sans bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium"
                         >
                           <CheckCircle2 className="w-3 h-3 text-[var(--ink-dark)]" />
                           {outcome}
@@ -141,7 +141,7 @@ export default function Collaborations() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-mono">
+                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans">
                   <span className="text-[var(--text-subtle)]">
                     Alliance Status: <strong className="text-[var(--accent-orange)] font-semibold">Active</strong>
                   </span>

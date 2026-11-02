@@ -52,14 +52,14 @@ export default function Interns() {
 
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="px-3 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-[var(--ink-dark)] text-white">
+                      <span className="px-3 py-0.5 rounded-full text-[11px] font-sans font-semibold bg-[var(--ink-dark)] text-white">
                         {intern.term}
                       </span>
                     </div>
                     <h3 className="text-2xl font-bold font-head text-[var(--text-primary)] mt-1.5">
                       {intern.name}
                     </h3>
-                    <p className="text-xs text-[var(--text-muted)] font-mono flex items-center gap-1.5 mt-0.5">
+                    <p className="text-xs text-[var(--text-muted)] font-sans flex items-center gap-1.5 mt-0.5">
                       <GraduationCap className="w-3.5 h-3.5 text-[var(--text-subtle)]" />
                       {intern.university}
                     </p>
@@ -68,7 +68,7 @@ export default function Interns() {
 
                 {/* Where they are now pill */}
                 <div className="p-4 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] mb-5 flex items-center justify-between">
-                  <div className="text-xs font-mono">
+                  <div className="text-xs font-sans">
                     <span className="text-[var(--text-subtle)] block text-[10px] font-bold">CURRENT ROLE:</span>
                     <strong className="text-[var(--text-primary)] font-semibold text-[13px]">{intern.currentRole}</strong>
                   </div>
@@ -76,7 +76,7 @@ export default function Interns() {
                 </div>
 
                 {/* Project Focus & Paper */}
-                <div className="space-y-2 mb-5 text-xs font-mono">
+                <div className="space-y-2 mb-5 text-xs font-sans">
                   <div className="text-[var(--text-muted)]">
                     Lab Project: <strong className="text-[var(--text-primary)]">{intern.project}</strong>
                   </div>
@@ -93,7 +93,7 @@ export default function Interns() {
                 </blockquote>
               </div>
 
-              <div className="pt-4 border-t border-[var(--border-hairline)] mt-6 flex items-center justify-between text-xs font-mono text-[var(--text-subtle)]">
+              <div className="pt-4 border-t border-[var(--border-hairline)] mt-6 flex items-center justify-between text-xs font-sans text-[var(--text-subtle)]">
                 <span>Alumni Network: <strong className="text-[var(--accent-orange)] font-medium">Verified</strong></span>
                 <span className="text-[var(--text-primary)] font-semibold">Former Intern</span>
               </div>
@@ -106,7 +106,7 @@ export default function Interns() {
       <SectionReveal>
         <div className="p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 text-left relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-sm">
           <div className="relative z-10">
-            <span className="text-xs font-mono uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-2 block">
+            <span className="text-xs font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-2 block">
               Join Our Team
             </span>
             <h3 className="text-2xl sm:text-3xl font-bold font-head text-[var(--text-primary)] mb-2.5">

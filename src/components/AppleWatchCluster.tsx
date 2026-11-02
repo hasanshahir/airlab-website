@@ -701,7 +701,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
 
         {/* Member Count Badge (Top Right) */}
         <div className="absolute top-3.5 right-3.5 z-30 flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-[var(--bg-surface)]/95 border border-[var(--border-hairline)] shadow-xs text-xs pointer-events-none">
-          <span className="text-[10px] font-bold text-[var(--accent-purple)] uppercase flex items-center gap-1.5 font-mono">
+          <span className="text-[10px] font-bold text-[var(--accent-purple)] uppercase flex items-center gap-1.5 font-sans">
             <Users className="w-3 h-3" />
             <span>{members.length} {members.length === 1 ? 'Member' : 'Members'}</span>
           </span>
@@ -767,7 +767,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                     className="w-full h-full bg-[var(--accent-purple)] relative flex items-center justify-center overflow-hidden"
                     style={{ clipPath: HEX_CLIP_PATH }}
                   >
-                    <span className="text-white text-xs sm:text-sm font-bold font-mono select-none">
+                    <span className="text-white text-xs sm:text-sm font-bold font-sans select-none">
                       {getInitials(member.name)}
                     </span>
                     {member.image && (
@@ -837,7 +837,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                   />
 
                   {/* Role Badge */}
-                  <div className="text-[9.5px] font-mono font-bold text-[var(--accent-orange)] uppercase tracking-wider mb-0.5">
+                  <div className="text-[9.5px] font-sans font-bold text-[var(--accent-orange)] uppercase tracking-wider mb-0.5">
                     {activeCardMember.member.role}
                   </div>
 
@@ -847,7 +847,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
                   </div>
 
                   {/* Department */}
-                  <div className="text-[11px] text-[var(--text-muted)] font-mono mt-0.5 line-clamp-1">
+                  <div className="text-[11px] text-[var(--text-muted)] font-sans mt-0.5 line-clamp-1">
                     {activeCardMember.member.department}
                   </div>
 
@@ -860,7 +860,7 @@ export const AppleWatchCluster: React.FC<AppleWatchClusterProps> = ({
 
                   {/* Tenure */}
                   {activeCardMember.member.tenure && (
-                    <div className="text-[10px] text-[var(--text-subtle)] font-mono mt-1">
+                    <div className="text-[10px] text-[var(--text-subtle)] font-sans mt-1">
                       Active: {activeCardMember.member.tenure}
                     </div>
                   )}

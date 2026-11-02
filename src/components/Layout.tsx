@@ -17,6 +17,7 @@ import {
   Image as GalleryIcon,
 } from 'lucide-react'
 import AirLabLogo from './AirLabLogo'
+import ParticleField from './ParticleField'
 import StudentApplicationModal from './StudentApplicationModal'
 
 export default function Layout() {
@@ -87,7 +88,8 @@ export default function Layout() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] font-sans antialiased flex flex-col selection:bg-[var(--accent-orange)] selection:text-white">
+    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] font-sans antialiased flex flex-col selection:bg-[var(--accent-orange)] selection:text-white relative">
+      <ParticleField />
       {/* ── 0. Accessibility Skip Link ── */}
       <a
         href="#main-content"
@@ -112,7 +114,7 @@ export default function Layout() {
           <div className="flex items-center gap-4 shrink-0">
             <a
               href="mailto:contact@airlab.neduet.edu.pk"
-              className="inline-flex items-center gap-1.5 text-[12px] font-mono text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
+              className="inline-flex items-center gap-1.5 text-[12px] font-sans text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
             >
               <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
               <span>contact@airlab.neduet.edu.pk</span>
@@ -122,7 +124,7 @@ export default function Layout() {
               href="https://cct.neduet.edu.pk/AIR"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[12px] font-mono text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
+              className="inline-flex items-center gap-1 text-[12px] font-sans text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
             >
               <span>NED University</span>
               <ExternalLink className="w-3 h-3" />
@@ -195,7 +197,7 @@ export default function Layout() {
                     className="absolute top-full left-0 mt-1.5 w-[520px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
                   >
                     <div>
-                      <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
                         EXPLORE & PORTFOLIO
                       </div>
                       <div className="space-y-1">
@@ -228,7 +230,7 @@ export default function Layout() {
                     </div>
 
                     <div>
-                      <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
                         SCHOLARSHIP & OUTPUT
                       </div>
                       <div className="space-y-1">
@@ -280,7 +282,7 @@ export default function Layout() {
                     className="absolute top-full left-0 mt-1.5 w-[560px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
                   >
                     <div>
-                      <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
                         LAB MEMBERS
                       </div>
                       <div className="space-y-1">
@@ -339,7 +341,7 @@ export default function Layout() {
                     </div>
 
                     <div>
-                      <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
                         COMMUNITY & SPOTLIGHT
                       </div>
                       <div className="space-y-1">
@@ -404,7 +406,7 @@ export default function Layout() {
                     className="absolute top-full left-0 mt-1.5 w-[520px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
                   >
                     <div>
-                      <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
                         INSTITUTION
                       </div>
                       <div className="space-y-1">
@@ -437,7 +439,7 @@ export default function Layout() {
                     </div>
 
                     <div>
-                      <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
                         LIFE AT THE LAB
                       </div>
                       <div className="space-y-1">
@@ -617,7 +619,7 @@ export default function Layout() {
               <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-3">
                 <a
                   href="mailto:contact@airlab.neduet.edu.pk"
-                  className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-orange)] flex items-center gap-1.5 font-mono"
+                  className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-orange)] flex items-center gap-1.5 font-sans"
                 >
                   <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
                   <span>contact@airlab.neduet.edu.pk</span>
@@ -655,14 +657,14 @@ export default function Layout() {
                   </div>
                   <div>
                     <div className="text-base font-bold tracking-tight text-white font-head leading-none">AIR Lab</div>
-                    <div className="text-[11px] text-white/60 tracking-wider uppercase font-mono mt-1">NED UNIVERSITY · CSIT</div>
+                    <div className="text-[11px] text-white/60 tracking-wider uppercase font-sans mt-1">NED UNIVERSITY · CSIT</div>
                   </div>
                 </div>
               </Link>
               <p className="text-[13.5px] text-[var(--text-on-dark-muted)] leading-relaxed max-w-sm">
                 The Artificial Intelligence Research Laboratory, Department of Computer Science & Information Technology (CSIT), NED University of Engineering & Technology. Advancing foundation models, edge perception, and robotics.
               </p>
-              <div className="pt-2 text-[12px] text-white/60 space-y-1.5 font-mono">
+              <div className="pt-2 text-[12px] text-white/60 space-y-1.5 font-sans">
                 <div>NED University Main Campus, Karachi 75270</div>
                 <div>
                   <a
@@ -678,7 +680,7 @@ export default function Layout() {
 
             {/* Column 2: Research */}
             <div>
-              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-mono">
+              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
                 Research
               </h5>
               <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
@@ -692,7 +694,7 @@ export default function Layout() {
 
             {/* Column 3: People & Partners */}
             <div>
-              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-mono">
+              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
                 People & Partners
               </h5>
               <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
@@ -706,7 +708,7 @@ export default function Layout() {
 
             {/* Column 4: NED CSIT & Inquiries */}
             <div>
-              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-mono">
+              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
                 NED CSIT & Inquiries
               </h5>
               <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
@@ -759,7 +761,7 @@ export default function Layout() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between text-[12px] text-white/50 gap-3 pt-6 border-t border-white/10 font-mono">
+          <div className="flex flex-col sm:flex-row items-center justify-between text-[12px] text-white/50 gap-3 pt-6 border-t border-white/10 font-sans">
             <div>
               &copy; {new Date().getFullYear()} Artificial Intelligence Research Lab &bull; Department of CSIT, NED University.
             </div>

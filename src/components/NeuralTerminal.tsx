@@ -123,7 +123,7 @@ export default function NeuralTerminal() {
       glareMaxOpacity={0.12}
       className="w-full max-w-5xl mx-auto"
     >
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/90 backdrop-blur-2xl shadow-2xl shadow-black/60 overflow-hidden text-left font-mono">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/90 backdrop-blur-2xl shadow-2xl shadow-black/60 overflow-hidden text-left font-sans">
         {/* Top Mac Window Bar */}
         <div className="bg-[var(--bg-muted)]/80 px-4 py-3 border-b border-[var(--border)] flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -249,7 +249,7 @@ export default function NeuralTerminal() {
             {logs.map((log, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className="text-[var(--primary)] select-none">❯</span>
-                <span className="font-mono">{log}</span>
+                <span className="font-sans">{log}</span>
               </div>
             ))}
           </div>

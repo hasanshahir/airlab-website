@@ -35,7 +35,7 @@ export function FloatingTechObjects() {
       {/* Floating Tech Bracket */}
       <motion.div 
         style={{ y: y2 }} 
-        className="absolute top-[55%] right-[12%] text-rose-500/25 font-mono text-4xl font-bold"
+        className="absolute top-[55%] right-[12%] text-rose-500/25 font-sans text-4xl font-bold"
       >
         {`{ }`}
       </motion.div>

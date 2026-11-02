@@ -141,7 +141,7 @@ export default function Team() {
                 <span>{tab.label}</span>
                 {tab.count !== undefined && (
                   <span
-                    className={`text-[11px] font-mono px-2 py-0.5 rounded-full ${
+                    className={`text-[11px] font-sans px-2 py-0.5 rounded-full ${
                       isActive ? 'bg-white/20 text-white' : 'bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]'
                     }`}
                   >
@@ -162,7 +162,7 @@ export default function Team() {
               placeholder="Search by name or focus area..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-mono text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
+              className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
             />
           </div>
         )}
@@ -234,7 +234,7 @@ export default function Team() {
                             <GraduationCap className="w-3.5 h-3.5" />
                             {f.role}
                           </span>
-                          <span className="px-3 py-1 rounded-full text-xs font-mono font-medium bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)] flex items-center gap-1">
+                          <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)] flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             Active: {raw?.tenure || '2020 — Present'}
                           </span>
@@ -243,7 +243,7 @@ export default function Team() {
                         <h2 className="text-2xl sm:text-3xl font-semibold font-head text-[var(--text-primary)]">
                           {f.name}
                         </h2>
-                        <p className="text-sm font-medium text-[var(--text-muted)] mt-1 font-mono">
+                        <p className="text-sm font-medium text-[var(--text-muted)] mt-1 font-sans">
                           {f.designation} · {f.department}
                         </p>
 
@@ -253,7 +253,7 @@ export default function Team() {
                             {raw.tags.map((t, idx) => (
                               <span
                                 key={idx}
-                                className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
+                                className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
                               >
                                 #{t}
                               </span>
@@ -263,7 +263,7 @@ export default function Team() {
                       </div>
 
                       {/* Action buttons */}
-                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-3 text-xs font-mono">
+                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-3 text-xs font-sans">
                         {f.hasLinkedIn() && (
                           <a
                             href={f.getLinkedInUrl()!}
@@ -346,10 +346,10 @@ export default function Team() {
 
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-[var(--ink-dark)] text-white">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-sans font-semibold bg-[var(--ink-dark)] text-white">
                               {intern.role}
                             </span>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono text-[var(--text-subtle)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-sans text-[var(--text-subtle)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1">
                               <Calendar className="w-2.5 h-2.5" />
                               {raw?.tenure || intern.term}
                             </span>
@@ -359,7 +359,7 @@ export default function Team() {
                             {intern.name}
                           </h3>
 
-                          <div className="text-[11px] text-[var(--text-muted)] font-mono mt-0.5">
+                          <div className="text-[11px] text-[var(--text-muted)] font-sans mt-0.5">
                             {intern.department}
                           </div>
 
@@ -376,7 +376,7 @@ export default function Team() {
                     </div>
 
                     {/* Contact Links */}
-                    <div className="pt-3 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                    <div className="pt-3 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2 text-xs font-sans">
                       {intern.hasLinkedIn() ? (
                         <a
                           href={intern.getLinkedInUrl()!}
@@ -428,7 +428,7 @@ export default function Team() {
                     Researchers and interns who completed their research terms at AIR Lab.
                   </p>
                 </div>
-                <span className="px-3.5 py-1.5 rounded-full text-xs font-mono font-medium bg-[var(--ink-dark)] text-white shrink-0">
+                <span className="px-3.5 py-1.5 rounded-full text-xs font-sans font-medium bg-[var(--ink-dark)] text-white shrink-0">
                   {sortedPreviousInterns.length} Alumni Recorded
                 </span>
               </div>
@@ -436,7 +436,7 @@ export default function Team() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs sm:text-sm font-sans">
                   <thead>
-                    <tr className="border-b border-[var(--border-hairline)] font-mono text-[11px] uppercase tracking-wider text-[var(--text-subtle)] bg-[var(--bg-page)]">
+                    <tr className="border-b border-[var(--border-hairline)] font-sans text-[11px] uppercase tracking-wider text-[var(--text-subtle)] bg-[var(--bg-page)]">
                       <th className="py-4 px-6 font-semibold">Name</th>
                       <th className="py-4 px-6 font-semibold">Period & Department</th>
                       <th className="py-4 px-6 font-semibold">Email</th>
@@ -455,10 +455,10 @@ export default function Team() {
                         <td className="py-4 px-6 font-semibold text-[var(--text-primary)]">
                           {p.name}
                         </td>
-                        <td className="py-4 px-6 text-[var(--text-muted)] font-mono text-xs">
+                        <td className="py-4 px-6 text-[var(--text-muted)] font-sans text-xs">
                           {p.tenure || 'Former Research Intern'} • {p.department}
                         </td>
-                        <td className="py-4 px-6 font-mono text-xs text-[var(--text-muted)]">
+                        <td className="py-4 px-6 font-sans text-xs text-[var(--text-muted)]">
                           <a href={`mailto:${p.email}`} className="text-[var(--accent-orange)] hover:underline flex items-center gap-1 font-semibold">
                             <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
                             {p.email}
@@ -469,7 +469,7 @@ export default function Team() {
                             href={p.linkedin}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--bg-page)] text-[var(--ink-dark)] hover:bg-[var(--ink-dark)] hover:text-white transition-all text-xs font-mono border border-[var(--border-hairline)] font-medium"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--bg-page)] text-[var(--ink-dark)] hover:bg-[var(--ink-dark)] hover:text-white transition-all text-xs font-sans border border-[var(--border-hairline)] font-medium"
                           >
                             <Linkedin className="w-3.5 h-3.5" />
                             <span>LinkedIn ↳</span>

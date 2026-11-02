@@ -77,7 +77,7 @@ export default function Home() {
           {/* Left Column */}
           <SectionReveal delay={0.05} className="lg:col-span-5">
             <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-mono text-[var(--text-muted)] mb-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] mb-6">
                 <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
                 <span>DEPARTMENT OF CSIT &bull; NED UNIVERSITY</span>
               </div>
@@ -105,7 +105,7 @@ export default function Home() {
                 >
                   <Layers className="w-5 h-5 shrink-0" />
                   <span>Explore Projects</span>
-                  <span className="text-sm font-mono group-hover:translate-x-0.5 transition-transform">↳</span>
+                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
                 </button>
 
                 <button
@@ -115,11 +115,11 @@ export default function Home() {
                 >
                   <Users className="w-5 h-5 text-[var(--ink-dark)] shrink-0" />
                   <span>Lab Members</span>
-                  <span className="text-sm font-mono group-hover:translate-x-0.5 transition-transform">↳</span>
+                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
                 </button>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-xs font-mono text-[var(--text-muted)] pt-2">
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-xs font-sans text-[var(--text-muted)] pt-2">
                 <span className="text-[var(--text-subtle)]">Quick links:</span>
                 <Link to="/projects" className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1">
                   All Projects &rarr;
@@ -143,7 +143,7 @@ export default function Home() {
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto text-left mb-24 relative z-10">
         <div className="bg-[var(--ink-dark)] text-white rounded-3xl p-8 sm:p-14 relative overflow-hidden transition-all duration-200 shadow-xl border border-[var(--border-hairline)]">
           <div className="max-w-3xl relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-mono font-semibold uppercase mb-5 tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-sans font-semibold uppercase mb-5 tracking-wider">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)]" />
               ABOUT AIR LAB &bull; NED UNIVERSITY
             </div>
@@ -152,7 +152,7 @@ export default function Home() {
               Empowering Regional AI Innovation at NED University
             </h2>
 
-            <div className="space-y-4 text-sm sm:text-base text-white/80 leading-relaxed font-normal">
+            <div className="space-y-4 text-base sm:text-[17px] text-white/95 leading-relaxed font-normal [&>p]:text-white/95">
               <p>
                 The Artificial Intelligence Research Lab (AIR Lab) at NED University is dedicated to pushing the boundaries of machine learning, natural language processing, and computer vision.
               </p>
@@ -180,7 +180,7 @@ export default function Home() {
       {/* ── 3. CORE RESEARCH AREAS (Generous 24px Rounded Stone Cards) ── */}
       <section className="py-16 px-6 sm:px-10 max-w-[1240px] mx-auto mb-24 text-left relative z-10">
         <div className="max-w-2xl mb-14 relative z-10">
-          <span className="text-xs font-mono uppercase font-bold text-[var(--accent-orange)] tracking-wider">
+          <span className="text-xs font-sans uppercase font-bold text-[var(--accent-orange)] tracking-wider">
             LAB INITIATIVES
           </span>
           <h2 className="text-3xl sm:text-4xl font-head font-semibold text-[var(--text-primary)] tracking-tight mt-1.5 mb-3">
@@ -204,7 +204,7 @@ export default function Home() {
                     <div className="w-11 h-11 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-mono text-[var(--text-muted)] uppercase px-3 py-1 bg-[var(--bg-page)] rounded-full border border-[var(--border-hairline)]">
+                    <span className="text-[11px] font-sans text-[var(--text-muted)] uppercase px-3 py-1 bg-[var(--bg-page)] rounded-full border border-[var(--border-hairline)]">
                       {area.tag}
                     </span>
                   </div>
@@ -218,7 +218,7 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-mono font-medium text-[var(--accent-orange)]">
+                <div className="pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans font-medium text-[var(--accent-orange)]">
                   <Link to="/projects" className="inline-flex items-center gap-1.5 hover:underline font-semibold">
                     <span>View Projects</span>
                     <ArrowRight className="w-3.5 h-3.5" />

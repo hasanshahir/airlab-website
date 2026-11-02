@@ -64,7 +64,7 @@ export default function Publications() {
 
       {/* Search & Count Bar */}
       <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-6 text-left">
-        <div className="text-xs font-mono text-[var(--text-muted)]">
+        <div className="text-xs font-sans text-[var(--text-muted)]">
           Showing <span className="font-semibold text-[var(--text-primary)]">{filtered.length}</span> publications sorted by year
         </div>
 
@@ -75,7 +75,7 @@ export default function Publications() {
             placeholder="Search papers, authors, venues..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-mono text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
+            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
           />
         </div>
       </div>
@@ -103,24 +103,24 @@ export default function Publications() {
                     {/* Header Badges */}
                     <div className="flex flex-wrap items-center gap-2">
                       {isJournal ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
                           <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
                           Journal Paper
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[var(--ink-dark)] text-white">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white">
                           <FileText className="w-3.5 h-3.5" />
                           Conference Proceeding
                         </span>
                       )}
 
                       {'impactFactor' in pub && pub.impactFactor && (
-                        <span className="px-3 py-1 rounded-full text-xs font-mono font-medium bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]">
+                        <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]">
                           {pub.impactFactor}
                         </span>
                       )}
 
-                      <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)]">
+                      <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)]">
                         Year: {pub.year}
                       </span>
                     </div>
@@ -132,18 +132,18 @@ export default function Publications() {
 
                     {/* Venue */}
                     <div className="text-sm font-medium text-[var(--text-muted)] flex items-center gap-2">
-                      <span className="text-[var(--ink-dark)] font-bold font-mono text-xs">VENUE:</span>
+                      <span className="text-[var(--ink-dark)] font-bold font-sans text-xs">VENUE:</span>
                       <span>{pub.venue}</span>
                     </div>
 
                     {/* Authors */}
-                    <p className="text-xs sm:text-[13.5px] font-mono text-[var(--text-muted)]">
+                    <p className="text-xs sm:text-[13.5px] font-sans text-[var(--text-muted)]">
                       Authors: <span className="text-[var(--text-primary)] font-semibold">{pub.authors}</span>
                     </p>
 
                     {/* DOI */}
                     {pub.doi && (
-                      <div className="text-xs font-mono text-[var(--text-subtle)]">
+                      <div className="text-xs font-sans text-[var(--text-subtle)]">
                         DOI: <a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener noreferrer" className="text-[var(--accent-orange)] hover:underline">{pub.doi}</a>
                       </div>
                     )}
@@ -161,7 +161,7 @@ export default function Publications() {
                         {pub.tags.map((tag: string, idx: number) => (
                           <span
                             key={idx}
-                            className="px-3 py-0.5 rounded-full text-[11px] font-mono bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
+                            className="px-3 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
                           >
                             #{tag}
                           </span>
@@ -198,7 +198,7 @@ export default function Publications() {
 
                     <button
                       onClick={() => copyBibtex(pub)}
-                      className="h-9 px-4 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--bg-surface)] text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] whitespace-nowrap font-medium"
+                      className="h-9 px-4 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--bg-surface)] text-xs font-sans flex items-center gap-1.5 transition-colors cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] whitespace-nowrap font-medium"
                       title="Copy BibTeX Citation"
                     >
                       {copiedId === pub.id ? (
@@ -222,7 +222,7 @@ export default function Publications() {
 
         {filtered.length === 0 && (
           <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-            <p className="text-sm font-mono text-[var(--text-muted)]">No publications matched your search criteria.</p>
+            <p className="text-sm font-sans text-[var(--text-muted)]">No publications matched your search criteria.</p>
           </div>
         )}
       </div>

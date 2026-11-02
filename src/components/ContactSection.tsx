@@ -7,7 +7,7 @@ export const ContactSection: React.FC = () => {
       <div className="p-8 sm:p-12 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-sm text-left relative overflow-hidden">
         <div className="max-w-3xl">
           <div className="flex items-center gap-2 mb-4">
-            <span className="px-3 py-1 text-[11px] font-mono font-semibold bg-[var(--ink-dark)] text-white rounded-full uppercase tracking-wider">
+            <span className="px-3 py-1 text-[11px] font-sans font-semibold bg-[var(--ink-dark)] text-white rounded-full uppercase tracking-wider">
               COMMUNICATIONS & INQUIRIES
             </span>
           </div>
@@ -27,8 +27,8 @@ export const ContactSection: React.FC = () => {
                 <Mail className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <div className="text-[11px] font-mono text-[var(--text-subtle)] uppercase">Official Lab Email</div>
-                <div className="text-xs sm:text-sm font-semibold font-mono text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors truncate mt-0.5">
+                <div className="text-[11px] font-sans text-[var(--text-subtle)] uppercase">Official Lab Email</div>
+                <div className="text-xs sm:text-sm font-semibold font-sans text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors truncate mt-0.5">
                   contact@airlab.neduet.edu.pk
                 </div>
               </div>
@@ -39,8 +39,8 @@ export const ContactSection: React.FC = () => {
                 <Phone className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <div className="text-[11px] font-mono text-[var(--text-subtle)] uppercase">Department Phone</div>
-                <div className="text-xs sm:text-sm font-semibold font-mono text-[var(--text-primary)] mt-0.5">
+                <div className="text-[11px] font-sans text-[var(--text-subtle)] uppercase">Department Phone</div>
+                <div className="text-xs sm:text-sm font-semibold font-sans text-[var(--text-primary)] mt-0.5">
                   9221-99261261 Ext: 2399
                 </div>
               </div>
@@ -52,7 +52,7 @@ export const ContactSection: React.FC = () => {
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[11px] font-mono text-[var(--text-subtle)] uppercase">Physical Address</div>
+                  <div className="text-[11px] font-sans text-[var(--text-subtle)] uppercase">Physical Address</div>
                   <div className="text-xs sm:text-sm font-medium text-[var(--text-primary)] mt-0.5">
                     Department of Computer Science & Information Technology (CSIT), NED University Main Campus, University Road, Karachi 75270, Pakistan.
                   </div>
@@ -62,7 +62,7 @@ export const ContactSection: React.FC = () => {
                 href="https://cct.neduet.edu.pk/AIR"
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs font-mono text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 shrink-0 font-semibold"
+                className="text-xs font-sans text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 shrink-0 font-semibold"
               >
                 <span>NED University Website</span>
                 <ExternalLink className="w-3.5 h-3.5" />

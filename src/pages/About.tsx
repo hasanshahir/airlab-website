@@ -144,7 +144,7 @@ export default function About() {
                     <div className="w-11 h-11 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--ink-dark)] group-hover:text-[var(--accent-orange)] group-hover:scale-105 transition-all mb-5">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-mono text-[var(--text-subtle)] uppercase tracking-wider block mb-1.5 font-semibold">
+                    <span className="text-[11px] font-sans text-[var(--text-subtle)] uppercase tracking-wider block mb-1.5 font-semibold">
                       {pillar.tag}
                     </span>
                     <h3 className="text-[17px] font-semibold font-head text-[var(--text-primary)] mb-2.5 leading-snug">

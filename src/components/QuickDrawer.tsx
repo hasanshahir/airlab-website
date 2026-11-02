@@ -135,7 +135,7 @@ export default function QuickDrawer({
                     <Link
                       to={tab === 'projects' ? '/projects' : '/team'}
                       onClick={onClose}
-                      className="h-9 px-4 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+                      className="h-9 px-4 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-sans font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
                       title={tab === 'projects' ? 'Go to full Projects page' : 'Go to full Members page'}
                     >
                       <span className="hidden sm:inline">Go to {tab === 'projects' ? 'Projects' : 'Team'}</span>
@@ -195,7 +195,7 @@ export default function QuickDrawer({
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-[var(--text-subtle)] hover:text-[var(--text-primary)]"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-sans text-[var(--text-subtle)] hover:text-[var(--text-primary)]"
                     >
                       CLEAR
                     </button>
@@ -209,7 +209,7 @@ export default function QuickDrawer({
                       <button
                         key={f}
                         onClick={() => setMemberFilter(f)}
-                        className={`px-3 py-1 text-[11px] font-mono font-medium rounded-full border transition-colors cursor-pointer ${memberFilter === f
+                        className={`px-3 py-1 text-[11px] font-sans font-medium rounded-full border transition-colors cursor-pointer ${memberFilter === f
                             ? 'bg-[var(--ink-dark)] text-white border-[var(--ink-dark)]'
                             : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:text-[var(--text-primary)]'
                           }`}
@@ -227,7 +227,7 @@ export default function QuickDrawer({
                   /* Projects View */
                   <div className="space-y-4">
                     {filteredProjects.length === 0 ? (
-                      <div className="py-12 text-center text-xs font-mono text-[var(--text-subtle)] bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
+                      <div className="py-12 text-center text-xs font-sans text-[var(--text-subtle)] bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         No projects match "{searchQuery}"
                       </div>
                     ) : (
@@ -239,10 +239,10 @@ export default function QuickDrawer({
                           className="block p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-md transition-all group cursor-pointer text-left"
                         >
                           <div className="flex items-start justify-between gap-3 mb-2.5">
-                            <span className="px-3 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
+                            <span className="px-3 py-0.5 rounded-full text-[10px] font-sans font-bold tracking-wider uppercase bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
                               {proj.category}
                             </span>
-                            <span className="text-[11px] font-mono text-[var(--text-subtle)] font-medium">
+                            <span className="text-[11px] font-sans text-[var(--text-subtle)] font-medium">
                               {proj.status}
                             </span>
                           </div>
@@ -256,7 +256,7 @@ export default function QuickDrawer({
                             {proj.description}
                           </p>
 
-                          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[var(--border-hairline)] text-[11px] font-mono text-[var(--text-subtle)]">
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[var(--border-hairline)] text-[11px] font-sans text-[var(--text-subtle)]">
                             <span>Status: <strong className="text-[var(--text-primary)]">{proj.status}</strong></span>
                             <span className="text-[var(--accent-orange)] font-medium group-hover:underline flex items-center gap-1">
                               <span>View in Projects</span>
@@ -271,7 +271,7 @@ export default function QuickDrawer({
                   /* Members View */
                   <div className="space-y-4">
                     {filteredMembers.length === 0 ? (
-                      <div className="py-12 text-center text-xs font-mono text-[var(--text-subtle)] bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
+                      <div className="py-12 text-center text-xs font-sans text-[var(--text-subtle)] bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         No members match "{searchQuery}"
                       </div>
                     ) : (
@@ -305,13 +305,13 @@ export default function QuickDrawer({
                                 <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                               </h4>
                               {member.isLead && (
-                                <span className="px-2 py-0.5 text-[9px] font-mono font-bold bg-[var(--accent-orange)] text-white rounded-full">
+                                <span className="px-2 py-0.5 text-[9px] font-sans font-bold bg-[var(--accent-orange)] text-white rounded-full">
                                   LEAD
                                 </span>
                               )}
                             </div>
 
-                            <p className="text-xs text-[var(--ink-dark)] font-medium font-mono mb-1">
+                            <p className="text-xs text-[var(--ink-dark)] font-medium font-sans mb-1">
                               {member.role}
                             </p>
 
@@ -321,7 +321,7 @@ export default function QuickDrawer({
                               </p>
                             )}
 
-                            <div className="flex items-center justify-between pt-2 border-t border-[var(--border-hairline)] text-[11px] font-mono">
+                            <div className="flex items-center justify-between pt-2 border-t border-[var(--border-hairline)] text-[11px] font-sans">
                               {member.email ? (
                                 <span className="inline-flex items-center gap-1 text-[var(--text-subtle)]">
                                   <Mail className="w-3 h-3" />

@@ -80,7 +80,7 @@ export default function Projects() {
       {/* ── Section Header ── */}
       <div className="mb-14 text-left max-w-3xl">
         <div className="mb-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-xs font-mono font-semibold">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-xs font-sans font-semibold">
             <Layers className="w-3.5 h-3.5" />
             <span>FEATURED WORK & BENCHMARKS</span>
           </div>
@@ -121,7 +121,7 @@ export default function Projects() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-sans transition-all cursor-pointer ${
                   activeCategory === cat
                     ? 'bg-[var(--ink-dark)] text-white shadow-xs font-semibold'
                     : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)]'
@@ -141,7 +141,7 @@ export default function Projects() {
             placeholder="Search projects, grants..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-mono text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
+            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
           />
         </div>
       </div>
@@ -180,13 +180,13 @@ export default function Projects() {
 
                     {/* Status badge (Ongoing / Finished) */}
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[11px] font-mono font-semibold text-[var(--text-primary)] shadow-xs">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[11px] font-sans font-semibold text-[var(--text-primary)] shadow-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)]" />
                         {proj.category}
                       </span>
 
                       <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-mono font-semibold flex items-center gap-1.5 ${
+                        className={`px-3 py-1 rounded-full text-[10px] font-sans font-semibold flex items-center gap-1.5 ${
                           isOngoing
                             ? 'bg-emerald-600 text-white'
                             : 'bg-[var(--ink-dark)] text-white'
@@ -208,7 +208,7 @@ export default function Projects() {
                   </p>
 
                   {/* Metadata Specs */}
-                  <div className="space-y-1.5 mb-5 text-[12px] font-mono text-[var(--text-muted)] bg-[var(--bg-page)] p-3.5 rounded-2xl border border-[var(--border-hairline)]">
+                  <div className="space-y-1.5 mb-5 text-[12px] font-sans text-[var(--text-muted)] bg-[var(--bg-page)] p-3.5 rounded-2xl border border-[var(--border-hairline)]">
                     <div className="flex items-center justify-between">
                       <span className="text-[var(--text-subtle)]">Timeline:</span>
                       <span className="font-semibold text-[var(--text-primary)]">
@@ -233,7 +233,7 @@ export default function Projects() {
                 </div>
 
                 {/* Bottom Action Footer */}
-                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-mono">
+                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans">
                   <span className="text-[var(--text-subtle)] uppercase tracking-wider text-[11px] font-medium">
                     {proj.category}
                   </span>
@@ -251,7 +251,7 @@ export default function Projects() {
       {/* Empty State */}
       {filtered.length === 0 && (
         <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-          <p className="text-sm font-mono text-[var(--text-muted)]">No projects match the query "{query}".</p>
+          <p className="text-sm font-sans text-[var(--text-muted)]">No projects match the query "{query}".</p>
         </div>
       )}
 
@@ -274,10 +274,10 @@ export default function Projects() {
                 >
                   <div className="px-6 py-4 bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] flex items-center justify-between select-none">
                     <div className="flex items-center gap-2.5">
-                      <span className="px-3 py-1 rounded-full bg-[var(--accent-orange)] text-white text-[11px] font-mono font-semibold">
+                      <span className="px-3 py-1 rounded-full bg-[var(--accent-orange)] text-white text-[11px] font-sans font-semibold">
                         {selectedProject.status}
                       </span>
-                      <span className="text-xs font-mono text-[var(--text-muted)]">
+                      <span className="text-xs font-sans text-[var(--text-muted)]">
                         airlab.neduet.edu.pk/projects/{selectedProject.id}
                       </span>
                     </div>
@@ -331,7 +331,7 @@ export default function Projects() {
                     </p>
 
                     {/* Specs Table */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs font-mono mb-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs font-sans mb-8">
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">PROJECT TIMELINE</span>
                         <span className="font-semibold text-[var(--text-primary)]">
@@ -383,14 +383,14 @@ export default function Projects() {
                     {/* ── Student Researchers & Engineers Section ── */}
                     {selectedProject.teamMembers && selectedProject.teamMembers.length > 0 && (
                       <div className="mb-6 pt-6 border-t border-[var(--border-hairline)]">
-                        <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3.5 flex items-center gap-1.5">
+                        <h4 className="text-xs font-sans font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3.5 flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-[var(--accent-orange)]" /> Student Researchers & Engineers
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           {selectedProject.teamMembers.map((member, idx) => (
                             <div
                               key={idx}
-                              className="px-4 py-2.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-xl flex items-center justify-between text-xs font-mono"
+                              className="px-4 py-2.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-xl flex items-center justify-between text-xs font-sans"
                             >
                               <span className="font-semibold text-[var(--text-primary)]">{member}</span>
                               <span className="text-[10px] text-[var(--ink-dark)] bg-white px-2 py-0.5 rounded-full border border-[var(--border-hairline)]">
@@ -405,7 +405,7 @@ export default function Projects() {
                     {/* ── Project Team Members Section ── */}
                     {projectMembers.length > 0 && (
                       <div className="mb-2 pt-6 border-t border-[var(--border-hairline)]">
-                        <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3.5 flex items-center gap-1.5">
+                        <h4 className="text-xs font-sans font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3.5 flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-[var(--ink-dark)]" /> Project Leads & Team
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -427,14 +427,14 @@ export default function Projects() {
                                 <div className="font-semibold text-xs text-[var(--text-primary)] truncate font-head group-hover/member:text-[var(--accent-orange)] transition-colors">
                                   {member.name}
                                 </div>
-                                <div className="text-[11px] text-[var(--text-muted)] truncate font-mono">
+                                <div className="text-[11px] text-[var(--text-muted)] truncate font-sans">
                                   {member.role || member.category}
                                 </div>
                                 <div className="flex items-center gap-2 mt-1">
                                   <Link
                                     to={`/team?member=${member.id}`}
                                     onClick={() => setSelectedProject(null)}
-                                    className="text-[10px] font-mono text-[var(--accent-orange)] hover:underline inline-flex items-center gap-0.5 font-semibold"
+                                    className="text-[10px] font-sans text-[var(--accent-orange)] hover:underline inline-flex items-center gap-0.5 font-semibold"
                                   >
                                     Profile &rarr;
                                   </Link>
@@ -443,7 +443,7 @@ export default function Projects() {
                                       href={member.linkedin}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-[10px] font-mono text-[var(--text-subtle)] hover:text-[var(--ink-dark)] inline-flex items-center gap-0.5"
+                                      className="text-[10px] font-sans text-[var(--text-subtle)] hover:text-[var(--ink-dark)] inline-flex items-center gap-0.5"
                                       onClick={e => e.stopPropagation()}
                                     >
                                       LinkedIn <ExternalLink className="w-2.5 h-2.5" />
