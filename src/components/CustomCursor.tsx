@@ -102,7 +102,7 @@ export function CustomCursor() {
           x: cursorX,
           y: cursorY,
           backgroundColor: 'var(--accent-orange)',
-          boxShadow: '0 0 8px rgba(240, 78, 31, 0.65)',
+          boxShadow: '0 0 8px var(--accent-orange)',
           opacity: isVisible ? 1 : 0,
         }}
         animate={{
@@ -120,8 +120,8 @@ export function CustomCursor() {
           backgroundColor: 'transparent',
           border: '1.75px solid var(--accent-orange)',
           boxShadow: isHovering
-            ? '0 0 16px rgba(240, 78, 31, 0.45), inset 0 0 6px rgba(240, 78, 31, 0.15)'
-            : '0 0 8px rgba(240, 78, 31, 0.25)',
+            ? '0 0 16px var(--accent-orange), inset 0 0 6px var(--accent-orange)'
+            : '0 0 8px var(--accent-orange)',
           opacity: isVisible ? 1 : 0,
         }}
         animate={{

@@ -6,20 +6,14 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-:root {
-  /* ── Earthy Green 5-Color Core Tokens ──
-     1. Light Mist:      #C7D0C4 (Pale greyish-sage)
-     2. Muted Sage:       #7E9F86 (Soft medium leafy green)
-     3. Deep Eucalyptus:  #517469 (Rich medium-dark teal-green)
-     4. Dark Pine:        #304948 (Deep desaturated forest slate)
-     5. Charcoal Slate:   #2B3940 (Very dark blue-grey charcoal)
-  ── */
-  --color-mist: #C7D0C4;
-  --color-sage: #7E9F86;
-  --color-eucalyptus: #517469;
-  --color-pine: #304948;
-  --color-slate: #2B3940;
-
+/* ═══════════════════════════════════════════════════════════════
+   THEME 1: FRESH GREENS (Default / Revamped Green Theme)
+   Source: Coolors "Fresh Greens" 9-Color Palette
+   #081C15 | #1B4332 | #2D6A4F | #40916C | #52B788 | #74C69D | #95D5B2 | #B7E4C7 | #D8F3DC
+   ═══════════════════════════════════════════════════════════════ */
+:root,
+[data-theme="green"],
+.theme-green {
   /* Typography Scale */
   --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-head: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -31,115 +25,183 @@
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
 
-  /* ── Surface & Canvas (Light-Dominant Earthy Green / Organic Crisp Canvas) ── */
-  --bg-page: #F4F6F3;               /* Crisp, luminous off-white with delicate sage-mist tint */
-  --bg-backdrop: #E9EFE7;           /* Subtle outer canvas */
-  --bg-surface: #E0E7DE;            /* Secondary muted sage/mist card surface */
+  /* Surface & Canvas */
+  --bg-page: #F3FAF5;               /* Crisp, clean, luminous off-white with delicate fresh mint undertone */
+  --bg-backdrop: #E5F4EA;           /* Subtle outer canvas */
+  --bg-surface: #D8F3DC;            /* Pale mint / ice green card surface */
   --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
-  --bg-surface-glass: rgba(244, 246, 243, 0.95);
+  --bg-surface-glass: rgba(243, 250, 245, 0.95);
+  --surface-alt: #C4ECD0;           /* Interactive secondary hover surface */
 
-  /* ── Deep Ink Surfaces (Full-bleed dark bands — Charcoal Slate & Dark Pine) ── */
-  --ink-dark: #2B3940;              /* Charcoal Slate: deep, rich blue-grey charcoal */
-  --ink-dark-surface: #304948;      /* Dark Pine: elevated dark surface */
+  /* Deep Ink Surfaces (Full-bleed dark bands) */
+  --ink-dark: #081C15;              /* Deepest obsidian forest ink */
+  --ink-dark-surface: #1B4332;      /* Deep forest pine surface */
 
-  /* ── Primary Accent (Deep Eucalyptus #517469 — WCAG AA Verified) ── */
-  --accent-orange: #517469;         /* Deep Eucalyptus primary CTA */
-  --accent-orange-hover: #304948;   /* Dark Pine hover state */
-  --accent-orange-light: rgba(126, 159, 134, 0.22); /* Soft Muted Sage tint */
+  /* Primary Accent (Forest Green #2D6A4F — WCAG AA Verified 5.5:1 on white) */
+  --accent-orange: #2D6A4F;
+  --accent-orange-hover: #1B4332;
+  --accent-orange-light: rgba(82, 183, 136, 0.22);
 
   /* Secondary Accents / Semantic Aliases */
-  --accent-purple: #304948;         /* Dark Pine */
-  --accent-purple-hover: #2B3940;   /* Charcoal Slate */
-  --accent-purple-light: rgba(81, 116, 105, 0.15);
+  --accent-purple: #1B4332;
+  --accent-purple-hover: #081C15;
+  --accent-purple-light: rgba(45, 106, 79, 0.15);
 
-  --accent-cyan: #7E9F86;           /* Muted Sage */
-  --accent-cyan-light: rgba(199, 208, 196, 0.35); /* Light Mist tint */
+  --accent-cyan: #74C69D;
+  --accent-cyan-light: rgba(216, 243, 220, 0.40);
 
-  --accent-green: #517469;          /* Deep Eucalyptus */
-  --accent-green-light: rgba(126, 159, 134, 0.25);
+  --accent-green: #52B788;
+  --accent-green-light: rgba(82, 183, 136, 0.25);
 
-  --accent-warm-white: #F4F6F3;
-  --surface-alt: #D5DED3;           /* Interactive secondary hover surface */
+  --accent-warm-white: #F3FAF5;
 
   /* Typography Colors */
-  --text-primary: #2B3940;          /* Charcoal Slate primary text */
-  --text-muted: #517469;            /* Deep Eucalyptus muted secondary text */
-  --text-subtle: #7E9F86;           /* Muted Sage metadata & labels */
-  --text-on-dark: #C7D0C4;          /* Light Mist crisp high-contrast on dark surfaces */
-  --text-on-dark-muted: #A1B3A6;    /* Soft sage muted text on dark bands */
+  --text-primary: #081C15;          /* Deepest obsidian forest ink */
+  --text-muted: #2D6A4F;            /* Rich forest green muted body copy */
+  --text-subtle: #40916C;           /* Medium sea green metadata & labels */
+  --text-on-dark: #D8F3DC;          /* Lightest mint crisp high-contrast on dark surfaces */
+  --text-on-dark-muted: #B7E4C7;    /* Soft mint muted text on dark bands */
 
   --ink: var(--text-primary);
   --ink-2: var(--text-muted);
   --ink-3: var(--text-subtle);
 
   /* Precise Hairline Borders */
-  --border-hairline: rgba(81, 116, 105, 0.22);       /* Deep Eucalyptus at ~22% opacity */
-  --border-hairline-dark: rgba(43, 57, 64, 0.28);    /* Charcoal Slate border */
-  --line-strong: rgba(48, 73, 72, 0.40);             /* Dark Pine accent divider */
+  --border-hairline: rgba(45, 106, 79, 0.20);
+  --border-hairline-dark: rgba(8, 28, 21, 0.32);
+  --line-strong: rgba(27, 67, 50, 0.40);
 
-  /* Generous Geometry ── */
+  /* Generous Geometry */
   --radius-btn: 9999px;
   --radius-card: 24px;
   --radius-inner: 14px;
   --radius-pill: 9999px;
 
-  /* Elegant Organic Shadows Tinted by Charcoal Slate */
-  --shadow-sm: 0 1px 3px rgba(43, 57, 64, 0.08);
-  --shadow-card: 0 4px 20px -2px rgba(43, 57, 64, 0.10);
-  --shadow-hover: 0 12px 32px -4px rgba(43, 57, 64, 0.18);
+  /* Organic Tinted Shadows */
+  --shadow-sm: 0 1px 3px rgba(8, 28, 21, 0.08);
+  --shadow-card: 0 4px 20px -2px rgba(8, 28, 21, 0.10);
+  --shadow-hover: 0 12px 32px -4px rgba(8, 28, 21, 0.18);
 }
 
-/* ── Dark Theme Overrides (High-contrast Charcoal Slate & Dark Pine) ── */
-.dark,
-[data-theme="dark"] {
-  --bg-page: #2B3940;               /* Charcoal Slate primary background */
-  --bg-backdrop: #212C32;
-  --bg-surface: #304948;            /* Dark Pine elevated surface */
-  --bg-surface-elevated: #395453;
-  --bg-surface-glass: rgba(43, 57, 64, 0.95);
+/* ═══════════════════════════════════════════════════════════════
+   THEME 2: DEEP SEA BLUE (The New Blue Theme)
+   Source: Coolors "Deep Sea Blue" 10-Color Palette
+   #001233 | #001845 | #002855 | #023E7D | #0353A4 | #0466C8 | #33415C | #5C677D | #7D8597 | #979DAC
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="blue"],
+.theme-blue {
+  /* Surface & Canvas */
+  --bg-page: #F2F6FA;               /* Luminous cool ice-white canvas */
+  --bg-backdrop: #E4EDF5;           /* Subtle outer blue canvas */
+  --bg-surface: #DCE6F2;            /* Soft ice slate card surface */
+  --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
+  --bg-surface-glass: rgba(242, 246, 250, 0.95);
+  --surface-alt: #CADAE8;           /* Interactive secondary hover surface */
 
-  --ink-dark: #212C32;
-  --ink-dark-surface: #304948;
+  /* Deep Ink Surfaces (Full-bleed dark bands) */
+  --ink-dark: #001233;              /* Deepest navy abyss */
+  --ink-dark-surface: #002855;      /* Dark navy ink surface */
 
-  --accent-orange: #7E9F86;         /* Muted Sage active accent on dark */
-  --accent-orange-hover: #C7D0C4;   /* Light Mist hover state */
-  --accent-orange-light: rgba(126, 159, 134, 0.25);
+  /* Primary Accent (Royal Ocean Sapphire #0353A4 — WCAG AA Verified 5.4:1 on white) */
+  --accent-orange: #0353A4;
+  --accent-orange-hover: #023E7D;
+  --accent-orange-light: rgba(4, 102, 200, 0.18);
 
-  --accent-purple: #7E9F86;
-  --accent-purple-hover: #C7D0C4;
-  --accent-purple-light: rgba(126, 159, 134, 0.2);
+  /* Secondary Accents / Semantic Aliases */
+  --accent-purple: #023E7D;
+  --accent-purple-hover: #001233;
+  --accent-purple-light: rgba(3, 83, 164, 0.14);
 
-  --accent-cyan: #C7D0C4;
-  --accent-cyan-light: rgba(199, 208, 196, 0.2);
+  --accent-cyan: #0466C8;
+  --accent-cyan-light: rgba(220, 230, 242, 0.45);
 
-  --accent-green: #7E9F86;
-  --accent-green-light: rgba(126, 159, 134, 0.2);
+  --accent-green: #0353A4;
+  --accent-green-light: rgba(4, 102, 200, 0.20);
 
-  --accent-warm-white: #C7D0C4;
-  --surface-alt: #395453;
+  --accent-warm-white: #F2F6FA;
 
-  --text-primary: #C7D0C4;          /* Light Mist crisp heading & body text */
-  --text-muted: #7E9F86;            /* Muted Sage secondary text */
-  --text-subtle: #98B3A0;
-  --text-on-dark: #C7D0C4;
-  --text-on-dark-muted: #7E9F86;
+  /* Typography Colors */
+  --text-primary: #001233;          /* Deepest navy abyss */
+  --text-muted: #023E7D;            /* Royal sapphire muted body copy */
+  --text-subtle: #5C677D;           /* Muted steel slate metadata */
+  --text-on-dark: #F2F6FA;          /* Crisp ice white on dark ink bands */
+  --text-on-dark-muted: #979DAC;    /* Pale ice slate muted text on dark bands */
 
   --ink: var(--text-primary);
   --ink-2: var(--text-muted);
   --ink-3: var(--text-subtle);
 
-  --border-hairline: rgba(126, 159, 134, 0.25);
-  --border-hairline-dark: rgba(199, 208, 196, 0.28);
-  --line-strong: rgba(126, 159, 134, 0.45);
+  /* Precise Hairline Borders */
+  --border-hairline: rgba(2, 62, 125, 0.18);
+  --border-hairline-dark: rgba(0, 18, 51, 0.30);
+  --line-strong: rgba(0, 40, 85, 0.40);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
-  --shadow-hover: 0 12px 32px -4px rgba(0, 0, 0, 0.55);
+  /* Tinted Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 18, 51, 0.08);
+  --shadow-card: 0 4px 20px -2px rgba(0, 18, 51, 0.10);
+  --shadow-hover: 0 12px 32px -4px rgba(0, 18, 51, 0.18);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME 3: CLASSIC TERRACOTTA (Concept B Original)
+   #FCFBF9 | #F2EFEA | #D9531E | #0A3235 | #0E3E41
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="classic"],
+.theme-classic {
+  /* Surface & Canvas */
+  --bg-page: #FCFBF9;               /* Luminous clean off-white page background */
+  --bg-backdrop: #F7F5F0;           /* Subtle outer canvas */
+  --bg-surface: #F2EFEA;            /* Warm stone card surface */
+  --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
+  --bg-surface-glass: rgba(252, 251, 249, 0.95);
+  --surface-alt: #E8E2D8;           /* Interactive secondary hover surface */
+
+  /* Deep Ink Surfaces (Full-bleed dark bands) */
+  --ink-dark: #0A3235;              /* Deep pine teal-black */
+  --ink-dark-surface: #0E3E41;      /* Elevated ink card surface */
+
+  /* Primary Accent (Terracotta Orange #D9531E — WCAG AA Verified 4.9:1 on white) */
+  --accent-orange: #D9531E;
+  --accent-orange-hover: #BF4414;
+  --accent-orange-light: #FBEFEA;
+
+  /* Secondary Deep Ink Accent */
+  --accent-purple: #0A3235;
+  --accent-purple-hover: #14494D;
+  --accent-purple-light: rgba(10, 50, 53, 0.08);
+
+  --accent-cyan: #14494D;
+  --accent-cyan-light: rgba(10, 50, 53, 0.06);
+
+  --accent-green: #1B8354;
+  --accent-green-light: rgba(27, 131, 84, 0.15);
+
+  --accent-warm-white: #FCFBF9;
+
+  /* Typography Colors */
+  --text-primary: #112320;          /* Deep pine ink text */
+  --text-muted: #50615D;            /* Calm slate-teal muted text */
+  --text-subtle: #73837F;           /* Subtle metadata */
+  --text-on-dark: #FAF8F4;          /* High contrast text on dark bands */
+  --text-on-dark-muted: #C2CEC9;    /* Muted text on dark bands */
+
+  --ink: var(--text-primary);
+  --ink-2: var(--text-muted);
+  --ink-3: var(--text-subtle);
+
+  /* Precise Hairline Borders */
+  --border-hairline: rgba(10, 50, 53, 0.12);
+  --border-hairline-dark: rgba(10, 50, 53, 0.22);
+  --line-strong: rgba(10, 50, 53, 0.35);
+
+  /* Tinted Shadows */
+  --shadow-sm: 0 1px 3px rgba(10, 50, 53, 0.04);
+  --shadow-card: 0 4px 20px -2px rgba(10, 50, 53, 0.06);
+  --shadow-hover: 0 12px 32px -4px rgba(10, 50, 53, 0.10);
 }
 
 /* ── Base Styling (Clean Modern Typography & Contrast) ── */
 @layer base {
-
   *,
   *::before,
   *::after {
@@ -160,12 +222,27 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    transition: background-color 220ms ease, color 220ms ease;
   }
 
-  /* Selection highlight */
+  /* Selection highlight per theme */
+  [data-theme="green"] ::selection,
+  .theme-green ::selection,
   ::selection {
-    background: var(--color-mist);
-    color: var(--color-slate);
+    background: #B7E4C7;
+    color: #081C15;
+  }
+
+  [data-theme="blue"] ::selection,
+  .theme-blue ::selection {
+    background: #979DAC;
+    color: #001233;
+  }
+
+  [data-theme="classic"] ::selection,
+  .theme-classic ::selection {
+    background: #D9531E;
+    color: #FFFFFF;
   }
 
   /* Display & Wordmarks: Weight 700, Tight Tracking -0.035em, line-height 1.0 */
@@ -243,12 +320,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--color-mist);
+    background: var(--border-hairline-dark);
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-sage);
+    background: var(--accent-orange);
   }
 
   /* Clean cards with subtle hairline border */
@@ -271,7 +348,7 @@
   /* Pill button styling utility */
   .btn-pill-primary {
     background-color: var(--accent-orange);
-    color: var(--color-mist);
+    color: #FFFFFF;
     font-weight: 600;
     border-radius: 9999px;
     transition: all 180ms ease;

@@ -1,60 +1,97 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
-export type ThemePalette = 'default'
+export type ThemePalette = 'green' | 'blue' | 'classic'
 
 export interface ThemeOption {
   id: ThemePalette
   name: string
+  label: string
   accent: string
   subAccent: string
   tertiary: string
-  bgPreview: string
   description: string
-  gradientText: string
-  glows: {
-    c1: string
-    c2: string
-    c3: string
-    c4: string
-  }
+  particleColors: string[]
+  lineColor: string
+  mouseLineColor: string
 }
 
 export const THEME_OPTIONS: ThemeOption[] = [
   {
-    id: 'default',
-    name: 'Cruzeon Industrial',
-    accent: '#F04E1F',
-    subAccent: '#6B3FE6',
-    tertiary: '#C5B9CE',
-    bgPreview: '#E3E0E6',
-    description: 'Reference neo-grotesk industrial aesthetic: vivid red-orange, electric violet & soft lavender-gray',
-    gradientText: 'linear-gradient(135deg, #F04E1F 0%, #6B3FE6 100%)',
-    glows: {
-      c1: 'rgba(240, 78, 31, 0.18)',
-      c2: 'rgba(107, 63, 230, 0.14)',
-      c3: 'rgba(197, 185, 206, 0.25)',
-      c4: 'rgba(240, 78, 31, 0.10)',
-    }
-  }
+    id: 'green',
+    name: 'Fresh Greens',
+    label: 'Green',
+    accent: '#2D6A4F',
+    subAccent: '#081C15',
+    tertiary: '#D8F3DC',
+    description: 'Vibrant organic greens: obsidian forest ink, rich pine, and luminous mint highlights',
+    particleColors: [
+      'rgba(45, 106, 79, ',
+      'rgba(82, 183, 136, ',
+      'rgba(27, 67, 50, ',
+      'rgba(8, 28, 21, ',
+      'rgba(216, 243, 220, ',
+    ],
+    lineColor: 'rgba(45, 106, 79, ',
+    mouseLineColor: 'rgba(82, 183, 136, ',
+  },
+  {
+    id: 'blue',
+    name: 'Deep Sea Blue',
+    label: 'Blue',
+    accent: '#0353A4',
+    subAccent: '#001233',
+    tertiary: '#DCE6F2',
+    description: 'Deep maritime oceanic: abyssal navy, royal sapphire, and cool steel slate',
+    particleColors: [
+      'rgba(3, 83, 164, ',
+      'rgba(4, 102, 200, ',
+      'rgba(2, 62, 125, ',
+      'rgba(0, 18, 51, ',
+      'rgba(151, 157, 172, ',
+    ],
+    lineColor: 'rgba(2, 62, 125, ',
+    mouseLineColor: 'rgba(4, 102, 200, ',
+  },
+  {
+    id: 'classic',
+    name: 'Classic Terracotta',
+    label: 'Classic',
+    accent: '#D9531E',
+    subAccent: '#0A3235',
+    tertiary: '#F2EFEA',
+    description: 'Concept B signature aesthetic: deep pine teal-black, warm stone, and terracotta orange',
+    particleColors: [
+      'rgba(217, 83, 30, ',
+      'rgba(10, 50, 53, ',
+      'rgba(107, 63, 230, ',
+      'rgba(197, 185, 206, ',
+      'rgba(217, 83, 30, ',
+    ],
+    lineColor: 'rgba(10, 50, 53, ',
+    mouseLineColor: 'rgba(217, 83, 30, ',
+  },
 ]
 
 interface ThemeContextType {
   palette: ThemePalette
   setPalette: (palette: ThemePalette) => void
+  activeTheme: ThemeOption
   isDark: boolean
   toggleDark: () => void
-  activeTheme: ThemeOption
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
+const STORAGE_KEY = 'air_theme_active_palette'
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Always default to Cruzeon Industrial in Light mode as in reference
   const [palette, setPaletteState] = useState<ThemePalette>(() => {
-    localStorage.removeItem('air_theme_aurora_v5')
-    localStorage.removeItem('air_theme_palette')
-    localStorage.removeItem('air_theme_mode')
-    return 'default'
+    if (typeof window === 'undefined') return 'green'
+    const saved = localStorage.getItem(STORAGE_KEY) as ThemePalette | null
+    if (saved && THEME_OPTIONS.some(t => t.id === saved)) {
+      return saved
+    }
+    return 'green'
   })
 
   const [isDark, setIsDark] = useState<boolean>(false)
@@ -64,35 +101,20 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     const root = document.documentElement
 
-    // Remove all previous theme classes
-    THEME_OPTIONS.forEach(opt => {
-      if (opt.id !== 'default') {
-        root.classList.remove(opt.id)
-      }
-    })
+    // Remove legacy and existing theme classes
+    root.classList.remove('theme-green', 'theme-blue', 'theme-classic', 'default')
 
-    if (palette !== 'default') {
-      root.classList.add(palette)
+    // Apply active theme class and data-theme attribute
+    root.classList.add(`theme-${palette}`)
+    root.setAttribute('data-theme', palette)
+
+    // Save to localStorage
+    try {
+      localStorage.setItem(STORAGE_KEY, palette)
+    } catch {
+      // Ignore private browsing storage errors
     }
-
-    if (isDark) {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-
-    // Set custom CSS variables for ambient background blurs
-    root.style.setProperty('--glow-1', activeTheme.glows.c1)
-    root.style.setProperty('--glow-2', activeTheme.glows.c2)
-    root.style.setProperty('--glow-3', activeTheme.glows.c3)
-    root.style.setProperty('--glow-4', activeTheme.glows.c4)
-    root.style.setProperty('--accent-gradient', activeTheme.gradientText)
-    root.style.setProperty('--theme-accent', activeTheme.accent)
-    root.style.setProperty('--theme-subaccent', activeTheme.subAccent)
-
-    localStorage.setItem('air_theme_palette', palette)
-    localStorage.setItem('air_theme_mode', isDark ? 'dark' : 'light')
-  }, [palette, isDark, activeTheme])
+  }, [palette])
 
   const setPalette = (newPalette: ThemePalette) => {
     setPaletteState(newPalette)
@@ -103,7 +125,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }
 
   return (
-    <ThemeContext.Provider value={{ palette, setPalette, isDark, toggleDark, activeTheme }}>
+    <ThemeContext.Provider
+      value={{
+        palette,
+        setPalette,
+        activeTheme,
+        isDark,
+        toggleDark,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   )

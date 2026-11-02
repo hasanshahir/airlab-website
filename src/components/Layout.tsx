@@ -19,6 +19,7 @@ import {
 import AirLabLogo from './AirLabLogo'
 import ParticleField from './ParticleField'
 import StudentApplicationModal from './StudentApplicationModal'
+import ThemeToggle from './ThemeToggle'
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -476,11 +477,21 @@ export default function Layout() {
             </NavLink>
           </nav>
 
-          {/* Right Action CTA: Pill Apply Now button */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Right Action CTA: Theme Toggle & Apply Now */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            {/* Desktop Theme Switcher (3 Color Themes) */}
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
+
+            {/* Mobile/Compact Theme Toggle Button */}
+            <div className="md:hidden">
+              <ThemeToggle compact />
+            </div>
+
             <Link
               to="/contact"
-              className="hidden sm:inline-flex text-[13.5px] font-medium text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors items-center gap-1.5 px-3 py-1.5 rounded-full"
+              className="hidden xl:inline-flex text-[13.5px] font-medium text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors items-center gap-1.5 px-3 py-1.5 rounded-full"
             >
               <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
               <span>Inquiries</span>
@@ -488,7 +499,7 @@ export default function Layout() {
 
             <button
               onClick={() => setApplyModalOpen(true)}
-              className="group inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-medium tracking-tight transition-all duration-150 cursor-pointer shadow-sm active:translate-y-[1px]"
+              className="group inline-flex items-center justify-center gap-2 h-10 px-4 sm:px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-medium tracking-tight transition-all duration-150 cursor-pointer shadow-sm active:translate-y-[1px]"
             >
               <span>Apply Now</span>
               <span className="text-[12px] leading-none transition-transform duration-150 group-hover:translate-x-0.5">
@@ -517,6 +528,13 @@ export default function Layout() {
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="lg:hidden absolute top-[72px] left-0 right-0 bg-[var(--bg-surface-elevated)] border-b border-[var(--border-hairline)] px-6 py-6 shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto"
             >
+              <div className="flex items-center justify-between p-3 mb-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)]">
+                <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
+                  Theme
+                </span>
+                <ThemeToggle />
+              </div>
+
               <div className="space-y-2 mb-6">
                 <Link
                   to="/"

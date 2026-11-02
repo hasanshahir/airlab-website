@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { useTheme } from './ThemeProvider'
 
 interface ParticleNode {
   x: number
@@ -12,6 +13,7 @@ interface ParticleNode {
 export const ParticleField: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mousePosRef = useRef<{ x: number; y: number } | null>(null)
+  const { activeTheme } = useTheme()
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -43,14 +45,9 @@ export const ParticleField: React.FC = () => {
     let animationFrameId: number
     let particles: ParticleNode[] = []
 
-    // Earthy Green palette: Light Mist, Muted Sage, Deep Eucalyptus, Dark Pine, Charcoal Slate
-    const colorPalette = [
-      'rgba(81, 116, 105, ',   // Deep Eucalyptus #517469
-      'rgba(126, 159, 134, ',  // Muted Sage #7E9F86
-      'rgba(48, 73, 72, ',     // Dark Pine #304948
-      'rgba(43, 57, 64, ',     // Charcoal Slate #2B3940
-      'rgba(199, 208, 196, ',  // Light Mist #C7D0C4
-    ]
+    const colorPalette = activeTheme.particleColors
+    const nodeLineColor = activeTheme.lineColor
+    const mouseLineColor = activeTheme.mouseLineColor
 
     const resize = () => {
       width = window.innerWidth
@@ -66,7 +63,7 @@ export const ParticleField: React.FC = () => {
     const initParticles = () => {
       particles = []
       const isMobile = width < 768
-      const count = isMobile ? 30 : 65
+      const count = isMobile ? 32 : 68
 
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -74,19 +71,19 @@ export const ParticleField: React.FC = () => {
           y: Math.random() * height,
           vx: (Math.random() - 0.5) * 0.55,
           vy: (Math.random() - 0.5) * 0.55,
-          radius: Math.random() * 1.5 + 1.6,
+          radius: Math.random() * 1.8 + 1.2,
           color: colorPalette[Math.floor(Math.random() * colorPalette.length)],
         })
       }
     }
 
-    window.addEventListener('resize', resize)
     resize()
+    window.addEventListener('resize', resize)
 
     const animate = () => {
-      ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      ctx.save()
+      ctx.scale(dpr, dpr)
 
       const mouse = mousePosRef.current
 
@@ -97,26 +94,28 @@ export const ParticleField: React.FC = () => {
         p.x += p.vx
         p.y += p.vy
 
-        // Bounce off canvas edges
-        if (p.x < 0 || p.x > width) p.vx *= -1
-        if (p.y < 0 || p.y > height) p.vy *= -1
+        // Wrap around boundaries
+        if (p.x < 0) p.x = width
+        if (p.x > width) p.x = 0
+        if (p.y < 0) p.y = height
+        if (p.y > height) p.y = 0
 
-        // Mouse attraction physics
+        // Gentle mouse interaction (flee / drift)
         if (mouse) {
           const dx = p.x - mouse.x
           const dy = p.y - mouse.y
           const dist = Math.hypot(dx, dy)
-          if (dist < 200 && dist > 1) {
-            const force = (200 - dist) / 200
-            p.x -= (dx / dist) * force * 1.3
-            p.y -= (dy / dist) * force * 1.3
+          if (dist < 120 && dist > 0) {
+            const force = (120 - dist) / 120
+            p.x += (dx / dist) * force * 1.5
+            p.y += (dy / dist) * force * 1.5
           }
         }
 
         // Draw particle dot
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = p.color + '0.28)'
+        ctx.fillStyle = `${p.color}0.45)`
         ctx.fill()
       }
 
@@ -128,10 +127,10 @@ export const ParticleField: React.FC = () => {
           const dist = Math.hypot(dx, dy)
 
           if (dist < 135) {
-            const alpha = (1 - dist / 135) * 0.11
+            const alpha = (1 - dist / 135) * 0.12
             ctx.beginPath()
-            ctx.strokeStyle = `rgba(81, 116, 105, ${alpha.toFixed(3)})`
-            ctx.lineWidth = 0.8
+            ctx.strokeStyle = `${nodeLineColor}${alpha.toFixed(3)})`
+            ctx.lineWidth = 0.85
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
             ctx.stroke()
@@ -145,10 +144,10 @@ export const ParticleField: React.FC = () => {
           const mDist = Math.hypot(mdx, mdy)
 
           if (mDist < 180) {
-            const alpha = (1 - mDist / 180) * 0.25
+            const alpha = (1 - mDist / 180) * 0.28
             ctx.beginPath()
-            ctx.strokeStyle = `rgba(126, 159, 134, ${alpha.toFixed(3)})`
-            ctx.lineWidth = 1.0
+            ctx.strokeStyle = `${mouseLineColor}${alpha.toFixed(3)})`
+            ctx.lineWidth = 1.05
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(mouse.x, mouse.y)
             ctx.stroke()
@@ -156,6 +155,7 @@ export const ParticleField: React.FC = () => {
         }
       }
 
+      ctx.restore()
       animationFrameId = requestAnimationFrame(animate)
     }
 
@@ -165,7 +165,7 @@ export const ParticleField: React.FC = () => {
       window.removeEventListener('resize', resize)
       cancelAnimationFrame(animationFrameId)
     }
-  }, [])
+  }, [activeTheme])
 
   return (
     <canvas
