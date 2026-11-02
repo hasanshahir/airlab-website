@@ -1,239 +1,259 @@
-/* AIR Lab — Concept B Design System (Inspired by allenai.org / Strata) */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-/* ── 1. DESIGN TOKENS (Source of Truth) ── */
-:root {
-  /* ── Typography Token (Manrope primary, tight heading leading, comfortable body) ── */
-  --font-family-base: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-sans: var(--font-family-base);
-  --font-head: var(--font-family-base);
-  --font-display: var(--font-family-base);
-  --font-mono: var(--font-family-base);
+@theme inline {
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-head: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
 
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
+:root {
+  /* ── Earthy Green 5-Color Core Tokens ──
+     1. Light Mist:      #C7D0C4 (Pale greyish-sage)
+     2. Muted Sage:       #7E9F86 (Soft medium leafy green)
+     3. Deep Eucalyptus:  #517469 (Rich medium-dark teal-green)
+     4. Dark Pine:        #304948 (Deep desaturated forest slate)
+     5. Charcoal Slate:   #2B3940 (Very dark blue-grey charcoal)
+  ── */
+  --color-mist: #C7D0C4;
+  --color-sage: #7E9F86;
+  --color-eucalyptus: #517469;
+  --color-pine: #304948;
+  --color-slate: #2B3940;
+
+  /* Typography Scale */
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-head: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
 
-  /* ── Surface & Canvas (Light / Organic Warm Canvas) ── */
-  --bg-page: #FCFBF9;               /* Luminous clean off-white page background */
-  --bg-backdrop: #F7F5F0;           /* Subtle outer canvas */
-  --bg-surface: #F2EFEA;            /* Secondary warm stone card surface */
+  /* ── Surface & Canvas (Light-Dominant Earthy Green / Organic Crisp Canvas) ── */
+  --bg-page: #F4F6F3;               /* Crisp, luminous off-white with delicate sage-mist tint */
+  --bg-backdrop: #E9EFE7;           /* Subtle outer canvas */
+  --bg-surface: #E0E7DE;            /* Secondary muted sage/mist card surface */
   --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
-  --bg-surface-glass: rgba(252, 251, 249, 0.95);
+  --bg-surface-glass: rgba(244, 246, 243, 0.95);
 
-  /* ── Deep Ink Surfaces (Full-bleed dark bands) ── */
-  --ink-dark: #0A3235;              /* Deep pine teal-black */
-  --ink-dark-surface: #0E3E41;      /* Elevated ink card surface */
+  /* ── Deep Ink Surfaces (Full-bleed dark bands — Charcoal Slate & Dark Pine) ── */
+  --ink-dark: #2B3940;              /* Charcoal Slate: deep, rich blue-grey charcoal */
+  --ink-dark-surface: #304948;      /* Dark Pine: elevated dark surface */
 
-  /* ── Primary Accent (Deep Terracotta Orange — WCAG AA Verified) ── */
-  --accent-orange: #D9531E;         /* 4.94:1 on white, 4.7:1 on off-white */
-  --accent-orange-hover: #BF4414;
-  --accent-orange-light: #FBEFEA;
+  /* ── Primary Accent (Deep Eucalyptus #517469 — WCAG AA Verified) ── */
+  --accent-orange: #517469;         /* Deep Eucalyptus primary CTA */
+  --accent-orange-hover: #304948;   /* Dark Pine hover state */
+  --accent-orange-light: rgba(126, 159, 134, 0.22); /* Soft Muted Sage tint */
 
-  /* ── Secondary Deep Ink Accent ── */
-  --accent-purple: #0A3235;
-  --accent-purple-hover: #14494D;
-  --accent-purple-light: rgba(10, 50, 53, 0.08);
+  /* Secondary Accents / Semantic Aliases */
+  --accent-purple: #304948;         /* Dark Pine */
+  --accent-purple-hover: #2B3940;   /* Charcoal Slate */
+  --accent-purple-light: rgba(81, 116, 105, 0.15);
 
-  /* Semantic State Aliases */
-  --success: #1B8354;
-  --warning: #D97706;
-  --error: #DC2626;
-  --info: #0284C7;
+  --accent-cyan: #7E9F86;           /* Muted Sage */
+  --accent-cyan-light: rgba(199, 208, 196, 0.35); /* Light Mist tint */
 
-  /* Ecosystem Aliases */
-  --primary: var(--accent-orange);
-  --primary-hover: var(--accent-orange-hover);
-  --primary-light: var(--accent-orange-light);
-  --secondary: var(--accent-purple);
-  --secondary-hover: var(--accent-purple-hover);
-  --secondary-light: var(--accent-purple-light);
+  --accent-green: #517469;          /* Deep Eucalyptus */
+  --accent-green-light: rgba(126, 159, 134, 0.25);
 
-  --bg: var(--bg-page);
-  --surface: var(--bg-surface);
-  --surface-alt: #E8E2D8;
+  --accent-warm-white: #F4F6F3;
+  --surface-alt: #D5DED3;           /* Interactive secondary hover surface */
 
   /* Typography Colors */
-  --text-primary: #112320;          /* Deep ink text */
-  --text-muted: #50615D;            /* Calm slate-teal muted text */
-  --text-subtle: #73837F;           /* Subtle metadata */
-  --text-on-dark: #FAF8F4;          /* High contrast text on dark bands */
-  --text-on-dark-muted: #C2CEC9;    /* Muted text on dark bands */
+  --text-primary: #2B3940;          /* Charcoal Slate primary text */
+  --text-muted: #517469;            /* Deep Eucalyptus muted secondary text */
+  --text-subtle: #7E9F86;           /* Muted Sage metadata & labels */
+  --text-on-dark: #C7D0C4;          /* Light Mist crisp high-contrast on dark surfaces */
+  --text-on-dark-muted: #A1B3A6;    /* Soft sage muted text on dark bands */
 
   --ink: var(--text-primary);
   --ink-2: var(--text-muted);
   --ink-3: var(--text-subtle);
 
-  /* Borders (Subtle 10-12% opacity) ── */
-  --border-hairline: rgba(10, 50, 53, 0.12);
-  --border-hairline-dark: rgba(10, 50, 53, 0.22);
-  --line: var(--border-hairline);
-  --line-strong: rgba(10, 50, 53, 0.35);
+  /* Precise Hairline Borders */
+  --border-hairline: rgba(81, 116, 105, 0.22);       /* Deep Eucalyptus at ~22% opacity */
+  --border-hairline-dark: rgba(43, 57, 64, 0.28);    /* Charcoal Slate border */
+  --line-strong: rgba(48, 73, 72, 0.40);             /* Dark Pine accent divider */
 
-  /* Generous Ai2-Style Geometry ── */
-  --radius-btn: 9999px;             /* Pill buttons */
-  --radius-card: 24px;              /* Generous rounded cards */
+  /* Generous Geometry ── */
+  --radius-btn: 9999px;
+  --radius-card: 24px;
   --radius-inner: 14px;
   --radius-pill: 9999px;
 
-  --shadow-sm: 0 1px 3px rgba(10, 50, 53, 0.04);
-  --shadow-card: 0 4px 20px -2px rgba(10, 50, 53, 0.06);
-  --shadow-hover: 0 12px 32px -4px rgba(10, 50, 53, 0.10);
+  /* Elegant Organic Shadows Tinted by Charcoal Slate */
+  --shadow-sm: 0 1px 3px rgba(43, 57, 64, 0.08);
+  --shadow-card: 0 4px 20px -2px rgba(43, 57, 64, 0.10);
+  --shadow-hover: 0 12px 32px -4px rgba(43, 57, 64, 0.18);
 }
 
-/* ── Dark Theme Overrides (High-contrast deep teal ink) ── */
-.dark, [data-theme="dark"] {
-  --bg-page: #072528;
-  --bg-backdrop: #04191B;
-  --bg-surface: #0E3E41;
-  --bg-surface-glass: rgba(10, 50, 53, 0.95);
+/* ── Dark Theme Overrides (High-contrast Charcoal Slate & Dark Pine) ── */
+.dark,
+[data-theme="dark"] {
+  --bg-page: #2B3940;               /* Charcoal Slate primary background */
+  --bg-backdrop: #212C32;
+  --bg-surface: #304948;            /* Dark Pine elevated surface */
+  --bg-surface-elevated: #395453;
+  --bg-surface-glass: rgba(43, 57, 64, 0.95);
 
-  --text-primary: #FAF8F4;
-  --text-muted: #B8C7C4;
-  --text-subtle: #899D99;
+  --ink-dark: #212C32;
+  --ink-dark-surface: #304948;
 
-  --border-hairline: rgba(250, 248, 244, 0.12);
-  --border-hairline-dark: rgba(250, 248, 244, 0.24);
-  --surface-alt: #124C50;
+  --accent-orange: #7E9F86;         /* Muted Sage active accent on dark */
+  --accent-orange-hover: #C7D0C4;   /* Light Mist hover state */
+  --accent-orange-light: rgba(126, 159, 134, 0.25);
 
-  --accent-orange-light: rgba(217, 83, 30, 0.2);
-  --accent-purple-light: rgba(250, 248, 244, 0.1);
+  --accent-purple: #7E9F86;
+  --accent-purple-hover: #C7D0C4;
+  --accent-purple-light: rgba(126, 159, 134, 0.2);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 12px 32px -4px rgba(0, 0, 0, 0.5);
-}
+  --accent-cyan: #C7D0C4;
+  --accent-cyan-light: rgba(199, 208, 196, 0.2);
 
-/* ── Tailwind Theme Mapping ── */
-@theme inline {
-  --color-bg-page: var(--bg-page);
-  --color-bg-backdrop: var(--bg-backdrop);
-  --color-bg-surface: var(--bg-surface);
-  --color-accent-orange: var(--accent-orange);
-  --color-accent-orange-hover: var(--accent-orange-hover);
-  --color-accent-orange-light: var(--accent-orange-light);
-  --color-accent-purple: var(--accent-purple);
-  --color-accent-purple-hover: var(--accent-purple-hover);
-  --color-accent-purple-light: var(--accent-purple-light);
+  --accent-green: #7E9F86;
+  --accent-green-light: rgba(126, 159, 134, 0.2);
 
-  --color-text-primary: var(--text-primary);
-  --color-text-muted: var(--text-muted);
-  --color-text-subtle: var(--text-subtle);
-  --color-border-hairline: var(--border-hairline);
+  --accent-warm-white: #C7D0C4;
+  --surface-alt: #395453;
 
-  --color-bg: var(--bg-page);
-  --color-surface: var(--bg-surface);
-  --color-primary: var(--accent-orange);
-  --color-secondary: var(--accent-purple);
-  --color-ink: var(--text-primary);
-  --color-ink-2: var(--text-muted);
-  --color-ink-3: var(--text-subtle);
-  --color-line: var(--border-hairline);
+  --text-primary: #C7D0C4;          /* Light Mist crisp heading & body text */
+  --text-muted: #7E9F86;            /* Muted Sage secondary text */
+  --text-subtle: #98B3A0;
+  --text-on-dark: #C7D0C4;
+  --text-on-dark-muted: #7E9F86;
 
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-  --color-info: var(--info);
+  --ink: var(--text-primary);
+  --ink-2: var(--text-muted);
+  --ink-3: var(--text-subtle);
 
-  --font-sans: var(--font-sans);
-  --font-head: var(--font-head);
-  --font-mono: var(--font-mono);
+  --border-hairline: rgba(126, 159, 134, 0.25);
+  --border-hairline-dark: rgba(199, 208, 196, 0.28);
+  --line-strong: rgba(126, 159, 134, 0.45);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
+  --shadow-hover: 0 12px 32px -4px rgba(0, 0, 0, 0.55);
 }
 
 /* ── Base Styling (Clean Modern Typography & Contrast) ── */
 @layer base {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 
   html {
     scroll-behavior: smooth;
-    font-family: var(--font-sans);
-    color: var(--text-primary);
-    background-color: var(--bg-backdrop);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   body {
     background-color: var(--bg-page);
     color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
     font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  /* Selection highlight */
+  ::selection {
+    background: var(--color-mist);
+    color: var(--color-slate);
   }
 
   /* Display & Wordmarks: Weight 700, Tight Tracking -0.035em, line-height 1.0 */
-  .display-wordmark, .hero-display {
+  .display-wordmark,
+  .hero-display {
     font-family: var(--font-head);
     font-weight: 700;
     letter-spacing: -0.035em;
-    line-height: 1.0;
+    line-height: 1.02;
     color: var(--text-primary);
   }
 
   /* Section Headings: Weight 600, tight tracking & line-height */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-head);
     color: var(--text-primary);
   }
 
   h1 {
-    font-weight: 600;
-    font-size: clamp(38px, 5.5vw, 68px);
-    line-height: 1.08;
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 700;
     letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 
   h2 {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
     font-weight: 600;
-    font-size: clamp(28px, 3.6vw, 44px);
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    line-height: 1.18;
   }
 
   h3 {
+    font-size: clamp(1.25rem, 2.2vw, 1.625rem);
     font-weight: 600;
-    font-size: 20px;
-    line-height: 1.3;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
   }
 
   p {
-    font-weight: 400;
-    font-size: 14.5px;
+    color: var(--text-muted);
     line-height: 1.6;
+  }
+
+  a {
     color: inherit;
   }
 
-  button, input, select, textarea {
+  button,
+  input,
+  select,
+  textarea {
     font-family: var(--font-sans);
   }
 
-  ::selection {
-    background: var(--accent-orange);
-    color: #FFFFFF;
-  }
-}
-
-/* ── Reference Components & Utilities ── */
-@layer utilities {
-  .ft-container {
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 24px;
-    padding-right: 24px;
+  /* Focus ring */
+  *:focus-visible {
+    outline: 2px solid var(--accent-orange);
+    outline-offset: 2px;
   }
 
-  /* Ai2 rounded cards with subtle hairline border */
-  .craftly-card, .ft-card {
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-page);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-mist);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-sage);
+  }
+
+  /* Clean cards with subtle hairline border */
+  .craftly-card,
+  .ft-card {
     background-color: var(--bg-surface);
     border: 1px solid var(--border-hairline);
     border-radius: var(--radius-card);
@@ -241,26 +261,31 @@
     transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
   }
 
-  .craftly-card:hover, .ft-card:hover {
+  .craftly-card:hover,
+  .ft-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
     border-color: var(--border-hairline-dark);
   }
 
-  /* Full-bleed dark ink band */
-  .dark-ink-band {
-    background-color: var(--ink-dark);
-    color: var(--text-on-dark);
+  /* Pill button styling utility */
+  .btn-pill-primary {
+    background-color: var(--accent-orange);
+    color: var(--color-mist);
+    font-weight: 600;
+    border-radius: 9999px;
+    transition: all 180ms ease;
   }
 
-  .dark-ink-band p,
-  [class*="bg-[var(--ink-dark)]"] p,
-  .bg-\[var\(--ink-dark\)\] p {
-    color: rgba(255, 255, 255, 0.92) !important;
+  .btn-pill-primary:hover {
+    background-color: var(--accent-orange-hover);
+    color: #FFFFFF;
   }
 
-  /* Pill button utility */
-  .pill-button {
+  .btn-pill-secondary {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-hairline);
     border-radius: 9999px;
     transition: all 180ms ease;
   }

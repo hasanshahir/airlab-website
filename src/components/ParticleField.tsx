@@ -43,13 +43,13 @@ export const ParticleField: React.FC = () => {
     let animationFrameId: number
     let particles: ParticleNode[] = []
 
-    // Reference palette: Vivid Red-Orange (#F04E1F), Electric Violet (#6B3FE6), Muted Mauve
+    // Earthy Green palette: Light Mist, Muted Sage, Deep Eucalyptus, Dark Pine, Charcoal Slate
     const colorPalette = [
-      'rgba(217, 83, 30, ',    // Terracotta orange #D9531E
-      'rgba(107, 63, 230, ',   // Electric violet #6B3FE6
-      'rgba(10, 50, 53, ',     // Deep pine teal #0A3235
-      'rgba(197, 185, 206, ',  // Soft mauve #C5B9CE
-      'rgba(217, 83, 30, ',    // Terracotta accent
+      'rgba(81, 116, 105, ',   // Deep Eucalyptus #517469
+      'rgba(126, 159, 134, ',  // Muted Sage #7E9F86
+      'rgba(48, 73, 72, ',     // Dark Pine #304948
+      'rgba(43, 57, 64, ',     // Charcoal Slate #2B3940
+      'rgba(199, 208, 196, ',  // Light Mist #C7D0C4
     ]
 
     const resize = () => {
@@ -130,7 +130,7 @@ export const ParticleField: React.FC = () => {
           if (dist < 135) {
             const alpha = (1 - dist / 135) * 0.11
             ctx.beginPath()
-            ctx.strokeStyle = `rgba(107, 63, 230, ${alpha.toFixed(3)})`
+            ctx.strokeStyle = `rgba(81, 116, 105, ${alpha.toFixed(3)})`
             ctx.lineWidth = 0.8
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
@@ -147,7 +147,7 @@ export const ParticleField: React.FC = () => {
           if (mDist < 180) {
             const alpha = (1 - mDist / 180) * 0.25
             ctx.beginPath()
-            ctx.strokeStyle = `rgba(217, 83, 30, ${alpha.toFixed(3)})`
+            ctx.strokeStyle = `rgba(126, 159, 134, ${alpha.toFixed(3)})`
             ctx.lineWidth = 1.0
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(mouse.x, mouse.y)

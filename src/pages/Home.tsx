@@ -111,7 +111,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => openDrawer('members')}
-                  className="h-13 sm:h-14 px-8 bg-[var(--bg-surface)] hover:bg-[#E8E2D8] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] text-base font-semibold rounded-full shadow-xs hover:shadow transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-[0.99]"
+                  className="h-13 sm:h-14 px-8 bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] text-base font-semibold rounded-full shadow-xs hover:shadow transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-[0.99]"
                 >
                   <Users className="w-5 h-5 text-[var(--ink-dark)] shrink-0" />
                   <span>Lab Members</span>
@@ -162,7 +162,7 @@ export default function Home() {
             </div>
 
             <div className="mt-10 pt-6 border-t border-white/15 flex flex-wrap gap-4">
-              <Button to="/team" variant="secondary" size="md" className="bg-white text-[var(--ink-dark)] hover:bg-[#F0ECE4] border-transparent font-semibold">
+              <Button to="/team" variant="secondary" size="md" className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold">
                 Meet the Team
               </Button>
               <button

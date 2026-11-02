@@ -31,7 +31,7 @@ export const Button: React.FC<ButtonProps> = ({
     primary:
       'bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white font-medium shadow-sm hover:shadow transition-all duration-150',
     secondary:
-      'bg-[var(--bg-surface)] hover:bg-[#E8E2D8] text-[var(--text-primary)] border border-[var(--border-hairline)] font-medium transition-all duration-150',
+      'bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline)] font-medium transition-all duration-150',
     outline:
       'bg-transparent hover:bg-[rgba(10,50,53,0.06)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] font-medium transition-colors duration-150',
     ghost:

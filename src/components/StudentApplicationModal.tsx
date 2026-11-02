@@ -150,7 +150,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                   </div>
                   <button
                     onClick={handleReset}
-                    className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[#E8E2D8] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                    className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                     aria-label="Close modal"
                   >
                     <X className="w-4 h-4" />
@@ -203,7 +203,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                   <button
                     type="button"
                     onClick={onClose}
-                    className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[#E8E2D8] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--accent-orange)] transition-colors cursor-pointer shrink-0 mt-0.5"
+                    className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--accent-orange)] transition-colors cursor-pointer shrink-0 mt-0.5"
                     aria-label="Close modal"
                   >
                     <X className="w-4 h-4" />
@@ -404,7 +404,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                     <button
                       type="button"
                       onClick={onClose}
-                      className="h-10 sm:h-11 px-5 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface-elevated)] hover:bg-[#E8E2D8] text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xs font-semibold transition-colors cursor-pointer"
+                      className="h-10 sm:h-11 px-5 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface-elevated)] hover:bg-[var(--surface-alt)] text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xs font-semibold transition-colors cursor-pointer"
                     >
                       Cancel
                     </button>
