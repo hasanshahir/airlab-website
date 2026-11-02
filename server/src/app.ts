@@ -10,6 +10,7 @@ import { positionsRouter } from './routes/positions.js'
 import { authRouter } from './routes/auth.js'
 import { applicationsRouter } from './routes/applications.js'
 import { adminCrudRouter } from './routes/admin.js'
+import { syncRouter } from './routes/sync.js'
 import { errorHandler, notFound } from './middleware/errors.js'
 
 export function createApp() {
@@ -49,6 +50,7 @@ export function createApp() {
   app.use('/api/positions', positionsRouter)
   app.use('/api/applications', applicationsRouter)
   app.use('/api/admin', adminCrudRouter)
+  app.use('/api/sync', syncRouter)
 
   app.use('/api', notFound)
   app.use(errorHandler)
