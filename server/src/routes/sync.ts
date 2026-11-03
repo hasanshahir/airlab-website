@@ -41,7 +41,8 @@ function parseBool(val: any, defaultVal = false): boolean {
 function parseString(val: any): string | undefined {
   if (val === undefined || val === null) return undefined
   const s = String(val).trim()
-  return s.length > 0 ? s : undefined
+  if (s === '' || s.toLowerCase() === 'na' || s.toLowerCase() === 'n/a') return undefined
+  return s
 }
 
 function parseNumber(val: any, defaultVal?: number): number | undefined {
@@ -58,12 +59,26 @@ function parseStringList(val: any): string[] {
     return val.map((s) => String(s).trim()).filter(Boolean)
   }
   if (typeof val === 'string') {
+    // Split by newlines first (e.g. Team Members in a cell), or commas
+    const delimiter = val.includes('\n') ? /\r?\n/ : /[,;]/
     return val
-      .split(',')
+      .split(delimiter)
       .map((s) => s.trim())
-      .filter(Boolean)
+      .filter((s) => s && s.toLowerCase() !== 'na' && s.toLowerCase() !== 'n/a')
   }
   return []
+}
+
+function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '')
 }
 
 function makeIdFilter(id: any) {
@@ -76,8 +91,21 @@ function makeIdFilter(id: any) {
 }
 
 /**
+ * Normalizes project status:
+ * 'Completed' / 'Finished' -> 'Finished'
+ * 'Active' / 'Ongoing' -> 'Ongoing'
+ */
+function normalizeProjectStatus(raw?: string): 'Ongoing' | 'Finished' {
+  if (!raw) return 'Ongoing'
+  const lower = raw.trim().toLowerCase()
+  if (lower.includes('complete') || lower.includes('finish') || lower.includes('done')) {
+    return 'Finished'
+  }
+  return 'Ongoing'
+}
+
+/**
  * GET /api/sync/sheets/export
- * Dumps all current records formatted for the Google Sheets People & Works tabs.
  */
 syncRouter.get('/sheets/export', async (_req, res, next) => {
   try {
@@ -95,112 +123,17 @@ syncRouter.get('/sheets/export', async (_req, res, next) => {
       grantsModel.find({}).sort({ order: 1 }).lean(),
     ])
 
-    // Format People sheet items
-    const people = [
-      ...teamDocs.map((doc: any) => ({
-        id: String(doc.id ?? doc._id),
-        name: doc.name || '',
-        category: doc.category || 'Research Interns',
-        role: doc.role || '',
-        designation: doc.designation || '',
-        department: doc.department || '',
-        email: doc.email || '',
-        linkedin: doc.linkedin || '',
-        image: doc.image || '',
-        cvUrl: doc.cvUrl || '',
-        researchFocus: doc.researchFocus || '',
-        tags: Array.isArray(doc.tags) ? doc.tags.join(', ') : '',
-        isLead: Boolean(doc.isLead),
-        tenure: doc.tenure || '',
-        order: doc.order ?? 0,
-        published: doc.published ?? true,
-      })),
-      ...prevInternDocs.map((doc: any) => ({
-        id: String(doc.id ?? doc._id),
-        name: doc.name || '',
-        category: 'Previous Interns',
-        role: 'Alumni / Previous Intern',
-        designation: '',
-        department: doc.department || '',
-        email: doc.email || '',
-        linkedin: doc.linkedin || '',
-        image: '',
-        cvUrl: '',
-        researchFocus: '',
-        tags: '',
-        isLead: false,
-        tenure: doc.tenure || '',
-        order: doc.order ?? 0,
-        published: doc.published ?? true,
-      })),
-    ]
-
-    // Format Research & Works sheet items
-    const works = [
-      ...pubDocs.map((doc: any) => ({
-        id: String(doc.id ?? doc._id),
-        entityType: 'Publication',
-        title: doc.title || '',
-        category: doc.type || 'Conference',
-        status: 'Published',
-        authors_or_pi: doc.authors || '',
-        venue_or_funder: doc.venue || '',
-        year: doc.year || '',
-        amount: doc.impactFactor || '',
-        link_or_doi: doc.link || doc.doi || '',
-        pdf: doc.pdf || '',
-        coverImage: '',
-        description: doc.abstract || '',
-        tags: Array.isArray(doc.tags) ? doc.tags.join(', ') : '',
-        order: doc.order ?? 0,
-        published: doc.published ?? true,
-      })),
-      ...projDocs.map((doc: any) => ({
-        id: String(doc.id ?? doc._id),
-        entityType: 'Project',
-        title: doc.title || '',
-        category: doc.category || 'Funded',
-        status: doc.status || 'Ongoing',
-        authors_or_pi: doc.pi || '',
-        venue_or_funder: doc.grantSupplier || doc.funding || '',
-        year: doc.startDate || '',
-        amount: doc.grantAmount || '',
-        link_or_doi: doc.funderUrl || '',
-        pdf: '',
-        coverImage: doc.coverImage || '',
-        description: doc.description || '',
-        tags: Array.isArray(doc.tags) ? doc.tags.join(', ') : '',
-        order: doc.order ?? 0,
-        published: doc.published ?? true,
-      })),
-      ...grantDocs.map((doc: any) => ({
-        id: String(doc.id ?? doc._id),
-        entityType: 'Grant',
-        title: doc.title || '',
-        category: 'Grant',
-        status: doc.status || 'Active',
-        authors_or_pi: doc.leadInvestigator || '',
-        venue_or_funder: doc.funder || '',
-        year: doc.duration || '',
-        amount: doc.amount || '',
-        link_or_doi: doc.url || '',
-        pdf: '',
-        coverImage: doc.image || '',
-        description: doc.description || '',
-        tags: '',
-        order: doc.order ?? 0,
-        published: doc.published ?? true,
-      })),
-    ]
-
     res.json({
       success: true,
       counts: {
-        people: people.length,
-        works: works.length,
+        team: teamDocs.length,
+        previousInterns: prevInternDocs.length,
+        publications: pubDocs.length,
+        projects: projDocs.length,
+        grants: grantDocs.length,
       },
-      people,
-      works,
+      team: teamDocs,
+      projects: projDocs,
     })
   } catch (err) {
     next(err)
@@ -209,180 +142,193 @@ syncRouter.get('/sheets/export', async (_req, res, next) => {
 
 /**
  * POST /api/sync/sheets
- * Receives rows from Google Sheets extension and updates/upserts into MongoDB collections.
+ * Supports:
+ *  1. Exact AIR Lab 3-Tab Spreadsheet:
+ *     - facultyAndInterns: [{ Name, Role, Email, Linkedin, Specialty, ID? }]
+ *     - undergraduateProjects: [{ Title, Status, 'Team Members', 'Grant Supplier', 'Grant Amount', 'Time Taken', Pictures, 'Project Details', ID? }]
+ *     - fundedProjects: [{ 'Program Title', 'Project Title', Status, 'Grant Supplier', 'Time Taken', 'Project Details', 'Name of PI', 'Grant Amour', 'Funder Website', ID? }]
+ *  2. Universal legacy arrays (people, works).
  */
 syncRouter.post('/sheets', async (req, res, next) => {
   try {
-    const { people, works, dryRun = false } = req.body
+    const {
+      facultyAndInterns,
+      undergraduateProjects,
+      fundedProjects,
+      people,
+      works,
+      dryRun = false,
+    } = req.body
 
     const stats = {
+      facultyAndInterns: { processed: 0, updated: 0, created: 0, errors: [] as string[] },
+      undergraduateProjects: { processed: 0, updated: 0, created: 0, errors: [] as string[] },
+      fundedProjects: { processed: 0, updated: 0, created: 0, errors: [] as string[] },
       people: { processed: 0, updated: 0, created: 0, errors: [] as string[] },
       works: { processed: 0, updated: 0, created: 0, errors: [] as string[] },
     }
 
-    // 1. Process People rows
-    if (Array.isArray(people)) {
-      const teamModel = contentModels.get('team')!
-      const prevInternsModel = contentModels.get('previous-interns')!
+    const teamModel = contentModels.get('team')!
+    const projectsModel = contentModels.get('projects')!
 
-      for (const row of people) {
+    // =========================================================================
+    // 1. Process Tab: Faculty & Interns
+    // =========================================================================
+    if (Array.isArray(facultyAndInterns)) {
+      for (const row of facultyAndInterns) {
         if (!row || typeof row !== 'object') continue
-        const rawId = parseString(row.id)
-        const name = parseString(row.name)
+        const name = parseString(row.Name || row.name)
+        if (!name) continue
 
-        if (!rawId || !name) {
-          stats.people.errors.push(`Skipped row: missing required 'id' or 'name' (${JSON.stringify(row)})`)
-          continue
-        }
+        stats.facultyAndInterns.processed++
+        const roleRaw = (parseString(row.Role || row.role) || '').toLowerCase()
+        const isFaculty = roleRaw.includes('fac')
+        const category = isFaculty ? 'Faculty' : 'Research Interns'
+        const role = isFaculty ? 'Faculty Member' : 'Research Intern'
+        const email = parseString(row.Email || row.email)
+        const linkedin = parseString(row.Linkedin || row.linkedin)
+        const specialty = parseString(row.Specialty || row.specialty || row.tags)
+        const tags = specialty ? parseStringList(specialty) : []
 
-        stats.people.processed++
-        const category = parseString(row.category) || 'Research Interns'
-        const isPrevious = category.toLowerCase().includes('previous')
-        const targetModel = isPrevious ? prevInternsModel : teamModel
+        // ID resolution: use explicit ID if provided, otherwise stable slug derived from name
+        const rawId = parseString(row.id || row.ID) || (isFaculty ? `fac-${slugify(name)}` : `ri-${slugify(name)}`)
 
         const docData: Record<string, any> = {
           id: rawId,
           name,
-          email: parseString(row.email),
-          linkedin: parseString(row.linkedin),
-          department: parseString(row.department),
-          tenure: parseString(row.tenure),
-          order: parseNumber(row.order, 0),
-          published: parseBool(row.published, true),
-        }
-
-        if (!isPrevious) {
-          docData.role = parseString(row.role) || 'Researcher'
-          docData.category = category
-          docData.designation = parseString(row.designation)
-          docData.image = parseString(row.image)
-          docData.cvUrl = parseString(row.cvUrl)
-          docData.researchFocus = parseString(row.researchFocus)
-          docData.tags = parseStringList(row.tags)
-          docData.isLead = parseBool(row.isLead, false)
-          docData.term = parseString(row.term)
-          if (row.year) docData.year = parseNumber(row.year)
+          category,
+          role,
+          email,
+          linkedin,
+          researchFocus: specialty,
+          tags,
+          published: true,
         }
 
         if (!dryRun) {
-          const filter = makeIdFilter(rawId)
-          const existing = await targetModel.findOne(filter)
+          // Look up by ID, or email, or exact name
+          const filter: any = {
+            $or: [{ id: rawId }],
+          }
+          if (email) filter.$or.push({ email })
+          if (name) filter.$or.push({ name: new RegExp(`^${name}$`, 'i') })
+
+          const existing = await teamModel.findOne(filter)
           if (existing) {
-            await targetModel.updateOne(filter, { $set: docData })
-            stats.people.updated++
+            await teamModel.updateOne({ _id: existing._id }, { $set: docData })
+            stats.facultyAndInterns.updated++
           } else {
-            await targetModel.create(docData)
-            stats.people.created++
+            await teamModel.create(docData)
+            stats.facultyAndInterns.created++
           }
         }
       }
     }
 
-    // 2. Process Research & Works rows
-    if (Array.isArray(works)) {
-      const pubsModel = contentModels.get('publications')!
-      const projectsModel = contentModels.get('projects')!
-      const grantsModel = contentModels.get('grants')!
-
-      for (const row of works) {
+    // =========================================================================
+    // 2. Process Tab: Undergraduate Projects
+    // =========================================================================
+    if (Array.isArray(undergraduateProjects)) {
+      for (const row of undergraduateProjects) {
         if (!row || typeof row !== 'object') continue
-        const rawId = parseString(row.id)
-        const title = parseString(row.title)
-        const entityType = (parseString(row.entityType) || '').toLowerCase()
+        const title = parseString(row.Title || row.title)
+        if (!title) continue
 
-        if (!rawId || !title) {
-          stats.works.errors.push(`Skipped row: missing required 'id' or 'title' (${JSON.stringify(row)})`)
-          continue
+        stats.undergraduateProjects.processed++
+        const status = normalizeProjectStatus(parseString(row.Status || row.status))
+        const teamMembersRaw = row['Team Members'] || row.teamMembers
+        const teamMembers = teamMembersRaw ? parseStringList(teamMembersRaw) : []
+        const grantSupplier = parseString(row['Grant Supplier'] || row.grantSupplier)
+        const grantAmount = parseString(row['Grant Amount'] || row.grantAmount)
+        const timeTaken = parseString(row['Time Taken'] || row.timeTaken)
+        const pictures = parseString(row.Pictures || row.pictures || row.coverImage)
+        const projectDetails = parseString(row['Project Details'] || row.description || row.projectDetails)
+
+        const rawId = parseString(row.id || row.ID) || `ug-${slugify(title).slice(0, 36)}`
+
+        const docData: Record<string, any> = {
+          id: rawId,
+          title,
+          category: 'Undergraduate',
+          status,
+          teamMembers,
+          grantSupplier: grantSupplier || '',
+          grantAmount: grantAmount || '',
+          funding: grantSupplier || 'Departmental / Self-Funded',
+          timeTaken: timeTaken || '',
+          startDate: timeTaken || '',
+          coverImage: pictures || '',
+          description: projectDetails || '',
+          published: true,
         }
 
-        stats.works.processed++
-
-        if (entityType === 'publication') {
-          const docData: Record<string, any> = {
-            id: rawId,
-            title,
-            authors: parseString(row.authors_or_pi || row.authors) || 'AIR Lab',
-            venue: parseString(row.venue_or_funder || row.venue) || 'Conference',
-            type: parseString(row.category || row.type) || 'Conference',
-            year: parseNumber(row.year, new Date().getFullYear()),
-            link: parseString(row.link_or_doi || row.link),
-            doi: parseString(row.link_or_doi || row.doi),
-            pdf: parseString(row.pdf),
-            impactFactor: parseString(row.amount || row.impactFactor),
-            abstract: parseString(row.description || row.abstract),
-            tags: parseStringList(row.tags),
-            order: parseNumber(row.order, 0),
-            published: parseBool(row.published, true),
+        if (!dryRun) {
+          const filter: any = {
+            $or: [{ id: rawId }, { title: new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }],
           }
 
-          if (!dryRun) {
-            const filter = makeIdFilter(rawId)
-            const existing = await pubsModel.findOne(filter)
-            if (existing) {
-              await pubsModel.updateOne(filter, { $set: docData })
-              stats.works.updated++
-            } else {
-              await pubsModel.create(docData)
-              stats.works.created++
-            }
+          const existing = await projectsModel.findOne(filter)
+          if (existing) {
+            await projectsModel.updateOne({ _id: existing._id }, { $set: docData })
+            stats.undergraduateProjects.updated++
+          } else {
+            await projectsModel.create(docData)
+            stats.undergraduateProjects.created++
           }
-        } else if (entityType === 'grant') {
-          const docData: Record<string, any> = {
-            id: rawId,
-            title,
-            funder: parseString(row.venue_or_funder || row.funder) || 'Funding Agency',
-            amount: parseString(row.amount),
-            duration: parseString(row.year || row.duration) || 'Active',
-            status: parseString(row.status) || 'Active',
-            leadInvestigator: parseString(row.authors_or_pi || row.leadInvestigator),
-            description: parseString(row.description),
-            url: parseString(row.link_or_doi || row.url),
-            image: parseString(row.coverImage || row.image),
-            order: parseNumber(row.order, 0),
-            published: parseBool(row.published, true),
+        }
+      }
+    }
+
+    // =========================================================================
+    // 3. Process Tab: Funded Projects
+    // =========================================================================
+    if (Array.isArray(fundedProjects)) {
+      for (const row of fundedProjects) {
+        if (!row || typeof row !== 'object') continue
+        const title = parseString(row['Project Title'] || row.title || row.Title)
+        if (!title) continue
+
+        stats.fundedProjects.processed++
+        const programTitle = parseString(row['Program Title'] || row.programTitle)
+        const status = normalizeProjectStatus(parseString(row.Status || row.status))
+        const grantSupplier = parseString(row['Grant Supplier'] || row.grantSupplier)
+        const timeTaken = parseString(row['Time Taken'] || row.timeTaken)
+        const projectDetails = parseString(row['Project Details'] || row.description || row.projectDetails)
+        const pi = parseString(row['Name of PI'] || row.pi || row.leadInvestigator)
+        const grantAmount = parseString(row['Grant Amour'] || row['Grant Amount'] || row.grantAmount)
+        const funderUrl = parseString(row['Funder Website'] || row.funderUrl)
+
+        const rawId = parseString(row.id || row.ID) || `fnd-${slugify(title).slice(0, 36)}`
+
+        const docData: Record<string, any> = {
+          id: rawId,
+          title,
+          category: 'Funded',
+          programTitle: programTitle || '',
+          status,
+          grantSupplier: grantSupplier || '',
+          funding: grantSupplier || '',
+          timeTaken: timeTaken || '',
+          startDate: timeTaken || '',
+          description: projectDetails || '',
+          pi: pi || '',
+          grantAmount: grantAmount || '',
+          funderUrl: funderUrl || '',
+          published: true,
+        }
+
+        if (!dryRun) {
+          const filter: any = {
+            $or: [{ id: rawId }, { title: new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }],
           }
 
-          if (!dryRun) {
-            const filter = makeIdFilter(rawId)
-            const existing = await grantsModel.findOne(filter)
-            if (existing) {
-              await grantsModel.updateOne(filter, { $set: docData })
-              stats.works.updated++
-            } else {
-              await grantsModel.create(docData)
-              stats.works.created++
-            }
-          }
-        } else {
-          // Default to Project (covers 'project', 'projects', or undefined)
-          const docData: Record<string, any> = {
-            id: rawId,
-            title,
-            category: parseString(row.category) || 'Funded',
-            status: parseString(row.status) || 'Ongoing',
-            description: parseString(row.description) || '',
-            pi: parseString(row.authors_or_pi || row.pi),
-            grantSupplier: parseString(row.venue_or_funder || row.grantSupplier),
-            funding: parseString(row.venue_or_funder || row.funding),
-            grantAmount: parseString(row.amount || row.grantAmount),
-            funderUrl: parseString(row.link_or_doi || row.funderUrl),
-            startDate: parseString(row.year || row.startDate),
-            coverImage: parseString(row.coverImage || row.image),
-            tags: parseStringList(row.tags),
-            order: parseNumber(row.order, 0),
-            published: parseBool(row.published, true),
-          }
-
-          if (!dryRun) {
-            const filter = makeIdFilter(rawId)
-            const existing = await projectsModel.findOne(filter)
-            if (existing) {
-              await projectsModel.updateOne(filter, { $set: docData })
-              stats.works.updated++
-            } else {
-              await projectsModel.create(docData)
-              stats.works.created++
-            }
+          const existing = await projectsModel.findOne(filter)
+          if (existing) {
+            await projectsModel.updateOne({ _id: existing._id }, { $set: docData })
+            stats.fundedProjects.updated++
+          } else {
+            await projectsModel.create(docData)
+            stats.fundedProjects.created++
           }
         }
       }
@@ -397,4 +343,3 @@ syncRouter.post('/sheets', async (req, res, next) => {
     next(err)
   }
 })
-
