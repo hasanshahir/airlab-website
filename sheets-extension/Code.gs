@@ -19,7 +19,7 @@
 
 // Default Configuration (Can be changed from menu ⚡ AIR Lab -> ⚙️ Configure Website URL & Secret)
 const DEFAULT_CONFIG = {
-  BACKEND_URL: 'https://airlab-website.vercel.app', // Or your custom domain / localhost ngrok tunnel
+  BACKEND_URL: 'https://airlab-website-peach.vercel.app', // Or your custom domain / localhost ngrok tunnel
   SYNC_SECRET: 'airlab-sheets-sync-secret-2026',
   TAB_FACULTY_INTERNS: 'Faculty & Interns',
   TAB_UG_PROJECTS: 'Undergraduate Projects',
