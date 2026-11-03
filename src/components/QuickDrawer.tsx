@@ -11,8 +11,14 @@ import {
   ArrowUpRight,
   ArrowRight,
 } from 'lucide-react'
-import projectsData from '../data/projects.json'
-import teamData from '../data/team.json'
+import rawProjects from '../data/projects.json'
+import rawTeam from '../data/team.json'
+import type { ProjectItem, TeamMemberData } from '../types/data'
+import { getMemberAvatar } from '../lib/placeholders'
+
+const projectsData = rawProjects as unknown as ProjectItem[]
+const teamData = rawTeam as unknown as TeamMemberData[]
+
 
 interface QuickDrawerProps {
   isOpen: boolean
@@ -286,7 +292,7 @@ export default function QuickDrawer({
                           <div className="w-13 h-13 rounded-2xl overflow-hidden bg-[var(--bg-page)] border border-[var(--border-hairline)] shrink-0 flex items-center justify-center font-head font-bold text-base text-[var(--text-primary)]">
                             {member.image ? (
                               <img
-                                src={member.image}
+                                src={getMemberAvatar(member.image)}
                                 alt={member.name}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                                 onError={(e) => {

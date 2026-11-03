@@ -1,14 +1,24 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Award, ExternalLink, Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
+import type { Grant } from '../types/data'
 import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
 import PlaceholderBadge from '../components/ui/PlaceholderBadge'
 
 export default function Grants() {
   const [filter, setFilter] = useState<'All' | 'Active' | 'Completed'>('All')
-  const grants = useMemo(() => getGrants(), [])
+  const [grants, setGrants] = useState<Grant[]>(() => getGrants())
+
+  useEffect(() => {
+    fetch('/api/content/grants')
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        if (Array.isArray(data)) setGrants(data)
+      })
+      .catch(() => {})
+  }, [])
 
   const filtered = useMemo(() => {
     if (filter === 'All') return grants
@@ -177,6 +187,12 @@ export default function Grants() {
             })}
           </motion.div>
         </AnimatePresence>
+
+        {filtered.length === 0 && (
+          <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)] mt-8">
+            <p className="text-sm font-sans text-[var(--text-muted)]">No research grants published yet.</p>
+          </div>
+        )}
       </div>
     </div>
   )

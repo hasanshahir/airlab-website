@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, ExternalLink, GraduationCap, Users, Calendar, Search, Sparkles } from 'lucide-react'
 import { getTeamMembers, getPreviousInterns } from '../lib/data'
+import type { TeamMemberData } from '../types/data'
+import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
 import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
@@ -41,8 +43,22 @@ export default function Team() {
     }
   }, [searchParams])
 
-  const allMembersRaw = useMemo(() => getTeamMembers(), [])
-  const sortedPreviousInterns = useMemo(() => getPreviousInterns(), [])
+  const [allMembersRaw, setAllMembersRaw] = useState<TeamMemberData[]>(() => getTeamMembers())
+  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>(() => getPreviousInterns())
+
+  useEffect(() => {
+    let active = true
+    Promise.all([
+      fetch('/api/content/team').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/content/previous-interns').then(r => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([team, prev]) => {
+      if (!active) return
+      if (Array.isArray(team)) setAllMembersRaw(team)
+      if (Array.isArray(prev)) setSortedPreviousInterns(prev)
+    })
+    return () => { active = false }
+  }, [])
+
 
   const allMembers = useMemo(() => {
     const list = TeamMemberEntity.fromArray(allMembersRaw)
@@ -200,6 +216,11 @@ export default function Team() {
             className="space-y-8"
           >
             <div className="max-w-4xl mx-auto space-y-6">
+              {facultyMembers.length === 0 && (
+                <div className="text-center py-16 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
+                  <p className="text-sm font-sans text-[var(--text-muted)]">No faculty members listed yet.</p>
+                </div>
+              )}
               {facultyMembers.map(f => {
                 const raw = allMembersRaw.find(m => m.id === f.id)
                 const isHighlighted = highlightedMemberId === f.id
@@ -221,7 +242,10 @@ export default function Team() {
                       className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden border border-[var(--border-hairline)] shrink-0 shadow-sm bg-[var(--bg-page)] cursor-pointer group-hover:scale-102 transition-transform"
                     >
                       <img
-                        src={f.image}
+                        src={getMemberAvatar(f.image)}
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_AVATAR
+                        }}
                         alt={f.name}
                         className="w-full h-full object-cover"
                       />
@@ -315,6 +339,13 @@ export default function Team() {
             className="space-y-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left">
+              {filteredInterns.length === 0 && (
+                <div className="col-span-full text-center py-16 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
+                  <p className="text-sm font-sans text-[var(--text-muted)]">
+                    {searchQuery ? `No interns match "${searchQuery}".` : 'No research interns listed yet.'}
+                  </p>
+                </div>
+              )}
               {filteredInterns.map(intern => {
                 const raw = allMembersRaw.find(m => m.id === intern.id)
                 const isHighlighted = highlightedMemberId === intern.id
@@ -337,7 +368,10 @@ export default function Team() {
                           className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shrink-0 bg-[var(--bg-page)] border border-[var(--border-hairline)] group-hover:border-[var(--accent-orange)] shadow-xs transition-all"
                         >
                           <img
-                            src={intern.image}
+                            src={getMemberAvatar(intern.image)}
+                            onError={(e) => {
+                              e.currentTarget.src = DEFAULT_AVATAR
+                            }}
                             alt={intern.name}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                             loading="lazy"

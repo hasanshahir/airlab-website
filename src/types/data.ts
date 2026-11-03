@@ -24,7 +24,7 @@ export interface Sponsor {
 }
 
 export interface ProjectItem {
-  id: number
+  id: number | string
   title: string
   category: 'Funded' | 'R&D' | 'Undergraduate' | 'Postgraduate'
   description: string
@@ -86,4 +86,38 @@ export interface PublicationItem {
   tags: string[]
   abstract?: string
   placeholder?: boolean
+}
+
+export interface CollaborationItem {
+  id: string
+  partner: string
+  type?: string
+  grantAmount?: string
+  period?: string
+  focus?: string
+  description?: string
+  outcomes?: string[]
+  image?: string
+}
+
+export interface GalleryItem {
+  id: string
+  title: string
+  cat?: string
+  date?: string
+  desc?: string
+  url: string
+  span?: string
+}
+
+export interface InternItem {
+  id: string
+  name: string
+  term?: string
+  project?: string
+  university?: string
+  currentRole?: string
+  quote?: string
+  paper?: string
+  image?: string
 }

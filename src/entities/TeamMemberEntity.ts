@@ -1,3 +1,5 @@
+import { getMemberAvatar } from '../lib/placeholders'
+
 export interface TeamMemberData {
   id: string
   name: string
@@ -48,7 +50,7 @@ export class TeamMemberEntity {
     this.name = data.name
     this.role = data.role || 'Research Scholar'
     this.category = data.category || 'Research Interns'
-    this.image = data.image || './pfp/default.png'
+    this.image = getMemberAvatar(data.image)
     this.email = data.email
     this.linkedin = data.linkedin
     this.cvUrl = data.cvUrl

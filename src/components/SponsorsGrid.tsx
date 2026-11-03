@@ -4,6 +4,7 @@ import { getSponsors } from '../lib/data'
 
 export const SponsorsGrid: React.FC = () => {
   const sponsors = getSponsors()
+  if (!sponsors || sponsors.length === 0) return null
 
   return (
     <div className="w-full">

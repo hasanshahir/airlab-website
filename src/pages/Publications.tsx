@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen, Copy, Check, Award, FileText, Download, ExternalLink, Search } from 'lucide-react'
 import { getPublications } from '../lib/data'
@@ -9,7 +9,16 @@ export default function Publications() {
   const [searchQuery, setSearchQuery] = useState('')
   const [copiedId, setCopiedId] = useState<number | null>(null)
 
-  const pubData = useMemo(() => getPublications(), [])
+  const [pubData, setPubData] = useState<any[]>(() => getPublications())
+
+  useEffect(() => {
+    fetch('/api/content/publications')
+      .then(r => r.ok ? r.json() : [])
+      .then(d => {
+        if (Array.isArray(d)) setPubData(d)
+      })
+      .catch(() => {})
+  }, [])
 
   // Enforce sorted order: recent papers at top (descending by year, then by id)
   const sortedPublications = useMemo(() => {
@@ -26,7 +35,7 @@ export default function Publications() {
       p.title.toLowerCase().includes(q) ||
       p.authors.toLowerCase().includes(q) ||
       p.venue.toLowerCase().includes(q) ||
-      (p.tags && p.tags.some(t => t.toLowerCase().includes(q)))
+      (p.tags && p.tags.some((t: string) => t.toLowerCase().includes(q)))
     )
   }, [sortedPublications, searchQuery])
 
@@ -222,7 +231,9 @@ export default function Publications() {
 
         {filtered.length === 0 && (
           <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-            <p className="text-sm font-sans text-[var(--text-muted)]">No publications matched your search criteria.</p>
+            <p className="text-sm font-sans text-[var(--text-muted)]">
+              {searchQuery ? 'No publications matched your search criteria.' : 'No publications published yet.'}
+            </p>
           </div>
         )}
       </div>

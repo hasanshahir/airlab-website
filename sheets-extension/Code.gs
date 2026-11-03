@@ -73,11 +73,13 @@ function onOpen() {
   const ui = SpreadsheetApp.getUi()
   ui.createMenu('⚡ AIR Lab')
     .addItem('🚀 Sync All to Website', 'syncAllTabs')
+    .addItem('🔄 Fresh Sync (Wipe & Re-Upload Sheet Data)', 'freshSyncAllTabs')
     .addSeparator()
     .addItem('👥 Sync Faculty & Interns Only', 'syncFacultyInternsOnly')
     .addItem('🎓 Sync Undergraduate Projects Only', 'syncUndergraduateOnly')
     .addItem('💰 Sync Funded Projects Only', 'syncFundedOnly')
     .addSeparator()
+    .addItem('🧹 Clean All Placeholder / Mock Data from Website', 'cleanPlaceholderData')
     .addItem('⚙️ Configure Website URL & Secret', 'configureSettings')
     .addItem('🔄 Reset to Default Configuration', 'resetToDefaults')
     .addToUi()
@@ -179,7 +181,7 @@ function sendSyncPayload(payload) {
 }
 
 /**
- * 🚀 Sync All 3 Tabs to Website
+ * 🚀 Sync All 3 Tabs to Website (Automatically prunes legacy placeholders)
  */
 function syncAllTabs() {
   const facRows = readSheetToObjects(getSetting('TAB_FACULTY_INTERNS'))
@@ -205,7 +207,73 @@ function syncAllTabs() {
     facultyAndInterns: facRows || [],
     undergraduateProjects: ugRows || [],
     fundedProjects: fundedRows || [],
+    removePlaceholders: true,
   })
+}
+
+/**
+ * 🔄 Fresh Sync (Wipes old records and repopulates strictly from spreadsheet)
+ */
+function freshSyncAllTabs() {
+  const ui = SpreadsheetApp.getUi()
+  const confirm = ui.alert(
+    'Fresh Sync Confirmation',
+    'This will wipe all existing website projects & team records and re-populate them strictly from the current spreadsheet tabs.\n\nProceed?',
+    ui.ButtonSet.YES_NO
+  )
+  if (confirm !== ui.Button.YES) return
+
+  const facRows = readSheetToObjects(getSetting('TAB_FACULTY_INTERNS'))
+  const ugRows = readSheetToObjects(getSetting('TAB_UG_PROJECTS'))
+  const fundedRows = readSheetToObjects(getSetting('TAB_FUNDED_PROJECTS'))
+
+  sendSyncPayload({
+    facultyAndInterns: facRows || [],
+    undergraduateProjects: ugRows || [],
+    fundedProjects: fundedRows || [],
+    clearBeforeSync: true,
+    removePlaceholders: true,
+  })
+}
+
+/**
+ * 🧹 Clean All Placeholder / Mock Records from Website Database
+ */
+function cleanPlaceholderData() {
+  const ui = SpreadsheetApp.getUi()
+  const confirm = ui.alert(
+    'Clean Placeholder Data',
+    'This will remove all generated mock projects, fake interns, and stock photos from the website database, leaving only real content created by you.\n\nProceed?',
+    ui.ButtonSet.YES_NO
+  )
+  if (confirm !== ui.Button.YES) return
+
+  const cleanBase = getCleanEndpoint().replace(/\/api\/sync\/sheets\/?$/, '')
+  const endpoint = cleanBase + '/api/sync/cleanup'
+  const syncSecret = String(getSetting('SYNC_SECRET') || DEFAULT_CONFIG.SYNC_SECRET).trim()
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { 'x-sync-secret': syncSecret },
+    payload: JSON.stringify({ wipeAll: false }),
+    muteHttpExceptions: true,
+  }
+
+  try {
+    SpreadsheetApp.getActiveSpreadsheet().toast('Cleaning placeholder data...', 'AIR Lab Sync', 10)
+    const res = UrlFetchApp.fetch(endpoint, options)
+    const code = res.getResponseCode()
+    const text = res.getContentText()
+
+    if (code >= 200 && code < 300) {
+      ui.alert('Cleanup Complete', 'All artificial placeholders and mock data have been removed from the website database!', ui.ButtonSet.OK)
+    } else {
+      ui.alert('Cleanup Failed (HTTP ' + code + ')', text || 'Could not clean placeholders.', ui.ButtonSet.OK)
+    }
+  } catch (err) {
+    ui.alert('Connection Error', err.toString(), ui.ButtonSet.OK)
+  }
 }
 
 /**
@@ -217,7 +285,7 @@ function syncFacultyInternsOnly() {
     SpreadsheetApp.getUi().alert('Tab "' + getSetting('TAB_FACULTY_INTERNS') + '" not found.')
     return
   }
-  sendSyncPayload({ facultyAndInterns: rows })
+  sendSyncPayload({ facultyAndInterns: rows, removePlaceholders: true })
 }
 
 /**
@@ -229,7 +297,7 @@ function syncUndergraduateOnly() {
     SpreadsheetApp.getUi().alert('Tab "' + getSetting('TAB_UG_PROJECTS') + '" not found.')
     return
   }
-  sendSyncPayload({ undergraduateProjects: rows })
+  sendSyncPayload({ undergraduateProjects: rows, removePlaceholders: true })
 }
 
 /**
@@ -241,7 +309,7 @@ function syncFundedOnly() {
     SpreadsheetApp.getUi().alert('Tab "' + getSetting('TAB_FUNDED_PROJECTS') + '" not found.')
     return
   }
-  sendSyncPayload({ fundedProjects: rows })
+  sendSyncPayload({ fundedProjects: rows, removePlaceholders: true })
 }
 
 /**

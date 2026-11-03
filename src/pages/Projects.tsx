@@ -13,7 +13,8 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { getProjects, getTeamMembers } from '../lib/data'
-import type { ProjectItem } from '../types/data'
+import type { ProjectItem, TeamMemberData } from '../types/data'
+import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
 
 type StatusTab = 'All' | 'Ongoing' | 'Finished'
 
@@ -24,8 +25,22 @@ export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
   const [activeGalleryIndex, setActiveGalleryIndex] = useState<number>(0)
 
-  const projectsData = useMemo(() => getProjects(), [])
-  const allMembers = useMemo(() => getTeamMembers(), [])
+  const [projectsData, setProjectsData] = useState<ProjectItem[]>(() => getProjects())
+  const [allMembers, setAllMembers] = useState<TeamMemberData[]>(() => getTeamMembers())
+
+  useEffect(() => {
+    let active = true
+    Promise.all([
+      fetch('/api/content/projects').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/content/team').then(r => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([projs, team]) => {
+      if (!active) return
+      if (Array.isArray(projs)) setProjectsData(projs)
+      if (Array.isArray(team)) setAllMembers(team)
+    })
+    return () => { active = false }
+  }, [])
+
   const categories = ['All', 'Funded', 'R&D', 'Undergraduate', 'Postgraduate']
 
   // Prevent background layout shift & lock scroll safely when modal is open
@@ -171,7 +186,10 @@ export default function Projects() {
                   {/* Image Cover Banner */}
                   <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] mb-5 border border-[var(--border-hairline)]">
                     <img
-                      src={proj.coverImage || proj.images?.[0]}
+                      src={getProjectCover(proj.coverImage || proj.images?.[0])}
+                      onError={(e) => {
+                        e.currentTarget.src = DEFAULT_PROJECT_COVER
+                      }}
                       alt={proj.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -251,7 +269,9 @@ export default function Projects() {
       {/* Empty State */}
       {filtered.length === 0 && (
         <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-          <p className="text-sm font-sans text-[var(--text-muted)]">No projects match the query "{query}".</p>
+          <p className="text-sm font-sans text-[var(--text-muted)]">
+            {query ? `No projects match "${query}".` : 'No projects published yet.'}
+          </p>
         </div>
       )}
 
@@ -297,7 +317,10 @@ export default function Projects() {
                       <div className="mb-6">
                         <div className="h-64 sm:h-80 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] border border-[var(--border-hairline)] mb-3">
                           <img
-                            src={selectedProject.images[activeGalleryIndex] || selectedProject.coverImage}
+                            src={getProjectCover(selectedProject.images[activeGalleryIndex] || selectedProject.coverImage)}
+                            onError={(e) => {
+                              e.currentTarget.src = DEFAULT_PROJECT_COVER
+                            }}
                             alt={`${selectedProject.title} preview ${activeGalleryIndex + 1}`}
                             className="w-full h-full object-cover"
                           />

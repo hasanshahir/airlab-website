@@ -2,12 +2,25 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Camera, X, Maximize2 } from 'lucide-react'
-import galleryData from '../data/gallery.json'
+import rawGallery from '../data/gallery.json'
+import type { GalleryItem } from '../types/data'
+
+const galleryData = rawGallery as unknown as GalleryItem[]
 import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
 
 export default function Gallery() {
-  const [selectedImage, setSelectedImage] = useState<typeof galleryData[0] | null>(null)
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => galleryData)
+  const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null)
+
+  useEffect(() => {
+    fetch('/api/content/gallery')
+      .then(r => r.ok ? r.json() : [])
+      .then(d => {
+        if (Array.isArray(d)) setGalleryItems(d)
+      })
+      .catch(() => {})
+  }, [])
 
   // Safe scroll lock for lightbox modal
   useEffect(() => {
@@ -54,7 +67,11 @@ export default function Gallery() {
 
       {/* Image Grid with 24px Rounded Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 auto-rows-[300px] gap-6 text-left">
-        {galleryData.map((item, i) => (
+        {galleryItems.length === 0 ? (
+          <div className="col-span-full text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
+            <p className="text-sm font-sans text-[var(--text-muted)]">No media or gallery items published yet.</p>
+          </div>
+        ) : galleryItems.map((item, i) => (
           <div
             key={item.id}
             className={`${item.span || ''} h-full`}

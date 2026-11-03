@@ -141,6 +141,51 @@ syncRouter.get('/sheets/export', async (_req, res, next) => {
 })
 
 /**
+ * POST /api/sync/cleanup
+ * Wipes out legacy mock/placeholder records across all collections.
+ */
+syncRouter.post('/cleanup', async (req, res, next) => {
+  try {
+    const { wipeAll = false } = req.body || {}
+    const deleted: Record<string, number> = {}
+
+    for (const [slug, model] of contentModels.entries()) {
+      if (wipeAll) {
+        const r = await model.deleteMany({})
+        deleted[slug] = r.deletedCount
+        continue
+      }
+
+      const filters: any[] = [
+        { placeholder: true },
+        { image: { $regex: 'unsplash\\.com', $options: 'i' } },
+        { coverImage: { $regex: 'unsplash\\.com', $options: 'i' } },
+      ]
+
+      if (slug === 'team') {
+        filters.push({ id: { $in: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'ri1', 'ri2', 'ri3', 'ri4', 'ri5', 'ri6', 'ri7', 'ri8', 'ri9', 'ri10'] } })
+      }
+      if (slug === 'projects') {
+        filters.push({ id: { $type: 'number' } })
+        filters.push({ id: { $in: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'PRJ-1', 'PRJ-2', 'PRJ-3', 'PRJ-4', 'PRJ-5', 'PRJ-6', 'PRJ-7', 'PRJ-8', 'PRJ-9', 'PRJ-10'] } })
+      }
+      if (['interns', 'previous-interns', 'gallery', 'collaborations', 'performers', 'blogs', 'grants', 'publications', 'sponsors'].includes(slug)) {
+        const r = await model.deleteMany({})
+        deleted[slug] = r.deletedCount
+        continue
+      }
+
+      const r = await model.deleteMany({ $or: filters })
+      deleted[slug] = r.deletedCount
+    }
+
+    res.json({ success: true, message: 'All mock placeholders removed.', deleted })
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
  * POST /api/sync/sheets
  * Supports:
  *  1. Exact AIR Lab 3-Tab Spreadsheet:
@@ -158,6 +203,8 @@ syncRouter.post('/sheets', async (req, res, next) => {
       people,
       works,
       dryRun = false,
+      clearBeforeSync = false,
+      removePlaceholders = true,
     } = req.body
 
     const stats = {
@@ -172,6 +219,33 @@ syncRouter.post('/sheets', async (req, res, next) => {
     const projectsModel = contentModels.get('projects')!
 
     // =========================================================================
+    if (!dryRun) {
+      if (clearBeforeSync && Array.isArray(facultyAndInterns)) {
+        await teamModel.deleteMany({})
+      } else if (removePlaceholders) {
+        await teamModel.deleteMany({
+          $or: [
+            { id: { $in: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'ri1', 'ri2', 'ri3', 'ri4', 'ri5', 'ri6', 'ri7', 'ri8', 'ri9', 'ri10'] } },
+            { image: { $regex: 'unsplash\\.com', $options: 'i' } },
+            { placeholder: true },
+          ],
+        })
+      }
+
+      if (clearBeforeSync && (Array.isArray(undergraduateProjects) || Array.isArray(fundedProjects))) {
+        await projectsModel.deleteMany({})
+      } else if (removePlaceholders) {
+        await projectsModel.deleteMany({
+          $or: [
+            { id: { $type: 'number' } },
+            { id: { $in: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'PRJ-1', 'PRJ-2', 'PRJ-3', 'PRJ-4', 'PRJ-5', 'PRJ-6', 'PRJ-7', 'PRJ-8', 'PRJ-9', 'PRJ-10'] } },
+            { coverImage: { $regex: 'unsplash\\.com', $options: 'i' } },
+            { placeholder: true },
+          ],
+        })
+      }
+    }
+
     // 1. Process Tab: Faculty & Interns
     // =========================================================================
     if (Array.isArray(facultyAndInterns)) {
