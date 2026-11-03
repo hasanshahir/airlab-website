@@ -24,3 +24,4 @@ export function getProjectCover(image?: string): string {
   if (clean.includes('unsplash.com')) return DEFAULT_PROJECT_COVER
   return clean
 }
+
