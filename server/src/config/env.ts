@@ -21,6 +21,7 @@ const EnvSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   ADMIN_NOTIFICATION_EMAIL: z.string().default('hf.alihasan0@gmail.com'),
+  SHEETS_SYNC_SECRET: z.string().default('airlab-sheets-sync-secret-2026'),
 })
 
 const parsed = EnvSchema.safeParse(process.env)

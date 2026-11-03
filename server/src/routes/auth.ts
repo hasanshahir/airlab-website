@@ -9,60 +9,79 @@ import { HttpError } from '../middleware/errors.js'
 
 export const authRouter = Router()
 
+// Simple in-memory rate limiter to prevent brute-force attacks on /login
+interface AttemptRecord {
+  count: number
+  firstAttempt: number
+}
+const loginAttempts = new Map<string, AttemptRecord>()
+const MAX_ATTEMPTS = 5
+const LOCKOUT_MS = 15 * 60 * 1000 // 15 minutes
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const record = loginAttempts.get(ip)
+  if (!record) return true
+
+  if (now - record.firstAttempt > LOCKOUT_MS) {
+    loginAttempts.delete(ip)
+    return true
+  }
+
+  return record.count < MAX_ATTEMPTS
+}
+
+function recordFailedAttempt(ip: string) {
+  const now = Date.now()
+  const record = loginAttempts.get(ip)
+  if (!record || now - record.firstAttempt > LOCKOUT_MS) {
+    loginAttempts.set(ip, { count: 1, firstAttempt: now })
+  } else {
+    record.count += 1
+  }
+}
+
+function resetRateLimit(ip: string) {
+  loginAttempts.delete(ip)
+}
+
 const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 })
 
 authRouter.post('/login', async (req, res, next) => {
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown'
+
+  if (!checkRateLimit(clientIp)) {
+    return next(
+      new HttpError(
+        429,
+        'Too many failed login attempts. This IP address has been temporarily locked out for 15 minutes.'
+      )
+    )
+  }
+
   try {
     const { email, password } = LoginSchema.parse(req.body)
+    const normalizedEmail = email.toLowerCase().trim()
 
-    // Master fallback credentials for immediate, infallible access
-    const isMasterAdmin =
-      email.toLowerCase().trim() === 'admin@airlab.neduet.edu.pk' &&
-      password === 'airlab2026!'
-
-    if (isMasterAdmin) {
-      const token = jwt.sign(
-        { id: 'master-admin', email: 'admin@airlab.neduet.edu.pk', name: 'AIR Lab Administrator' },
-        env.JWT_SECRET || 'airlab-secret-key-fallback-2026',
-        { expiresIn: '7d' }
-      )
-
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
-
-      return res.json({
-        success: true,
-        token,
-        admin: {
-          id: 'master-admin',
-          email: 'admin@airlab.neduet.edu.pk',
-          name: 'AIR Lab Administrator',
-        },
-      })
-    }
-
-    let admin = null
-    try {
-      admin = await AdminModel.findOne({ email }).select('+passwordHash')
-    } catch (dbErr) {
-      console.warn('⚠️ DB query error during login:', dbErr)
-    }
+    // Strictly authenticate against the database (bcrypt hash comparison)
+    const admin = await AdminModel.findOne({ email: normalizedEmail }).select('+passwordHash')
 
     if (!admin) {
+      recordFailedAttempt(clientIp)
       throw new HttpError(401, 'Invalid email or password')
     }
 
     const isValid = await bcrypt.compare(password, admin.passwordHash)
     if (!isValid) {
+      recordFailedAttempt(clientIp)
       throw new HttpError(401, 'Invalid email or password')
     }
+
+    // Reset failed attempts on successful login
+    resetRateLimit(clientIp)
 
     admin.lastLoginAt = new Date()
     await admin.save()
@@ -76,7 +95,7 @@ authRouter.post('/login', async (req, res, next) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: isProd,
-      sameSite: 'lax',
+      sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
 
@@ -101,18 +120,15 @@ authRouter.post('/logout', (_req, res) => {
 
 authRouter.get('/me', requireAdmin, async (req: AuthRequest, res, next) => {
   try {
-    if (req.admin?.id === 'master-admin') {
-      return res.json({
-        admin: {
-          id: 'master-admin',
-          email: 'admin@airlab.neduet.edu.pk',
-          name: 'AIR Lab Administrator',
-        },
-      })
+    if (!req.admin?.id) {
+      throw new HttpError(401, 'Unauthorized')
     }
 
-    const admin = await AdminModel.findById(req.admin!.id)
-    if (!admin) throw new HttpError(404, 'Admin not found')
+    const admin = await AdminModel.findById(req.admin.id)
+    if (!admin) {
+      throw new HttpError(401, 'Admin session invalid')
+    }
+
     res.json({
       admin: {
         id: String(admin._id),
