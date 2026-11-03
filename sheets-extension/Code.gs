@@ -287,3 +287,4 @@ function configureSettings() {
 
   ui.alert('Settings Saved', 'Backend URL and Secret have been updated.', ui.ButtonSet.OK)
 }
+

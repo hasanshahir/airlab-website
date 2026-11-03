@@ -79,3 +79,4 @@ Once you refresh the Google Sheet, a new menu will appear at the top toolbar:
 - **`status`**: `Published`, `Ongoing`, `Finished`, `Active`.
 - **`tags`**: Comma-separated topics.
 - **`published`**: `TRUE` / `FALSE`.
+

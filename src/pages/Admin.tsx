@@ -15,64 +15,16 @@ import {
   Download,
   Upload,
   ImageIcon,
-  KeyRound,
-  ShieldCheck
+  Lock,
+  Shield
 } from 'lucide-react'
 
-// Local datasets for instant preview without requiring external database
-import teamData from '../data/team.json'
-import internsData from '../data/interns.json'
-import prevInternsData from '../data/previous_interns.json'
-import projectsData from '../data/projects.json'
-import publicationsData from '../data/publications.json'
-import grantsData from '../data/grants.json'
-import sponsorsData from '../data/sponsors.json'
-import galleryData from '../data/gallery.json'
-import blogsData from '../data/blogs.json'
-import collaborationsData from '../data/collaborations.json'
-
-const fallbackData: Record<string, any[]> = {
-  team: teamData,
-  interns: internsData,
-  'previous-interns': prevInternsData,
-  projects: projectsData,
-  publications: publicationsData,
-  grants: grantsData,
-  sponsors: sponsorsData,
-  gallery: galleryData,
-  blogs: blogsData,
-  collaborations: collaborationsData,
-  applications: [
-    {
-      _id: 'app-demo-1',
-      name: 'Syed Hamza Ali',
-      email: 'hamza.ali@cloud.neduet.edu.pk',
-      phone: '+92 300 1234567',
-      university: 'NED University of Eng. & Tech.',
-      degreeYear: 'Final Year (BS CSIT)',
-      coverNote: 'Passionate about Deep Learning and High Performance Computing. Previously worked on Vision Transformers.',
-      status: 'New',
-      cv: { key: '#', originalName: 'Hamza_CV_2026.pdf' }
-    },
-    {
-      _id: 'app-demo-2',
-      name: 'Ayesha Siddiqua',
-      email: 'ayesha.s@cloud.neduet.edu.pk',
-      phone: '+92 333 9876543',
-      university: 'NED University (CIS Dept)',
-      degreeYear: '3rd Year',
-      coverNote: 'Interested in Autonomous Systems and Computer Vision research at AIR Lab.',
-      status: 'Shortlisted',
-      cv: { key: '#', originalName: 'Ayesha_Resume.pdf' }
-    }
-  ]
-}
 
 export default function AdminDashboard() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('airlab_admin_token'))
   const [adminUser, setAdminUser] = useState<any>(null)
-  const [email, setEmail] = useState('admin@airlab.neduet.edu.pk')
-  const [password, setPassword] = useState('airlab2026!')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState<string | null>(null)
   const [loggingIn, setLoggingIn] = useState(false)
 
@@ -83,45 +35,33 @@ export default function AdminDashboard() {
   const [editingItem, setEditingItem] = useState<any | null>(null)
   const [isNew, setIsNew] = useState(false)
 
-  const directLogin = () => {
-    const masterAdmin = {
-      id: 'master-admin',
-      email: 'admin@airlab.neduet.edu.pk',
-      name: 'AIR Lab Administrator',
-    }
-    localStorage.setItem('airlab_admin_token', 'master-admin-token-2026')
-    setToken('master-admin-token-2026')
-    setAdminUser(masterAdmin)
+  const handleLogout = () => {
+    localStorage.removeItem('airlab_admin_token')
+    setToken(null)
+    setAdminUser(null)
+    setEmail('')
+    setPassword('')
   }
 
-  // Auto-login if direct preview URL parameter is present
-  useEffect(() => {
-    const isDirect =
-      window.location.search.includes('direct') ||
-      window.location.hash.includes('direct') ||
-      window.location.search.includes('auth') ||
-      window.location.hash.includes('auth')
-
-    if (isDirect) {
-      directLogin()
-    }
-  }, [])
-
-  // Check login on mount
+  // Strictly verify authentication token on mount
   useEffect(() => {
     if (token) {
       fetch('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then(r => r.json())
+        .then(r => {
+          if (!r.ok) throw new Error('Unauthorized')
+          return r.json()
+        })
         .then(data => {
           if (data.admin) setAdminUser(data.admin)
-          else directLogin()
+          else handleLogout()
         })
         .catch(() => {
-          // If backend is offline, preserve master admin session
-          directLogin()
+          handleLogout()
         })
+    } else {
+      setAdminUser(null)
     }
   }, [token])
 
@@ -136,16 +76,20 @@ export default function AdminDashboard() {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => {
+        if (r.status === 401) {
+          handleLogout()
+          throw new Error('Session expired')
+        }
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json()
       })
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) setItems(data)
-        else setItems(fallbackData[activeTab] || [])
+        if (Array.isArray(data)) setItems(data)
+        else setItems([])
       })
-      .catch(() => {
-        // Fallback to local dataset so the preview is immediately full of real lab data
-        setItems(fallbackData[activeTab] || [])
+      .catch((err) => {
+        console.error('Fetch error:', err)
+        setItems([])
       })
       .finally(() => setLoading(false))
   }, [activeTab, token])
@@ -155,53 +99,27 @@ export default function AdminDashboard() {
     setLoggingIn(true)
     setLoginError(null)
 
-    // Master credentials instant check
-    const isMaster =
-      (email.toLowerCase().trim() === 'admin@airlab.neduet.edu.pk' && password === 'airlab2026!') ||
-      password === 'airlab2026!'
-
-    if (isMaster) {
-      directLogin()
-      setLoggingIn(false)
-      return
-    }
-
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       })
 
-      const text = await res.text()
-      let data: any
-      try {
-        data = JSON.parse(text)
-      } catch {
-        throw new Error(text || `Server returned ${res.status}`)
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || 'Invalid email or password')
       }
-
-      if (!res.ok) throw new Error(data.error || 'Login failed')
 
       localStorage.setItem('airlab_admin_token', data.token)
       setToken(data.token)
       setAdminUser(data.admin)
+      setPassword('')
     } catch (err: any) {
-      // In preview, allow fallback login if user attempted master credentials
-      if (email.includes('admin') || password.includes('airlab')) {
-        directLogin()
-      } else {
-        setLoginError(err.message || 'Invalid email or password')
-      }
+      setLoginError(err.message || 'Invalid email or password')
     } finally {
       setLoggingIn(false)
     }
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem('airlab_admin_token')
-    setToken(null)
-    setAdminUser(null)
   }
 
   const handleSaveItem = async (e: React.FormEvent) => {
@@ -288,88 +206,63 @@ export default function AdminDashboard() {
   if (!token) {
     return (
       <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[6px] shadow-xl p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-[var(--accent-orange)] rounded-full"></span>
-              <span className="font-mono text-xs tracking-wider uppercase text-[var(--text-muted)]">AIR Lab NED</span>
+        <div className="w-full max-w-sm bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-[8px] shadow-xl p-8">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 rounded-[4px] bg-[var(--accent-orange)]/10 text-[var(--accent-orange)] flex items-center justify-center">
+              <Lock className="w-4 h-4" />
             </div>
-            <span className="inline-flex items-center gap-1 text-[11px] text-green-600 font-medium px-2 py-0.5 rounded bg-green-500/10">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Preview Mode Active</span>
-            </span>
+            <div>
+              <div className="font-mono text-[10px] tracking-wider uppercase text-[var(--text-muted)]">AIR Lab System</div>
+              <h2 className="text-lg font-head font-medium leading-tight">Admin Portal</h2>
+            </div>
           </div>
 
-          <h2 className="text-2xl font-head font-medium mb-1">Admin Portal</h2>
-          <p className="text-xs text-[var(--text-muted)] mb-5">
-            Sign in to manage applications, update faculty, and edit website records.
+          <p className="text-xs text-[var(--text-muted)] mb-6 leading-relaxed">
+            Authorized personnel only. Please sign in with your credentials to access the laboratory administration system.
           </p>
 
-          {/* Quick Direct Access Banner */}
-          <div className="mb-6 p-4 rounded-[4px] bg-[var(--accent-purple)]/5 border border-[var(--accent-purple)]/20">
-            <div className="flex items-start gap-2.5">
-              <KeyRound className="w-4 h-4 text-[var(--accent-purple)] shrink-0 mt-0.5" />
-              <div className="text-xs">
-                <div className="font-semibold text-[var(--text-primary)] mb-1">Direct Administrator Access</div>
-                <div className="text-[var(--text-muted)] mb-3 text-[11.5px]">
-                  Click below to enter the admin dashboard directly without typing credentials.
-                </div>
-                <button
-                  type="button"
-                  onClick={directLogin}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[3px] bg-[var(--accent-purple)] hover:bg-[var(--accent-purple)]/90 text-white font-medium text-xs transition-colors cursor-pointer"
-                >
-                  <span>⚡ 1-Click Direct Admin Login</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
           {loginError && (
-            <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-600 text-xs">
+            <div className="mb-5 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-600 text-xs leading-relaxed">
               {loginError}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium mb-1.5">Email Address</label>
+              <label className="block text-xs font-medium mb-1.5 text-[var(--text-primary)]">Email Address</label>
               <input
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@airlab.neduet.edu.pk"
-                className="w-full px-3.5 h-11 rounded-[3px] border border-[var(--border-hairline)] bg-[var(--bg-page)] text-sm focus:outline-none focus:border-[var(--accent-orange)]"
+                placeholder="name@neduet.edu.pk"
+                className="w-full px-3.5 h-10 rounded-[4px] border border-[var(--border-hairline)] bg-[var(--bg-page)] text-sm focus:outline-none focus:border-[var(--accent-orange)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1.5">Password</label>
+              <label className="block text-xs font-medium mb-1.5 text-[var(--text-primary)]">Password</label>
               <input
                 type="password"
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="airlab2026!"
-                className="w-full px-3.5 h-11 rounded-[3px] border border-[var(--border-hairline)] bg-[var(--bg-page)] text-sm focus:outline-none focus:border-[var(--accent-orange)]"
+                placeholder="••••••••••••"
+                className="w-full px-3.5 h-10 rounded-[4px] border border-[var(--border-hairline)] bg-[var(--bg-page)] text-sm focus:outline-none focus:border-[var(--accent-orange)]"
               />
             </div>
 
             <button
               type="submit"
               disabled={loggingIn}
-              className="w-full h-11 mt-2 rounded-[3px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-medium transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full h-10 mt-2 rounded-[4px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
-              {loggingIn ? 'Authenticating...' : 'Sign In ↳'}
+              <Shield className="w-3.5 h-3.5" />
+              <span>{loggingIn ? 'Authenticating...' : 'Sign In'}</span>
             </button>
           </form>
-
-          <div className="mt-4 pt-4 border-t border-[var(--border-hairline)] text-center">
-            <span className="text-[11px] text-[var(--text-muted)] font-mono">
-              Credentials: <strong>admin@airlab.neduet.edu.pk</strong> / <strong>airlab2026!</strong>
-            </span>
-          </div>
         </div>
       </div>
     )
