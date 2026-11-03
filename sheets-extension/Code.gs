@@ -11,15 +11,16 @@
  *
  * Instructions:
  * 1. In your Google Spreadsheet, click "Extensions" -> "Apps Script".
- * 2. Delete any existing code and replace with this entire file.
- * 3. Save (Ctrl + S) and refresh your Google Spreadsheet.
- * 4. A new "⚡ AIR Lab" menu will appear in the top toolbar!
+ * 2. Select all existing code, delete it, and paste this entire code.
+ * 3. Click the Save icon (💾 or Ctrl + S).
+ * 4. Refresh your Google Spreadsheet in the browser.
+ * 5. Click "⚡ AIR Lab" -> "🚀 Sync All to Website"!
  * ============================================================================
  */
 
-// Default Configuration (Can be changed from menu ⚡ AIR Lab -> ⚙️ Configure Website URL & Secret)
+// Default Configuration
 const DEFAULT_CONFIG = {
-  BACKEND_URL: 'https://airlab-website-peach.vercel.app', // Or your custom domain / localhost ngrok tunnel
+  BACKEND_URL: 'https://airlab-website-peach.vercel.app',
   SYNC_SECRET: 'airlab-sheets-sync-secret-2026',
   TAB_FACULTY_INTERNS: 'Faculty & Interns',
   TAB_UG_PROJECTS: 'Undergraduate Projects',
@@ -30,6 +31,39 @@ function getSetting(key) {
   const props = PropertiesService.getScriptProperties()
   const custom = props.getProperty(key)
   return custom || DEFAULT_CONFIG[key]
+}
+
+/**
+ * Robust URL resolver that strips hash fragments (#), query strings, and duplicate paths
+ * so that any URL entered (even with /#/ or /admin) cleanly resolves to:
+ * https://airlab-website-peach.vercel.app/api/sync/sheets
+ */
+function getCleanEndpoint() {
+  let url = String(getSetting('BACKEND_URL') || DEFAULT_CONFIG.BACKEND_URL).trim()
+
+  // 1. Strip hash fragments (e.g. /#/ or #/admin)
+  if (url.includes('#')) {
+    url = url.split('#')[0]
+  }
+
+  // 2. Strip query parameters
+  if (url.includes('?')) {
+    url = url.split('?')[0]
+  }
+
+  // 3. Remove trailing slashes
+  url = url.replace(/\/+$/, '')
+
+  // 4. Strip duplicate /api/sync/sheets or /api
+  url = url.replace(/\/api\/sync\/sheets\/?$/i, '')
+  url = url.replace(/\/api\/?$/i, '')
+
+  // 5. Fallback if empty or invalid
+  if (!url || !url.startsWith('http')) {
+    url = DEFAULT_CONFIG.BACKEND_URL
+  }
+
+  return url.replace(/\/+$/, '') + '/api/sync/sheets'
 }
 
 /**
@@ -45,6 +79,7 @@ function onOpen() {
     .addItem('💰 Sync Funded Projects Only', 'syncFundedOnly')
     .addSeparator()
     .addItem('⚙️ Configure Website URL & Secret', 'configureSettings')
+    .addItem('🔄 Reset to Default Configuration', 'resetToDefaults')
     .addToUi()
 }
 
@@ -86,9 +121,8 @@ function readSheetToObjects(sheetName) {
  * Sends sync request to the AIR Lab backend API.
  */
 function sendSyncPayload(payload) {
-  const backendUrl = getSetting('BACKEND_URL').replace(/\/+$/, '')
-  const syncSecret = getSetting('SYNC_SECRET')
-  const endpoint = backendUrl + '/api/sync/sheets'
+  const endpoint = getCleanEndpoint()
+  const syncSecret = String(getSetting('SYNC_SECRET') || DEFAULT_CONFIG.SYNC_SECRET).trim()
 
   const options = {
     method: 'post',
@@ -101,13 +135,18 @@ function sendSyncPayload(payload) {
   }
 
   try {
-    SpreadsheetApp.getActiveSpreadsheet().toast('Syncing with AIR Lab database...', 'AIR Lab Sync', 10)
+    SpreadsheetApp.getActiveSpreadsheet().toast('Connecting to ' + endpoint + '...', 'AIR Lab Sync', 10)
     const res = UrlFetchApp.fetch(endpoint, options)
     const code = res.getResponseCode()
     const text = res.getContentText()
 
     if (code >= 200 && code < 300) {
-      const result = JSON.parse(text)
+      let result = {}
+      try {
+        result = JSON.parse(text)
+      } catch (e) {
+        result = {}
+      }
       const st = result.stats || {}
 
       let summary = '✅ Website Database Synced Successfully!\n\n'
@@ -126,14 +165,14 @@ function sendSyncPayload(payload) {
     } else {
       SpreadsheetApp.getUi().alert(
         'Sync Failed (HTTP ' + code + ')',
-        text || 'Please check that the backend URL and secret key are configured correctly.',
+        'Target Endpoint:\n' + endpoint + '\n\nServer Response:\n' + (text ? text.slice(0, 300) : 'Check URL or Secret Key'),
         SpreadsheetApp.getUi().ButtonSet.OK
       )
     }
   } catch (err) {
     SpreadsheetApp.getUi().alert(
       'Connection Error',
-      'Could not connect to backend endpoint:\n' + endpoint + '\n\n' + err.toString(),
+      'Could not connect to:\n' + endpoint + '\n\nError: ' + err.toString(),
       SpreadsheetApp.getUi().ButtonSet.OK
     )
   }
@@ -206,7 +245,7 @@ function syncFundedOnly() {
 }
 
 /**
- * Modal to configure custom Backend URL or Secret without touching the code.
+ * Modal to configure custom Backend URL or Secret.
  */
 function configureSettings() {
   const ui = SpreadsheetApp.getUi()
@@ -215,18 +254,21 @@ function configureSettings() {
   const currentUrl = getSetting('BACKEND_URL')
   const urlPrompt = ui.prompt(
     'Configure Website URL',
-    'Enter your live website URL:\nCurrent: ' + currentUrl,
+    'Enter your live website URL (e.g. https://airlab-website-peach.vercel.app):\n\nCurrent: ' + currentUrl,
     ui.ButtonSet.OK_CANCEL
   )
   if (urlPrompt.getSelectedButton() === ui.Button.OK) {
-    const val = urlPrompt.getResponseText().trim()
-    if (val) props.setProperty('BACKEND_URL', val)
+    let val = urlPrompt.getResponseText().trim()
+    if (val) {
+      val = val.split('#')[0].split('?')[0].replace(/\/+$/, '').replace(/\/api\/sync\/sheets\/?$/i, '').replace(/\/api\/?$/i, '')
+      props.setProperty('BACKEND_URL', val)
+    }
   }
 
   const currentSecret = getSetting('SYNC_SECRET')
   const secretPrompt = ui.prompt(
     'Configure Sync Secret',
-    'Enter secret key:\nCurrent: ' + currentSecret,
+    'Enter your secret key:\nDefault: ' + DEFAULT_CONFIG.SYNC_SECRET + '\n\nCurrent: ' + currentSecret,
     ui.ButtonSet.OK_CANCEL
   )
   if (secretPrompt.getSelectedButton() === ui.Button.OK) {
@@ -234,5 +276,27 @@ function configureSettings() {
     if (val) props.setProperty('SYNC_SECRET', val)
   }
 
-  ui.alert('Settings Saved', 'Backend URL and Secret have been updated.', ui.ButtonSet.OK)
+  ui.alert(
+    'Settings Saved',
+    'Configured Target Endpoint:\n' + getCleanEndpoint() + '\n\nYou can now run "🚀 Sync All to Website"!',
+    ui.ButtonSet.OK
+  )
+}
+
+/**
+ * 🔄 Reset Configuration to Default
+ */
+function resetToDefaults() {
+  const ui = SpreadsheetApp.getUi()
+  const confirm = ui.alert(
+    'Reset Configuration',
+    'Reset Website URL and Secret to defaults?\n\nURL: ' + DEFAULT_CONFIG.BACKEND_URL + '\nSecret: ' + DEFAULT_CONFIG.SYNC_SECRET,
+    ui.ButtonSet.YES_NO
+  )
+  if (confirm === ui.Button.YES) {
+    const props = PropertiesService.getScriptProperties()
+    props.deleteProperty('BACKEND_URL')
+    props.deleteProperty('SYNC_SECRET')
+    ui.alert('Reset Complete', 'Configuration restored to defaults.\nTarget Endpoint:\n' + getCleanEndpoint(), ui.ButtonSet.OK)
+  }
 }
