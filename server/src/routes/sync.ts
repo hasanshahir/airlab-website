@@ -163,7 +163,7 @@ syncRouter.post('/cleanup', async (req, res, next) => {
       ]
 
       if (slug === 'team') {
-        filters.push({ id: { $in: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'ri1', 'ri2', 'ri3', 'ri4', 'ri5', 'ri6', 'ri7', 'ri8', 'ri9', 'ri10'] } })
+        filters.push({ id: { $in: ['ri1', 'ri2', 'ri3', 'ri4', 'ri5', 'ri6', 'ri7', 'ri8', 'ri9', 'ri10'] } })
       }
       if (slug === 'projects') {
         filters.push({ id: { $type: 'number' } })
@@ -225,7 +225,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
       } else if (removePlaceholders) {
         await teamModel.deleteMany({
           $or: [
-            { id: { $in: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'ri1', 'ri2', 'ri3', 'ri4', 'ri5', 'ri6', 'ri7', 'ri8', 'ri9', 'ri10'] } },
+            { id: { $in: ['ri1', 'ri2', 'ri3', 'ri4', 'ri5', 'ri6', 'ri7', 'ri8', 'ri9', 'ri10'] } },
             { image: { $regex: 'unsplash\\.com', $options: 'i' } },
             { placeholder: true },
           ],

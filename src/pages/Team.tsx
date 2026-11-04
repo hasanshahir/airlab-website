@@ -53,7 +53,19 @@ export default function Team() {
       fetch('/api/content/previous-interns').then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([team, prev]) => {
       if (!active) return
-      if (Array.isArray(team)) setAllMembersRaw(team)
+      if (Array.isArray(team)) {
+        const fallbackFaculty = getTeamMembers().filter(m => m.category === 'Faculty')
+        const merged = [...fallbackFaculty]
+        for (const item of team) {
+          const idx = merged.findIndex(m => m.id === item.id || m.name.trim().toLowerCase() === item.name.trim().toLowerCase())
+          if (idx >= 0) {
+            merged[idx] = { ...merged[idx], ...item }
+          } else {
+            merged.push(item)
+          }
+        }
+        setAllMembersRaw(merged)
+      }
       if (Array.isArray(prev)) setSortedPreviousInterns(prev)
     })
     return () => { active = false }
