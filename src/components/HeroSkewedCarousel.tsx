@@ -63,14 +63,17 @@ interface CarouselCardProps {
   slide: CarouselSlide
   offset: number
   isCenter: number | boolean
+  spread?: 'normal' | 'wide'
   onClick: () => void
 }
 
-function CarouselCard({ slide, offset, isCenter, onClick }: CarouselCardProps) {
+function CarouselCard({ slide, offset, isCenter, spread = 'normal', onClick }: CarouselCardProps) {
   const [tiltX, setTiltX] = useState(0)
   const [tiltY, setTiltY] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 })
+
+  const isWide = spread === 'wide'
 
   // Base transformations derived from relative offset
   let xPercent = 0
@@ -86,31 +89,31 @@ function CarouselCard({ slide, offset, isCenter, onClick }: CarouselCardProps) {
     zIndex = 30
     opacity = 1
   } else if (offset === -1) {
-    xPercent = -58
-    baseRotateY = 24
+    xPercent = isWide ? -66 : -58
+    baseRotateY = isWide ? 26 : 24
     scale = 0.88
     zIndex = 20
     opacity = 0.85
   } else if (offset === 1) {
-    xPercent = 58
-    baseRotateY = -24
+    xPercent = isWide ? 66 : 58
+    baseRotateY = isWide ? -26 : -24
     scale = 0.88
     zIndex = 20
     opacity = 0.85
   } else if (offset === -2) {
-    xPercent = -105
-    baseRotateY = 38
+    xPercent = isWide ? -122 : -105
+    baseRotateY = isWide ? 40 : 38
     scale = 0.74
     zIndex = 10
     opacity = 0.45
   } else if (offset === 2) {
-    xPercent = 105
-    baseRotateY = -38
+    xPercent = isWide ? 122 : 105
+    baseRotateY = isWide ? -40 : -38
     scale = 0.74
     zIndex = 10
     opacity = 0.45
   } else {
-    xPercent = offset > 0 ? 140 : -140
+    xPercent = offset > 0 ? 150 : -150
     scale = 0.6
     zIndex = 0
     opacity = 0
@@ -304,11 +307,17 @@ function CarouselCard({ slide, offset, isCenter, onClick }: CarouselCardProps) {
 interface HeroSkewedCarouselProps {
   slides?: CarouselSlide[]
   autoPlayInterval?: number
+  spread?: 'normal' | 'wide'
+  showControls?: boolean
+  className?: string
 }
 
 export default function HeroSkewedCarousel({
   slides = DEFAULT_SLIDES,
   autoPlayInterval = 4500,
+  spread = 'normal',
+  showControls = true,
+  className = '',
 }: HeroSkewedCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
@@ -358,7 +367,7 @@ export default function HeroSkewedCarousel({
 
   return (
     <div
-      className="relative w-full select-none py-6 sm:py-8 flex flex-col items-center justify-center overflow-visible"
+      className={`relative w-full select-none py-6 sm:py-8 flex flex-col items-center justify-center overflow-visible ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
@@ -366,7 +375,7 @@ export default function HeroSkewedCarousel({
     >
       {/* 3D Perspective Stage */}
       <div
-        className="relative w-full max-w-[940px] h-[390px] sm:h-[450px] md:h-[490px] flex items-center justify-center"
+        className="relative w-full max-w-[1020px] h-[390px] sm:h-[450px] md:h-[490px] flex items-center justify-center"
         style={{ perspective: '1100px', transformStyle: 'preserve-3d' }}
       >
         {slides.map((slide, index) => {
@@ -382,6 +391,7 @@ export default function HeroSkewedCarousel({
               slide={slide}
               offset={offset}
               isCenter={isCenter}
+              spread={spread}
               onClick={() => {
                 if (!isCenter) setCurrentIndex(index)
               }}
@@ -391,44 +401,46 @@ export default function HeroSkewedCarousel({
       </div>
 
       {/* Pagination & Arrow Controls */}
-      <div className="mt-7 flex items-center justify-center gap-4 z-20">
-        {/* Prev Arrow */}
-        <button
-          type="button"
-          onClick={handlePrev}
-          aria-label="Previous slide"
-          className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center shadow-xs transition-all hover:scale-105 active:scale-95 cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+      {showControls && (
+        <div className="mt-7 flex items-center justify-center gap-4 z-20">
+          {/* Prev Arrow */}
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label="Previous slide"
+            className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center shadow-xs transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
 
-        {/* Dots Indicator */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-xs">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setCurrentIndex(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                currentIndex === i
-                  ? 'w-6 bg-[var(--accent-orange)]'
-                  : 'w-2 bg-[var(--border-hairline-dark)] hover:bg-[var(--accent-orange)]/50'
-              }`}
-            />
-          ))}
+          {/* Dots Indicator */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-xs">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setCurrentIndex(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                  currentIndex === i
+                    ? 'w-6 bg-[var(--accent-orange)]'
+                    : 'w-2 bg-[var(--border-hairline-dark)] hover:bg-[var(--accent-orange)]/50'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Next Arrow */}
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Next slide"
+            className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center shadow-xs transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
-
-        {/* Next Arrow */}
-        <button
-          type="button"
-          onClick={handleNext}
-          aria-label="Next slide"
-          className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center shadow-xs transition-all hover:scale-105 active:scale-95 cursor-pointer"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
+      )}
     </div>
   )
 }

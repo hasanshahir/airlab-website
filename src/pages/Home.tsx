@@ -72,84 +72,99 @@ export default function Home() {
 
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] overflow-hidden">
-      {/* ── 1. HERO SECTION (With 3D Skewed Carousel & Editorial Rhythm) ── */}
-      <section className="pt-8 pb-16 sm:pt-12 sm:pb-22 px-4 sm:px-8 max-w-[1240px] mx-auto text-left relative z-10">
-        {/* Top Header Badge */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
-            <span>DEPARTMENT OF CSIT &bull; NED UNIVERSITY</span>
+      {/* ── 1. HERO SECTION (21st.dev style: Bold Center Typography on top with 3D Skewed Carousel in Background) ── */}
+      <section className="relative min-h-[580px] sm:min-h-[660px] md:min-h-[720px] flex items-center justify-center overflow-hidden px-4 sm:px-8 py-16 sm:py-24 text-center">
+        {/* BACKGROUND LAYER: 3D Skewed Carousel with Lowered Transparency */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-0 overflow-hidden select-none">
+          {/* Subtle Ambient Radial Lighting Glow */}
+          <div className="absolute w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] bg-[var(--accent-orange)]/15 rounded-full blur-[120px] pointer-events-none" />
+
+          {/* 3D Carousel with Lowered Transparency & Spread */}
+          <div className="w-full opacity-40 sm:opacity-50 hover:opacity-80 transition-opacity duration-700 scale-95 sm:scale-100 transform -translate-y-4 sm:-translate-y-2">
+            <HeroSkewedCarousel spread="wide" showControls={true} />
           </div>
 
-          <div className="text-xs font-mono text-[var(--text-subtle)] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-green)] animate-pulse" />
-            <span>AIR LAB // 3D GALLERY</span>
-          </div>
+          {/* Center Radial Vignette Mask so Foreground Typography is 100% Readable */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 65% 65% at 50% 50%, var(--bg-page) 30%, transparent 85%)',
+              opacity: 0.90,
+            }}
+          />
+
+          {/* Top & Bottom Soft Fade Transitions into Page Body */}
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[var(--bg-page)] to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[var(--bg-page)] to-transparent pointer-events-none" />
         </div>
 
-        {/* 3D Skewed Carousel Component */}
-        <div className="my-2 sm:my-4 overflow-visible">
-          <HeroSkewedCarousel />
-        </div>
-
-        {/* Hero Editorial Narrative & Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center pt-8 border-t border-[var(--border-hairline)] mt-6">
-          {/* Left Column: Bold Title & Mission */}
-          <SectionReveal delay={0.05} className="lg:col-span-5">
-            <div>
-              <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-[-0.035em] leading-[0.98] text-[var(--text-primary)] font-head mb-4">
-                AIR Lab
-              </h1>
-              <p className="text-[15px] sm:text-[16px] text-[var(--text-muted)] leading-relaxed font-normal max-w-lg">
-                The Artificial Intelligence Research Lab at NED University is pioneering foundational regional AI models, edge perception, and autonomous robotics benchmarks for national impact.
-              </p>
+        {/* FOREGROUND LAYER: Sleek Centered Typography & Primary Action Buttons (21st.dev Style) */}
+        <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
+          {/* Department / Affiliation Badge */}
+          <SectionReveal delay={0.05}>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] mb-6 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)] animate-pulse" />
+              <span>DEPARTMENT OF CSIT &bull; NED UNIVERSITY</span>
             </div>
           </SectionReveal>
 
-          {/* Right Column: Narrative Headline & Direct Action Buttons */}
-          <SectionReveal delay={0.12} className="lg:col-span-7">
-            <div className="lg:pl-8 lg:border-l border-[var(--border-hairline)]">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-normal tracking-[-0.02em] leading-[1.25] text-[var(--text-primary)] mb-8 font-head">
-                Ignite intelligence, computational strength, and breakthrough innovation on every research frontier, turning lab discoveries into impactful real-world systems.
-              </h2>
+          {/* Giant, Commanding Modernist Headline */}
+          <SectionReveal delay={0.1}>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[84px] font-black tracking-[-0.04em] leading-[0.96] text-[var(--text-primary)] font-head mb-6 max-w-3xl drop-shadow-sm">
+              Pioneering Frontier AI.
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-orange)] via-[var(--accent-green)] to-[var(--text-primary)]">
+                Building Real Impact.
+              </span>
+            </h1>
+          </SectionReveal>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-6">
-                <button
-                  type="button"
-                  onClick={() => openDrawer('projects')}
-                  className="h-12 sm:h-13 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm sm:text-base font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-[0.99]"
-                >
-                  <Layers className="w-4.5 h-4.5 shrink-0" />
-                  <span>Explore Projects</span>
-                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-                </button>
+          {/* Sleek Subtitle */}
+          <SectionReveal delay={0.16}>
+            <p className="text-base sm:text-lg md:text-xl text-[var(--text-muted)] max-w-2xl font-normal leading-relaxed mb-8">
+              The Artificial Intelligence Research Lab at NED University develops foundational regional models, edge perception, and autonomous robotics benchmarks for national impact.
+            </p>
+          </SectionReveal>
 
-                <button
-                  type="button"
-                  onClick={() => openDrawer('members')}
-                  className="h-12 sm:h-13 px-7 bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] text-sm sm:text-base font-semibold rounded-full shadow-xs hover:shadow transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-[0.99]"
-                >
-                  <Users className="w-4.5 h-4.5 text-[var(--ink-dark)] shrink-0" />
-                  <span>Lab Members</span>
-                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-                </button>
-              </div>
+          {/* Foreground CTA Action Buttons */}
+          <SectionReveal delay={0.22}>
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
+              <button
+                type="button"
+                onClick={() => openDrawer('projects')}
+                className="h-13 px-8 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 group"
+              >
+                <Layers className="w-5 h-5 shrink-0" />
+                <span>Explore Projects</span>
+                <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
+              </button>
 
-              <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-xs font-sans text-[var(--text-muted)] pt-1">
-                <span className="text-[var(--text-subtle)]">Quick links:</span>
-                <Link to="/projects" className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1">
-                  All Projects &rarr;
-                </Link>
-                <span>&bull;</span>
-                <Link to="/grants" className="text-[var(--ink-dark)] hover:underline font-semibold flex items-center gap-1">
-                  <Award className="w-3.5 h-3.5" />
-                  Active Grants &rarr;
-                </Link>
-                <span>&bull;</span>
-                <Link to="/team" className="text-[var(--text-primary)] hover:underline font-semibold flex items-center gap-1">
-                  All Team Members &rarr;
-                </Link>
-              </div>
+              <button
+                type="button"
+                onClick={() => openDrawer('members')}
+                className="h-13 px-8 bg-[var(--bg-surface)]/95 backdrop-blur-md hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] text-base font-semibold rounded-full shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 group"
+              >
+                <Users className="w-5 h-5 text-[var(--ink-dark)] shrink-0" />
+                <span>Lab Members</span>
+                <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
+              </button>
+            </div>
+          </SectionReveal>
+
+          {/* Quick Direct Navigation Links */}
+          <SectionReveal delay={0.28}>
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-sans text-[var(--text-muted)]">
+              <Link to="/projects" className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1">
+                All Projects &rarr;
+              </Link>
+              <span>&bull;</span>
+              <Link to="/grants" className="text-[var(--ink-dark)] hover:underline font-semibold flex items-center gap-1">
+                <Award className="w-3.5 h-3.5" />
+                Active Grants &rarr;
+              </Link>
+              <span>&bull;</span>
+              <Link to="/team" className="text-[var(--text-primary)] hover:underline font-semibold flex items-center gap-1">
+                All Team Members &rarr;
+              </Link>
             </div>
           </SectionReveal>
         </div>
