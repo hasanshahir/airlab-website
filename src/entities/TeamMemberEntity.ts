@@ -107,6 +107,15 @@ export class TeamMemberEntity {
   /**
    * Checks whether the member has a registered email address
    */
+  public hasResume(): boolean {
+    return Boolean(
+      this.cvUrl &&
+      this.cvUrl.trim() !== '' &&
+      this.cvUrl.trim() !== '#' &&
+      !this.cvUrl.includes('placeholder')
+    )
+  }
+
   public hasEmail(): boolean {
     return Boolean(this.email && this.email.trim() !== '')
   }

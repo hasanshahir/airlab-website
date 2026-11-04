@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, ExternalLink, GraduationCap, Users, Calendar, Search, Sparkles } from 'lucide-react'
+import { Mail, ExternalLink, GraduationCap, Users, Calendar, Search, Sparkles, FileText } from 'lucide-react'
 import { getTeamMembers, getPreviousInterns } from '../lib/data'
 import type { TeamMemberData } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
@@ -298,38 +298,56 @@ export default function Team() {
                         )}
                       </div>
 
-                      {/* Action buttons */}
-                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-3 text-xs font-sans">
-                        {f.hasLinkedIn() && (
+                      {/* Action buttons: LinkedIn, Email, Resume */}
+                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-2.5 text-xs font-sans">
+                        {f.hasLinkedIn() ? (
                           <a
                             href={f.getLinkedInUrl()!}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="h-9 px-4 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold inline-flex items-center gap-2 shadow-xs transition-colors"
+                            className="h-8.5 px-3.5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold inline-flex items-center gap-2 shadow-xs transition-colors"
                           >
                             <Linkedin className="w-3.5 h-3.5" />
                             <span>LinkedIn ↳</span>
                           </a>
+                        ) : (
+                          <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
+                            <Linkedin className="w-3.5 h-3.5" />
+                            <span>LinkedIn</span>
+                          </span>
                         )}
-                        {f.hasEmail() && (
+
+                        {f.hasEmail() ? (
                           <a
                             href={`mailto:${f.email}`}
-                            className="h-9 px-4 rounded-full bg-[var(--bg-page)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] text-xs font-medium inline-flex items-center gap-2 border border-[var(--border-hairline)] transition-colors"
+                            className="h-8.5 px-3.5 rounded-full bg-[var(--bg-page)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] text-xs font-medium inline-flex items-center gap-2 border border-[var(--border-hairline)] transition-colors truncate max-w-[220px]"
                           >
-                            <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                            <span>{f.email}</span>
+                            <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)] shrink-0" />
+                            <span className="truncate">{f.email}</span>
                           </a>
+                        ) : (
+                          <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
+                            <Mail className="w-3.5 h-3.5 shrink-0" />
+                            <span>No Email</span>
+                          </span>
                         )}
-                        {f.cvUrl && (
+
+                        {f.hasResume() ? (
                           <a
                             href={f.cvUrl}
                             target="_blank"
-                            rel="noreferrer"
-                            className="h-9 px-4 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:bg-black transition-colors"
+                            rel="noopener noreferrer"
+                            className="h-8.5 px-3.5 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:bg-black transition-colors"
                           >
-                            <span>View Resume</span>
+                            <FileText className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                            <span>Resume</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
+                        ) : (
+                          <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>Resume</span>
+                          </span>
                         )}
                       </div>
                     </div>
@@ -421,30 +439,56 @@ export default function Team() {
                       </div>
                     </div>
 
-                    {/* Contact Links */}
-                    <div className="pt-3 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2 text-xs font-sans">
+                    {/* Action buttons: LinkedIn, Email, Resume */}
+                    <div className="pt-3 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-2 text-xs font-sans">
                       {intern.hasLinkedIn() ? (
                         <a
                           href={intern.getLinkedInUrl()!}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="h-8 px-3.5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white font-semibold flex items-center gap-1.5 shadow-xs transition-all"
+                          className="h-8 px-3 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white font-semibold inline-flex items-center gap-1.5 shadow-xs transition-all"
                         >
                           <Linkedin className="w-3 h-3" />
                           <span>LinkedIn ↳</span>
                         </a>
                       ) : (
-                        <span className="text-[var(--text-subtle)] text-xs italic">No LinkedIn</span>
+                        <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
+                          <Linkedin className="w-3 h-3" />
+                          <span>LinkedIn</span>
+                        </span>
                       )}
 
-                      {intern.hasEmail() && (
+                      {intern.hasEmail() ? (
                         <a
                           href={`mailto:${intern.email}`}
-                          className="h-8 px-3 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] font-medium flex items-center gap-1.5 transition-colors truncate max-w-[220px]"
+                          className="h-8 px-3 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] font-medium inline-flex items-center gap-1.5 transition-colors truncate max-w-[190px]"
                         >
-                          <Mail className="w-3 h-3 text-[var(--accent-orange)]" />
+                          <Mail className="w-3 h-3 text-[var(--accent-orange)] shrink-0" />
                           <span className="truncate">{intern.email}</span>
                         </a>
+                      ) : (
+                        <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
+                          <Mail className="w-3 h-3 shrink-0" />
+                          <span>No Email</span>
+                        </span>
+                      )}
+
+                      {intern.hasResume() ? (
+                        <a
+                          href={intern.cvUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="h-8 px-3 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:bg-black transition-colors"
+                        >
+                          <FileText className="w-3 h-3 text-[var(--accent-orange)]" />
+                          <span>Resume</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
+                          <FileText className="w-3 h-3" />
+                          <span>Resume</span>
+                        </span>
                       )}
                     </div>
                   </div>

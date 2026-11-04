@@ -270,6 +270,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
         const image = parseString(row.image) || (name.toLowerCase().includes('marvi') ? './pfp/marvi.jpeg' : '')
         const email = parseString(row.Email || row.email)
         const linkedin = parseString(row.Linkedin || row.linkedin)
+        const cvUrl = parseString(row.Resume || row.resume || row.CV || row.cv || row.cvUrl || row['Resume Link'] || row['CV Link'])
         const specialty = parseString(row.Specialty || row.specialty || row.tags)
         const tags = specialty ? parseStringList(specialty) : []
 
@@ -283,6 +284,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
           role,
           email,
           linkedin,
+          cvUrl: cvUrl || '',
           researchFocus: specialty,
           tags,
           isLead,
