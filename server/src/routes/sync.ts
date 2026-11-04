@@ -256,9 +256,18 @@ syncRouter.post('/sheets', async (req, res, next) => {
 
         stats.facultyAndInterns.processed++
         const roleRaw = (parseString(row.Role || row.role) || '').toLowerCase()
-        const isFaculty = roleRaw.includes('fac')
+        const isFaculty =
+          roleRaw.includes('fac') ||
+          roleRaw.includes('prof') ||
+          roleRaw.includes('dr') ||
+          row.category === 'Faculty' ||
+          Boolean(row.isLead) ||
+          name.toLowerCase().includes('marvi') ||
+          name.toLowerCase().includes('mubashir')
         const category = isFaculty ? 'Faculty' : 'Research Interns'
-        const role = isFaculty ? 'Faculty Member' : 'Research Intern'
+        const role = parseString(row.Role || row.role) || (isFaculty ? 'Faculty Member' : 'Research Intern')
+        const isLead = Boolean(row.isLead || name.toLowerCase().includes('marvi') || name.toLowerCase().includes('mubashir'))
+        const image = parseString(row.image) || (name.toLowerCase().includes('marvi') ? './pfp/marvi.jpeg' : '')
         const email = parseString(row.Email || row.email)
         const linkedin = parseString(row.Linkedin || row.linkedin)
         const specialty = parseString(row.Specialty || row.specialty || row.tags)
@@ -276,6 +285,8 @@ syncRouter.post('/sheets', async (req, res, next) => {
           linkedin,
           researchFocus: specialty,
           tags,
+          isLead,
+          image,
           published: true,
         }
 
