@@ -59,6 +59,248 @@ const DEFAULT_SLIDES: CarouselSlide[] = [
   },
 ]
 
+interface CarouselCardProps {
+  slide: CarouselSlide
+  offset: number
+  isCenter: number | boolean
+  onClick: () => void
+}
+
+function CarouselCard({ slide, offset, isCenter, onClick }: CarouselCardProps) {
+  const [tiltX, setTiltX] = useState(0)
+  const [tiltY, setTiltY] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
+  const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 })
+
+  // Base transformations derived from relative offset
+  let xPercent = 0
+  let baseRotateY = 0
+  let scale = 1
+  let zIndex = 30
+  let opacity = 1
+
+  if (offset === 0) {
+    xPercent = 0
+    baseRotateY = 0
+    scale = 1
+    zIndex = 30
+    opacity = 1
+  } else if (offset === -1) {
+    xPercent = -58
+    baseRotateY = 24
+    scale = 0.88
+    zIndex = 20
+    opacity = 0.85
+  } else if (offset === 1) {
+    xPercent = 58
+    baseRotateY = -24
+    scale = 0.88
+    zIndex = 20
+    opacity = 0.85
+  } else if (offset === -2) {
+    xPercent = -105
+    baseRotateY = 38
+    scale = 0.74
+    zIndex = 10
+    opacity = 0.45
+  } else if (offset === 2) {
+    xPercent = 105
+    baseRotateY = -38
+    scale = 0.74
+    zIndex = 10
+    opacity = 0.45
+  } else {
+    xPercent = offset > 0 ? 140 : -140
+    scale = 0.6
+    zIndex = 0
+    opacity = 0
+  }
+
+  // Handle 3D Mouse Parallax & Specular Glare Tracking
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const normX = (e.clientX - rect.left) / rect.width - 0.5
+    const normY = (e.clientY - rect.top) / rect.height - 0.5
+
+    const maxTilt = isCenter ? 15 : 9
+    setTiltX(-normY * maxTilt)
+    setTiltY(normX * maxTilt)
+
+    setGlarePos({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+      opacity: isCenter ? 0.4 : 0.25,
+    })
+  }
+
+  const handleMouseEnter = () => {
+    setIsHovered(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovered(false)
+    setTiltX(0)
+    setTiltY(0)
+    setGlarePos(prev => ({ ...prev, opacity: 0 }))
+  }
+
+  // Combined 3D Position & Rotation
+  const currentY = isHovered ? (isCenter ? -14 : -8) : 0
+  const currentScale = isHovered ? (isCenter ? scale * 1.05 : scale * 1.04) : scale
+  const currentZ = isCenter ? (isHovered ? 85 : 40) : (isHovered ? 15 : -Math.abs(offset) * 60)
+
+  return (
+    <motion.div
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      animate={{
+        x: `${xPercent}%`,
+        y: currentY,
+        rotateX: tiltX,
+        rotateY: baseRotateY + tiltY,
+        scale: currentScale,
+        opacity,
+        z: currentZ,
+      }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 26,
+        mass: 0.75,
+      }}
+      style={{
+        zIndex: isHovered ? zIndex + 5 : zIndex,
+        transformStyle: 'preserve-3d',
+      }}
+      className={`absolute w-[240px] sm:w-[280px] md:w-[320px] aspect-[3/4] rounded-3xl cursor-pointer overflow-hidden transition-all duration-300 ${
+        isCenter
+          ? 'shadow-[0_25px_60px_-10px_rgba(0,0,0,0.38)] ring-1.5 ring-[var(--accent-orange)]/50'
+          : 'shadow-[0_12px_32px_rgba(0,0,0,0.22)] hover:shadow-[0_20px_45px_rgba(0,0,0,0.32)] hover:ring-1 hover:ring-[var(--accent-orange)]/40 hover:opacity-100'
+      }`}
+    >
+      {/* Dynamic 3D Specular Glare / Holographic Light Sheen */}
+      <div
+        className="absolute inset-0 pointer-events-none rounded-3xl z-30 transition-opacity duration-300"
+        style={{
+          opacity: glarePos.opacity,
+          background: `radial-gradient(circle 260px at ${glarePos.x}% ${glarePos.y}%, rgba(255, 255, 255, 0.45), transparent 70%)`,
+          mixBlendMode: 'overlay',
+        }}
+      />
+
+      {/* Ambient Edge Reflection */}
+      <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/15 pointer-events-none z-20" />
+
+      {/* SLIDE TYPE 1: SLEEK AIR LAB TYPOGRAPHY */}
+      {slide.type === 'typography' ? (
+        <div className="w-full h-full relative p-6 sm:p-7 flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#0c1813] via-[#081c15] to-[#122e23] text-white border border-[var(--accent-orange)]/35 rounded-3xl group">
+          {/* Subtle dynamic ambient lighting mesh */}
+          <div
+            className="absolute -top-24 -right-24 w-56 h-56 bg-[var(--accent-orange)]/30 rounded-full blur-3xl pointer-events-none transition-transform duration-500"
+            style={{
+              transform: isHovered ? `translate3d(${tiltY * 3}px, ${-tiltX * 3}px, 0) scale(1.2)` : 'none',
+            }}
+          />
+          <div className="absolute -bottom-24 -left-24 w-56 h-56 bg-[#74C69D]/20 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Grid texture overlay */}
+          <div
+            className="absolute inset-0 opacity-[0.08] pointer-events-none"
+            style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.85) 1px, transparent 0)`,
+              backgroundSize: '16px 16px',
+            }}
+          />
+
+          {/* Top Bar: Lab Badge & Coordinates */}
+          <div className="relative z-10 flex items-center justify-between text-[11px] font-mono tracking-wider text-[var(--accent-cyan)]/90">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)] animate-pulse" />
+              AIR-LAB // 2026
+            </span>
+            <span className="text-white/55 text-[10px] font-mono">EST. 2019</span>
+          </div>
+
+          {/* Center Typography: Sleek, architectural, bold */}
+          <div
+            className="relative z-10 my-auto py-4 transition-transform duration-300"
+            style={{
+              transform: isHovered ? `translate3d(${tiltY * 1.5}px, ${-tiltX * 1.5}px, 20px)` : 'none',
+            }}
+          >
+            <div className="text-[11px] font-mono tracking-[0.25em] text-[var(--accent-orange)] uppercase font-semibold mb-1 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+              <span>FRONTIER AI</span>
+            </div>
+
+            <h2 className="text-5xl sm:text-6xl font-black font-head tracking-[-0.04em] leading-[0.88] text-white drop-shadow-md">
+              AIR
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-[var(--accent-cyan)] to-[var(--accent-orange)]">
+                LAB
+              </span>
+            </h2>
+
+            <div className="w-12 h-1 bg-[var(--accent-orange)] rounded-full mt-3 mb-3 shadow-xs" />
+
+            <p className="text-xs sm:text-[13px] font-sans font-medium text-white/85 leading-relaxed max-w-[240px]">
+              Artificial Intelligence Research Laboratory
+            </p>
+          </div>
+
+          {/* Bottom: Department details & status */}
+          <div className="relative z-10 pt-3 border-t border-white/10 flex flex-col gap-1 text-[11px] font-sans">
+            <div className="text-white/95 font-semibold flex items-center justify-between">
+              <span>NED University CSIT</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+            </div>
+            <span className="text-white/50 text-[10px] font-mono">
+              AUTONOMOUS &bull; REGIONAL &bull; IMPACT
+            </span>
+          </div>
+        </div>
+      ) : (
+        /* SLIDE TYPE 2: HIGH-RES PHOTOGRAPH WITH 3D ZOOM & SLEEK GLASS OVERLAY */
+        <div className="w-full h-full relative group overflow-hidden">
+          <motion.img
+            src={slide.src}
+            alt={slide.alt || 'AIR Lab'}
+            className="w-full h-full object-cover rounded-3xl"
+            animate={{
+              scale: isHovered ? 1.08 : 1.0,
+            }}
+            transition={{ duration: 0.45 }}
+            loading="lazy"
+          />
+
+          {/* Gradient Overlay for Readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent rounded-3xl pointer-events-none" />
+
+          {/* Card Content & Tag with Parallax depth */}
+          <div
+            className="absolute bottom-0 inset-x-0 p-5 text-left text-white transition-transform duration-300"
+            style={{
+              transform: isHovered ? `translate3d(${tiltY * 1.2}px, ${-tiltX * 1.2}px, 15px)` : 'none',
+            }}
+          >
+            {slide.tag && (
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold tracking-wider bg-[var(--accent-orange)] text-white mb-2 shadow-xs">
+                {slide.tag}
+              </span>
+            )}
+            {slide.caption && (
+              <p className="text-sm font-semibold font-sans leading-snug text-white/95 drop-shadow-md">
+                {slide.caption}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
 interface HeroSkewedCarouselProps {
   slides?: CarouselSlide[]
   autoPlayInterval?: number
@@ -82,7 +324,7 @@ export default function HeroSkewedCarousel({
     setCurrentIndex(prev => (prev - 1 + total) % total)
   }
 
-  // Autoplay
+  // Autoplay (pauses smoothly when user hovers over the carousel)
   useEffect(() => {
     if (isHovered || total <= 1) return
     const timer = setInterval(() => {
@@ -91,7 +333,7 @@ export default function HeroSkewedCarousel({
     return () => clearInterval(timer)
   }, [isHovered, total, autoPlayInterval])
 
-  // Touch Swipe Handlers
+  // Touch Swipe Handlers for Mobile & Tablet
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
   }
@@ -124,7 +366,7 @@ export default function HeroSkewedCarousel({
     >
       {/* 3D Perspective Stage */}
       <div
-        className="relative w-full max-w-[940px] h-[380px] sm:h-[440px] md:h-[480px] flex items-center justify-center"
+        className="relative w-full max-w-[940px] h-[390px] sm:h-[450px] md:h-[490px] flex items-center justify-center"
         style={{ perspective: '1100px', transformStyle: 'preserve-3d' }}
       >
         {slides.map((slide, index) => {
@@ -132,173 +374,24 @@ export default function HeroSkewedCarousel({
           const isCenter = offset === 0
           const isVisible = Math.abs(offset) <= 2
 
-          // Style transformations based on offset
-          let xPercent = 0
-          let rotateY = 0
-          let scale = 1
-          let zIndex = 30
-          let opacity = 1
-
-          if (offset === 0) {
-            xPercent = 0
-            rotateY = 0
-            scale = 1
-            zIndex = 30
-            opacity = 1
-          } else if (offset === -1) {
-            xPercent = -58
-            rotateY = 24
-            scale = 0.88
-            zIndex = 20
-            opacity = 0.85
-          } else if (offset === 1) {
-            xPercent = 58
-            rotateY = -24
-            scale = 0.88
-            zIndex = 20
-            opacity = 0.85
-          } else if (offset === -2) {
-            xPercent = -105
-            rotateY = 38
-            scale = 0.74
-            zIndex = 10
-            opacity = 0.45
-          } else if (offset === 2) {
-            xPercent = 105
-            rotateY = -38
-            scale = 0.74
-            zIndex = 10
-            opacity = 0.45
-          } else {
-            xPercent = offset > 0 ? 140 : -140
-            scale = 0.6
-            zIndex = 0
-            opacity = 0
-          }
-
-          if (!isVisible && opacity === 0) return null
+          if (!isVisible) return null
 
           return (
-            <motion.div
+            <CarouselCard
               key={slide.id}
+              slide={slide}
+              offset={offset}
+              isCenter={isCenter}
               onClick={() => {
                 if (!isCenter) setCurrentIndex(index)
               }}
-              animate={{
-                x: `${xPercent}%`,
-                rotateY,
-                scale,
-                opacity,
-                z: isCenter ? 40 : -Math.abs(offset) * 60,
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 280,
-                damping: 28,
-                mass: 0.8,
-              }}
-              style={{
-                zIndex,
-                transformStyle: 'preserve-3d',
-              }}
-              className={`absolute w-[240px] sm:w-[280px] md:w-[320px] aspect-[3/4] rounded-3xl cursor-pointer overflow-hidden transition-shadow duration-300 ${
-                isCenter
-                  ? 'shadow-[0_20px_50px_rgba(0,0,0,0.32)] ring-1 ring-[var(--accent-orange)]/40'
-                  : 'shadow-[0_12px_30px_rgba(0,0,0,0.20)] hover:opacity-95'
-              }`}
-            >
-              {/* SLIDE TYPE 1: SLEEK AIR LAB TYPOGRAPHY */}
-              {slide.type === 'typography' ? (
-                <div className="w-full h-full relative p-6 sm:p-7 flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#0c1813] via-[#081c15] to-[#122e23] text-white border border-[var(--accent-orange)]/30 rounded-3xl group">
-                  {/* Subtle ambient lighting mesh */}
-                  <div className="absolute -top-20 -right-20 w-48 h-48 bg-[var(--accent-orange)]/25 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700" />
-                  <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-[#74C69D]/15 rounded-full blur-3xl pointer-events-none" />
-
-                  {/* Grid texture overlay */}
-                  <div
-                    className="absolute inset-0 opacity-[0.07] pointer-events-none"
-                    style={{
-                      backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.8) 1px, transparent 0)`,
-                      backgroundSize: '16px 16px',
-                    }}
-                  />
-
-                  {/* Top Bar: Lab Badge & Coordinates */}
-                  <div className="relative z-10 flex items-center justify-between text-[11px] font-mono tracking-wider text-[var(--accent-cyan)]/90">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)] animate-pulse" />
-                      AIR-LAB // 2026
-                    </span>
-                    <span className="text-white/50 text-[10px]">EST. 2019</span>
-                  </div>
-
-                  {/* Center Typography: Sleek, architectural, bold */}
-                  <div className="relative z-10 my-auto py-4">
-                    <div className="text-[11px] font-mono tracking-[0.25em] text-[var(--accent-orange)] uppercase font-semibold mb-1 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                      <span>FRONTIER AI</span>
-                    </div>
-
-                    <h2 className="text-5xl sm:text-6xl font-black font-head tracking-[-0.04em] leading-[0.88] text-white drop-shadow-md">
-                      AIR
-                      <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-[var(--accent-cyan)] to-[var(--accent-orange)]">
-                        LAB
-                      </span>
-                    </h2>
-
-                    <div className="w-12 h-1 bg-[var(--accent-orange)] rounded-full mt-3 mb-3" />
-
-                    <p className="text-xs sm:text-[13px] font-sans font-medium text-white/80 leading-relaxed max-w-[240px]">
-                      Artificial Intelligence Research Laboratory
-                    </p>
-                  </div>
-
-                  {/* Bottom: Department details & status */}
-                  <div className="relative z-10 pt-3 border-t border-white/10 flex flex-col gap-1 text-[11px] font-sans">
-                    <div className="text-white/90 font-semibold flex items-center justify-between">
-                      <span>NED University CSIT</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                    </div>
-                    <span className="text-white/50 text-[10px] font-mono">
-                      AUTONOMOUS &bull; REGIONAL &bull; IMPACT
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                /* SLIDE TYPE 2: HIGH-RES PHOTOGRAPH WITH SLEEK GLASS OVERLAY */
-                <div className="w-full h-full relative group">
-                  <img
-                    src={slide.src}
-                    alt={slide.alt || 'AIR Lab'}
-                    className="w-full h-full object-cover rounded-3xl transform group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-
-                  {/* Gradient Overlay for Readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent rounded-3xl" />
-
-                  {/* Card Content & Tag */}
-                  <div className="absolute bottom-0 inset-x-0 p-5 text-left text-white">
-                    {slide.tag && (
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold tracking-wider bg-[var(--accent-orange)] text-white mb-2 shadow-xs">
-                        {slide.tag}
-                      </span>
-                    )}
-                    {slide.caption && (
-                      <p className="text-sm font-semibold font-sans leading-snug text-white/95 drop-shadow-sm">
-                        {slide.caption}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </motion.div>
+            />
           )
         })}
       </div>
 
       {/* Pagination & Arrow Controls */}
-      <div className="mt-6 flex items-center justify-center gap-4 z-20">
+      <div className="mt-7 flex items-center justify-center gap-4 z-20">
         {/* Prev Arrow */}
         <button
           type="button"
