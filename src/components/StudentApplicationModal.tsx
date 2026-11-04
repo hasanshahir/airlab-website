@@ -351,7 +351,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        Upload CV / Resume (PDF) <span className="text-[var(--text-subtle)] font-normal">(Max 4MB)</span>
+                        Upload Resume (PDF) <span className="text-[var(--text-subtle)] font-normal">(Max 4MB)</span>
                       </label>
                       <input
                         type="file"

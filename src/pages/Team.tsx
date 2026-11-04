@@ -250,7 +250,7 @@ export default function Team() {
                         else if (f.cvUrl) window.open(f.cvUrl, '_blank')
                         else if (f.hasEmail()) window.location.href = f.getEmailFallback()!
                       }}
-                      title="Click to view profile / CV"
+                      title="Click to view profile / Resume"
                       className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden border border-[var(--border-hairline)] shrink-0 shadow-sm bg-[var(--bg-page)] cursor-pointer group-hover:scale-102 transition-transform"
                     >
                       <img
@@ -327,7 +327,7 @@ export default function Team() {
                             rel="noreferrer"
                             className="h-9 px-4 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:bg-black transition-colors"
                           >
-                            <span>View CV</span>
+                            <span>View Resume</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         )}

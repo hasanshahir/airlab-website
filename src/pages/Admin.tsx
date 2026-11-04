@@ -420,7 +420,7 @@ export default function AdminDashboard() {
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:border-[var(--accent-purple)] text-xs text-[var(--text-primary)]"
                       >
                         <Download className="w-3.5 h-3.5 text-[var(--accent-purple)]" />
-                        <span>Download CV</span>
+                        <span>Download Resume</span>
                       </a>
                     )}
 
