@@ -1,1 +1,138 @@
-[]
+[
+  {
+    "id": "PUB-1",
+    "title": "Attention Is All You Still Need: Revisiting Transformers for Urdu NLP",
+    "authors": "Dr. Murk Marvi, Muhammad Shaheer Khan, Kashaf Zia, Bilal Ahmed",
+    "venue": "ACL 2026 (Association for Computational Linguistics)",
+    "type": "Conference",
+    "year": 2026,
+    "impactFactor": "",
+    "link": "https://aclanthology.org",
+    "abstract": "We introduce UrduLLM-12B, an open-weights bilingual foundation architecture evaluated across 14 standardized regional syntactic and comprehension benchmarks.",
+    "tags": [
+      "NLP",
+      "Transformers",
+      "Urdu Language",
+      "Foundation Models"
+    ]
+  },
+  {
+    "id": "PUB-2",
+    "title": "Hybrid LSTM-Transformer Networks for National Grid Dynamic Load Forecasting",
+    "authors": "Dr. Murk Marvi, Muhammad Umer Safee, Roshaan Tahir",
+    "venue": "IEEE Transactions on Smart Grid",
+    "type": "Journal",
+    "year": 2026,
+    "impactFactor": "8.96 IF",
+    "link": "https://ieeexplore.ieee.org",
+    "abstract": "A robust spatio-temporal hybrid neural pipeline achieving sub-3.1% mean absolute percentage error across nationwide electrical dispatch telemetries.",
+    "tags": [
+      "Smart Grid",
+      "Deep Learning",
+      "Forecasting",
+      "Energy AI"
+    ]
+  },
+  {
+    "id": "PUB-3",
+    "title": "Low-Latency EdgeVision: Real-Time Multi-Class Vehicle Perception at Karachi Corridors",
+    "authors": "Bilal Ahmed, Syed Omer Ahmed Shamsi, Haseeb Yaqoob, Dr. Murk Marvi",
+    "venue": "CVPR 2025 (Computer Vision and Pattern Recognition)",
+    "type": "Conference",
+    "year": 2025,
+    "impactFactor": "",
+    "link": "https://openaccess.thecvf.com",
+    "abstract": "Deployment of sub-5W FPGA-accelerated convolutional backbones processing dense traffic streams at 60 FPS under extreme occlusion and low-light conditions.",
+    "tags": [
+      "Computer Vision",
+      "Edge AI",
+      "FPGA Acceleration",
+      "Autonomous Transit"
+    ]
+  },
+  {
+    "id": "PUB-4",
+    "title": "MedScan: Self-Supervised Multi-Label Radiograph Classification with Anomaly Localization",
+    "authors": "Syed Shujauddin Hashmi, Areeba Zehra Jafri, Dr. Murk Marvi",
+    "venue": "Nature Scientific Reports",
+    "type": "Journal",
+    "year": 2025,
+    "impactFactor": "4.99 IF",
+    "link": "https://www.nature.com/srep",
+    "abstract": "Clinical validation of contrastive representation learning for early detection of 14 pulmonary anomalies with 94.2% ROC-AUC on multicentric clinical cohorts.",
+    "tags": [
+      "Medical Imaging",
+      "Self-Supervised",
+      "Diagnostics",
+      "Explainable AI"
+    ]
+  },
+  {
+    "id": "PUB-5",
+    "title": "Decentralized Visual-Inertial Odometry for Heterogeneous UAV Swarm Coordination",
+    "authors": "Haseeb Yaqoob, Syed Muhammed Ahmed, Dr. Murk Marvi",
+    "venue": "NeurIPS 2025 (Neural Information Processing Systems)",
+    "type": "Conference",
+    "year": 2025,
+    "impactFactor": "",
+    "link": "https://neurips.cc",
+    "abstract": "Peer-to-peer relative pose estimation algorithm enabling collaborative aerial mapping in GPS-denied environments with bounded spatial drift (<0.04%).",
+    "tags": [
+      "Robotics",
+      "Swarm Intelligence",
+      "Visual SLAM",
+      "Multi-Agent"
+    ]
+  },
+  {
+    "id": "PUB-6",
+    "title": "Quantized Neural Network Architectures for Resource-Constrained Embedded Sensors",
+    "authors": "Roshaan Tahir, Muhammad Hammad Khan, Dr. Murk Marvi",
+    "venue": "Elsevier Neural Networks",
+    "type": "Journal",
+    "year": 2025,
+    "impactFactor": "7.83 IF",
+    "link": "https://www.sciencedirect.com/journal/neural-networks",
+    "abstract": "Novel mixed-precision FP4/INT4 quantization framework maintaining baseline accuracy while slashing memory footprints by 78% on ARM Cortex-M microcontrollers.",
+    "tags": [
+      "Quantization",
+      "Embedded AI",
+      "Neuromorphic",
+      "Model Compression"
+    ]
+  },
+  {
+    "id": "PUB-7",
+    "title": "Ethical Alignment and Bias Auditing Frameworks for Regional Vernacular Language Models",
+    "authors": "Areeba Zehra Jafri, Muhammad Shaheer Khan, Dr. Murk Marvi",
+    "venue": "EMNLP 2024 (Empirical Methods in Natural Language Processing)",
+    "type": "Conference",
+    "year": 2024,
+    "impactFactor": "",
+    "link": "https://aclanthology.org",
+    "abstract": "First comprehensive empirical safety and representation audit for generative language models trained on low-resource South Asian corpus distributions.",
+    "tags": [
+      "AI Ethics",
+      "Bias Auditing",
+      "Fairness",
+      "Safety Benchmarks"
+    ]
+  },
+  {
+    "id": "PUB-8",
+    "title": "Deep Metric Learning for Hyperspectral Agricultural Canopy Stress Identification",
+    "authors": "Zara Malik, Kashaf Zia, Dr. Murk Marvi",
+    "venue": "IEEE Geoscience and Remote Sensing Letters",
+    "type": "Journal",
+    "year": 2024,
+    "impactFactor": "4.81 IF",
+    "link": "https://ieeexplore.ieee.org",
+    "abstract": "Multispectral convolutional networks identifying pre-symptomatic crop desiccation stress with 98.2% field accuracy across Sindh agricultural test zones.",
+    "tags": [
+      "Agriculture AI",
+      "Hyperspectral",
+      "Remote Sensing",
+      "Precision Farming"
+    ]
+  }
+]

@@ -417,6 +417,34 @@ syncRouter.post('/sheets', async (req, res, next) => {
             await projectsModel.create(docData)
             stats.fundedProjects.created++
           }
+
+          // Mirror into grantsModel so the Grants page is automatically populated
+          const grantsModel = contentModels.get('grants')
+          if (grantsModel) {
+            const grantStatus = status === 'Finished' ? 'Completed' : 'Active'
+            const grantDoc: Record<string, any> = {
+              id: `grant-${rawId}`,
+              title,
+              funder: grantSupplier || 'Government / Sponsored Grant',
+              programTitle: programTitle || '',
+              amount: grantAmount || '',
+              duration: timeTaken || 'Active',
+              status: grantStatus,
+              leadInvestigator: pi || '',
+              description: projectDetails || '',
+              url: funderUrl || '',
+              published: true,
+            }
+            const grantFilter: any = {
+              $or: [{ id: `grant-${rawId}` }, { title }],
+            }
+            const existingGrant = await grantsModel.findOne(grantFilter)
+            if (existingGrant) {
+              await grantsModel.updateOne({ _id: existingGrant._id }, { $set: grantDoc })
+            } else {
+              await grantsModel.create(grantDoc)
+            }
+          }
         }
       }
     }

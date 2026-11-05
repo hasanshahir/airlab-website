@@ -72,7 +72,7 @@ export interface TeamMemberData {
 }
 
 export interface PublicationItem {
-  id: number
+  id: number | string
   title: string
   authors: string
   venue: string
