@@ -235,13 +235,13 @@ export default function HeroSkewedCarousel({
                 }}
                 className={`absolute w-[280px] sm:w-[370px] md:w-[430px] lg:w-[455px] h-[180px] sm:h-[235px] md:h-[270px] lg:h-[285px] rounded-none cursor-pointer overflow-hidden transition-all duration-300 ${
                   isCenter
-                    ? 'border-2 border-[var(--accent-orange)] shadow-[0_0_28px_rgba(240,106,31,0.35),0_20px_50px_rgba(0,0,0,0.3)]'
+                    ? 'border-2 border-[var(--accent-orange)] shadow-2xl'
                     : isSideHovered
-                    ? 'border-2 border-[var(--accent-orange)] shadow-[0_0_22px_rgba(240,106,31,0.5),0_15px_35px_rgba(0,0,0,0.25)] brightness-105'
-                    : 'border border-[var(--accent-orange)]/55 hover:border-[var(--accent-orange)] shadow-[0_12px_30px_rgba(0,0,0,0.18)] hover:brightness-105'
+                    ? 'border-2 border-[var(--accent-orange)] shadow-xl'
+                    : 'border border-[var(--accent-orange)]/60 hover:border-[var(--accent-orange)] shadow-lg'
                 }`}
               >
-                {/* 100% PURE, CLEAN RECTANGULAR PHOTOGRAPH WITH ORANGE ACCENTS */}
+                {/* 100% PURE, CLEAN RECTANGULAR PHOTOGRAPH WITH CRISP ORANGE OUTLINE */}
                 <div className="w-full h-full relative overflow-hidden bg-[var(--surface-alt)] rounded-none">
                   <img
                     src={slide.src}
@@ -250,21 +250,6 @@ export default function HeroSkewedCarousel({
                     draggable={false}
                     loading="lazy"
                   />
-
-                  {/* Corner Accent Hairlines for Engineering / Lab aesthetic */}
-                  <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--accent-orange)] pointer-events-none" />
-                  <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[var(--accent-orange)] pointer-events-none" />
-                  <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[var(--accent-orange)] pointer-events-none" />
-                  <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[var(--accent-orange)] pointer-events-none" />
-
-                  {/* Subtle hover prompt on side cards */}
-                  {isSideHovered && (
-                    <div className="absolute inset-0 bg-black/15 flex items-center justify-center pointer-events-none transition-opacity duration-300">
-                      <span className="px-3 py-1 bg-black/75 text-[var(--accent-orange)] text-[11px] font-mono font-semibold tracking-wider rounded-none border border-[var(--accent-orange)]/80 shadow-md backdrop-blur-xs">
-                        CLICK TO FOCUS
-                      </span>
-                    </div>
-                  )}
                 </div>
               </motion.div>
             )
