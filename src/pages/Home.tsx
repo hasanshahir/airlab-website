@@ -126,7 +126,7 @@ export default function Home() {
               <span>&bull;</span>
               <Link to="/grants" className="text-[var(--ink-dark)] hover:underline font-semibold flex items-center gap-1">
                 <Award className="w-3.5 h-3.5" />
-                Active Grants &rarr;
+                Research Grants &rarr;
               </Link>
               <span>&bull;</span>
               <Link to="/team" className="text-[var(--text-primary)] hover:underline font-semibold flex items-center gap-1">

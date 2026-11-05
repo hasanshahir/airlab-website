@@ -135,7 +135,7 @@ export default function Projects() {
         </h1>
 
         <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-          Portfolio of ongoing and finished foundation architectures, edge robotics pipelines, and clinical diagnostic benchmarks developed at AIR Lab.
+          Portfolio of foundation architectures, edge robotics pipelines, and clinical diagnostic benchmarks developed at AIR Lab.
         </p>
       </div>
 

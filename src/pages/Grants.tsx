@@ -52,7 +52,7 @@ export default function Grants() {
 
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Active & Sponsored Grants
+            Research Funding & Sponsored Grants
           </h1>
         </SectionReveal>
 

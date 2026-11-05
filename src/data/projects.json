@@ -1,153 +1,5 @@
 [
   {
-    "id": "PRJ-1",
-    "title": "Connected Identity Intelligence Platform for Digital Investigation",
-    "category": "Funded",
-    "status": "Ongoing",
-    "description": "This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.",
-    "funding": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
-    "grantSupplier": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
-    "grantAmount": "Rs. 5 million",
-    "pi": "Dr. Murk Marvi",
-    "funderUrl": "https://sindhhec.gov.pk/",
-    "timeTaken": "June 2026",
-    "startDate": "June 2026",
-    "coverImage": "https://i.ibb.co/0pLB2b49/project-04.jpg",
-    "images": [
-      "https://i.ibb.co/0pLB2b49/project-04.jpg"
-    ],
-    "tags": [
-      "Multilingual NER",
-      "Identity Intelligence",
-      "Urdu NLP",
-      "Face Matching",
-      "Sindh HEC"
-    ]
-  },
-  {
-    "id": "PRJ-2",
-    "title": "Integrated Information Discovery System for Digital Investigation",
-    "category": "Funded",
-    "status": "Ongoing",
-    "description": "This project builds an on-premises investigation workspace for regulatory, compliance, audit, and journalistic work. Investigators usually start with little information about a subject and spend hours gathering and cross-checking public data from disconnected sites and tools. The platform cuts that work to minutes while keeping every result traceable to its source and a human in control.",
-    "funding": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
-    "grantSupplier": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
-    "grantAmount": "Rs. 5 million",
-    "pi": "Prof. Dr. Muhammad Mubashir Khan",
-    "funderUrl": "https://sindhhec.gov.pk/",
-    "timeTaken": "June 2026",
-    "startDate": "June 2026",
-    "coverImage": "https://i.ibb.co/gML0Tzsv/project-05.jpg",
-    "images": [
-      "https://i.ibb.co/gML0Tzsv/project-05.jpg"
-    ],
-    "tags": [
-      "Digital Forensics",
-      "Information Discovery",
-      "OSINT",
-      "Audit & Compliance",
-      "Sindh HEC"
-    ]
-  },
-  {
-    "id": "PRJ-3",
-    "title": "AutoGradeHub \u2013 Automated Assignment Grading and Feedback System",
-    "category": "Undergraduate",
-    "status": "Finished",
-    "description": "AutoGradeHub is an AI-powered system that automatically grades programming assignments by running code in a secure environment against predefined test cases. It gives students detailed feedback, flags plagiarism, and gives teachers analytics on class performance. This saves teachers grading time and helps students learn from consistent, timely feedback.",
-    "funding": "Departmental / Self-Funded",
-    "grantSupplier": "",
-    "grantAmount": "",
-    "pi": "",
-    "funderUrl": "",
-    "timeTaken": "Aug 2025",
-    "startDate": "Aug 2025",
-    "coverImage": "https://i.ibb.co/hx2y1jNQ/project-01.jpg",
-    "images": [
-      "https://i.ibb.co/hx2y1jNQ/project-01.jpg"
-    ],
-    "tags": [
-      "Automated Grading",
-      "Code Analysis",
-      "Plagiarism Detection",
-      "Pedagogy AI"
-    ]
-  },
-  {
-    "id": "PRJ-4",
-    "title": "Development of Voice Based Agent for Collecting Post-Ambulance Service Feedback",
-    "category": "Undergraduate",
-    "status": "Finished",
-    "description": "This project builds a fully offline, locally run voice agent that automates post-ambulance feedback calls for emergency medical services (SIEHS). Manual feedback collection is costly and ties up call agents who should be available for emergencies, and keeping everything local protects patient privacy.",
-    "funding": "Departmental / Self-Funded",
-    "grantSupplier": "",
-    "grantAmount": "",
-    "pi": "",
-    "funderUrl": "",
-    "timeTaken": "Aug 2025",
-    "startDate": "Aug 2025",
-    "coverImage": "https://i.ibb.co/Ym6hVqj/project-02.jpg",
-    "images": [
-      "https://i.ibb.co/Ym6hVqj/project-02.jpg"
-    ],
-    "tags": [
-      "Voice Agent",
-      "Speech-to-Text",
-      "Healthcare AI",
-      "SIEHS Emergency Services",
-      "Privacy AI"
-    ]
-  },
-  {
-    "id": "PRJ-5",
-    "title": "Strategic Agent \u2013 Real-Time Market Intelligence System for Smart Insights",
-    "category": "Undergraduate",
-    "status": "Finished",
-    "description": "Strategic Agent is an AI platform that replaces the manual tracking B2B teams do on their competitors. Price changes, leadership news, product launches and hiring surges appear across dozens of sources, and people can\u2019t follow them all by hand.",
-    "funding": "Departmental / Self-Funded",
-    "grantSupplier": "",
-    "grantAmount": "",
-    "pi": "",
-    "funderUrl": "",
-    "timeTaken": "Aug 2025",
-    "startDate": "Aug 2025",
-    "coverImage": "https://i.ibb.co/b5h1NMbT/project-03.jpg",
-    "images": [
-      "https://i.ibb.co/b5h1NMbT/project-03.jpg"
-    ],
-    "tags": [
-      "Market Intelligence",
-      "B2B Analytics",
-      "Competitive Intel",
-      "AI Agents"
-    ]
-  },
-  {
-    "id": "PRJ-6",
-    "title": "An Agentic AI-Powered Tour Guide for Safer and Smarter Travel in Pakistan",
-    "category": "Undergraduate",
-    "status": "Finished",
-    "description": "The Intelligent Travel Agent is an AI platform from NED University of Engineering and Technology (NEDUET) that automates family holiday planning in Pakistan. Planning a trip today means manually comparing many separate sources for tickets, hotels, activities, weather and road conditions. That is stressful, slow and risky, and families often miss better budget options or end up paying for traditional tour guides.",
-    "funding": "NEDAASC",
-    "grantSupplier": "NEDAASC",
-    "grantAmount": "Rs. 97,000",
-    "pi": "",
-    "funderUrl": "",
-    "timeTaken": "Aug 2025",
-    "startDate": "Aug 2025",
-    "coverImage": "https://i.ibb.co/7JvNqgD4/project-06.jpg",
-    "images": [
-      "https://i.ibb.co/7JvNqgD4/project-06.jpg"
-    ],
-    "tags": [
-      "Agentic AI",
-      "Travel Assistant",
-      "Pakistan Tourism",
-      "Budget Optimization",
-      "NEDAASC"
-    ]
-  },
-  {
     "id": "PRJ-7",
     "title": "Familiar: Quality-Aware Face Recognition System for Pakistani Subjects",
     "category": "Undergraduate",
@@ -202,7 +54,7 @@
     "title": "MemTrace: Lifecycle-Aware Provenance for Detecting and Mitigating Memory Poisoning Attacks in LLM Agents",
     "category": "Undergraduate",
     "status": "Ongoing",
-    "description": "MemTrace is a security framework that protects LLM agents\u2019 persistent memory from poisoning, where false or malicious information gets stored and later influences the agent across sessions. Instead of checking memory at only one stage, it tracks each entry\u2019s origin, trust level and history through six lifecycle stages (write, store, retrieve, use, propagate, forget/rollback) and uses that provenance to flag, isolate, delete or roll back suspicious memories.",
+    "description": "MemTrace is a security framework that protects LLM agents’ persistent memory from poisoning, where false or malicious information gets stored and later influences the agent across sessions. Instead of checking memory at only one stage, it tracks each entry’s origin, trust level and history through six lifecycle stages (write, store, retrieve, use, propagate, forget/rollback) and uses that provenance to flag, isolate, delete or roll back suspicious memories.",
     "funding": "Departmental / Self-Funded",
     "grantSupplier": "",
     "grantAmount": "",
@@ -245,6 +97,154 @@
       "Multimodal AI",
       "PKR Catalogue",
       "Spatial Constraints"
+    ]
+  },
+  {
+    "id": "PRJ-1",
+    "title": "Connected Identity Intelligence Platform for Digital Investigation",
+    "category": "Funded",
+    "status": "Ongoing",
+    "description": "This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.",
+    "funding": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
+    "grantSupplier": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
+    "grantAmount": "Rs. 5 million",
+    "pi": "Dr. Murk Marvi",
+    "funderUrl": "https://sindhhec.gov.pk/",
+    "timeTaken": "June 2026",
+    "startDate": "June 2026",
+    "coverImage": "https://i.ibb.co/0pLB2b49/project-04.jpg",
+    "images": [
+      "https://i.ibb.co/0pLB2b49/project-04.jpg"
+    ],
+    "tags": [
+      "Multilingual NER",
+      "Identity Intelligence",
+      "Urdu NLP",
+      "Face Matching",
+      "Sindh HEC"
+    ]
+  },
+  {
+    "id": "PRJ-2",
+    "title": "Integrated Information Discovery System for Digital Investigation",
+    "category": "Funded",
+    "status": "Ongoing",
+    "description": "This project builds an on-premises investigation workspace for regulatory, compliance, audit, and journalistic work. Investigators usually start with little information about a subject and spend hours gathering and cross-checking public data from disconnected sites and tools. The platform cuts that work to minutes while keeping every result traceable to its source and a human in control.",
+    "funding": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
+    "grantSupplier": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
+    "grantAmount": "Rs. 5 million",
+    "pi": "Prof. Dr. Muhammad Mubashir Khan",
+    "funderUrl": "https://sindhhec.gov.pk/",
+    "timeTaken": "June 2026",
+    "startDate": "June 2026",
+    "coverImage": "https://i.ibb.co/gML0Tzsv/project-05.jpg",
+    "images": [
+      "https://i.ibb.co/gML0Tzsv/project-05.jpg"
+    ],
+    "tags": [
+      "Digital Forensics",
+      "Information Discovery",
+      "OSINT",
+      "Audit & Compliance",
+      "Sindh HEC"
+    ]
+  },
+  {
+    "id": "PRJ-3",
+    "title": "AutoGradeHub – Automated Assignment Grading and Feedback System",
+    "category": "Undergraduate",
+    "status": "Finished",
+    "description": "AutoGradeHub is an AI-powered system that automatically grades programming assignments by running code in a secure environment against predefined test cases. It gives students detailed feedback, flags plagiarism, and gives teachers analytics on class performance. This saves teachers grading time and helps students learn from consistent, timely feedback.",
+    "funding": "Departmental / Self-Funded",
+    "grantSupplier": "",
+    "grantAmount": "",
+    "pi": "",
+    "funderUrl": "",
+    "timeTaken": "Aug 2025",
+    "startDate": "Aug 2025",
+    "coverImage": "https://i.ibb.co/hx2y1jNQ/project-01.jpg",
+    "images": [
+      "https://i.ibb.co/hx2y1jNQ/project-01.jpg"
+    ],
+    "tags": [
+      "Automated Grading",
+      "Code Analysis",
+      "Plagiarism Detection",
+      "Pedagogy AI"
+    ]
+  },
+  {
+    "id": "PRJ-4",
+    "title": "Development of Voice Based Agent for Collecting Post-Ambulance Service Feedback",
+    "category": "Undergraduate",
+    "status": "Finished",
+    "description": "This project builds a fully offline, locally run voice agent that automates post-ambulance feedback calls for emergency medical services (SIEHS). Manual feedback collection is costly and ties up call agents who should be available for emergencies, and keeping everything local protects patient privacy.",
+    "funding": "Departmental / Self-Funded",
+    "grantSupplier": "",
+    "grantAmount": "",
+    "pi": "",
+    "funderUrl": "",
+    "timeTaken": "Aug 2025",
+    "startDate": "Aug 2025",
+    "coverImage": "https://i.ibb.co/Ym6hVqj/project-02.jpg",
+    "images": [
+      "https://i.ibb.co/Ym6hVqj/project-02.jpg"
+    ],
+    "tags": [
+      "Voice Agent",
+      "Speech-to-Text",
+      "Healthcare AI",
+      "SIEHS Emergency Services",
+      "Privacy AI"
+    ]
+  },
+  {
+    "id": "PRJ-5",
+    "title": "Strategic Agent – Real-Time Market Intelligence System for Smart Insights",
+    "category": "Undergraduate",
+    "status": "Finished",
+    "description": "Strategic Agent is an AI platform that replaces the manual tracking B2B teams do on their competitors. Price changes, leadership news, product launches and hiring surges appear across dozens of sources, and people can’t follow them all by hand.",
+    "funding": "Departmental / Self-Funded",
+    "grantSupplier": "",
+    "grantAmount": "",
+    "pi": "",
+    "funderUrl": "",
+    "timeTaken": "Aug 2025",
+    "startDate": "Aug 2025",
+    "coverImage": "https://i.ibb.co/b5h1NMbT/project-03.jpg",
+    "images": [
+      "https://i.ibb.co/b5h1NMbT/project-03.jpg"
+    ],
+    "tags": [
+      "Market Intelligence",
+      "B2B Analytics",
+      "Competitive Intel",
+      "AI Agents"
+    ]
+  },
+  {
+    "id": "PRJ-6",
+    "title": "An Agentic AI-Powered Tour Guide for Safer and Smarter Travel in Pakistan",
+    "category": "Undergraduate",
+    "status": "Finished",
+    "description": "The Intelligent Travel Agent is an AI platform from NED University of Engineering and Technology (NEDUET) that automates family holiday planning in Pakistan. Planning a trip today means manually comparing many separate sources for tickets, hotels, activities, weather and road conditions. That is stressful, slow and risky, and families often miss better budget options or end up paying for traditional tour guides.",
+    "funding": "NEDAASC",
+    "grantSupplier": "NEDAASC",
+    "grantAmount": "Rs. 97,000",
+    "pi": "",
+    "funderUrl": "",
+    "timeTaken": "Aug 2025",
+    "startDate": "Aug 2025",
+    "coverImage": "https://i.ibb.co/7JvNqgD4/project-06.jpg",
+    "images": [
+      "https://i.ibb.co/7JvNqgD4/project-06.jpg"
+    ],
+    "tags": [
+      "Agentic AI",
+      "Travel Assistant",
+      "Pakistan Tourism",
+      "Budget Optimization",
+      "NEDAASC"
     ]
   }
 ]

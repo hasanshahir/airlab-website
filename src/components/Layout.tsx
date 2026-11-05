@@ -197,7 +197,7 @@ export default function Layout() {
                         >
                           <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
                             <Award className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Active Grants</span>
+                            <span>Research Grants</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
                             Sponsored research funding and national initiatives
@@ -522,7 +522,7 @@ export default function Layout() {
                         Projects Catalog
                       </Link>
                       <Link to="/grants" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Active Grants
+                        Research Grants
                       </Link>
                       <Link to="/publications" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Publications
@@ -664,7 +664,7 @@ export default function Layout() {
               <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
                 <li><Link to="/about" className="hover:text-white transition-colors">About AIR Lab</Link></li>
                 <li><Link to="/projects" className="hover:text-white transition-colors">Projects Catalog</Link></li>
-                <li><Link to="/grants" className="hover:text-white transition-colors">Active Grants</Link></li>
+                <li><Link to="/grants" className="hover:text-white transition-colors">Research Grants</Link></li>
                 <li><Link to="/publications" className="hover:text-white transition-colors">Publications</Link></li>
                 <li><Link to="/gallery" className="hover:text-white transition-colors">Lab Gallery</Link></li>
               </ul>
