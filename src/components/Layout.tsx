@@ -12,7 +12,6 @@ import {
   BookOpen,
   Users,
   GraduationCap,
-  Sparkles,
   Building,
   Image as GalleryIcon,
 } from 'lucide-react'
@@ -274,19 +273,6 @@ export default function Layout() {
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
                             Principal investigators, professors, and advisors
-                          </p>
-                        </Link>
-
-                        <Link
-                          to="/team?tab=all"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Sparkles className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Overview Cluster</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Interactive visual team network overview
                           </p>
                         </Link>
 
@@ -556,9 +542,6 @@ export default function Layout() {
                   </button>
                   {mobileAccordion === 'people' && (
                     <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
-                      <Link to="/team?tab=all" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Overview Cluster
-                      </Link>
                       <Link to="/team?tab=faculty" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Faculty Leads
                       </Link>

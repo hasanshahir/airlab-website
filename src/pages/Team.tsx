@@ -9,7 +9,6 @@ import { TeamMemberEntity } from '../entities/TeamMemberEntity'
 import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
-import AppleWatchCluster from '../components/AppleWatchCluster'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -17,11 +16,11 @@ const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   </svg>
 )
 
-type TabType = 'all' | 'faculty' | 'interns' | 'previous'
+type TabType = 'faculty' | 'interns' | 'previous'
 
 export default function Team() {
   const [searchParams] = useSearchParams()
-  const [activeTab, setActiveTab] = useState<TabType>('all')
+  const [activeTab, setActiveTab] = useState<TabType>('faculty')
   const [applyModalOpen, setApplyModalOpen] = useState(false)
   const [highlightedMemberId, setHighlightedMemberId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -29,8 +28,10 @@ export default function Team() {
   useEffect(() => {
     const tabParam = searchParams.get('tab') as TabType
     const memberParam = searchParams.get('member')
-    if (tabParam && ['all', 'faculty', 'interns', 'previous'].includes(tabParam)) {
+    if (tabParam && ['faculty', 'interns', 'previous'].includes(tabParam)) {
       setActiveTab(tabParam)
+    } else if (tabParam === 'all' as unknown) {
+      setActiveTab('faculty')
     }
     if (memberParam) {
       setHighlightedMemberId(memberParam)
@@ -105,23 +106,10 @@ export default function Team() {
   }, [highlightedMemberId])
 
   const tabs: { id: TabType; label: string; count?: number }[] = [
-    { id: 'all', label: 'Overview', count: allMembers.length },
     { id: 'faculty', label: 'Faculty', count: facultyMembers.length },
     { id: 'interns', label: 'Research Interns', count: internMembers.length },
     { id: 'previous', label: 'Alumni Interns', count: sortedPreviousInterns.length },
   ]
-
-  const handleOverviewClick = (member: TeamMemberEntity) => {
-    const targetTab = member.getCategoryTab()
-    setActiveTab(targetTab === 'faculty' ? 'faculty' : 'interns')
-    setHighlightedMemberId(member.id)
-    setTimeout(() => {
-      const el = document.getElementById(`member-${member.id}`)
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
-    }, 150)
-  }
 
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-6 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
@@ -198,26 +186,7 @@ export default function Team() {
 
       {/* Tab Content Display */}
       <AnimatePresence mode="wait">
-        {/* TAB 1: ALL MEMBERS (CLUSTER) */}
-        {activeTab === 'all' && (
-          <motion.div
-            key="all"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-6"
-          >
-            <div className="rounded-3xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] p-4 sm:p-8 shadow-sm">
-              <AppleWatchCluster
-                members={allMembers}
-                onSelectMember={handleOverviewClick}
-              />
-            </div>
-          </motion.div>
-        )}
-
-        {/* TAB 2: FACULTY */}
+        {/* TAB 1: FACULTY */}
         {activeTab === 'faculty' && (
           <motion.div
             key="faculty"
