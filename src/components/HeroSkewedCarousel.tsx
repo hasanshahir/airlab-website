@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, type PanInfo } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ArrowDown } from 'lucide-react'
 
@@ -56,12 +56,12 @@ interface HeroSkewedCarouselProps {
 
 export default function HeroSkewedCarousel({
   slides = DEFAULT_SLIDES,
-  autoPlayInterval = 4500, // 4.5 seconds for engaging, steady progression through all slides
+  autoPlayInterval = 4000, // 4 seconds for a brisk, engaging showcase across all 5 images
   className = '',
 }: HeroSkewedCarouselProps) {
-  // Continuous index tracking to cycle infinitely through all slides without rewinding
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [hoveredSide, setHoveredSide] = useState<'left' | 'right' | null>(null)
+  // Current active slide index (0 to slides.length - 1)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [hoveredOffset, setHoveredOffset] = useState<-1 | 1 | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [windowWidth, setWindowWidth] = useState(1200)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -78,25 +78,22 @@ export default function HeroSkewedCarousel({
   const isMobile = windowWidth < 640
   const isTablet = windowWidth >= 640 && windowWidth < 1024
 
-  // Spacing and radius parameters
-  const radius = isMobile ? 540 : isTablet ? 720 : 860
-  const angleStep = isMobile ? 32 : isTablet ? 29 : 27 // degrees per card slot
-
-  const activeSlideIndex = useMemo(() => {
-    return ((currentIndex % total) + total) % total
-  }, [currentIndex, total])
+  // Card spacing & depth
+  const cardSpacing = isMobile ? 290 : isTablet ? 375 : 445
+  const baseDepth = isMobile ? 48 : isTablet ? 62 : 72
+  const yawAngle = isMobile ? 18 : isTablet ? 20 : 21
 
   const handleNext = useCallback(() => {
-    setHoveredSide(null)
-    setCurrentIndex(prev => prev + 1)
-  }, [])
+    setHoveredOffset(null)
+    setActiveIndex(prev => (prev + 1) % total)
+  }, [total])
 
   const handlePrev = useCallback(() => {
-    setHoveredSide(null)
-    setCurrentIndex(prev => prev - 1)
-  }, [])
+    setHoveredOffset(null)
+    setActiveIndex(prev => (prev - 1 + total) % total)
+  }, [total])
 
-  // Autoplay continues smoothly, only pauses during active touch/mouse drag
+  // Autoplay through all 5 images sequentially
   useEffect(() => {
     if (isDragging || total <= 1) return
     const timer = setInterval(() => {
@@ -126,11 +123,13 @@ export default function HeroSkewedCarousel({
     }
   }
 
-  // EXACTLY 3 SLOTS ARE SHOWN: Left (-1), Center (0), Right (+1)
-  // We also mount -2 and +2 strictly for smooth entering/exiting with opacity: 0
-  const slotsToRender = useMemo(() => {
-    return [-2, -1, 0, 1, 2]
-  }, [])
+  // Calculate circular offset relative to activeIndex (-2, -1, 0, 1, 2)
+  const getSlideOffset = (index: number) => {
+    let diff = index - activeIndex
+    if (diff > total / 2) diff -= total
+    if (diff < -total / 2) diff += total
+    return diff
+  }
 
   const scrollToExplore = () => {
     const el = document.getElementById('explore-anchor') || document.getElementById('about-section')
@@ -145,9 +144,9 @@ export default function HeroSkewedCarousel({
     <div
       ref={containerRef}
       className={`relative w-full select-none flex flex-col items-center justify-center overflow-visible ${className}`}
-      onMouseLeave={() => setHoveredSide(null)}
+      onMouseLeave={() => setHoveredOffset(null)}
     >
-      {/* ── 3D INNER-CIRCLE STAGE: EXACTLY 3 CARDS VISIBLE AT ALL TIMES ── */}
+      {/* ── 3D INNER-CIRCLE STAGE: EXACTLY 3 CARDS VISIBLE, SMOOTH PERSISTENT NODES ── */}
       <div
         className="relative w-full h-[195px] sm:h-[245px] md:h-[285px] lg:h-[315px] flex items-center justify-center overflow-hidden"
         style={{
@@ -167,30 +166,24 @@ export default function HeroSkewedCarousel({
           className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing touch-pan-y"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          {slotsToRender.map((offset) => {
+          {slides.map((slide, index) => {
+            const offset = getSlideOffset(index)
             const isCenter = offset === 0
             const isLeft = offset === -1
             const isRight = offset === 1
             const isVisible = isCenter || isLeft || isRight
-
-            // Compute the exact slide for this slot relative to currentIndex
-            const slideSlotNumber = currentIndex + offset
-            const slideIndex = ((slideSlotNumber % total) + total) % total
-            const slide = slides[slideIndex]
+            const isHidden = !isVisible // offset is -2, 2 or beyond (0% opacity in buffer)
 
             const isSideHovered =
-              (isLeft && hoveredSide === 'left') || (isRight && hoveredSide === 'right')
+              (isLeft && hoveredOffset === -1) || (isRight && hoveredOffset === 1)
 
-            // Inner circle geometry
-            const angleDeg = offset * angleStep
-            const angleRad = (angleDeg * Math.PI) / 180
+            // Coordinates in 3D circular space
+            const baseX = offset * cardSpacing
+            const baseZ = -Math.abs(offset) * baseDepth
+            const baseRotateY = -offset * yawAngle
+            const baseScale = isCenter ? 1.0 : isVisible ? 0.94 : 0.84
 
-            const baseX = radius * Math.sin(angleRad)
-            const baseZ = -radius * (1 - Math.cos(angleRad))
-            const baseRotateY = -angleDeg
-            const baseScale = isCenter ? 1.0 : isVisible ? 0.94 : 0.85
-
-            // Opacity: Center is 1.0, Side visible cards are 0.88, outer buffer slots are 0
+            // Opacity: ONLY the 3 active cards are visible; buffer cards are strictly 0
             const targetOpacity = isCenter ? 1.0 : isVisible ? 0.88 : 0
 
             // 3D Hover Displacement on Side Cards Only
@@ -200,24 +193,17 @@ export default function HeroSkewedCarousel({
             const targetRotateY = isSideHovered ? baseRotateY * 0.75 : baseRotateY
             const targetScale = isSideHovered ? baseScale + 0.04 : baseScale
 
-            const zIndex = isCenter ? 30 : isVisible ? 20 : 5
+            const zIndex = isCenter ? 30 : isVisible ? 20 : 1
 
             return (
               <motion.div
-                key={`slot-${offset}-${slide.id}`}
-                initial={{
-                  x: baseX,
-                  y: targetY,
-                  z: baseZ,
-                  rotateY: baseRotateY,
-                  scale: baseScale,
-                  opacity: 0,
-                }}
+                // PERSISTENT KEY ensures smooth motion between slots instead of re-mounting!
+                key={slide.id}
                 onMouseEnter={() => {
-                  if (isLeft) setHoveredSide('left')
-                  else if (isRight) setHoveredSide('right')
+                  if (isLeft) setHoveredOffset(-1)
+                  else if (isRight) setHoveredOffset(1)
                 }}
-                onMouseLeave={() => setHoveredSide(null)}
+                onMouseLeave={() => setHoveredOffset(null)}
                 onClick={() => {
                   if (isLeft) handlePrev()
                   else if (isRight) handleNext()
@@ -230,10 +216,15 @@ export default function HeroSkewedCarousel({
                   scale: targetScale,
                   opacity: targetOpacity,
                 }}
-                transition={{
-                  duration: 0.75,
-                  ease: [0.22, 1, 0.36, 1], // Silky smooth ease-out
-                }}
+                // Silky smooth transition for visible slides; instant relocation for the hidden buffer slide
+                transition={
+                  isHidden
+                    ? { duration: 0 } // Jumps silently in the dark with opacity: 0 without flying across!
+                    : {
+                        duration: 0.75,
+                        ease: [0.22, 1, 0.36, 1], // Smooth seamless cubic-bezier glide
+                      }
+                }
                 style={{
                   zIndex,
                   transformStyle: 'preserve-3d',
@@ -300,16 +291,12 @@ export default function HeroSkewedCarousel({
                 key={i}
                 type="button"
                 onClick={() => {
-                  setHoveredSide(null)
-                  const currentMod = ((currentIndex % total) + total) % total
-                  let diff = i - currentMod
-                  if (diff > total / 2) diff -= total
-                  if (diff < -total / 2) diff += total
-                  setCurrentIndex(prev => prev + diff)
+                  setHoveredOffset(null)
+                  setActiveIndex(i)
                 }}
                 aria-label={`Go to slide ${i + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  activeSlideIndex === i
+                  activeIndex === i
                     ? 'w-5 bg-[var(--accent-orange)]'
                     : 'w-1.5 bg-[var(--border-hairline-dark)] hover:bg-[var(--accent-orange)]/50'
                 }`}
