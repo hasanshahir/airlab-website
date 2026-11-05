@@ -33,9 +33,9 @@ export const Button: React.FC<ButtonProps> = ({
     secondary:
       'bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline)] font-medium transition-all duration-150',
     outline:
-      'bg-transparent hover:bg-[rgba(10,50,53,0.06)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] font-medium transition-colors duration-150',
+      'bg-transparent hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] font-medium transition-colors duration-150',
     ghost:
-      'bg-transparent hover:bg-[rgba(10,50,53,0.06)] text-[var(--text-primary)] font-medium transition-colors duration-150',
+      'bg-transparent hover:bg-[var(--surface-alt)] text-[var(--text-primary)] font-medium transition-colors duration-150',
   }
 
   const showArrow = arrow !== undefined ? arrow : variant === 'primary'

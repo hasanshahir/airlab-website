@@ -1,22 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-head: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-head: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   THEME 1: FRESH GREENS (Default / Revamped Green Theme)
-   Source: Coolors "Fresh Greens" 9-Color Palette
-   #081C15 | #1B4332 | #2D6A4F | #40916C | #52B788 | #74C69D | #95D5B2 | #B7E4C7 | #D8F3DC
+   THEME 1: DEEP VIOLET (Default Theme)
+   Source: Monochromatic Deep Violet Coolors Palette
+   #10002B | #240046 | #3C096C | #5A189A | #7B2CBF | #9D4EDD | #C77DFF | #E0AAFF
+   Background: Pure White (#FFFFFF) for Maximum Element Contrast
    ═══════════════════════════════════════════════════════════════ */
 :root,
-[data-theme="green"],
-.theme-green {
+[data-theme="deep-violet"],
+.theme-deep-violet {
   /* Typography Scale */
-  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-head: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-head: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --font-weight-regular: 400;
@@ -25,51 +27,51 @@
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
 
-  /* Surface & Canvas */
-  --bg-page: #F3FAF5;               /* Crisp, clean, luminous off-white with delicate fresh mint undertone */
-  --bg-backdrop: #E5F4EA;           /* Subtle outer canvas */
-  --bg-surface: #D8F3DC;            /* Pale mint / ice green card surface */
+  /* Surface & Canvas (Crisp Pure White) */
+  --bg-page: #FFFFFF;               /* Pure white canvas for high contrast */
+  --bg-backdrop: #F8F6FA;           /* Subtle outer canvas */
+  --bg-surface: #F4EFF9;            /* Soft elevated lavender-grey surface */
   --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
-  --bg-surface-glass: rgba(243, 250, 245, 0.95);
-  --surface-alt: #C4ECD0;           /* Interactive secondary hover surface */
+  --bg-surface-glass: rgba(255, 255, 255, 0.95);
+  --surface-alt: #EDE3F7;           /* Interactive secondary hover surface */
 
   /* Deep Ink Surfaces (Full-bleed dark bands) */
-  --ink-dark: #081C15;              /* Deepest obsidian forest ink */
-  --ink-dark-surface: #1B4332;      /* Deep forest pine surface */
+  --ink-dark: #10002B;              /* Deepest abyssal midnight violet */
+  --ink-dark-surface: #240046;      /* Deep royal purple surface */
 
-  /* Primary Accent (Forest Green #2D6A4F — WCAG AA Verified 5.5:1 on white) */
-  --accent-orange: #2D6A4F;
-  --accent-orange-hover: #1B4332;
-  --accent-orange-light: rgba(82, 183, 136, 0.22);
+  /* Primary Accent (Electric Royal Violet #7B2CBF — WCAG AA Verified 5.2:1 on white) */
+  --accent-orange: #7B2CBF;
+  --accent-orange-hover: #5A189A;
+  --accent-orange-light: rgba(123, 44, 191, 0.12);
 
   /* Secondary Accents / Semantic Aliases */
-  --accent-purple: #1B4332;
-  --accent-purple-hover: #081C15;
-  --accent-purple-light: rgba(45, 106, 79, 0.15);
+  --accent-purple: #3C096C;
+  --accent-purple-hover: #240046;
+  --accent-purple-light: rgba(60, 9, 108, 0.12);
 
-  --accent-cyan: #74C69D;
-  --accent-cyan-light: rgba(216, 243, 220, 0.40);
+  --accent-cyan: #9D4EDD;
+  --accent-cyan-light: rgba(199, 125, 255, 0.25);
 
-  --accent-green: #52B788;
-  --accent-green-light: rgba(82, 183, 136, 0.25);
+  --accent-green: #7B2CBF;
+  --accent-green-light: rgba(123, 44, 191, 0.15);
 
-  --accent-warm-white: #F3FAF5;
+  --accent-warm-white: #FFFFFF;
 
-  /* Typography Colors */
-  --text-primary: #081C15;          /* Deepest obsidian forest ink */
-  --text-muted: #2D6A4F;            /* Rich forest green muted body copy */
-  --text-subtle: #40916C;           /* Medium sea green metadata & labels */
-  --text-on-dark: #D8F3DC;          /* Lightest mint crisp high-contrast on dark surfaces */
-  --text-on-dark-muted: #B7E4C7;    /* Soft mint muted text on dark bands */
+  /* Typography Colors (High Contrast on White) */
+  --text-primary: #10002B;          /* Abyssal violet — 16.5:1 contrast on white */
+  --text-muted: #3C096C;            /* Royal purple muted body copy — 9.8:1 contrast */
+  --text-subtle: #5A189A;           /* Vivid purple metadata & labels */
+  --text-on-dark: #FFFFFF;          /* Pure white high-contrast text on dark bands */
+  --text-on-dark-muted: #E0AAFF;    /* Soft lavender muted text on dark bands */
 
   --ink: var(--text-primary);
   --ink-2: var(--text-muted);
   --ink-3: var(--text-subtle);
 
   /* Precise Hairline Borders */
-  --border-hairline: rgba(45, 106, 79, 0.20);
-  --border-hairline-dark: rgba(8, 28, 21, 0.32);
-  --line-strong: rgba(27, 67, 50, 0.40);
+  --border-hairline: rgba(16, 0, 43, 0.10);
+  --border-hairline-dark: rgba(16, 0, 43, 0.22);
+  --line-strong: rgba(36, 0, 70, 0.35);
 
   /* Generous Geometry */
   --radius-btn: 9999px;
@@ -77,130 +79,73 @@
   --radius-inner: 14px;
   --radius-pill: 9999px;
 
-  /* Organic Tinted Shadows */
-  --shadow-sm: 0 1px 3px rgba(8, 28, 21, 0.08);
-  --shadow-card: 0 4px 20px -2px rgba(8, 28, 21, 0.10);
-  --shadow-hover: 0 12px 32px -4px rgba(8, 28, 21, 0.18);
+  /* Clean Tinted Shadows */
+  --shadow-sm: 0 1px 3px rgba(16, 0, 43, 0.06);
+  --shadow-card: 0 4px 20px -2px rgba(16, 0, 43, 0.08);
+  --shadow-hover: 0 12px 32px -4px rgba(16, 0, 43, 0.16);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   THEME 2: DEEP SEA BLUE (The New Blue Theme)
-   Source: Coolors "Deep Sea Blue" 10-Color Palette
-   #001233 | #001845 | #002855 | #023E7D | #0353A4 | #0466C8 | #33415C | #5C677D | #7D8597 | #979DAC
+   THEME 2: SOFT PASTELS
+   Source: Coolors "Soft Pastels" Palette
+   #FFD6FF | #E7C6FF | #C8B6FF | #B8C0FF | #BBD0FF
+   Background: Pure White (#FFFFFF) for High Contrast & Editorial Elegance
    ═══════════════════════════════════════════════════════════════ */
-[data-theme="blue"],
-.theme-blue {
-  /* Surface & Canvas */
-  --bg-page: #F2F6FA;               /* Luminous cool ice-white canvas */
-  --bg-backdrop: #E4EDF5;           /* Subtle outer blue canvas */
-  --bg-surface: #DCE6F2;            /* Soft ice slate card surface */
+[data-theme="soft-pastels"],
+.theme-soft-pastels {
+  /* Surface & Canvas (Crisp Pure White) */
+  --bg-page: #FFFFFF;               /* Pure white canvas */
+  --bg-backdrop: #FAF8FD;           /* Subtle outer canvas */
+  --bg-surface: #F7F3FB;            /* Soft pastel mist surface */
   --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
-  --bg-surface-glass: rgba(242, 246, 250, 0.95);
-  --surface-alt: #CADAE8;           /* Interactive secondary hover surface */
+  --bg-surface-glass: rgba(255, 255, 255, 0.95);
+  --surface-alt: #E7C6FF;           /* Interactive secondary hover surface (Pastel Lavender) */
 
   /* Deep Ink Surfaces (Full-bleed dark bands) */
-  --ink-dark: #001233;              /* Deepest navy abyss */
-  --ink-dark-surface: #002855;      /* Dark navy ink surface */
+  --ink-dark: #1A0B2E;              /* Deep twilight velvet purple-black */
+  --ink-dark-surface: #2B1347;      /* Velvet purple surface */
 
-  /* Primary Accent (Royal Ocean Sapphire #0353A4 — WCAG AA Verified 5.4:1 on white) */
-  --accent-orange: #0353A4;
-  --accent-orange-hover: #023E7D;
-  --accent-orange-light: rgba(4, 102, 200, 0.18);
+  /* Primary Accent (Vibrant Orchid Pink #C042BA — Matching Ai2 pill aesthetic, 5.1:1 on white) */
+  --accent-orange: #C042BA;
+  --accent-orange-hover: #9D2898;
+  --accent-orange-light: rgba(255, 214, 255, 0.35);
 
   /* Secondary Accents / Semantic Aliases */
-  --accent-purple: #023E7D;
-  --accent-purple-hover: #001233;
-  --accent-purple-light: rgba(3, 83, 164, 0.14);
+  --accent-purple: #6B46C1;
+  --accent-purple-hover: #553C9A;
+  --accent-purple-light: rgba(200, 182, 255, 0.25);
 
-  --accent-cyan: #0466C8;
-  --accent-cyan-light: rgba(220, 230, 242, 0.45);
+  --accent-cyan: #7E57C2;
+  --accent-cyan-light: rgba(184, 192, 255, 0.35);
 
-  --accent-green: #0353A4;
-  --accent-green-light: rgba(4, 102, 200, 0.20);
+  --accent-green: #C042BA;
+  --accent-green-light: rgba(255, 214, 255, 0.30);
 
-  --accent-warm-white: #F2F6FA;
+  --accent-warm-white: #FFFFFF;
 
-  /* Typography Colors */
-  --text-primary: #001233;          /* Deepest navy abyss */
-  --text-muted: #023E7D;            /* Royal sapphire muted body copy */
-  --text-subtle: #5C677D;           /* Muted steel slate metadata */
-  --text-on-dark: #F2F6FA;          /* Crisp ice white on dark ink bands */
-  --text-on-dark-muted: #979DAC;    /* Pale ice slate muted text on dark bands */
-
-  --ink: var(--text-primary);
-  --ink-2: var(--text-muted);
-  --ink-3: var(--text-subtle);
-
-  /* Precise Hairline Borders */
-  --border-hairline: rgba(2, 62, 125, 0.18);
-  --border-hairline-dark: rgba(0, 18, 51, 0.30);
-  --line-strong: rgba(0, 40, 85, 0.40);
-
-  /* Tinted Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 18, 51, 0.08);
-  --shadow-card: 0 4px 20px -2px rgba(0, 18, 51, 0.10);
-  --shadow-hover: 0 12px 32px -4px rgba(0, 18, 51, 0.18);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   THEME 3: CLASSIC TERRACOTTA (Concept B Original)
-   #FCFBF9 | #F2EFEA | #D9531E | #0A3235 | #0E3E41
-   ═══════════════════════════════════════════════════════════════ */
-[data-theme="classic"],
-.theme-classic {
-  /* Surface & Canvas */
-  --bg-page: #FCFBF9;               /* Luminous clean off-white page background */
-  --bg-backdrop: #F7F5F0;           /* Subtle outer canvas */
-  --bg-surface: #F2EFEA;            /* Warm stone card surface */
-  --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
-  --bg-surface-glass: rgba(252, 251, 249, 0.95);
-  --surface-alt: #E8E2D8;           /* Interactive secondary hover surface */
-
-  /* Deep Ink Surfaces (Full-bleed dark bands) */
-  --ink-dark: #0A3235;              /* Deep pine teal-black */
-  --ink-dark-surface: #0E3E41;      /* Elevated ink card surface */
-
-  /* Primary Accent (Terracotta Orange #D9531E — WCAG AA Verified 4.9:1 on white) */
-  --accent-orange: #D9531E;
-  --accent-orange-hover: #BF4414;
-  --accent-orange-light: #FBEFEA;
-
-  /* Secondary Deep Ink Accent */
-  --accent-purple: #0A3235;
-  --accent-purple-hover: #14494D;
-  --accent-purple-light: rgba(10, 50, 53, 0.08);
-
-  --accent-cyan: #14494D;
-  --accent-cyan-light: rgba(10, 50, 53, 0.06);
-
-  --accent-green: #1B8354;
-  --accent-green-light: rgba(27, 131, 84, 0.15);
-
-  --accent-warm-white: #FCFBF9;
-
-  /* Typography Colors */
-  --text-primary: #112320;          /* Deep pine ink text */
-  --text-muted: #50615D;            /* Calm slate-teal muted text */
-  --text-subtle: #73837F;           /* Subtle metadata */
-  --text-on-dark: #FAF8F4;          /* High contrast text on dark bands */
-  --text-on-dark-muted: #C2CEC9;    /* Muted text on dark bands */
+  /* Typography Colors (High Contrast on White) */
+  --text-primary: #1A0B2E;          /* Deep twilight ink — 16.2:1 contrast on white */
+  --text-muted: #4C2D7A;            /* Muted twilight — 8.6:1 contrast on white */
+  --text-subtle: #7E57C2;           /* Soft periwinkle-purple metadata */
+  --text-on-dark: #FFFFFF;          /* Pure white high-contrast text on dark bands */
+  --text-on-dark-muted: #FFD6FF;    /* Soft pastel pink muted text on dark bands */
 
   --ink: var(--text-primary);
   --ink-2: var(--text-muted);
   --ink-3: var(--text-subtle);
 
   /* Precise Hairline Borders */
-  --border-hairline: rgba(10, 50, 53, 0.12);
-  --border-hairline-dark: rgba(10, 50, 53, 0.22);
-  --line-strong: rgba(10, 50, 53, 0.35);
+  --border-hairline: rgba(26, 11, 46, 0.10);
+  --border-hairline-dark: rgba(26, 11, 46, 0.20);
+  --line-strong: rgba(43, 19, 71, 0.35);
 
-  /* Tinted Shadows */
-  --shadow-sm: 0 1px 3px rgba(10, 50, 53, 0.04);
-  --shadow-card: 0 4px 20px -2px rgba(10, 50, 53, 0.06);
-  --shadow-hover: 0 12px 32px -4px rgba(10, 50, 53, 0.10);
+  /* Clean Tinted Shadows */
+  --shadow-sm: 0 1px 3px rgba(26, 11, 46, 0.06);
+  --shadow-card: 0 4px 20px -2px rgba(26, 11, 46, 0.08);
+  --shadow-hover: 0 12px 32px -4px rgba(26, 11, 46, 0.16);
 }
 
-/* ── Base Styling (Clean Modern Typography & Contrast) ── */
+/* ── Base Styling (Clean Modern Typography & High Contrast) ── */
 @layer base {
   *,
   *::before,
@@ -226,32 +171,26 @@
   }
 
   /* Selection highlight per theme */
-  [data-theme="green"] ::selection,
-  .theme-green ::selection,
+  [data-theme="deep-violet"] ::selection,
+  .theme-deep-violet ::selection,
   ::selection {
-    background: #B7E4C7;
-    color: #081C15;
+    background: #C77DFF;
+    color: #10002B;
   }
 
-  [data-theme="blue"] ::selection,
-  .theme-blue ::selection {
-    background: #979DAC;
-    color: #001233;
+  [data-theme="soft-pastels"] ::selection,
+  .theme-soft-pastels ::selection {
+    background: #FFD6FF;
+    color: #1A0B2E;
   }
 
-  [data-theme="classic"] ::selection,
-  .theme-classic ::selection {
-    background: #D9531E;
-    color: #FFFFFF;
-  }
-
-  /* Display & Wordmarks: Weight 700, Tight Tracking -0.035em, line-height 1.0 */
+  /* Display & Wordmarks: Weight 700, Tight Tracking -0.035em, line-height 1.05 */
   .display-wordmark,
   .hero-display {
     font-family: var(--font-head);
     font-weight: 700;
     letter-spacing: -0.035em;
-    line-height: 1.02;
+    line-height: 1.05;
     color: var(--text-primary);
   }
 
@@ -267,14 +206,14 @@
   }
 
   h1 {
-    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-size: clamp(2.1rem, 4.8vw, 3.4rem);
     font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
   }
 
   h2 {
-    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
     font-weight: 600;
     letter-spacing: -0.025em;
     line-height: 1.18;

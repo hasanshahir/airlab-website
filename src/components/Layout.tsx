@@ -115,7 +115,7 @@ export default function Layout() {
       <header
         ref={navRef}
         className={`sticky top-0 z-40 h-[72px] transition-all duration-200 ${scrolled
-            ? 'bg-[var(--bg-surface-glass)] backdrop-blur-md border-b border-[var(--border-hairline)] shadow-[0_4px_20px_rgba(10,50,53,0.04)]'
+            ? 'bg-[var(--bg-surface-glass)] backdrop-blur-md border-b border-[var(--border-hairline)] shadow-sm'
             : 'bg-[var(--bg-page)] border-b border-[var(--border-hairline)]'
           }`}
       >

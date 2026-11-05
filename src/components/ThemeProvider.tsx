@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
-export type ThemePalette = 'green' | 'blue' | 'classic'
+export type ThemePalette = 'deep-violet' | 'soft-pastels'
 
 export interface ThemeOption {
   id: ThemePalette
@@ -17,58 +17,40 @@ export interface ThemeOption {
 
 export const THEME_OPTIONS: ThemeOption[] = [
   {
-    id: 'green',
-    name: 'Fresh Greens',
-    label: 'Green',
-    accent: '#2D6A4F',
-    subAccent: '#081C15',
-    tertiary: '#D8F3DC',
-    description: 'Vibrant organic greens: obsidian forest ink, rich pine, and luminous mint highlights',
+    id: 'deep-violet',
+    name: 'Deep Violet',
+    label: 'Deep Violet',
+    accent: '#7B2CBF',
+    subAccent: '#10002B',
+    tertiary: '#E0AAFF',
+    description: 'Rich royal purple & midnight violet palette with high contrast against pure white',
     particleColors: [
-      'rgba(45, 106, 79, ',
-      'rgba(82, 183, 136, ',
-      'rgba(27, 67, 50, ',
-      'rgba(8, 28, 21, ',
-      'rgba(216, 243, 220, ',
+      'rgba(123, 44, 191, ',
+      'rgba(90, 24, 154, ',
+      'rgba(157, 78, 221, ',
+      'rgba(16, 0, 43, ',
+      'rgba(199, 125, 255, ',
     ],
-    lineColor: 'rgba(45, 106, 79, ',
-    mouseLineColor: 'rgba(82, 183, 136, ',
+    lineColor: 'rgba(123, 44, 191, ',
+    mouseLineColor: 'rgba(157, 78, 221, ',
   },
   {
-    id: 'blue',
-    name: 'Deep Sea Blue',
-    label: 'Blue',
-    accent: '#0353A4',
-    subAccent: '#001233',
-    tertiary: '#DCE6F2',
-    description: 'Deep maritime oceanic: abyssal navy, royal sapphire, and cool steel slate',
+    id: 'soft-pastels',
+    name: 'Soft Pastels',
+    label: 'Soft Pastels',
+    accent: '#C042BA',
+    subAccent: '#1A0B2E',
+    tertiary: '#FFD6FF',
+    description: 'Delicate orchid, lavender and periwinkle tones paired with crisp velvet ink on pure white',
     particleColors: [
-      'rgba(3, 83, 164, ',
-      'rgba(4, 102, 200, ',
-      'rgba(2, 62, 125, ',
-      'rgba(0, 18, 51, ',
-      'rgba(151, 157, 172, ',
+      'rgba(192, 66, 186, ',
+      'rgba(200, 182, 255, ',
+      'rgba(184, 192, 255, ',
+      'rgba(255, 214, 255, ',
+      'rgba(187, 208, 255, ',
     ],
-    lineColor: 'rgba(2, 62, 125, ',
-    mouseLineColor: 'rgba(4, 102, 200, ',
-  },
-  {
-    id: 'classic',
-    name: 'Classic Terracotta',
-    label: 'Classic',
-    accent: '#D9531E',
-    subAccent: '#0A3235',
-    tertiary: '#F2EFEA',
-    description: 'Concept B signature aesthetic: deep pine teal-black, warm stone, and terracotta orange',
-    particleColors: [
-      'rgba(217, 83, 30, ',
-      'rgba(10, 50, 53, ',
-      'rgba(107, 63, 230, ',
-      'rgba(197, 185, 206, ',
-      'rgba(217, 83, 30, ',
-    ],
-    lineColor: 'rgba(10, 50, 53, ',
-    mouseLineColor: 'rgba(217, 83, 30, ',
+    lineColor: 'rgba(200, 182, 255, ',
+    mouseLineColor: 'rgba(192, 66, 186, ',
   },
 ]
 
@@ -82,16 +64,16 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-const STORAGE_KEY = 'air_theme_active_palette'
+const STORAGE_KEY = 'air_theme_palette_v3'
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [palette, setPaletteState] = useState<ThemePalette>(() => {
-    if (typeof window === 'undefined') return 'green'
+    if (typeof window === 'undefined') return 'deep-violet'
     const saved = localStorage.getItem(STORAGE_KEY) as ThemePalette | null
     if (saved && THEME_OPTIONS.some(t => t.id === saved)) {
       return saved
     }
-    return 'green'
+    return 'deep-violet'
   })
 
   const [isDark, setIsDark] = useState<boolean>(false)
@@ -102,7 +84,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const root = document.documentElement
 
     // Remove legacy and existing theme classes
-    root.classList.remove('theme-green', 'theme-blue', 'theme-classic', 'default')
+    root.classList.remove(
+      'theme-deep-violet',
+      'theme-soft-pastels',
+      'theme-green',
+      'theme-blue',
+      'theme-classic',
+      'default'
+    )
 
     // Apply active theme class and data-theme attribute
     root.classList.add(`theme-${palette}`)

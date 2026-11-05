@@ -12,21 +12,20 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ compact = false, class
   const { palette, setPalette } = useTheme()
 
   if (compact) {
-    // Quick cycling button for compact screens
-    const currentIndex = THEME_OPTIONS.findIndex(t => t.id === palette)
-    const nextTheme = THEME_OPTIONS[(currentIndex + 1) % THEME_OPTIONS.length]
-    const currentTheme = THEME_OPTIONS[currentIndex] || THEME_OPTIONS[0]
+    // Quick toggle between the 2 themes
+    const otherTheme = THEME_OPTIONS.find(t => t.id !== palette) || THEME_OPTIONS[0]
+    const currentTheme = THEME_OPTIONS.find(t => t.id === palette) || THEME_OPTIONS[0]
 
     return (
       <button
         type="button"
-        onClick={() => setPalette(nextTheme.id)}
+        onClick={() => setPalette(otherTheme.id)}
         className={`inline-flex items-center gap-2 h-9 px-3 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] text-[var(--text-primary)] text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98] ${className}`}
-        title={`Current theme: ${currentTheme.name}. Tap to switch to ${nextTheme.name}`}
-        aria-label={`Current theme: ${currentTheme.name}. Tap to switch to ${nextTheme.name}`}
+        title={`Current: ${currentTheme.name}. Tap to switch to ${otherTheme.name}`}
+        aria-label={`Current: ${currentTheme.name}. Tap to switch to ${otherTheme.name}`}
       >
         <span
-          className="w-2.5 h-2.5 rounded-full ring-2 ring-white/60 shadow-xs"
+          className="w-2.5 h-2.5 rounded-full ring-2 ring-white/70 shadow-xs"
           style={{ backgroundColor: currentTheme.accent }}
         />
         <span className="font-medium">{currentTheme.label}</span>
@@ -34,7 +33,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ compact = false, class
     )
   }
 
-  // Full segmented pill control showing all 3 color themes
+  // Full segmented pill control showing the 2 color themes
   return (
     <div
       role="radiogroup"
@@ -50,7 +49,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ compact = false, class
             role="radio"
             aria-checked={isActive}
             onClick={() => setPalette(opt.id as ThemePalette)}
-            className={`relative px-3 py-1 rounded-full text-[12px] font-semibold transition-colors duration-180 flex items-center gap-1.5 cursor-pointer select-none ${
+            className={`relative px-3.5 py-1 rounded-full text-[12px] font-semibold transition-colors duration-180 flex items-center gap-1.5 cursor-pointer select-none ${
               isActive
                 ? 'text-white'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
@@ -79,4 +78,3 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ compact = false, class
 }
 
 export default ThemeToggle
-
