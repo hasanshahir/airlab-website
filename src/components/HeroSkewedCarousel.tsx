@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, type PanInfo } from 'framer-motion'
-import { ChevronLeft, ChevronRight, ArrowDown } from 'lucide-react'
 
 export interface CarouselSlide {
   id: string
@@ -131,15 +130,6 @@ export default function HeroSkewedCarousel({
     return diff
   }
 
-  const scrollToExplore = () => {
-    const el = document.getElementById('explore-anchor') || document.getElementById('about-section')
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      window.scrollBy({ top: 480, behavior: 'smooth' })
-    }
-  }
-
   return (
     <div
       ref={containerRef}
@@ -257,62 +247,6 @@ export default function HeroSkewedCarousel({
         {/* Edge gradient masks */}
         <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[var(--bg-page)] to-transparent z-40" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[var(--bg-page)] to-transparent z-40" />
-      </div>
-
-      {/* ── COMPACT BOTTOM CONTROLS (ALWAYS VISIBLE & TIED TO ALL 5 SLIDES) ── */}
-      <div className="mt-4 sm:mt-5 flex flex-col items-center justify-center gap-2.5 z-30">
-        {/* Explore More Button with Circular Dashed Arrow */}
-        <button
-          type="button"
-          onClick={scrollToExplore}
-          className="group flex flex-col items-center gap-1.5 text-center text-xs sm:text-sm font-sans font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-        >
-          <span className="tracking-wide">Explore More</span>
-          <div className="w-8 h-8 rounded-full border-2 border-dashed border-[var(--border-hairline-dark)] group-hover:border-[var(--accent-orange)] text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] flex items-center justify-center transition-all duration-300 group-hover:translate-y-0.5">
-            <ArrowDown className="w-3.5 h-3.5" />
-          </div>
-        </button>
-
-        {/* Minimalist Navigation Controls across all 5 slides */}
-        <div className="flex items-center gap-2 p-1 rounded-full bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-hairline)] shadow-xs">
-          <button
-            type="button"
-            onClick={handlePrev}
-            aria-label="Previous slide"
-            className="w-6.5 h-6.5 rounded-full bg-[var(--bg-page)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] flex items-center justify-center border border-[var(--border-hairline)] shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-
-          {/* 5 Dots Indicator: 1 for each slide in total */}
-          <div className="flex items-center gap-1.5 px-2">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => {
-                  setHoveredOffset(null)
-                  setActiveIndex(i)
-                }}
-                aria-label={`Go to slide ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  activeIndex === i
-                    ? 'w-5 bg-[var(--accent-orange)]'
-                    : 'w-1.5 bg-[var(--border-hairline-dark)] hover:bg-[var(--accent-orange)]/50'
-                }`}
-              />
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={handleNext}
-            aria-label="Next slide"
-            className="w-6.5 h-6.5 rounded-full bg-[var(--bg-page)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] flex items-center justify-center border border-[var(--border-hairline)] shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
       </div>
     </div>
   )
