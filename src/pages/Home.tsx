@@ -153,7 +153,7 @@ export default function Home() {
       </section>
 
       {/* ── 2. ABOUT AIR LAB SECTION (Deep Ink Band with High Contrast) ── */}
-      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto text-left mb-24 relative z-10">
+      <section id="explore-anchor" className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto text-left mb-24 relative z-10">
         <div className="bg-[var(--ink-dark)] text-white rounded-3xl p-8 sm:p-14 relative overflow-hidden transition-all duration-200 shadow-xl border border-[var(--border-hairline)]">
           <div className="max-w-3xl relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-sans font-semibold uppercase mb-5 tracking-wider">
