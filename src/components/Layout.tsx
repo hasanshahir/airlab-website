@@ -385,7 +385,7 @@ export default function Layout() {
                   >
                     <div>
                       <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
-                        INSTITUTION
+                        ABOUT US
                       </div>
                       <div className="space-y-1">
                         <Link
