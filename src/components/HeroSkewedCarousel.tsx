@@ -12,39 +12,39 @@ export interface CarouselSlide {
 
 const DEFAULT_SLIDES: CarouselSlide[] = [
   {
-    id: 'lab-workstation',
+    id: 'lab-workstation-1',
     src: '/carousel-images/6530466a-3815-4434-a181-85e97c3ae385.jpg',
     alt: 'AIR Lab Research & Prototyping Laboratory',
     title: 'Research Laboratory',
     subtitle: 'Deep Learning & Neural Systems Cluster',
   },
   {
-    id: 'team-collaboration',
+    id: 'gpu-rig-1',
     src: '/carousel-images/6a392586-ef4f-41db-9be7-cee1a0018f1f.jpg',
-    alt: 'Collaborative AI Research at NED CSIT',
+    alt: 'High Performance Neural Computing Rig',
+    title: 'Deep Learning Compute',
+    subtitle: 'TensorRT & Edge Accelerated GPU Nodes',
+  },
+  {
+    id: 'collaboration-2',
+    src: '/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg',
+    alt: 'Interdisciplinary Student Collaboration & ML Pipelines',
     title: 'Collaborative Research',
     subtitle: 'Interdisciplinary Machine Learning Teams',
   },
   {
-    id: 'gpu-rig',
-    src: '/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg',
-    alt: 'Autonomous Robotics & High Performance Compute',
-    title: 'High Performance Compute',
-    subtitle: 'TensorRT & Edge Accelerated GPU Nodes',
-  },
-  {
-    id: 'fellows-workstation',
+    id: 'fellows-workstation-2',
     src: '/carousel-images/adc711cf-26d5-4a13-ac9f-4e29f0cf13d7.jpg',
-    alt: 'Research Fellows & Student Innovators',
+    alt: 'AIR Lab Research Fellows Station',
     title: 'Frontier AI Fellowship',
     subtitle: 'Nurturing the Next Generation of AI Scientists',
   },
   {
     id: 'csit-entrance',
     src: '/carousel-images/cb2f092f-f6df-418b-b84c-04085f274522.jpg',
-    alt: 'Department of CSIT, NED University of Engineering & Technology',
+    alt: 'Department of CSIT & AIR Lab Entrance',
     title: 'Academic Excellence',
-    subtitle: 'Department of CSIT &bull; NED University',
+    subtitle: 'Department of CSIT • NED University',
   },
 ]
 
@@ -56,13 +56,12 @@ interface HeroSkewedCarouselProps {
 
 export default function HeroSkewedCarousel({
   slides = DEFAULT_SLIDES,
-  autoPlayInterval = 7000,
+  autoPlayInterval = 4500, // 4.5 seconds for engaging, steady progression through all slides
   className = '',
 }: HeroSkewedCarouselProps) {
-  // Continuous rotational slot position
-  const [position, setPosition] = useState(0)
-  const [hoveredSlot, setHoveredSlot] = useState<number | null>(null)
-  const [isHovered, setIsHovered] = useState(false)
+  // Continuous index tracking to cycle infinitely through all slides without rewinding
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [hoveredSide, setHoveredSide] = useState<'left' | 'right' | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [windowWidth, setWindowWidth] = useState(1200)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -79,31 +78,32 @@ export default function HeroSkewedCarousel({
   const isMobile = windowWidth < 640
   const isTablet = windowWidth >= 640 && windowWidth < 1024
 
+  // Spacing and radius parameters
   const radius = isMobile ? 540 : isTablet ? 720 : 860
   const angleStep = isMobile ? 32 : isTablet ? 29 : 27 // degrees per card slot
 
-  const activeIndex = useMemo(() => {
-    return ((position % total) + total) % total
-  }, [position, total])
+  const activeSlideIndex = useMemo(() => {
+    return ((currentIndex % total) + total) % total
+  }, [currentIndex, total])
 
   const handleNext = useCallback(() => {
-    setHoveredSlot(null)
-    setPosition(prev => prev + 1)
+    setHoveredSide(null)
+    setCurrentIndex(prev => prev + 1)
   }, [])
 
   const handlePrev = useCallback(() => {
-    setHoveredSlot(null)
-    setPosition(prev => prev - 1)
+    setHoveredSide(null)
+    setCurrentIndex(prev => prev - 1)
   }, [])
 
-  // Autoplay loop
+  // Autoplay continues smoothly, only pauses during active touch/mouse drag
   useEffect(() => {
-    if (isHovered || isDragging || total <= 1) return
+    if (isDragging || total <= 1) return
     const timer = setInterval(() => {
       handleNext()
     }, autoPlayInterval)
     return () => clearInterval(timer)
-  }, [isHovered, isDragging, total, autoPlayInterval, handleNext])
+  }, [isDragging, total, autoPlayInterval, handleNext])
 
   // Keyboard navigation
   useEffect(() => {
@@ -126,15 +126,11 @@ export default function HeroSkewedCarousel({
     }
   }
 
-  // Pre-render ONLY slots in immediate view (prevents any card from ever jumping across)
-  const visibleSlots = useMemo(() => {
-    const centerSlot = position
-    const slots = []
-    for (let k = centerSlot - 2; k <= centerSlot + 2; k++) {
-      slots.push(k)
-    }
-    return slots
-  }, [position])
+  // EXACTLY 3 SLOTS ARE SHOWN: Left (-1), Center (0), Right (+1)
+  // We also mount -2 and +2 strictly for smooth entering/exiting with opacity: 0
+  const slotsToRender = useMemo(() => {
+    return [-2, -1, 0, 1, 2]
+  }, [])
 
   const scrollToExplore = () => {
     const el = document.getElementById('explore-anchor') || document.getElementById('about-section')
@@ -149,21 +145,17 @@ export default function HeroSkewedCarousel({
     <div
       ref={containerRef}
       className={`relative w-full select-none flex flex-col items-center justify-center overflow-visible ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false)
-        setHoveredSlot(null)
-      }}
+      onMouseLeave={() => setHoveredSide(null)}
     >
-      {/* ── 3D SPINNING INNER-CIRCLE STAGE WITH ZERO CROSS-SCREEN TRAVEL ── */}
+      {/* ── 3D INNER-CIRCLE STAGE: EXACTLY 3 CARDS VISIBLE AT ALL TIMES ── */}
       <div
-        className="relative w-full h-[200px] sm:h-[250px] md:h-[290px] lg:h-[320px] flex items-center justify-center overflow-hidden"
+        className="relative w-full h-[195px] sm:h-[245px] md:h-[285px] lg:h-[315px] flex items-center justify-center overflow-hidden"
         style={{
           perspective: '1200px',
           perspectiveOrigin: '50% 50%',
           transformStyle: 'preserve-3d',
-          maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
+          maskImage: 'linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)',
         }}
       >
         <motion.div
@@ -175,40 +167,31 @@ export default function HeroSkewedCarousel({
           className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing touch-pan-y"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          {visibleSlots.map((slot) => {
-            const offset = slot - position // 0 is center, -1 is left, +1 is right
+          {slotsToRender.map((offset) => {
             const isCenter = offset === 0
-            const absOffset = Math.abs(offset)
+            const isLeft = offset === -1
+            const isRight = offset === 1
+            const isVisible = isCenter || isLeft || isRight
 
-            // Strict cutoff: beyond 1.6 slots, card is completely unmounted
-            // ensuring NO card ever lingers or jumps from one side to the other
-            if (absOffset > 1.6) return null
-
-            const slideIndex = ((slot % total) + total) % total
+            // Compute the exact slide for this slot relative to currentIndex
+            const slideSlotNumber = currentIndex + offset
+            const slideIndex = ((slideSlotNumber % total) + total) % total
             const slide = slides[slideIndex]
 
-            const isSideHovered = !isCenter && hoveredSlot === slot
+            const isSideHovered =
+              (isLeft && hoveredSide === 'left') || (isRight && hoveredSide === 'right')
 
-            // ── Cylindrical Circular Arc Geometry ──
+            // Inner circle geometry
             const angleDeg = offset * angleStep
             const angleRad = (angleDeg * Math.PI) / 180
 
             const baseX = radius * Math.sin(angleRad)
             const baseZ = -radius * (1 - Math.cos(angleRad))
             const baseRotateY = -angleDeg
-            const baseScale = isCenter ? 1.0 : Math.max(0.85, 0.96 - absOffset * 0.05)
+            const baseScale = isCenter ? 1.0 : isVisible ? 0.94 : 0.85
 
-            // Strict Fade: completely zero opacity past 1.4, fading in smoothly from nothing
-            let opacity = 0
-            if (absOffset <= 0.2) {
-              opacity = 1.0
-            } else if (absOffset <= 1.0) {
-              opacity = 1.0 - (absOffset - 0.2) * 0.15 // 1.0 down to ~0.88
-            } else if (absOffset <= 1.45) {
-              opacity = Math.max(0, 0.88 * (1 - (absOffset - 1.0) / 0.45))
-            } else {
-              opacity = 0
-            }
+            // Opacity: Center is 1.0, Side visible cards are 0.88, outer buffer slots are 0
+            const targetOpacity = isCenter ? 1.0 : isVisible ? 0.88 : 0
 
             // 3D Hover Displacement on Side Cards Only
             const targetX = baseX + (isSideHovered ? (offset < 0 ? -12 : 12) : 0)
@@ -217,13 +200,11 @@ export default function HeroSkewedCarousel({
             const targetRotateY = isSideHovered ? baseRotateY * 0.75 : baseRotateY
             const targetScale = isSideHovered ? baseScale + 0.04 : baseScale
 
-            const zIndex = isCenter ? 30 : Math.max(1, Math.round(20 - absOffset * 8))
+            const zIndex = isCenter ? 30 : isVisible ? 20 : 5
 
             return (
               <motion.div
-                key={`slot-${slot}`}
-                // Initial placement starts ALREADY at its respective side position with opacity 0
-                // NEVER from center (x: 0), so it cannot fly across the screen
+                key={`slot-${offset}-${slide.id}`}
                 initial={{
                   x: baseX,
                   y: targetY,
@@ -233,16 +214,13 @@ export default function HeroSkewedCarousel({
                   opacity: 0,
                 }}
                 onMouseEnter={() => {
-                  if (!isCenter && opacity > 0.3) setHoveredSlot(slot)
+                  if (isLeft) setHoveredSide('left')
+                  else if (isRight) setHoveredSide('right')
                 }}
-                onMouseLeave={() => {
-                  if (hoveredSlot === slot) setHoveredSlot(null)
-                }}
+                onMouseLeave={() => setHoveredSide(null)}
                 onClick={() => {
-                  if (!isCenter && opacity > 0.3) {
-                    setHoveredSlot(null)
-                    setPosition(slot)
-                  }
+                  if (isLeft) handlePrev()
+                  else if (isRight) handleNext()
                 }}
                 animate={{
                   x: targetX,
@@ -250,23 +228,23 @@ export default function HeroSkewedCarousel({
                   z: targetZ,
                   rotateY: targetRotateY,
                   scale: targetScale,
-                  opacity,
+                  opacity: targetOpacity,
                 }}
                 transition={{
                   duration: 0.75,
-                  ease: [0.22, 1, 0.36, 1], // Smooth seamless glide
+                  ease: [0.22, 1, 0.36, 1], // Silky smooth ease-out
                 }}
                 style={{
                   zIndex,
                   transformStyle: 'preserve-3d',
                   backfaceVisibility: 'hidden',
-                  pointerEvents: opacity < 0.2 ? 'none' : 'auto',
+                  pointerEvents: isVisible ? 'auto' : 'none',
                 }}
                 className={`absolute w-[280px] sm:w-[360px] md:w-[410px] lg:w-[440px] h-[175px] sm:h-[225px] md:h-[255px] lg:h-[275px] rounded-none cursor-pointer overflow-hidden transition-colors duration-300 ${
                   isCenter
                     ? 'border-2 border-[var(--accent-orange)] shadow-2xl'
                     : isSideHovered
-                    ? 'border-2 border-[var(--accent-orange)] shadow-xl'
+                    ? 'border-2 border-[var(--accent-orange)] shadow-xl brightness-105'
                     : 'border border-[var(--accent-orange)]/60 hover:border-[var(--accent-orange)] shadow-lg'
                 }`}
               >
@@ -290,8 +268,8 @@ export default function HeroSkewedCarousel({
         <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[var(--bg-page)] to-transparent z-40" />
       </div>
 
-      {/* ── COMPACT BOTTOM CONTROLS (TIGHTENED VERTICAL GAP) ── */}
-      <div className="mt-4 sm:mt-5 flex flex-col items-center justify-center gap-3 z-30">
+      {/* ── COMPACT BOTTOM CONTROLS (ALWAYS VISIBLE & TIED TO ALL 5 SLIDES) ── */}
+      <div className="mt-4 sm:mt-5 flex flex-col items-center justify-center gap-2.5 z-30">
         {/* Explore More Button with Circular Dashed Arrow */}
         <button
           type="button"
@@ -304,7 +282,7 @@ export default function HeroSkewedCarousel({
           </div>
         </button>
 
-        {/* Minimalist Slide Navigation Controls */}
+        {/* Minimalist Navigation Controls across all 5 slides */}
         <div className="flex items-center gap-2 p-1 rounded-full bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-hairline)] shadow-xs">
           <button
             type="button"
@@ -315,22 +293,23 @@ export default function HeroSkewedCarousel({
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
 
+          {/* 5 Dots Indicator: 1 for each slide in total */}
           <div className="flex items-center gap-1.5 px-2">
             {slides.map((_, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => {
-                  setHoveredSlot(null)
-                  const currentMod = ((position % total) + total) % total
+                  setHoveredSide(null)
+                  const currentMod = ((currentIndex % total) + total) % total
                   let diff = i - currentMod
                   if (diff > total / 2) diff -= total
                   if (diff < -total / 2) diff += total
-                  setPosition(prev => prev + diff)
+                  setCurrentIndex(prev => prev + diff)
                 }}
                 aria-label={`Go to slide ${i + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  activeIndex === i
+                  activeSlideIndex === i
                     ? 'w-5 bg-[var(--accent-orange)]'
                     : 'w-1.5 bg-[var(--border-hairline-dark)] hover:bg-[var(--accent-orange)]/50'
                 }`}
