@@ -75,12 +75,12 @@ export default function Home() {
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] overflow-hidden">
       {/* ── 1. HERO SHOWCASE (Dedicated Editorial Header + 3D Coverflow Stage) ── */}
-      <section className="relative pt-12 sm:pt-16 md:pt-20 pb-16 sm:pb-24 px-4 sm:px-8 max-w-[1280px] mx-auto text-center overflow-visible z-10">
+      <section className="relative pt-6 sm:pt-8 md:pt-10 pb-10 sm:pb-14 px-4 sm:px-8 max-w-[1280px] mx-auto text-center overflow-visible z-10">
         {/* Top Header Editorial Block */}
-        <div className="max-w-3xl mx-auto mb-8 sm:mb-12">
+        <div className="max-w-3xl mx-auto mb-4 sm:mb-6">
           {/* Lab Affiliation Badge */}
           <SectionReveal delay={0.05}>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] mb-5 shadow-xs">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] mb-3 shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
               <span>DEPARTMENT OF CSIT &bull; NED UNIVERSITY</span>
             </div>
@@ -88,21 +88,21 @@ export default function Home() {
 
           {/* Master Headline */}
           <SectionReveal delay={0.1}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-[-0.035em] leading-[1.05] text-[var(--text-primary)] font-head mb-5">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-[-0.035em] leading-[1.05] text-[var(--text-primary)] font-head mb-3">
               Where Intelligence Meets Engineering.
             </h1>
           </SectionReveal>
 
           {/* Narrative Subtitle */}
           <SectionReveal delay={0.15}>
-            <p className="text-sm sm:text-base md:text-lg text-[var(--text-muted)] leading-relaxed font-normal max-w-2xl mx-auto mb-8">
+            <p className="text-sm sm:text-base md:text-lg text-[var(--text-muted)] leading-relaxed font-normal max-w-2xl mx-auto mb-5">
               The Artificial Intelligence Research Lab at NED University is pioneering foundational regional AI models, edge perception, and autonomous robotics benchmarks for national impact.
             </p>
           </SectionReveal>
 
           {/* Primary Action Buttons */}
           <SectionReveal delay={0.2}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-3.5">
               <button
                 type="button"
                 onClick={() => openDrawer('projects')}
@@ -146,7 +146,7 @@ export default function Home() {
 
         {/* ── THE 3D COVERFLOW SHOWPIECE STAGE (Full High-Res Glory) ── */}
         <SectionReveal delay={0.28}>
-          <div className="w-full my-4 sm:my-8 overflow-visible">
+          <div className="w-full mt-1 sm:mt-2 mb-4 sm:mb-6 overflow-visible">
             <HeroSkewedCarousel />
           </div>
         </SectionReveal>

@@ -69,7 +69,6 @@ export default function HeroSkewedCarousel({
 
   const total = slides.length
 
-  // Track window width for responsive circle radius & spacing
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
     handleResize()
@@ -127,11 +126,11 @@ export default function HeroSkewedCarousel({
     }
   }
 
-  // Pre-render visible slots around current position
+  // Pre-render ONLY slots in immediate view (prevents any card from ever jumping across)
   const visibleSlots = useMemo(() => {
     const centerSlot = position
     const slots = []
-    for (let k = centerSlot - 3; k <= centerSlot + 3; k++) {
+    for (let k = centerSlot - 2; k <= centerSlot + 2; k++) {
       slots.push(k)
     }
     return slots
@@ -156,15 +155,15 @@ export default function HeroSkewedCarousel({
         setHoveredSlot(null)
       }}
     >
-      {/* ── 3D SPINNING INNER-CIRCLE STAGE WITH ZERO-WRAP FADE ── */}
+      {/* ── 3D SPINNING INNER-CIRCLE STAGE WITH ZERO CROSS-SCREEN TRAVEL ── */}
       <div
-        className="relative w-full h-[220px] sm:h-[280px] md:h-[320px] lg:h-[350px] flex items-center justify-center overflow-hidden"
+        className="relative w-full h-[200px] sm:h-[250px] md:h-[290px] lg:h-[320px] flex items-center justify-center overflow-hidden"
         style={{
           perspective: '1200px',
           perspectiveOrigin: '50% 50%',
           transformStyle: 'preserve-3d',
-          maskImage: 'linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)',
+          maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
         }}
       >
         <motion.div
@@ -181,15 +180,16 @@ export default function HeroSkewedCarousel({
             const isCenter = offset === 0
             const absOffset = Math.abs(offset)
 
-            // Strict visibility cutoff: beyond 1.8 slots, cards fade completely into nothing
-            if (absOffset > 2.2) return null
+            // Strict cutoff: beyond 1.6 slots, card is completely unmounted
+            // ensuring NO card ever lingers or jumps from one side to the other
+            if (absOffset > 1.6) return null
 
             const slideIndex = ((slot % total) + total) % total
             const slide = slides[slideIndex]
 
             const isSideHovered = !isCenter && hoveredSlot === slot
 
-            // ── Inner Part of a Circle Spinning Math ──
+            // ── Cylindrical Circular Arc Geometry ──
             const angleDeg = offset * angleStep
             const angleRad = (angleDeg * Math.PI) / 180
 
@@ -198,23 +198,21 @@ export default function HeroSkewedCarousel({
             const baseRotateY = -angleDeg
             const baseScale = isCenter ? 1.0 : Math.max(0.85, 0.96 - absOffset * 0.05)
 
-            // ── "FADE INTO NOTHING & COME FROM NOTHING" OPACITY FORMULA ──
-            // Center is 1.0, adjacent card (1.0) is 0.85, then rapidly dissolves to 0 as it exits
+            // Strict Fade: completely zero opacity past 1.4, fading in smoothly from nothing
             let opacity = 0
             if (absOffset <= 0.2) {
               opacity = 1.0
             } else if (absOffset <= 1.0) {
-              opacity = 1.0 - (absOffset - 0.2) * 0.18 // ~0.85 at offset 1
-            } else if (absOffset <= 1.7) {
-              // Rapid smooth dissolve to 0 at offset 1.7
-              opacity = Math.max(0, 0.85 * (1 - (absOffset - 1.0) / 0.7))
+              opacity = 1.0 - (absOffset - 0.2) * 0.15 // 1.0 down to ~0.88
+            } else if (absOffset <= 1.45) {
+              opacity = Math.max(0, 0.88 * (1 - (absOffset - 1.0) / 0.45))
             } else {
               opacity = 0
             }
 
             // 3D Hover Displacement on Side Cards Only
             const targetX = baseX + (isSideHovered ? (offset < 0 ? -12 : 12) : 0)
-            const targetY = isSideHovered ? -16 : 0
+            const targetY = isSideHovered ? -14 : 0
             const targetZ = isSideHovered ? baseZ + 36 : baseZ
             const targetRotateY = isSideHovered ? baseRotateY * 0.75 : baseRotateY
             const targetScale = isSideHovered ? baseScale + 0.04 : baseScale
@@ -224,6 +222,16 @@ export default function HeroSkewedCarousel({
             return (
               <motion.div
                 key={`slot-${slot}`}
+                // Initial placement starts ALREADY at its respective side position with opacity 0
+                // NEVER from center (x: 0), so it cannot fly across the screen
+                initial={{
+                  x: baseX,
+                  y: targetY,
+                  z: baseZ,
+                  rotateY: baseRotateY,
+                  scale: baseScale,
+                  opacity: 0,
+                }}
                 onMouseEnter={() => {
                   if (!isCenter && opacity > 0.3) setHoveredSlot(slot)
                 }}
@@ -246,7 +254,7 @@ export default function HeroSkewedCarousel({
                 }}
                 transition={{
                   duration: 0.75,
-                  ease: [0.22, 1, 0.36, 1], // Buttery smooth ease-out (no acceleration hiccup)
+                  ease: [0.22, 1, 0.36, 1], // Smooth seamless glide
                 }}
                 style={{
                   zIndex,
@@ -254,7 +262,7 @@ export default function HeroSkewedCarousel({
                   backfaceVisibility: 'hidden',
                   pointerEvents: opacity < 0.2 ? 'none' : 'auto',
                 }}
-                className={`absolute w-[280px] sm:w-[370px] md:w-[430px] lg:w-[455px] h-[180px] sm:h-[235px] md:h-[270px] lg:h-[285px] rounded-none cursor-pointer overflow-hidden transition-colors duration-300 ${
+                className={`absolute w-[280px] sm:w-[360px] md:w-[410px] lg:w-[440px] h-[175px] sm:h-[225px] md:h-[255px] lg:h-[275px] rounded-none cursor-pointer overflow-hidden transition-colors duration-300 ${
                   isCenter
                     ? 'border-2 border-[var(--accent-orange)] shadow-2xl'
                     : isSideHovered
@@ -277,22 +285,22 @@ export default function HeroSkewedCarousel({
           })}
         </motion.div>
 
-        {/* Soft edge fade masks on sides to ensure complete dissolve into nothingness */}
+        {/* Edge gradient masks */}
         <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[var(--bg-page)] to-transparent z-40" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[var(--bg-page)] to-transparent z-40" />
       </div>
 
-      {/* ── BOTTOM CONTROLS: "Explore More" + Dashed Arrow Indicator ── */}
-      <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4 z-30">
+      {/* ── COMPACT BOTTOM CONTROLS (TIGHTENED VERTICAL GAP) ── */}
+      <div className="mt-4 sm:mt-5 flex flex-col items-center justify-center gap-3 z-30">
         {/* Explore More Button with Circular Dashed Arrow */}
         <button
           type="button"
           onClick={scrollToExplore}
-          className="group flex flex-col items-center gap-2 text-center text-xs sm:text-sm font-sans font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="group flex flex-col items-center gap-1.5 text-center text-xs sm:text-sm font-sans font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
         >
           <span className="tracking-wide">Explore More</span>
-          <div className="w-9 h-9 rounded-full border-2 border-dashed border-[var(--border-hairline-dark)] group-hover:border-[var(--accent-orange)] text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] flex items-center justify-center transition-all duration-300 group-hover:translate-y-1">
-            <ArrowDown className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-full border-2 border-dashed border-[var(--border-hairline-dark)] group-hover:border-[var(--accent-orange)] text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] flex items-center justify-center transition-all duration-300 group-hover:translate-y-0.5">
+            <ArrowDown className="w-3.5 h-3.5" />
           </div>
         </button>
 
@@ -302,7 +310,7 @@ export default function HeroSkewedCarousel({
             type="button"
             onClick={handlePrev}
             aria-label="Previous slide"
-            className="w-7 h-7 rounded-full bg-[var(--bg-page)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] flex items-center justify-center border border-[var(--border-hairline)] shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+            className="w-6.5 h-6.5 rounded-full bg-[var(--bg-page)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] flex items-center justify-center border border-[var(--border-hairline)] shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
@@ -334,7 +342,7 @@ export default function HeroSkewedCarousel({
             type="button"
             onClick={handleNext}
             aria-label="Next slide"
-            className="w-7 h-7 rounded-full bg-[var(--bg-page)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] flex items-center justify-center border border-[var(--border-hairline)] shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+            className="w-6.5 h-6.5 rounded-full bg-[var(--bg-page)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] flex items-center justify-center border border-[var(--border-hairline)] shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
