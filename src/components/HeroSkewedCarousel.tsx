@@ -62,6 +62,7 @@ export default function HeroSkewedCarousel({
   // Current active slide index (0 to slides.length - 1)
   const [activeIndex, setActiveIndex] = useState(0)
   const [hoveredOffset, setHoveredOffset] = useState<-1 | 1 | null>(null)
+  const [isHovered, setIsHovered] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [windowWidth, setWindowWidth] = useState(1200)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -93,14 +94,14 @@ export default function HeroSkewedCarousel({
     setActiveIndex(prev => (prev - 1 + total) % total)
   }, [total])
 
-  // Autoplay through all 5 images sequentially
+  // Autoplay through all 5 images sequentially; PAUSES whenever cursor is on the carousel
   useEffect(() => {
-    if (isDragging || total <= 1) return
+    if (isHovered || isDragging || total <= 1) return
     const timer = setInterval(() => {
       handleNext()
     }, autoPlayInterval)
     return () => clearInterval(timer)
-  }, [isDragging, total, autoPlayInterval, handleNext])
+  }, [isHovered, isDragging, total, autoPlayInterval, handleNext])
 
   // Keyboard navigation
   useEffect(() => {
@@ -144,7 +145,11 @@ export default function HeroSkewedCarousel({
     <div
       ref={containerRef}
       className={`relative w-full select-none flex flex-col items-center justify-center overflow-visible ${className}`}
-      onMouseLeave={() => setHoveredOffset(null)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false)
+        setHoveredOffset(null)
+      }}
     >
       {/* ── 3D INNER-CIRCLE STAGE: EXACTLY 3 CARDS VISIBLE, SMOOTH PERSISTENT NODES ── */}
       <div
@@ -183,45 +188,60 @@ export default function HeroSkewedCarousel({
             const baseRotateY = -offset * yawAngle
             const baseScale = isCenter ? 1.0 : isVisible ? 0.94 : 0.84
 
+            // 3D Hover Tilt & Displacement on Side Cards Only
+            const targetX = baseX + (isSideHovered ? (offset < 0 ? -14 : 14) : 0)
+            const targetY = isSideHovered ? -16 : 0
+            const targetZ = isSideHovered ? baseZ + 55 : baseZ
+            const targetRotateX = isSideHovered ? 6 : 0
+            const targetRotateY = isSideHovered
+              ? (offset < 0 ? 10 : -10)
+              : baseRotateY
+            const targetRotateZ = isSideHovered ? (offset < 0 ? -2.5 : 2.5) : 0
+            const targetScale = isSideHovered ? baseScale + 0.05 : baseScale
+
             // Opacity: ONLY the 3 active cards are visible; buffer cards are strictly 0
-            const targetOpacity = isCenter ? 1.0 : isVisible ? 0.88 : 0
+            const targetOpacity = isCenter ? 1.0 : isVisible ? (isSideHovered ? 1.0 : 0.88) : 0
 
-            // 3D Hover Displacement on Side Cards Only
-            const targetX = baseX + (isSideHovered ? (offset < 0 ? -12 : 12) : 0)
-            const targetY = isSideHovered ? -14 : 0
-            const targetZ = isSideHovered ? baseZ + 36 : baseZ
-            const targetRotateY = isSideHovered ? baseRotateY * 0.75 : baseRotateY
-            const targetScale = isSideHovered ? baseScale + 0.04 : baseScale
-
-            const zIndex = isCenter ? 30 : isVisible ? 20 : 1
+            const zIndex = isCenter ? 30 : isSideHovered ? 25 : isVisible ? 20 : 1
 
             return (
               <motion.div
                 // PERSISTENT KEY ensures smooth motion between slots instead of re-mounting!
                 key={slide.id}
                 onMouseEnter={() => {
+                  setIsHovered(true)
                   if (isLeft) setHoveredOffset(-1)
                   else if (isRight) setHoveredOffset(1)
+                  else setHoveredOffset(null)
                 }}
                 onMouseLeave={() => setHoveredOffset(null)}
                 onClick={() => {
                   if (isLeft) handlePrev()
                   else if (isRight) handleNext()
                 }}
+                title={
+                  isLeft
+                    ? 'Previous photo (click to rotate)'
+                    : isRight
+                    ? 'Next photo (click to rotate)'
+                    : undefined
+                }
                 animate={{
                   x: targetX,
                   y: targetY,
                   z: targetZ,
+                  rotateX: targetRotateX,
                   rotateY: targetRotateY,
+                  rotateZ: targetRotateZ,
                   scale: targetScale,
                   opacity: targetOpacity,
                 }}
-                // Silky smooth transition for visible slides; instant relocation for the hidden buffer slide
+                // Snappy 3D tilt response on hover; silky smooth glide on slide navigation
                 transition={
                   isHidden
                     ? { duration: 0 } // Jumps silently in the dark with opacity: 0 without flying across!
                     : {
-                        duration: 0.75,
+                        duration: isSideHovered ? 0.35 : 0.75,
                         ease: [0.22, 1, 0.36, 1], // Smooth seamless cubic-bezier glide
                       }
                 }
@@ -231,12 +251,12 @@ export default function HeroSkewedCarousel({
                   backfaceVisibility: 'hidden',
                   pointerEvents: isVisible ? 'auto' : 'none',
                 }}
-                className={`absolute w-[280px] sm:w-[360px] md:w-[410px] lg:w-[440px] h-[175px] sm:h-[225px] md:h-[255px] lg:h-[275px] rounded-none cursor-pointer overflow-hidden transition-colors duration-300 ${
+                className={`absolute w-[280px] sm:w-[360px] md:w-[410px] lg:w-[440px] h-[175px] sm:h-[225px] md:h-[255px] lg:h-[275px] rounded-none overflow-hidden transition-all duration-300 ${
                   isCenter
-                    ? 'border-2 border-[var(--accent-orange)] shadow-2xl'
+                    ? 'border-2 border-[var(--accent-orange)] shadow-2xl cursor-default'
                     : isSideHovered
-                    ? 'border-2 border-[var(--accent-orange)] shadow-xl brightness-105'
-                    : 'border border-[var(--accent-orange)]/60 hover:border-[var(--accent-orange)] shadow-lg'
+                    ? 'border-2 border-[var(--accent-orange)] shadow-[0_24px_45px_-10px_rgba(0,0,0,0.5)] brightness-105 cursor-pointer ring-1 ring-[var(--accent-orange)]/40'
+                    : 'border border-[var(--accent-orange)]/60 hover:border-[var(--accent-orange)] shadow-lg cursor-pointer'
                 }`}
               >
                 {/* 100% PURE RECTANGULAR PHOTOGRAPH WITH CRISP SOLID ORANGE OUTLINE */}
@@ -244,9 +264,18 @@ export default function HeroSkewedCarousel({
                   <img
                     src={slide.src}
                     alt={slide.alt || 'AIR Lab'}
-                    className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 ease-out hover:scale-103 rounded-none"
+                    className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 ease-out rounded-none"
                     draggable={false}
                     loading="lazy"
+                  />
+
+                  {/* 3D Sheen highlight reflection on tilted side card */}
+                  <div
+                    className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
+                      isSideHovered
+                        ? 'opacity-100 bg-gradient-to-tr from-white/0 via-white/10 to-white/20'
+                        : 'opacity-0'
+                    }`}
                   />
                 </div>
               </motion.div>
