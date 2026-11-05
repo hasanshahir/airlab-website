@@ -56,10 +56,11 @@ interface HeroSkewedCarouselProps {
 
 export default function HeroSkewedCarousel({
   slides = DEFAULT_SLIDES,
-  autoPlayInterval = 4500,
+  autoPlayInterval = 7000, // Increased to 7 seconds for smoother, relaxed viewing
   className = '',
 }: HeroSkewedCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [hoveredSideIndex, setHoveredSideIndex] = useState<number | null>(null)
   const [isHovered, setIsHovered] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [cardSpacing, setCardSpacing] = useState(445)
@@ -85,14 +86,16 @@ export default function HeroSkewedCarousel({
   }, [])
 
   const handleNext = useCallback(() => {
+    setHoveredSideIndex(null)
     setCurrentIndex(prev => (prev + 1) % total)
   }, [total])
 
   const handlePrev = useCallback(() => {
+    setHoveredSideIndex(null)
     setCurrentIndex(prev => (prev - 1 + total) % total)
   }, [total])
 
-  // Autoplay loop
+  // Autoplay loop (smooth 7-second rotation)
   useEffect(() => {
     if (isHovered || isDragging || total <= 1) return
     const timer = setInterval(() => {
@@ -144,13 +147,16 @@ export default function HeroSkewedCarousel({
       ref={containerRef}
       className={`relative w-full select-none flex flex-col items-center justify-center overflow-visible ${className}`}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false)
+        setHoveredSideIndex(null)
+      }}
     >
-      {/* ── 3D CURVED PANORAMIC CYLINDRICAL STAGE ── */}
+      {/* ── 3D CURVED PANORAMIC STAGE ── */}
       <div
         className="relative w-full h-[220px] sm:h-[280px] md:h-[320px] lg:h-[350px] flex items-center justify-center overflow-visible"
         style={{
-          perspective: '1100px',
+          perspective: '1200px',
           perspectiveOrigin: '50% 50%',
           transformStyle: 'preserve-3d',
         }}
@@ -158,7 +164,7 @@ export default function HeroSkewedCarousel({
         <motion.div
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.18}
+          dragElastic={0.16}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={handleDragEnd}
           className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing touch-pan-y"
@@ -171,53 +177,94 @@ export default function HeroSkewedCarousel({
 
             if (!isVisible) return null
 
-            // ── Exact Concave Cylindrical Ribbon Arc Geometry (Matching carousel video.mp4) ──
-            const x = offset * cardSpacing
-            const z = Math.abs(offset) * (cardSpacing < 350 ? 42 : 68) // curves forward towards viewer
-            const rotateY = -offset * (cardSpacing < 350 ? 18.5 : 21.5) // inward yaw facing center viewer
-            const opacity = isCenter ? 1.0 : Math.abs(offset) <= 1 ? 0.98 : 0.85
-            const zIndex = 20 - Math.abs(offset) * 5
+            const isSideHovered = !isCenter && hoveredSideIndex === index
+
+            // ── Depth & Coordinate Math ──
+            // Center card sits at z = 0 (foreground).
+            // Side cards sit BEHIND at z < 0.
+            // This guarantees side cards rotate from behind and never cut across/above other cards!
+            const baseZ = -Math.abs(offset) * (cardSpacing < 350 ? 50 : 75)
+            const baseY = 0
+            const baseRotateY = -offset * (cardSpacing < 350 ? 17 : 20)
+            const baseScale = isCenter ? 1.0 : 0.94 - Math.abs(offset) * 0.03
+            const opacity = isCenter ? 1.0 : Math.abs(offset) <= 1 ? 0.95 : 0.8
+
+            // ── Side Card 3D Hover Displacement (Only on side cards, NOT on center) ──
+            const targetX = offset * cardSpacing + (isSideHovered ? (offset < 0 ? -10 : 10) : 0)
+            const targetY = isSideHovered ? -16 : baseY // lifts up on hover
+            const targetZ = isSideHovered ? baseZ + 40 : baseZ // floats forward in 3D
+            const targetRotateY = isSideHovered ? baseRotateY * 0.7 : baseRotateY // faces viewer slightly more
+            const targetScale = isSideHovered ? baseScale + 0.05 : baseScale
+
+            // High zIndex on center card ensures clean initial render, with smooth 3D depth
+            const zIndex = isCenter ? 30 : 20 - Math.abs(offset) * 5
 
             return (
               <motion.div
                 key={slide.id}
+                onMouseEnter={() => {
+                  if (!isCenter) setHoveredSideIndex(index)
+                }}
+                onMouseLeave={() => {
+                  if (hoveredSideIndex === index) setHoveredSideIndex(null)
+                }}
                 onClick={() => {
-                  if (!isCenter) setCurrentIndex(index)
+                  if (!isCenter) {
+                    setHoveredSideIndex(null)
+                    setCurrentIndex(index)
+                  }
                 }}
                 animate={{
-                  x,
-                  z,
-                  rotateY,
+                  x: targetX,
+                  y: targetY,
+                  z: targetZ,
+                  rotateY: targetRotateY,
+                  scale: targetScale,
                   opacity,
                 }}
                 transition={{
                   type: 'spring',
-                  stiffness: 300,
-                  damping: 30,
-                  mass: 0.8,
+                  stiffness: 145, // Silky smooth, relaxed glide
+                  damping: 24,
+                  mass: 0.9,
                 }}
                 style={{
                   zIndex,
                   transformStyle: 'preserve-3d',
                   backfaceVisibility: 'hidden',
                 }}
-                className={`absolute w-[280px] sm:w-[370px] md:w-[430px] lg:w-[455px] h-[180px] sm:h-[235px] md:h-[270px] lg:h-[285px] rounded-xl sm:rounded-2xl cursor-pointer overflow-hidden transition-shadow duration-300 ${
+                className={`absolute w-[280px] sm:w-[370px] md:w-[430px] lg:w-[455px] h-[180px] sm:h-[235px] md:h-[270px] lg:h-[285px] rounded-none cursor-pointer overflow-hidden transition-all duration-300 ${
                   isCenter
-                    ? 'shadow-[0_24px_50px_rgba(0,0,0,0.24)] ring-1 ring-black/10 dark:ring-white/20'
-                    : 'shadow-[0_16px_36px_rgba(0,0,0,0.16)] hover:brightness-105'
+                    ? 'border-2 border-[var(--accent-orange)] shadow-[0_0_28px_rgba(240,106,31,0.35),0_20px_50px_rgba(0,0,0,0.3)]'
+                    : isSideHovered
+                    ? 'border-2 border-[var(--accent-orange)] shadow-[0_0_22px_rgba(240,106,31,0.5),0_15px_35px_rgba(0,0,0,0.25)] brightness-105'
+                    : 'border border-[var(--accent-orange)]/55 hover:border-[var(--accent-orange)] shadow-[0_12px_30px_rgba(0,0,0,0.18)] hover:brightness-105'
                 }`}
               >
-                {/* 100% PURE, CLEAN, EDGE-TO-EDGE PHOTOGRAPH */}
-                <div className="w-full h-full relative overflow-hidden bg-[var(--surface-alt)]">
+                {/* 100% PURE, CLEAN RECTANGULAR PHOTOGRAPH WITH ORANGE ACCENTS */}
+                <div className="w-full h-full relative overflow-hidden bg-[var(--surface-alt)] rounded-none">
                   <img
                     src={slide.src}
                     alt={slide.alt || 'AIR Lab'}
-                    className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 ease-out hover:scale-103"
+                    className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 ease-out hover:scale-103 rounded-none"
                     draggable={false}
                     loading="lazy"
                   />
-                  {/* Subtle edge highlight for crisp depth */}
-                  <div className="absolute inset-0 rounded-xl sm:rounded-2xl border border-white/20 dark:border-white/10 pointer-events-none" />
+
+                  {/* Corner Accent Hairlines for Engineering / Lab aesthetic */}
+                  <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--accent-orange)] pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[var(--accent-orange)] pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[var(--accent-orange)] pointer-events-none" />
+                  <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[var(--accent-orange)] pointer-events-none" />
+
+                  {/* Subtle hover prompt on side cards */}
+                  {isSideHovered && (
+                    <div className="absolute inset-0 bg-black/15 flex items-center justify-center pointer-events-none transition-opacity duration-300">
+                      <span className="px-3 py-1 bg-black/75 text-[var(--accent-orange)] text-[11px] font-mono font-semibold tracking-wider rounded-none border border-[var(--accent-orange)]/80 shadow-md backdrop-blur-xs">
+                        CLICK TO FOCUS
+                      </span>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )
@@ -255,7 +302,10 @@ export default function HeroSkewedCarousel({
               <button
                 key={i}
                 type="button"
-                onClick={() => setCurrentIndex(i)}
+                onClick={() => {
+                  setHoveredSideIndex(null)
+                  setCurrentIndex(i)
+                }}
                 aria-label={`Go to slide ${i + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                   currentIndex === i
