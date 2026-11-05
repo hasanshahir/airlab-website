@@ -63,7 +63,7 @@ export const ParticleField: React.FC = () => {
     const initParticles = () => {
       particles = []
       const isMobile = width < 768
-      const count = isMobile ? 32 : 68
+      const count = isMobile ? 38 : 78
 
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -71,7 +71,7 @@ export const ParticleField: React.FC = () => {
           y: Math.random() * height,
           vx: (Math.random() - 0.5) * 0.55,
           vy: (Math.random() - 0.5) * 0.55,
-          radius: Math.random() * 1.8 + 1.2,
+          radius: Math.random() * 1.8 + 1.8,
           color: colorPalette[Math.floor(Math.random() * colorPalette.length)],
         })
       }
@@ -87,7 +87,7 @@ export const ParticleField: React.FC = () => {
 
       const mouse = mousePosRef.current
 
-      // Update and draw particles
+      // Update and draw particle nodes
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
 
@@ -105,32 +105,38 @@ export const ParticleField: React.FC = () => {
           const dx = p.x - mouse.x
           const dy = p.y - mouse.y
           const dist = Math.hypot(dx, dy)
-          if (dist < 120 && dist > 0) {
-            const force = (120 - dist) / 120
-            p.x += (dx / dist) * force * 1.5
-            p.y += (dy / dist) * force * 1.5
+          if (dist < 130 && dist > 0) {
+            const force = (130 - dist) / 130
+            p.x += (dx / dist) * force * 1.6
+            p.y += (dy / dist) * force * 1.6
           }
         }
 
-        // Draw particle dot
+        // Outer node glow / disc
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `${p.color}0.45)`
+        ctx.fillStyle = `${p.color}0.65)`
+        ctx.fill()
+
+        // Inner solid core for sharp visibility on pure white canvas
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.radius * 0.55, 0, Math.PI * 2)
+        ctx.fillStyle = `${p.color}0.95)`
         ctx.fill()
       }
 
-      // Draw particle-to-particle connections
+      // Draw particle-to-particle connecting lines
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x
           const dy = particles[i].y - particles[j].y
           const dist = Math.hypot(dx, dy)
 
-          if (dist < 135) {
-            const alpha = (1 - dist / 135) * 0.12
+          if (dist < 145) {
+            const alpha = (1 - dist / 145) * 0.32
             ctx.beginPath()
             ctx.strokeStyle = `${nodeLineColor}${alpha.toFixed(3)})`
-            ctx.lineWidth = 0.85
+            ctx.lineWidth = 1.05
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
             ctx.stroke()
@@ -143,11 +149,11 @@ export const ParticleField: React.FC = () => {
           const mdy = particles[i].y - mouse.y
           const mDist = Math.hypot(mdx, mdy)
 
-          if (mDist < 180) {
-            const alpha = (1 - mDist / 180) * 0.28
+          if (mDist < 190) {
+            const alpha = (1 - mDist / 190) * 0.52
             ctx.beginPath()
             ctx.strokeStyle = `${mouseLineColor}${alpha.toFixed(3)})`
-            ctx.lineWidth = 1.05
+            ctx.lineWidth = 1.35
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(mouse.x, mouse.y)
             ctx.stroke()

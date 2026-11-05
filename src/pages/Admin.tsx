@@ -212,7 +212,7 @@ export default function AdminDashboard() {
               <Lock className="w-4 h-4" />
             </div>
             <div>
-              <div className="font-mono text-[10px] tracking-wider uppercase text-[var(--text-muted)]">AIR Lab System</div>
+              <div className="font-sans text-[10px] tracking-wider uppercase text-[var(--text-muted)] font-semibold">AIR Lab System</div>
               <h2 className="text-lg font-head font-medium leading-tight">Admin Portal</h2>
             </div>
           </div>
@@ -362,7 +362,7 @@ export default function AdminDashboard() {
         </header>
 
         {loading ? (
-          <div className="py-20 text-center text-xs text-[var(--text-muted)] font-mono">
+          <div className="py-20 text-center text-xs text-[var(--text-muted)] font-sans">
             Loading database records...
           </div>
         ) : activeTab === 'applications' ? (
@@ -381,7 +381,7 @@ export default function AdminDashboard() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-sm">{app.name}</span>
-                      <span className="text-xs text-[var(--text-muted)] font-mono">({app.university})</span>
+                      <span className="text-xs text-[var(--text-muted)] font-sans">({app.university})</span>
                       <span
                         className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
                           app.status === 'Accepted'
@@ -510,7 +510,7 @@ export default function AdminDashboard() {
                       .filter(k => !['_id', '__v', 'createdAt', 'updatedAt'].includes(k))
                       .map(field => (
                         <div key={field}>
-                          <label className="block text-xs font-mono uppercase text-[var(--text-muted)] mb-1">
+                          <label className="block text-xs font-sans uppercase font-medium text-[var(--text-muted)] mb-1">
                             {field}
                           </label>
                           {typeof editingItem[field] === 'boolean' ? (

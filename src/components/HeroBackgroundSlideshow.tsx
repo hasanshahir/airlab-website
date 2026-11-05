@@ -57,49 +57,78 @@ interface HeroBackgroundSlideshowProps {
 
 export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = ({
   slides = LAB_SLIDES,
-  autoPlayInterval = 5000, // 5 seconds per slide for a comfortable reading rhythm
+  autoPlayInterval = 5000,
   onPauseChange,
   children,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
-  const timerRef = useRef<number | null>(null)
+  const [progress, setProgress] = useState(0) // 0 to 100%
 
   const total = slides.length
+  const lastTimeRef = useRef<number>(performance.now())
+  const elapsedRef = useRef<number>(0)
+  const isHoveredRef = useRef<boolean>(false)
+
+  // Sync ref with state
+  useEffect(() => {
+    isHoveredRef.current = isHovered
+    onPauseChange?.(isHovered)
+  }, [isHovered, onPauseChange])
 
   const handleNext = useCallback(() => {
     setCurrentIndex(prev => (prev + 1) % total)
+    elapsedRef.current = 0
+    setProgress(0)
+    lastTimeRef.current = performance.now()
   }, [total])
 
   const handlePrev = useCallback(() => {
     setCurrentIndex(prev => (prev - 1 + total) % total)
+    elapsedRef.current = 0
+    setProgress(0)
+    lastTimeRef.current = performance.now()
   }, [total])
 
-  // Autoplay timer with pause on hover
+  const goToSlide = useCallback((idx: number) => {
+    setCurrentIndex(idx)
+    elapsedRef.current = 0
+    setProgress(0)
+    lastTimeRef.current = performance.now()
+  }, [])
+
+  // Smooth frame-by-frame timer & progress loop
   useEffect(() => {
-    if (isHovered) {
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
-        timerRef.current = null
+    let animId: number
+    lastTimeRef.current = performance.now()
+
+    const loop = (timestamp: number) => {
+      const delta = timestamp - lastTimeRef.current
+      lastTimeRef.current = timestamp
+
+      if (!isHoveredRef.current) {
+        elapsedRef.current += delta
+        const pct = Math.min((elapsedRef.current / autoPlayInterval) * 100, 100)
+        setProgress(pct)
+
+        if (elapsedRef.current >= autoPlayInterval) {
+          elapsedRef.current = 0
+          setProgress(0)
+          setCurrentIndex(prev => (prev + 1) % total)
+        }
       }
-      onPauseChange?.(true)
-      return
+
+      animId = requestAnimationFrame(loop)
     }
 
-    onPauseChange?.(false)
-    timerRef.current = window.setInterval(() => {
-      handleNext()
-    }, autoPlayInterval)
+    animId = requestAnimationFrame(loop)
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
-        timerRef.current = null
-      }
+      cancelAnimationFrame(animId)
     }
-  }, [isHovered, autoPlayInterval, handleNext, onPauseChange])
+  }, [autoPlayInterval, total])
 
-  // Keyboard navigation
+  // Keyboard arrow navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') handlePrev()
@@ -113,13 +142,19 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
 
   return (
     <div
-      className="relative w-full rounded-3xl overflow-hidden select-none bg-[#10002B] border border-black/10 shadow-2xl transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="relative w-full rounded-3xl overflow-hidden select-none bg-[#10002B] border border-black/10 shadow-2xl transition-all duration-300 group/hero"
+      onMouseEnter={() => {
+        setIsHovered(true)
+        lastTimeRef.current = performance.now()
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false)
+        lastTimeRef.current = performance.now()
+      }}
       role="region"
       aria-label="AIR Lab Photography Showcase"
     >
-      {/* ── BACKGROUND SLIDESHOW IMAGES (Untampered, High Resolution) ── */}
+      {/* ── BACKGROUND SLIDESHOW IMAGES (Untampered Lab Photography) ── */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <AnimatePresence initial={false} mode="wait">
           <motion.div
@@ -128,8 +163,8 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
             animate={{ opacity: 1, scale: 1.0 }}
             exit={{ opacity: 0 }}
             transition={{
-              opacity: { duration: 0.9, ease: 'easeInOut' },
-              scale: { duration: 7.0, ease: 'easeOut' },
+              opacity: { duration: 0.85, ease: 'easeInOut' },
+              scale: { duration: 6.5, ease: 'easeOut' },
             }}
             className="absolute inset-0 w-full h-full"
           >
@@ -142,31 +177,31 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
           </motion.div>
         </AnimatePresence>
 
-        {/* ── CRISP VIGNETTE & CONTRAST OVERLAY (Keeps images vibrant while text pops with 100% clarity) ── */}
-        {/* Top subtle vignette for navbar/top elements */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/55 via-black/35 to-black/75 z-10" />
+        {/* ── HIGH-LEGIBILITY GRADIENT SCENE OVERLAY ── */}
+        {/* Soft top-down gradient for clean header / logo visibility */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/65 via-black/30 to-black/80 z-10" />
 
-        {/* Center radial focus scrim to elevate the slogan */}
+        {/* Subtle radial shadow to highlight foreground text without darkening center photo */}
         <div
           className="absolute inset-0 pointer-events-none z-10"
           style={{
             background:
-              'radial-gradient(ellipse at center, rgba(16, 0, 43, 0.35) 0%, rgba(16, 0, 43, 0.65) 100%)',
+              'radial-gradient(ellipse at 80% 20%, rgba(16, 0, 43, 0.45) 0%, rgba(16, 0, 43, 0.15) 60%, rgba(16, 0, 43, 0.55) 100%)',
           }}
         />
       </div>
 
-      {/* ── FOREGROUND CONTENT LAYER (Slogan, CTA, and Links on top of the slideshow) ── */}
-      <div className="relative z-20 w-full flex flex-col items-center justify-center min-h-[520px] sm:min-h-[580px] md:min-h-[640px] lg:min-h-[680px] px-6 sm:px-12 py-14 sm:py-20 text-center">
+      {/* ── FOREGROUND CONTENT (Split Hero: Logo on Left, Slogan on Right, Center Unobstructed) ── */}
+      <div className="relative z-20 w-full min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px] flex flex-col justify-between p-5 sm:p-8 md:p-10 lg:p-12">
         {children}
       </div>
 
-      {/* ── NAVIGATION ARROWS (Fade in on hover or visible on desktop) ── */}
+      {/* ── NAVIGATION ARROWS (Floating at left & right edges) ── */}
       <div className="absolute inset-y-0 left-3 sm:left-5 flex items-center z-30 pointer-events-none">
         <button
           type="button"
           onClick={handlePrev}
-          className="pointer-events-auto w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-black/75 text-white/85 hover:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg active:scale-95"
+          className="pointer-events-auto w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/45 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg active:scale-95 opacity-85 group-hover/hero:opacity-100"
           aria-label="Previous lab photograph"
           title="Previous image (Left arrow)"
         >
@@ -178,7 +213,7 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
         <button
           type="button"
           onClick={handleNext}
-          className="pointer-events-auto w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-black/75 text-white/85 hover:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg active:scale-95"
+          className="pointer-events-auto w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/45 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg active:scale-95 opacity-85 group-hover/hero:opacity-100"
           aria-label="Next lab photograph"
           title="Next image (Right arrow)"
         >
@@ -186,68 +221,67 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
         </button>
       </div>
 
-      {/* ── BOTTOM HUD BAR: Real-time Caption, Hover Pause Indicator, and Segmented Progress Pill ── */}
-      <div className="absolute bottom-4 sm:bottom-6 inset-x-4 sm:inset-x-8 z-30 flex flex-col sm:flex-row items-center justify-between gap-3 pointer-events-none">
-        {/* Caption Badge */}
-        <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/15 text-white/90 text-xs font-medium shadow-md">
+      {/* ── BOTTOM HUD STRIP (Slide caption badge + Jump dots + Pause indicator) ── */}
+      <div className="absolute bottom-3.5 sm:bottom-4 inset-x-4 sm:inset-x-8 z-30 flex items-center justify-between gap-3 pointer-events-none">
+        {/* Caption Badge on the left */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/20 text-white text-xs font-sans shadow-md">
           <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)] animate-pulse shrink-0" />
-          <span className="font-semibold text-white">{activeSlide.title}</span>
-          <span className="text-white/40">•</span>
-          <span className="text-white/75">{activeSlide.subtitle}</span>
+          <span className="font-semibold text-white">0{currentIndex + 1} / 0{total}</span>
+          <span className="text-white/40 hidden sm:inline">•</span>
+          <span className="text-white/85 hidden sm:inline">{activeSlide.title}</span>
         </div>
 
-        {/* Center: Segmented Timer Indicators */}
-        <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/15 shadow-md">
-          {slides.map((slide, idx) => {
-            const isActive = idx === currentIndex
-            return (
-              <button
-                key={slide.id}
-                type="button"
-                onClick={() => setCurrentIndex(idx)}
-                className={`group relative h-2 rounded-full transition-all duration-300 cursor-pointer overflow-hidden ${
-                  isActive ? 'w-8 bg-white/30' : 'w-2 bg-white/40 hover:bg-white/70'
-                }`}
-                aria-label={`Jump to slide ${idx + 1}: ${slide.title}`}
-                title={slide.title}
-              >
-                {isActive && (
-                  <motion.div
-                    className="absolute inset-y-0 left-0 bg-[var(--accent-orange)] rounded-full"
-                    initial={{ width: '0%' }}
-                    animate={{ width: isHovered ? '100%' : '100%' }}
-                    transition={{
-                      duration: isHovered ? 0 : autoPlayInterval / 1000,
-                      ease: 'linear',
-                    }}
-                  />
-                )}
-              </button>
-            )
-          })}
+        {/* Jump Dots & Pause Indicator on the right */}
+        <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/20 shadow-md">
+          {slides.map((slide, idx) => (
+            <button
+              key={slide.id}
+              type="button"
+              onClick={() => goToSlide(idx)}
+              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                idx === currentIndex
+                  ? 'w-6 bg-[var(--accent-orange)]'
+                  : 'w-2 bg-white/40 hover:bg-white/85'
+              }`}
+              aria-label={`Jump to slide ${idx + 1}: ${slide.title}`}
+              title={slide.title}
+            />
+          ))}
 
-          {/* Pause Status Indicator */}
-          <div
-            className="ml-1 pl-2 border-l border-white/20 text-white/70 text-[11px] font-sans flex items-center gap-1 select-none"
-            title={isHovered ? 'Slideshow paused while hovering' : 'Slideshow actively playing'}
-          >
+          <div className="ml-1 pl-2 border-l border-white/20 text-white/80 text-[11px] font-sans flex items-center gap-1.5">
             {isHovered ? (
               <>
                 <Pause className="w-3 h-3 text-[var(--accent-orange)]" />
-                <span className="text-[10.5px] uppercase tracking-wider font-semibold text-white/90">Paused</span>
+                <span className="text-[10px] uppercase font-bold text-white/95 tracking-wide">
+                  Paused
+                </span>
               </>
             ) : (
               <>
                 <Play className="w-3 h-3 text-white/70" />
-                <span className="text-[10px] text-white/60">5s</span>
+                <span className="text-[10px] text-white/75 font-medium">5s</span>
               </>
             )}
           </div>
         </div>
+      </div>
+
+      {/* ── FULL-WIDTH BOTTOM PROGRESS BAR (Animated 0% to 100%, pauses on hover) ── */}
+      <div
+        className="absolute bottom-0 inset-x-0 h-1.5 sm:h-2 bg-black/50 backdrop-blur-xs z-40 overflow-hidden cursor-pointer"
+        onClick={() => handleNext()}
+        title={isHovered ? 'Slideshow paused (mouse hovering)' : 'Slideshow timer progress'}
+      >
+        <div
+          className="h-full bg-gradient-to-r from-[var(--accent-orange)] via-[var(--accent-cyan)] to-[var(--accent-orange)] shadow-[0_0_12px_var(--accent-orange)]"
+          style={{
+            width: `${progress}%`,
+            transition: isHovered ? 'none' : 'width 30ms linear',
+          }}
+        />
       </div>
     </div>
   )
 }
 
 export default HeroBackgroundSlideshow
-

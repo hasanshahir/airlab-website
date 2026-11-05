@@ -7,6 +7,7 @@ export interface AirLabLogoProps {
   height?: number | string
   variant?: 'lockup' | 'full' | 'mark'
   showSubtitle?: boolean
+  light?: boolean
 }
 
 /**
@@ -18,6 +19,7 @@ export const AirLabLogo: React.FC<AirLabLogoProps> = ({
   height = 36,
   variant = 'lockup',
   showSubtitle = true,
+  light = false,
 }) => {
   const numericHeight = typeof height === 'number' ? height : parseInt(String(height), 10) || 36
 
@@ -52,7 +54,7 @@ export const AirLabLogo: React.FC<AirLabLogoProps> = ({
   // Variant: 'lockup' (horizontal lockup: crisp 'ai' mark + official typography)
   // Optimal for navbars, banners, and tight headers
   return (
-    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
+    <div className={`inline-flex items-center gap-3 select-none ${className}`}>
       <img
         src={airLabMark}
         alt="AI Research Lab"
@@ -60,11 +62,23 @@ export const AirLabLogo: React.FC<AirLabLogoProps> = ({
         className="object-contain shrink-0 transition-transform duration-200 group-hover:scale-105"
       />
       <div className="flex flex-col text-left leading-none justify-center">
-        <span className="font-head font-bold text-[15px] sm:text-[16px] tracking-tight text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+        <span
+          className={`font-head font-bold text-[15px] sm:text-[17px] tracking-tight transition-colors ${
+            light
+              ? 'text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]'
+              : 'text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]'
+          }`}
+        >
           AI Research Lab
         </span>
         {showSubtitle && (
-          <span className="text-[10px] sm:text-[10.5px] font-sans tracking-tight text-[var(--text-muted)] mt-1 font-medium">
+          <span
+            className={`text-[10px] sm:text-[11px] font-sans tracking-tight mt-1 font-medium ${
+              light
+                ? 'text-white/85 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]'
+                : 'text-[var(--text-muted)]'
+            }`}
+          >
             NED University of Engineering & Technology
           </span>
         )}
