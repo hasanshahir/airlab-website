@@ -81,9 +81,9 @@ export default function Layout() {
       <aside aria-label="Announcement" className="w-full bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] text-xs font-medium py-2.5 px-4 sm:px-8 relative z-30">
         <div className="max-w-[1240px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-            <span className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full bg-[var(--ink-dark)] text-white text-[11px] font-semibold tracking-tight shadow-xs">
+            <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--accent-orange)] text-xs tracking-tight">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)] animate-pulse shrink-0" />
-              Applications Open
+              Applications Open:
             </span>
             <span className="text-[13px] text-[var(--text-muted)] font-normal">
               Student Research Internship & Fellowship Vacancies Open for Fall 2026 — NEDUET CSIT
