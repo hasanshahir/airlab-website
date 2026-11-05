@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
@@ -70,17 +70,35 @@ export default function QuickDrawer({
     }
   }, [isOpen])
 
-  // Filtered projects
-  const filteredProjects = projectsData.filter(p => {
-    if (!searchQuery.trim()) return true
-    const q = searchQuery.toLowerCase()
-    return (
-      p.title.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q) ||
-      p.funding.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q)
-    )
-  })
+  // Filtered & sorted projects (Ongoing / most recent projects at the top)
+  const filteredProjects = useMemo(() => {
+    const list = projectsData.filter((p: ProjectItem) => {
+      if (!searchQuery.trim()) return true
+      const q = searchQuery.toLowerCase()
+      return (
+        p.title.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.funding.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+      )
+    })
+
+    return list.slice().sort((a: ProjectItem, b: ProjectItem) => {
+      const isOngoingA = a.status === 'Ongoing'
+      const isOngoingB = b.status === 'Ongoing'
+
+      if (isOngoingA && !isOngoingB) return -1
+      if (!isOngoingA && isOngoingB) return 1
+
+      const parseDateScore = (dateStr?: string) => {
+        if (!dateStr) return 0
+        const ym = dateStr.match(/\b(19\d\d|20\d\d)\b/)
+        return ym ? parseInt(ym[1], 10) : 0
+      }
+
+      return parseDateScore(b.startDate || b.timeTaken) - parseDateScore(a.startDate || a.timeTaken)
+    })
+  }, [searchQuery])
 
   // Filtered members
   const filteredMembers = teamData.filter(m => {

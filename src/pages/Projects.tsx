@@ -16,10 +16,26 @@ import { getProjects, getTeamMembers } from '../lib/data'
 import type { ProjectItem, TeamMemberData } from '../types/data'
 import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
 
-type StatusTab = 'All' | 'Ongoing' | 'Finished'
+function parseDateScore(dateStr?: string): number {
+  if (!dateStr) return 0
+  const months: Record<string, number> = {
+    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+  }
+  const lower = dateStr.toLowerCase()
+  const yearMatch = lower.match(/\b(19\d\d|20\d\d)\b/)
+  const year = yearMatch ? parseInt(yearMatch[1], 10) : 0
+  let month = 0
+  for (const [m, num] of Object.entries(months)) {
+    if (lower.includes(m)) {
+      month = num
+      break
+    }
+  }
+  return year * 100 + month
+}
 
 export default function Projects() {
-  const [statusTab, setStatusTab] = useState<StatusTab>('All')
   const [activeCategory, setActiveCategory] = useState<string>('All')
   const [query, setQuery] = useState('')
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
@@ -70,17 +86,30 @@ export default function Projects() {
   }, [selectedProject])
 
   const filtered = useMemo(() => {
-    return projectsData.filter(p => {
-      const matchesStatus = statusTab === 'All' || p.status === statusTab
+    const list = projectsData.filter(p => {
       const matchesCat = activeCategory === 'All' || p.category === activeCategory
       const matchesSearch =
         query === '' ||
         p.title.toLowerCase().includes(query.toLowerCase()) ||
         p.description.toLowerCase().includes(query.toLowerCase()) ||
         p.funding.toLowerCase().includes(query.toLowerCase())
-      return matchesStatus && matchesCat && matchesSearch
+      return matchesCat && matchesSearch
     })
-  }, [projectsData, statusTab, activeCategory, query])
+
+    // Sort: Ongoing projects at the top, Finished / older projects at the bottom; within groups, most recent first
+    return list.slice().sort((a, b) => {
+      const isOngoingA = a.status === 'Ongoing'
+      const isOngoingB = b.status === 'Ongoing'
+
+      if (isOngoingA && !isOngoingB) return -1
+      if (!isOngoingA && isOngoingB) return 1
+
+      const scoreA = Math.max(parseDateScore(a.startDate), parseDateScore(a.timeTaken), parseDateScore(a.endDate))
+      const scoreB = Math.max(parseDateScore(b.startDate), parseDateScore(b.timeTaken), parseDateScore(b.endDate))
+
+      return scoreB - scoreA
+    })
+  }, [projectsData, activeCategory, query])
 
   // Resolve team members associated with selected project
   const projectMembers = useMemo(() => {
@@ -110,42 +139,23 @@ export default function Projects() {
         </p>
       </div>
 
-      {/* ── Status Split (Ongoing vs Finished) + Filter Tabs ── */}
+      {/* ── Category Filter Pills & Search ── */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 mb-10 pb-6 border-b border-[var(--border-hairline)]">
-        {/* Ongoing / Finished Toggle */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="inline-flex items-center gap-1.5 p-1.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-full shadow-xs">
-            {(['All', 'Ongoing', 'Finished'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setStatusTab(tab)}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
-                  statusTab === tab
-                    ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)]'
-                }`}
-              >
-                <span>{tab}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Sub Categories */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-sans transition-all cursor-pointer ${
-                  activeCategory === cat
-                    ? 'bg-[var(--ink-dark)] text-white shadow-xs font-semibold'
-                    : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+        {/* Category Pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${
+                activeCategory === cat
+                  ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
+                  : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)] hover:border-[var(--accent-orange)]/40'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         {/* Search Input (Pill Shaped) */}
@@ -164,7 +174,7 @@ export default function Projects() {
       {/* ── Project Cards Grid (Generous 28px Rounded Stone Cards) ── */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={statusTab + activeCategory + query}
+          key={activeCategory + query}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}

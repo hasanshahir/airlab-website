@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Award, ExternalLink, Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
 import type { Grant } from '../types/data'
@@ -7,8 +6,14 @@ import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
 import PlaceholderBadge from '../components/ui/PlaceholderBadge'
 
+function parseGrantDateScore(durationStr?: string): number {
+  if (!durationStr) return 0
+  const lower = durationStr.toLowerCase()
+  const yearMatch = lower.match(/\b(19\d\d|20\d\d)\b/)
+  return yearMatch ? parseInt(yearMatch[1], 10) : 0
+}
+
 export default function Grants() {
-  const [filter, setFilter] = useState<'All' | 'Active' | 'Completed'>('All')
   const [grants, setGrants] = useState<Grant[]>(() => getGrants())
 
   useEffect(() => {
@@ -20,10 +25,18 @@ export default function Grants() {
       .catch(() => {})
   }, [])
 
-  const filtered = useMemo(() => {
-    if (filter === 'All') return grants
-    return grants.filter(g => g.status === filter)
-  }, [grants, filter])
+  // Sort: Active grants at top, Completed / older grants at bottom
+  const sortedGrants = useMemo(() => {
+    return grants.slice().sort((a, b) => {
+      const isActiveA = a.status === 'Active'
+      const isActiveB = b.status === 'Active'
+
+      if (isActiveA && !isActiveB) return -1
+      if (!isActiveA && isActiveB) return 1
+
+      return parseGrantDateScore(b.duration) - parseGrantDateScore(a.duration)
+    })
+  }, [grants])
 
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
@@ -50,39 +63,10 @@ export default function Grants() {
         </SectionReveal>
       </div>
 
-      {/* Filter Tabs (Pill selectors) */}
-      <div className="mb-10 flex items-center justify-between border-b border-[var(--border-hairline)] pb-6">
-        <div className="inline-flex items-center gap-1.5 p-1.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-full shadow-xs">
-          {(['All', 'Active', 'Completed'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${filter === tab
-                  ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)]'
-                }`}
-            >
-              <span>{tab} Grants</span>
-              <span className="ml-1.5 opacity-80 text-[10px]">
-                ({tab === 'All' ? grants.length : grants.filter(g => g.status === tab).length})
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Grants Cards (Generous 28px Rounded Stone Cards) */}
       <div className="space-y-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={filter}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-6 text-left"
-          >
-            {filtered.map(grant => {
+        <div className="space-y-6 text-left">
+          {sortedGrants.map(grant => {
               const isActive = grant.status === 'Active'
               return (
                 <div
@@ -185,10 +169,9 @@ export default function Grants() {
                 </div>
               )
             })}
-          </motion.div>
-        </AnimatePresence>
+        </div>
 
-        {filtered.length === 0 && (
+        {sortedGrants.length === 0 && (
           <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)] mt-8">
             <p className="text-sm font-sans text-[var(--text-muted)]">No research grants published yet.</p>
           </div>
