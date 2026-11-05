@@ -15,7 +15,7 @@ export default function Grants() {
     fetch('/api/content/grants')
       .then(r => r.ok ? r.json() : [])
       .then(data => {
-        if (Array.isArray(data)) setGrants(data)
+        if (Array.isArray(data) && data.length > 0) setGrants(data)
       })
       .catch(() => {})
   }, [])

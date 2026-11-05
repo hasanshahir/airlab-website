@@ -88,9 +88,27 @@ function onOpen() {
 /**
  * Reads any sheet tab into an array of clean JSON objects using row 1 as column headers.
  */
-function readSheetToObjects(sheetName) {
+function findSheetFlexible(sheetName) {
   const ss = SpreadsheetApp.getActiveSpreadsheet()
-  const sheet = ss.getSheetByName(sheetName)
+  let sheet = ss.getSheetByName(sheetName)
+  if (sheet) return sheet
+
+  // Case-insensitive & typo-tolerant match (e.g. "Funded Projetcs", "Funded Projects")
+  const allSheets = ss.getSheets()
+  const cleanTarget = sheetName.toLowerCase().replace(/[^a-z]/g, '')
+  for (let i = 0; i < allSheets.length; i++) {
+    const s = allSheets[i]
+    const cleanName = s.getName().toLowerCase().replace(/[^a-z]/g, '')
+    if (cleanName === cleanTarget) return s
+    if (cleanTarget.includes('funded') && cleanName.includes('funded')) return s
+    if (cleanTarget.includes('undergraduate') && cleanName.includes('undergraduate')) return s
+    if (cleanTarget.includes('faculty') && cleanName.includes('faculty')) return s
+  }
+  return null
+}
+
+function readSheetToObjects(sheetName) {
+  const sheet = findSheetFlexible(sheetName)
   if (!sheet) return null
 
   const data = sheet.getDataRange().getValues()
