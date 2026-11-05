@@ -142,7 +142,7 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
 
   return (
     <div
-      className="relative w-full rounded-3xl overflow-hidden select-none bg-[#10002B] border border-black/10 shadow-2xl transition-all duration-300 group/hero"
+      className="relative w-full rounded-3xl overflow-hidden select-none bg-slate-900 border border-black/10 shadow-2xl transition-all duration-300 group/hero"
       onMouseEnter={() => {
         setIsHovered(true)
         lastTimeRef.current = performance.now()
@@ -154,41 +154,27 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
       role="region"
       aria-label="AIR Lab Photography Showcase"
     >
-      {/* ── BACKGROUND SLIDESHOW IMAGES (Untampered Lab Photography) ── */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <AnimatePresence initial={false} mode="wait">
-          <motion.div
+      {/* ── BACKGROUND SLIDESHOW IMAGES (100% Natural, Untampered Lab Photography) ── */}
+      <div className="absolute inset-0 z-0 overflow-hidden bg-slate-900">
+        <AnimatePresence initial={false}>
+          <motion.img
             key={activeSlide.id}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1.0 }}
+            src={activeSlide.src}
+            alt={activeSlide.alt}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{
-              opacity: { duration: 0.85, ease: 'easeInOut' },
-              scale: { duration: 6.5, ease: 'easeOut' },
-            }}
-            className="absolute inset-0 w-full h-full"
-          >
-            <img
-              src={activeSlide.src}
-              alt={activeSlide.alt}
-              className="w-full h-full object-cover object-center pointer-events-none select-none"
-              loading="eager"
-            />
-          </motion.div>
+            transition={{ duration: 0.65, ease: 'easeInOut' }}
+            className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+            loading="eager"
+          />
         </AnimatePresence>
 
-        {/* ── HIGH-LEGIBILITY GRADIENT SCENE OVERLAY ── */}
-        {/* Soft top-down gradient for clean header / logo visibility */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/65 via-black/30 to-black/80 z-10" />
+        {/* Top subtle vignette only behind top elements for clean text contrast */}
+        <div className="absolute top-0 inset-x-0 h-44 bg-gradient-to-b from-black/60 via-black/20 to-transparent pointer-events-none z-10" />
 
-        {/* Subtle radial shadow to highlight foreground text without darkening center photo */}
-        <div
-          className="absolute inset-0 pointer-events-none z-10"
-          style={{
-            background:
-              'radial-gradient(ellipse at 80% 20%, rgba(16, 0, 43, 0.45) 0%, rgba(16, 0, 43, 0.15) 60%, rgba(16, 0, 43, 0.55) 100%)',
-          }}
-        />
+        {/* Bottom subtle vignette for HUD & progress bar */}
+        <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black/65 to-transparent pointer-events-none z-10" />
       </div>
 
       {/* ── FOREGROUND CONTENT (Split Hero: Logo on Left, Slogan on Right, Center Unobstructed) ── */}
