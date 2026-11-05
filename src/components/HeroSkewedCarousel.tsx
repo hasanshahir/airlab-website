@@ -93,25 +93,25 @@ function CarouselCard({ slide, offset, isCenter, spread = 'normal', onClick }: C
     baseRotateY = isWide ? 26 : 24
     scale = 0.88
     zIndex = 20
-    opacity = 0.85
+    opacity = 0.94
   } else if (offset === 1) {
     xPercent = isWide ? 66 : 58
     baseRotateY = isWide ? -26 : -24
     scale = 0.88
     zIndex = 20
-    opacity = 0.85
+    opacity = 0.94
   } else if (offset === -2) {
     xPercent = isWide ? -122 : -105
     baseRotateY = isWide ? 40 : 38
     scale = 0.74
     zIndex = 10
-    opacity = 0.45
+    opacity = 0.72
   } else if (offset === 2) {
     xPercent = isWide ? 122 : 105
     baseRotateY = isWide ? -40 : -38
     scale = 0.74
     zIndex = 10
-    opacity = 0.45
+    opacity = 0.72
   } else {
     xPercent = offset > 0 ? 150 : -150
     scale = 0.6
@@ -367,7 +367,7 @@ export default function HeroSkewedCarousel({
 
   return (
     <div
-      className={`relative w-full select-none py-6 sm:py-8 flex flex-col items-center justify-center overflow-visible ${className}`}
+      className={`relative w-full select-none py-0 flex flex-col items-center justify-center overflow-visible ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}

@@ -1,3 +1,4 @@
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -64,6 +65,13 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerTab, setDrawerTab] = useState<'projects' | 'members'>('projects')
 
+  // Smooth scroll-driven fadeout: Hero section dissolves to 0 opacity as user scrolls down
+  const { scrollY } = useScroll()
+  const heroOpacity = useTransform(scrollY, [0, 340], [1, 0])
+  const heroScale = useTransform(scrollY, [0, 340], [1, 0.94])
+  const heroY = useTransform(scrollY, [0, 340], [0, -45])
+  const heroPointerEvents = useTransform(scrollY, (val) => (val > 300 ? 'none' : 'auto'))
+
   // Side panel opens on click only (no hover trigger)
   const openDrawer = (tab: 'projects' | 'members') => {
     setDrawerTab(tab)
@@ -72,37 +80,45 @@ export default function Home() {
 
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] overflow-hidden">
-      {/* ── 1. HERO SECTION (21st.dev style: Bold Center Typography on top with 3D Skewed Carousel in Background) ── */}
-      <section className="relative min-h-[580px] sm:min-h-[660px] md:min-h-[720px] flex items-center justify-center overflow-hidden px-4 sm:px-8 py-16 sm:py-24 text-center">
-        {/* BACKGROUND LAYER: 3D Skewed Carousel with Lowered Transparency */}
+      {/* ── 1. HERO SECTION (High-visibility 3D Carousel in background, bold typography on top, scroll-fades to 0 opacity) ── */}
+      <motion.section
+        style={{
+          opacity: heroOpacity,
+          scale: heroScale,
+          y: heroY,
+          pointerEvents: heroPointerEvents,
+        }}
+        className="relative min-h-[580px] sm:min-h-[660px] md:min-h-[720px] flex items-center justify-center overflow-hidden px-4 sm:px-8 py-12 sm:py-20 text-center"
+      >
+        {/* BACKGROUND LAYER: 3D Skewed Carousel with High Visibility & Vivid Colors */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-0 overflow-hidden select-none">
-          {/* Subtle Ambient Radial Lighting Glow */}
-          <div className="absolute w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] bg-[var(--accent-orange)]/15 rounded-full blur-[120px] pointer-events-none" />
+          {/* Ambient Lighting Glow */}
+          <div className="absolute w-[500px] sm:w-[750px] h-[500px] sm:h-[750px] bg-[var(--accent-orange)]/20 rounded-full blur-[130px] pointer-events-none" />
 
-          {/* 3D Carousel with Lowered Transparency & Spread */}
-          <div className="w-full opacity-40 sm:opacity-50 hover:opacity-80 transition-opacity duration-700 scale-95 sm:scale-100 transform -translate-y-4 sm:-translate-y-2">
+          {/* 3D Carousel: High Visibility (Vivid, crisp, zero card padding) */}
+          <div className="w-full opacity-85 sm:opacity-90 hover:opacity-100 transition-opacity duration-300 scale-95 sm:scale-100 transform -translate-y-4 sm:-translate-y-2">
             <HeroSkewedCarousel spread="wide" showControls={true} />
           </div>
 
-          {/* Center Radial Vignette Mask so Foreground Typography is 100% Readable */}
+          {/* Subtle localized soft vignette so text pops without washing out the carousel */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'radial-gradient(ellipse 65% 65% at 50% 50%, var(--bg-page) 30%, transparent 85%)',
-              opacity: 0.90,
+              background: 'radial-gradient(ellipse 55% 55% at 50% 50%, var(--bg-page) 15%, transparent 75%)',
+              opacity: 0.55,
             }}
           />
 
-          {/* Top & Bottom Soft Fade Transitions into Page Body */}
-          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[var(--bg-page)] to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[var(--bg-page)] to-transparent pointer-events-none" />
+          {/* Soft Top & Bottom Seamless Transitions */}
+          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[var(--bg-page)] to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[var(--bg-page)] to-transparent pointer-events-none" />
         </div>
 
-        {/* FOREGROUND LAYER: Sleek Centered Typography & Primary Action Buttons (21st.dev Style) */}
-        <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
+        {/* FOREGROUND LAYER: Glass Editorial Typography & Action Controls */}
+        <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center p-6 sm:p-9 rounded-3xl bg-[var(--bg-page)]/80 backdrop-blur-md border border-[var(--border-hairline)]/70 shadow-2xl">
           {/* Department / Affiliation Badge */}
           <SectionReveal delay={0.05}>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-surface)]/95 backdrop-blur-md border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] mb-5 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)] animate-pulse" />
               <span>DEPARTMENT OF CSIT &bull; NED UNIVERSITY</span>
             </div>
@@ -110,7 +126,7 @@ export default function Home() {
 
           {/* Giant, Commanding Modernist Headline */}
           <SectionReveal delay={0.1}>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[84px] font-black tracking-[-0.04em] leading-[0.96] text-[var(--text-primary)] font-head mb-6 max-w-3xl drop-shadow-sm">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[80px] font-black tracking-[-0.04em] leading-[0.96] text-[var(--text-primary)] font-head mb-5 max-w-3xl drop-shadow-sm">
               Pioneering Frontier AI.
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-orange)] via-[var(--accent-green)] to-[var(--text-primary)]">
                 Building Real Impact.
@@ -120,18 +136,18 @@ export default function Home() {
 
           {/* Sleek Subtitle */}
           <SectionReveal delay={0.16}>
-            <p className="text-base sm:text-lg md:text-xl text-[var(--text-muted)] max-w-2xl font-normal leading-relaxed mb-8">
+            <p className="text-sm sm:text-base md:text-lg text-[var(--text-muted)] max-w-2xl font-normal leading-relaxed mb-7">
               The Artificial Intelligence Research Lab at NED University develops foundational regional models, edge perception, and autonomous robotics benchmarks for national impact.
             </p>
           </SectionReveal>
 
           {/* Foreground CTA Action Buttons */}
           <SectionReveal delay={0.22}>
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row items-center gap-3.5 mb-6">
               <button
                 type="button"
                 onClick={() => openDrawer('projects')}
-                className="h-13 px-8 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 group"
+                className="h-12 sm:h-13 px-7 sm:px-8 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm sm:text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 group"
               >
                 <Layers className="w-5 h-5 shrink-0" />
                 <span>Explore Projects</span>
@@ -141,7 +157,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => openDrawer('members')}
-                className="h-13 px-8 bg-[var(--bg-surface)]/95 backdrop-blur-md hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] text-base font-semibold rounded-full shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 group"
+                className="h-12 sm:h-13 px-7 sm:px-8 bg-[var(--bg-surface)]/95 backdrop-blur-md hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] text-sm sm:text-base font-semibold rounded-full shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 group"
               >
                 <Users className="w-5 h-5 text-[var(--ink-dark)] shrink-0" />
                 <span>Lab Members</span>
@@ -168,7 +184,7 @@ export default function Home() {
             </div>
           </SectionReveal>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── 2. ABOUT AIR LAB SECTION (Deep Ink Band with High Contrast) ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto text-left mb-24 relative z-10">
