@@ -59,7 +59,7 @@ export default function HeroSkewedCarousel({
   autoPlayInterval = 7000,
   className = '',
 }: HeroSkewedCarouselProps) {
-  // Continuous rotational position (never wraps around or snaps)
+  // Continuous rotational slot position
   const [position, setPosition] = useState(0)
   const [hoveredSlot, setHoveredSlot] = useState<number | null>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -77,8 +77,6 @@ export default function HeroSkewedCarousel({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Geometry configuration for spinning inner cylinder:
-  // R is the circle radius in px, angleStep is the degrees per slide slot
   const isMobile = windowWidth < 640
   const isTablet = windowWidth >= 640 && windowWidth < 1024
 
@@ -99,7 +97,7 @@ export default function HeroSkewedCarousel({
     setPosition(prev => prev - 1)
   }, [])
 
-  // Autoplay loop: continuously spins the circle one direction
+  // Autoplay loop
   useEffect(() => {
     if (isHovered || isDragging || total <= 1) return
     const timer = setInterval(() => {
@@ -121,7 +119,7 @@ export default function HeroSkewedCarousel({
   // Drag Gesture Handling
   const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     setIsDragging(false)
-    const threshold = 40
+    const threshold = 35
     if (info.offset.x < -threshold || info.velocity.x < -300) {
       handleNext()
     } else if (info.offset.x > threshold || info.velocity.x > 300) {
@@ -129,8 +127,7 @@ export default function HeroSkewedCarousel({
     }
   }
 
-  // Generate 7 contiguous slots centered around current position
-  // to ensure butter-smooth spinning with zero pop-in
+  // Pre-render visible slots around current position
   const visibleSlots = useMemo(() => {
     const centerSlot = position
     const slots = []
@@ -159,13 +156,15 @@ export default function HeroSkewedCarousel({
         setHoveredSlot(null)
       }}
     >
-      {/* ── 3D SPINNING INNER-CIRCLE STAGE ── */}
+      {/* ── 3D SPINNING INNER-CIRCLE STAGE WITH ZERO-WRAP FADE ── */}
       <div
-        className="relative w-full h-[220px] sm:h-[280px] md:h-[320px] lg:h-[350px] flex items-center justify-center overflow-visible"
+        className="relative w-full h-[220px] sm:h-[280px] md:h-[320px] lg:h-[350px] flex items-center justify-center overflow-hidden"
         style={{
           perspective: '1200px',
           perspectiveOrigin: '50% 50%',
           transformStyle: 'preserve-3d',
+          maskImage: 'linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%)',
         }}
       >
         <motion.div
@@ -180,50 +179,59 @@ export default function HeroSkewedCarousel({
           {visibleSlots.map((slot) => {
             const offset = slot - position // 0 is center, -1 is left, +1 is right
             const isCenter = offset === 0
-            const isVisible = Math.abs(offset) <= 2.3
+            const absOffset = Math.abs(offset)
 
-            if (!isVisible) return null
+            // Strict visibility cutoff: beyond 1.8 slots, cards fade completely into nothing
+            if (absOffset > 2.2) return null
 
-            // Slide data mapped cyclically to slot
             const slideIndex = ((slot % total) + total) % total
             const slide = slides[slideIndex]
 
             const isSideHovered = !isCenter && hoveredSlot === slot
 
             // ── Inner Part of a Circle Spinning Math ──
-            // Angle along the inner cylindrical circumference (in radians)
             const angleDeg = offset * angleStep
             const angleRad = (angleDeg * Math.PI) / 180
 
-            // The cards face inward on the circle's inner surface:
-            // Center is at z = 0 (closest to viewer).
-            // Left & Right curve away into the circle background (z < 0).
             const baseX = radius * Math.sin(angleRad)
             const baseZ = -radius * (1 - Math.cos(angleRad))
-            const baseRotateY = -angleDeg // faces inward toward camera
-            const baseScale = isCenter ? 1.0 : Math.max(0.85, 0.96 - Math.abs(offset) * 0.04)
-            const opacity = isCenter ? 1.0 : Math.abs(offset) <= 1 ? 0.95 : 0.75
+            const baseRotateY = -angleDeg
+            const baseScale = isCenter ? 1.0 : Math.max(0.85, 0.96 - absOffset * 0.05)
 
-            // 3D Hover Displacement on Side Cards Only (lifts up & floats forward slightly)
+            // ── "FADE INTO NOTHING & COME FROM NOTHING" OPACITY FORMULA ──
+            // Center is 1.0, adjacent card (1.0) is 0.85, then rapidly dissolves to 0 as it exits
+            let opacity = 0
+            if (absOffset <= 0.2) {
+              opacity = 1.0
+            } else if (absOffset <= 1.0) {
+              opacity = 1.0 - (absOffset - 0.2) * 0.18 // ~0.85 at offset 1
+            } else if (absOffset <= 1.7) {
+              // Rapid smooth dissolve to 0 at offset 1.7
+              opacity = Math.max(0, 0.85 * (1 - (absOffset - 1.0) / 0.7))
+            } else {
+              opacity = 0
+            }
+
+            // 3D Hover Displacement on Side Cards Only
             const targetX = baseX + (isSideHovered ? (offset < 0 ? -12 : 12) : 0)
             const targetY = isSideHovered ? -16 : 0
             const targetZ = isSideHovered ? baseZ + 36 : baseZ
             const targetRotateY = isSideHovered ? baseRotateY * 0.75 : baseRotateY
             const targetScale = isSideHovered ? baseScale + 0.04 : baseScale
 
-            const zIndex = isCenter ? 30 : 20 - Math.abs(offset) * 5
+            const zIndex = isCenter ? 30 : Math.max(1, Math.round(20 - absOffset * 8))
 
             return (
               <motion.div
                 key={`slot-${slot}`}
                 onMouseEnter={() => {
-                  if (!isCenter) setHoveredSlot(slot)
+                  if (!isCenter && opacity > 0.3) setHoveredSlot(slot)
                 }}
                 onMouseLeave={() => {
                   if (hoveredSlot === slot) setHoveredSlot(null)
                 }}
                 onClick={() => {
-                  if (!isCenter) {
+                  if (!isCenter && opacity > 0.3) {
                     setHoveredSlot(null)
                     setPosition(slot)
                   }
@@ -236,15 +244,15 @@ export default function HeroSkewedCarousel({
                   scale: targetScale,
                   opacity,
                 }}
-                // Single smooth motion with silky ease-out curve (no hesitation, no sudden snap)
                 transition={{
-                  duration: 0.8,
-                  ease: [0.22, 1, 0.36, 1], // Smooth cinematic curve: instant smooth start, coasts gently to rest
+                  duration: 0.75,
+                  ease: [0.22, 1, 0.36, 1], // Buttery smooth ease-out (no acceleration hiccup)
                 }}
                 style={{
                   zIndex,
                   transformStyle: 'preserve-3d',
                   backfaceVisibility: 'hidden',
+                  pointerEvents: opacity < 0.2 ? 'none' : 'auto',
                 }}
                 className={`absolute w-[280px] sm:w-[370px] md:w-[430px] lg:w-[455px] h-[180px] sm:h-[235px] md:h-[270px] lg:h-[285px] rounded-none cursor-pointer overflow-hidden transition-colors duration-300 ${
                   isCenter
@@ -254,7 +262,7 @@ export default function HeroSkewedCarousel({
                     : 'border border-[var(--accent-orange)]/60 hover:border-[var(--accent-orange)] shadow-lg'
                 }`}
               >
-                {/* 100% PURE, CLEAN RECTANGULAR PHOTOGRAPH WITH CRISP SOLID ORANGE OUTLINE */}
+                {/* 100% PURE RECTANGULAR PHOTOGRAPH WITH CRISP SOLID ORANGE OUTLINE */}
                 <div className="w-full h-full relative overflow-hidden bg-[var(--surface-alt)] rounded-none">
                   <img
                     src={slide.src}
@@ -268,6 +276,10 @@ export default function HeroSkewedCarousel({
             )
           })}
         </motion.div>
+
+        {/* Soft edge fade masks on sides to ensure complete dissolve into nothingness */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[var(--bg-page)] to-transparent z-40" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[var(--bg-page)] to-transparent z-40" />
       </div>
 
       {/* ── BOTTOM CONTROLS: "Explore More" + Dashed Arrow Indicator ── */}
@@ -302,7 +314,6 @@ export default function HeroSkewedCarousel({
                 type="button"
                 onClick={() => {
                   setHoveredSlot(null)
-                  // Find closest slot corresponding to slide i
                   const currentMod = ((position % total) + total) % total
                   let diff = i - currentMod
                   if (diff > total / 2) diff -= total
