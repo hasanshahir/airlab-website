@@ -100,16 +100,18 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
   // Smooth frame-by-frame timer & progress loop
   useEffect(() => {
     let animId: number
-    lastTimeRef.current = performance.now()
 
-    const loop = (timestamp: number) => {
-      const delta = timestamp - lastTimeRef.current
-      lastTimeRef.current = timestamp
+    const step = (now: number) => {
+      const delta = now - lastTimeRef.current
+      lastTimeRef.current = now
 
       if (!isHoveredRef.current) {
         elapsedRef.current += delta
-        const pct = Math.min((elapsedRef.current / autoPlayInterval) * 100, 100)
-        setProgress(pct)
+        const nextProgress = Math.min(
+          100,
+          (elapsedRef.current / autoPlayInterval) * 100
+        )
+        setProgress(nextProgress)
 
         if (elapsedRef.current >= autoPlayInterval) {
           elapsedRef.current = 0
@@ -118,21 +120,23 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
         }
       }
 
-      animId = requestAnimationFrame(loop)
+      animId = requestAnimationFrame(step)
     }
 
-    animId = requestAnimationFrame(loop)
+    lastTimeRef.current = performance.now()
+    animId = requestAnimationFrame(step)
 
-    return () => {
-      cancelAnimationFrame(animId)
-    }
+    return () => cancelAnimationFrame(animId)
   }, [autoPlayInterval, total])
 
-  // Keyboard arrow navigation
+  // Keyboard navigation (Left / Right arrows)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') handlePrev()
-      else if (e.key === 'ArrowRight') handleNext()
+      if (e.key === 'ArrowLeft') {
+        handlePrev()
+      } else if (e.key === 'ArrowRight') {
+        handleNext()
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
@@ -142,7 +146,7 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
 
   return (
     <div
-      className="relative w-full rounded-3xl overflow-hidden select-none bg-slate-900 border border-black/10 shadow-2xl transition-all duration-300 group/hero"
+      className="relative w-full overflow-hidden select-none bg-slate-950 transition-all duration-300 group/hero"
       onMouseEnter={() => {
         setIsHovered(true)
         lastTimeRef.current = performance.now()
@@ -154,8 +158,8 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
       role="region"
       aria-label="AIR Lab Photography Showcase"
     >
-      {/* ── BACKGROUND SLIDESHOW IMAGES (100% Natural, Untampered Lab Photography) ── */}
-      <div className="absolute inset-0 z-0 overflow-hidden bg-slate-900">
+      {/* ── FULL SCREEN-WIDTH BACKGROUND PHOTOGRAPHY ── */}
+      <div className="absolute inset-0 z-0 overflow-hidden bg-slate-950">
         <AnimatePresence initial={false}>
           <motion.img
             key={activeSlide.id}
@@ -170,47 +174,50 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
           />
         </AnimatePresence>
 
-        {/* Top subtle vignette only behind top elements for clean text contrast */}
-        <div className="absolute top-0 inset-x-0 h-44 bg-gradient-to-b from-black/60 via-black/20 to-transparent pointer-events-none z-10" />
+        {/* Global Dark Legibility Overlay matching AllenAI */}
+        <div className="absolute inset-0 bg-black/55 backdrop-blur-[0.5px] pointer-events-none z-10" />
 
-        {/* Bottom subtle vignette for HUD & progress bar */}
-        <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black/65 to-transparent pointer-events-none z-10" />
+        {/* Top subtle vignette */}
+        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black/60 to-transparent pointer-events-none z-10" />
+
+        {/* Bottom subtle vignette for progress bar & caption */}
+        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black/75 to-transparent pointer-events-none z-10" />
       </div>
 
-      {/* ── FOREGROUND CONTENT (Middle alignment matching AllenAI: Centered vertically and horizontally) ── */}
-      <div className="relative z-20 w-full min-h-[440px] sm:min-h-[500px] md:min-h-[540px] flex items-center justify-center p-4 sm:p-8 md:p-12">
+      {/* ── FOREGROUND CONTENT (Full horizontal span, middle aligned, directly on photography) ── */}
+      <div className="relative z-20 w-full min-h-[500px] sm:min-h-[560px] md:min-h-[620px] flex items-center justify-center px-4 sm:px-8 md:px-12 py-16">
         {children}
       </div>
 
-      {/* ── NAVIGATION ARROWS (Floating at left & right edges) ── */}
-      <div className="absolute inset-y-0 left-3 sm:left-5 flex items-center z-30 pointer-events-none">
+      {/* ── NAVIGATION ARROWS (Floating at left & right screen edges) ── */}
+      <div className="absolute inset-y-0 left-4 sm:left-6 flex items-center z-30 pointer-events-none">
         <button
           type="button"
           onClick={handlePrev}
-          className="pointer-events-auto w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/45 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg active:scale-95 opacity-85 group-hover/hero:opacity-100"
+          className="pointer-events-auto w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/75 text-white/85 hover:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg active:scale-95"
           aria-label="Previous lab photograph"
-          title="Previous image (Left arrow)"
+          title="Previous image"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+          <ChevronLeft className="w-6 h-6" />
         </button>
       </div>
 
-      <div className="absolute inset-y-0 right-3 sm:right-5 flex items-center z-30 pointer-events-none">
+      <div className="absolute inset-y-0 right-4 sm:right-6 flex items-center z-30 pointer-events-none">
         <button
           type="button"
           onClick={handleNext}
-          className="pointer-events-auto w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/45 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg active:scale-95 opacity-85 group-hover/hero:opacity-100"
+          className="pointer-events-auto w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/75 text-white/85 hover:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg active:scale-95"
           aria-label="Next lab photograph"
-          title="Next image (Right arrow)"
+          title="Next image"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+          <ChevronRight className="w-6 h-6" />
         </button>
       </div>
 
       {/* ── BOTTOM HUD STRIP (Slide caption badge + Jump dots + Pause indicator) ── */}
-      <div className="absolute bottom-3.5 sm:bottom-4 inset-x-4 sm:inset-x-8 z-30 flex items-center justify-between gap-3 pointer-events-none">
+      <div className="absolute bottom-4 sm:bottom-5 inset-x-6 sm:inset-x-12 z-30 flex items-center justify-between gap-4 pointer-events-none">
         {/* Caption Badge on the left */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/20 text-white text-xs font-sans shadow-md">
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/20 text-white text-xs font-sans shadow-md">
           <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)] animate-pulse shrink-0" />
           <span className="font-semibold text-white">0{currentIndex + 1} / 0{total}</span>
           <span className="text-white/40 hidden sm:inline">•</span>
@@ -218,7 +225,7 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
         </div>
 
         {/* Jump Dots & Pause Indicator on the right */}
-        <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/20 shadow-md">
+        <div className="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/20 shadow-md">
           {slides.map((slide, idx) => (
             <button
               key={slide.id}
@@ -252,7 +259,7 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
         </div>
       </div>
 
-      {/* ── FULL-WIDTH BOTTOM PROGRESS BAR (Animated 0% to 100%, pauses on hover) ── */}
+      {/* ── FULL-WIDTH BOTTOM PROGRESS BAR ── */}
       <div
         className="absolute bottom-0 inset-x-0 h-1.5 sm:h-2 bg-black/50 backdrop-blur-xs z-40 overflow-hidden cursor-pointer"
         onClick={() => handleNext()}

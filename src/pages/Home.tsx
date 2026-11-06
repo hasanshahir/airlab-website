@@ -12,7 +12,6 @@ import {
   Award,
   ArrowRight,
   Calendar,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   Cpu,
@@ -147,63 +146,65 @@ export default function Home() {
 
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
-      {/* ── 1. HERO SHOWCASE (Ai2-Inspired Middle Alignment: Logo Left, Slogan Right, Background Carousel) ── */}
-      <section className="relative pt-3 sm:pt-4 md:pt-6 pb-6 sm:pb-8 px-3 sm:px-6 md:px-8 max-w-[1360px] mx-auto z-10">
+      {/* ── 1. FULL-WIDTH HERO SHOWCASE (Pans 100% of the screen horizontally, no padded rectangles) ── */}
+      <section className="relative w-full z-10">
         <HeroBackgroundSlideshow autoPlayInterval={5000}>
-          {/* Middle Alignment matching Ai2: Logo on Left, Slogan on Right, Center Aligned */}
-          <div className="w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-8 p-6 sm:p-8 md:p-10 rounded-3xl bg-black/45 backdrop-blur-md border border-white/20 shadow-2xl">
-            {/* LOGO ON THE LEFT: Just the mark alone, clean and iconic */}
+          <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-6">
+            {/* LOGO ON THE LEFT: Clean, iconic, floating directly on imagery */}
             <div className="shrink-0 flex items-center justify-center">
               <img
                 src={airLabMark}
                 alt="AIR Lab Mark"
-                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
               />
             </div>
 
             {/* Subtle vertical separator on desktop */}
-            <div className="hidden md:block w-px h-20 bg-white/25 shrink-0" />
+            <div className="hidden md:block w-px h-24 bg-white/30 shrink-0" />
 
-            {/* TEXT ON THE RIGHT: Punchy 4-word slogan + small description */}
-            <div className="text-center md:text-left flex flex-col items-center md:items-start">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[44px] font-bold font-head text-white tracking-tight leading-[1.12] drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] select-none">
+            {/* TEXT ON THE RIGHT: Clean punchy slogan + concise narrative */}
+            <div className="text-center md:text-left flex flex-col items-center md:items-start max-w-2xl">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-head text-white tracking-tight leading-[1.08] drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] select-none">
                 Where Intelligence Meets Engineering.
               </h1>
-              <p className="text-xs sm:text-sm md:text-base text-white/90 font-sans mt-2.5 max-w-lg leading-relaxed font-normal drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
-                Pioneering foundational regional AI, edge perception, and robotics benchmarks for national impact.
+              <p className="text-sm sm:text-base md:text-lg text-white/95 font-sans mt-3.5 leading-relaxed font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                The Artificial Intelligence Research Lab at NED University is pioneering foundational regional AI models, edge perception, and autonomous robotics benchmarks for national impact.
               </p>
+
+              {/* Action Buttons directly on the photography */}
+              <div className="mt-7 flex flex-wrap items-center justify-center md:justify-start gap-3.5">
+                <button
+                  type="button"
+                  onClick={() => openDrawer('projects')}
+                  className="h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
+                >
+                  <Layers className="w-4 h-4 shrink-0" />
+                  <span>Explore Projects</span>
+                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => openDrawer('members')}
+                  className="h-12 px-7 bg-white/90 hover:bg-white text-[var(--ink-dark)] backdrop-blur-md text-sm font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
+                >
+                  <Users className="w-4 h-4 text-[var(--ink-dark)]/70 shrink-0" />
+                  <span>Lab Members</span>
+                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
+                </button>
+              </div>
             </div>
           </div>
         </HeroBackgroundSlideshow>
 
-        {/* ── ACTION BAR DIRECTLY BELOW HERO STAGE (High Contrast on White Canvas) ── */}
-        <div className="mt-5 sm:mt-6 flex flex-col md:flex-row items-center justify-between gap-5 p-4 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-xs">
-          {/* Explore Projects & Lab Members Buttons */}
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <button
-              type="button"
-              onClick={() => openDrawer('projects')}
-              className="h-11 sm:h-12 px-6 sm:px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer active:scale-98 group flex-1 sm:flex-none"
-            >
-              <Layers className="w-4 h-4 shrink-0" />
-              <span>Explore Projects</span>
-              <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => openDrawer('members')}
-              className="h-11 sm:h-12 px-6 sm:px-7 bg-white hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline)] text-sm font-semibold rounded-full shadow-xs hover:shadow-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer active:scale-98 group flex-1 sm:flex-none"
-            >
-              <Users className="w-4 h-4 text-[var(--text-subtle)] shrink-0" />
-              <span>Lab Members</span>
-              <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-            </button>
+        {/* ── MINIMAL CLEAN QUICK LINKS STRIP ── */}
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-5 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
+          <div className="flex items-center gap-2 font-semibold text-[var(--text-primary)]">
+            <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
+            <span>Direct Research Portals:</span>
           </div>
 
-          {/* Quick Direct Links */}
-          <div className="flex flex-wrap items-center justify-center md:justify-end gap-3.5 text-xs sm:text-sm font-sans text-[var(--text-muted)]">
-            <span className="font-semibold text-[var(--text-primary)]">Quick links:</span>
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <Link
               to="/projects"
               className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
@@ -215,7 +216,7 @@ export default function Home() {
               to="/grants"
               className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
             >
-              <Award className="w-3.5 h-3.5 text-[var(--accent-purple)]" />
+              <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
               Active Grants &rarr;
             </Link>
             <span className="text-[var(--border-hairline)]">•</span>
@@ -229,116 +230,114 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 2. RECENT UPDATES SECTION (Compact Horizontal Slider Highlighted Distinctly) ── */}
-      <section className="py-5 sm:py-7 px-3 sm:px-6 md:px-8 max-w-[1360px] mx-auto relative z-10">
-        <div className="p-5 sm:p-7 rounded-3xl bg-gradient-to-r from-[var(--bg-surface)] via-[var(--surface-alt)]/35 to-[var(--bg-surface)] border-2 border-[var(--accent-orange)]/30 shadow-md">
-          {/* Header Row with Prev/Next Controls */}
-          <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-[var(--border-hairline)]">
-            <div className="flex items-center gap-2.5">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-orange)] text-white text-xs font-bold uppercase tracking-wider shadow-xs">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Recent Updates</span>
-              </div>
-              <span className="text-xs sm:text-sm text-[var(--text-muted)] hidden sm:inline font-medium">
-                Latest research breakthroughs, benchmark releases & fellowship opportunities
-              </span>
-            </div>
-
-            {/* Horizontal Navigation Arrow Buttons */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => scrollUpdates('left')}
-                className="w-8 h-8 rounded-full bg-[var(--bg-page)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-                aria-label="Previous updates"
-                title="Scroll left"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollUpdates('right')}
-                className="w-8 h-8 rounded-full bg-[var(--bg-page)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-                aria-label="Next updates"
-                title="Scroll right"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+      {/* ── 2. RECENT UPDATES SECTION (Clean, Minimal, Distinct Without Padded Boxes) ── */}
+      <section className="py-10 sm:py-12 px-4 sm:px-8 max-w-[1240px] mx-auto relative z-10">
+        {/* Header Row with Prev/Next Controls */}
+        <div className="flex items-center justify-between gap-4 mb-6 pb-3 border-b border-[var(--border-hairline)]">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-sans uppercase font-bold text-[var(--accent-orange)] tracking-wider">
+              DISPATCHES & ANNOUNCEMENTS
+            </span>
+            <span className="text-[var(--border-hairline)]">•</span>
+            <h2 className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)]">
+              Recent Updates
+            </h2>
           </div>
 
-          {/* Horizontal Scrollable Cards Rail */}
-          <div
-            ref={updatesScrollRef}
-            className="flex gap-4 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {recentUpdates.map(item => {
-              const Icon = item.icon
-              return (
-                <article
-                  key={item.id}
-                  className="min-w-[280px] sm:min-w-[320px] max-w-[340px] p-5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/50 shadow-xs hover:shadow-md transition-all shrink-0 snap-start flex flex-col justify-between group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold uppercase tracking-wider bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
-                        {item.badge}
-                      </span>
-                      <div className="flex items-center gap-1 text-[11px] text-[var(--text-subtle)] font-medium">
-                        <Calendar className="w-3 h-3" />
-                        <span>{item.date}</span>
-                      </div>
-                    </div>
+          {/* Horizontal Navigation Arrow Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => scrollUpdates('left')}
+              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              aria-label="Previous updates"
+              title="Scroll left"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollUpdates('right')}
+              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              aria-label="Next updates"
+              title="Scroll right"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
-                    <div className="flex items-start gap-2.5 mb-2">
-                      <div className="w-7 h-7 rounded-lg bg-[var(--bg-surface)] text-[var(--accent-orange)] flex items-center justify-center shrink-0 mt-0.5">
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <h3 className="text-base font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug">
-                        {item.title}
-                      </h3>
-                    </div>
-
-                    <p className="text-xs text-[var(--text-muted)] leading-relaxed font-normal mt-2">
-                      {item.desc}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
-                    <span className="text-[11px] text-[var(--text-subtle)] font-medium">
-                      {item.category}
+        {/* Horizontal Scrollable Cards Rail */}
+        <div
+          ref={updatesScrollRef}
+          className="flex gap-5 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {recentUpdates.map(item => {
+            const Icon = item.icon
+            return (
+              <article
+                key={item.id}
+                className="min-w-[290px] sm:min-w-[340px] max-w-[360px] p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/50 shadow-xs hover:shadow-md transition-all shrink-0 snap-start flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold uppercase tracking-wider bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
+                      {item.badge}
                     </span>
-                    {item.actionType === 'apply' ? (
-                      <button
-                        type="button"
-                        onClick={() => setApplyModalOpen(true)}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                      >
-                        <span>{item.actionText}</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </button>
-                    ) : (
-                      <Link
-                        to={item.link!}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline group-hover:translate-x-0.5 transition-transform"
-                      >
-                        <span>{item.actionText}</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    )}
+                    <div className="flex items-center gap-1 text-[11px] text-[var(--text-subtle)] font-medium">
+                      <Calendar className="w-3 h-3" />
+                      <span>{item.date}</span>
+                    </div>
                   </div>
-                </article>
-              )
-            })}
-          </div>
+
+                  <div className="flex items-start gap-3 mb-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-white text-[var(--accent-orange)] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-base font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug">
+                      {item.title}
+                    </h3>
+                  </div>
+
+                  <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-relaxed font-normal mt-2">
+                    {item.desc}
+                  </p>
+                </div>
+
+                <div className="pt-3 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
+                  <span className="text-[11px] text-[var(--text-subtle)] font-medium">
+                    {item.category}
+                  </span>
+                  {item.actionType === 'apply' ? (
+                    <button
+                      type="button"
+                      onClick={() => setApplyModalOpen(true)}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
+                    >
+                      <span>{item.actionText}</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  ) : (
+                    <Link
+                      to={item.link!}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline group-hover:translate-x-0.5 transition-transform"
+                    >
+                      <span>{item.actionText}</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  )}
+                </div>
+              </article>
+            )
+          })}
         </div>
       </section>
 
-      {/* ── 3. ABOUT AIR LAB SECTION (Deep Ink Band with High Contrast) ── */}
-      <section id="explore-anchor" className="py-12 sm:py-16 px-4 sm:px-8 max-w-[1240px] mx-auto text-left mb-16 relative z-10">
-        <div className="bg-[var(--ink-dark)] text-white rounded-3xl p-8 sm:p-14 relative overflow-hidden transition-all duration-200 shadow-xl border border-[var(--border-hairline)]">
-          <div className="max-w-3xl relative z-10">
+      {/* ── 3. ABOUT AIR LAB SECTION (Full Bleed Deep Ink Band) ── */}
+      <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-20 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
+        <div className="max-w-[1240px] mx-auto">
+          <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-semibold uppercase tracking-wider mb-6">
               <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
               <span>About AIR Lab • NED University</span>
@@ -378,14 +377,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 4. CORE RESEARCH AREAS (High-Contrast Cards on Pure White Canvas) ── */}
-      <section className="py-12 sm:py-16 px-4 sm:px-8 max-w-[1240px] mx-auto relative z-10">
+      {/* ── 4. CORE RESEARCH AREAS (High-Contrast Clean Cards) ── */}
+      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-[var(--border-hairline)] pb-6 gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--text-subtle)] text-xs font-bold uppercase tracking-wider mb-3">
-              <span>Frontier Thrusts</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
+            <span className="text-xs font-sans uppercase font-bold text-[var(--accent-orange)] tracking-wider">
+              LAB INITIATIVES
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head mt-1.5">
               Core Research Areas
             </h2>
           </div>
@@ -400,21 +399,32 @@ export default function Home() {
             return (
               <div
                 key={idx}
-                className="group relative p-8 rounded-3xl bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                className="p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group cursor-pointer"
               >
                 <div>
-                  <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[var(--accent-orange)] shadow-xs mb-6 group-hover:scale-105 transition-transform duration-200">
-                    <Icon className="w-6 h-6" />
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="w-11 h-11 rounded-2xl bg-white border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all shadow-xs">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="text-[11px] font-sans text-[var(--text-muted)] uppercase px-3 py-1 bg-white rounded-full border border-[var(--border-hairline)]">
+                      {area.tag}
+                    </span>
                   </div>
-                  <div className="text-[11px] font-semibold tracking-wider uppercase text-[var(--text-subtle)] mb-2">
-                    {area.tag}
-                  </div>
-                  <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3 group-hover:text-[var(--accent-orange)] transition-colors duration-150 font-head">
+
+                  <h3 className="font-head font-semibold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors mb-2.5">
                     {area.title}
                   </h3>
+
                   <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
                     {area.desc}
                   </p>
+                </div>
+
+                <div className="pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans font-medium text-[var(--accent-orange)]">
+                  <Link to="/projects" className="inline-flex items-center gap-1.5 hover:underline font-semibold">
+                    <span>View Projects</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
             )
@@ -423,7 +433,7 @@ export default function Home() {
       </section>
 
       {/* ── 5. RESEARCH PARTNERS & SPONSORS ── */}
-      <section className="py-12 sm:py-16 px-4 sm:px-8 max-w-[1240px] mx-auto relative z-10">
+      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
         <div className="text-center max-w-xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--text-subtle)] text-xs font-bold uppercase tracking-wider mb-3">
             <span>Collaboration</span>
