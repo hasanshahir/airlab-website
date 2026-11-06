@@ -150,12 +150,12 @@ export default function Home() {
       <section className="relative w-full z-10">
         <HeroBackgroundSlideshow autoPlayInterval={5000}>
           <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-6">
-            {/* LOGO ON THE LEFT: Clean, iconic, floating directly on imagery */}
+            {/* LOGO ON THE LEFT: Clean, iconic, white on imagery */}
             <div className="shrink-0 flex items-center justify-center">
               <img
                 src={airLabMark}
                 alt="AIR Lab Mark"
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain brightness-0 invert drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
               />
             </div>
 
@@ -230,19 +230,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 2. RECENT UPDATES SECTION (Clean, Minimal, Distinct Without Padded Boxes) ── */}
+      {/* ── 2. RECENT UPDATES SECTION (Clean, Minimal, Directly Labeled) ── */}
       <section className="py-10 sm:py-12 px-4 sm:px-8 max-w-[1240px] mx-auto relative z-10">
         {/* Header Row with Prev/Next Controls */}
         <div className="flex items-center justify-between gap-4 mb-6 pb-3 border-b border-[var(--border-hairline)]">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-sans uppercase font-bold text-[var(--accent-orange)] tracking-wider">
-              DISPATCHES & ANNOUNCEMENTS
-            </span>
-            <span className="text-[var(--border-hairline)]">•</span>
-            <h2 className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)]">
-              Recent Updates
-            </h2>
-          </div>
+          <h2 className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)]">
+            Recent Updates
+          </h2>
 
           {/* Horizontal Navigation Arrow Buttons */}
           <div className="flex items-center gap-2">
