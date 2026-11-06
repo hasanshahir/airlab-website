@@ -177,8 +177,8 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
         <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black/65 to-transparent pointer-events-none z-10" />
       </div>
 
-      {/* ── FOREGROUND CONTENT (Split Hero: Logo on Left, Slogan on Right, Center Unobstructed) ── */}
-      <div className="relative z-20 w-full min-h-[460px] sm:min-h-[520px] md:min-h-[560px] lg:min-h-[600px] flex flex-col justify-between p-5 sm:p-8 md:p-10 lg:p-12">
+      {/* ── FOREGROUND CONTENT (Middle alignment matching AllenAI: Centered vertically and horizontally) ── */}
+      <div className="relative z-20 w-full min-h-[440px] sm:min-h-[500px] md:min-h-[540px] flex items-center justify-center p-4 sm:p-8 md:p-12">
         {children}
       </div>
 

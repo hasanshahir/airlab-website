@@ -10,6 +10,7 @@ import {
   Layers,
   Award,
   BookOpen,
+  FileText,
   Users,
   GraduationCap,
   Building,
@@ -208,7 +209,7 @@ export default function Layout() {
 
                     <div>
                       <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
-                        SCHOLARSHIP & OUTPUT
+                        ARTICLES
                       </div>
                       <div className="space-y-1">
                         <Link
@@ -221,6 +222,19 @@ export default function Layout() {
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
                             Peer-reviewed conference papers, journals, and citations
+                          </p>
+                        </Link>
+
+                        <Link
+                          to="/publications#blogs"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                        >
+                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
+                            <FileText className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                            <span>Blogs</span>
+                          </div>
+                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
+                            Technical breakdowns, research notes, and lab stories
                           </p>
                         </Link>
                       </div>
@@ -295,7 +309,7 @@ export default function Layout() {
                         >
                           <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
                             <Users className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Alumni Interns</span>
+                            <span>Past Interns</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
                             Past fellows and where they are today
@@ -527,6 +541,9 @@ export default function Layout() {
                       <Link to="/publications" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Publications
                       </Link>
+                      <Link to="/publications#blogs" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                        Blogs
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -549,7 +566,7 @@ export default function Layout() {
                         Research Interns
                       </Link>
                       <Link to="/team?tab=previous" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Alumni Interns
+                        Past Interns
                       </Link>
                       <Link to="/interns" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Fellowship Program
