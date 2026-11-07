@@ -1,781 +1,493 @@
-import { useState, useEffect, useRef } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Menu,
-  X,
-  ExternalLink,
-  Mail,
-  ChevronDown,
-  Layers,
-  Award,
-  BookOpen,
-  FileText,
-  Users,
-  GraduationCap,
-  Building,
-  Image as GalleryIcon,
-} from 'lucide-react'
-import AirLabLogo from './AirLabLogo'
-import ParticleField from './ParticleField'
-import StudentApplicationModal from './StudentApplicationModal'
-import ThemeToggle from './ThemeToggle'
+import React, { useState, useEffect, useRef } from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import StudentApplicationModal from './StudentApplicationModal';
+import QuickDrawer from './QuickDrawer';
+
+export interface LayoutOutletContext {
+  openApplicationModal: () => void;
+  openDrawer: () => void;
+}
+
+const MENU_ITEMS = [
+  {
+    num: '01',
+    word: 'WORK',
+    line: 'See what we mean — Projects, Clinical AI & Deployed Benchmarks.',
+    to: '/projects',
+    match: ['/projects', '/grants'],
+  },
+  {
+    num: '02',
+    word: 'SERVICES',
+    line: 'From idea to reality — Research Pillars, Publications & Grants.',
+    to: '/publications',
+    match: ['/publications', '/collaborations'],
+  },
+  {
+    num: '03',
+    word: 'STUDIO',
+    line: 'Two minds. One direction — About AIR Lab, Faculty, Fellows & Performers.',
+    to: '/about',
+    match: ['/about', '/team', '/interns', '/performers', '/gallery'],
+  },
+  {
+    num: '04',
+    word: 'CONTACT',
+    line: 'Give us a limit — Fellowships, R&D Partnerships & Direct Inquiry.',
+    to: '/contact',
+    match: ['/contact'],
+  },
+];
 
 export default function Layout() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [applyModalOpen, setApplyModalOpen] = useState(false)
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-  const [mobileAccordion, setMobileAccordion] = useState<string | null>(null)
-  const [scrolled, setScrolled] = useState(false)
-  const navRef = useRef<HTMLDivElement>(null)
-  const location = useLocation()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHeaderDark, setIsHeaderDark] = useState(false);
+  const [isApplicationOpen, setIsApplicationOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [karachiTime, setKarachiTime] = useState('');
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const location = useLocation();
 
-
+  // Live Karachi clock
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-    setActiveDropdown(null)
-    setMobileMenuOpen(false)
-  }, [location.pathname, location.search])
-
-  // Close dropdown on Escape key or outside click
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setActiveDropdown(null)
-        setMobileMenuOpen(false)
+    const updateClock = () => {
+      try {
+        const formatted = new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Asia/Karachi',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }).format(new Date());
+        setKarachiTime(formatted);
+      } catch {
+        setKarachiTime('12:00');
       }
+    };
+    updateClock();
+    const timer = setInterval(updateClock, 15000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Scroll to top or hash on route navigation
+  useEffect(() => {
+    setIsMenuOpen(false);
+    if (dialogRef.current?.open) {
+      dialogRef.current.close();
     }
-    const handleClickOutside = (e: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) {
-        setActiveDropdown(null)
+    document.body.style.overflow = '';
+
+    if (location.hash) {
+      const targetId = location.hash.replace('#', '');
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+        }
+      }, 60);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    }
+  }, [location.pathname, location.search, location.hash]);
+
+  // Header condensed state & dark section detection
+  useEffect(() => {
+    let rafId = 0;
+    const checkScroll = () => {
+      rafId = 0;
+      const y = window.scrollY;
+      document.documentElement.classList.toggle('is-condensed', y > 80);
+
+      // Check if header overlaps a .studio-dark section
+      const headerHeight = y > 80 ? 72 : 118;
+      const sampleY = headerHeight * 0.5;
+      const darkSections = document.querySelectorAll('.studio-dark');
+      let overDark = false;
+      darkSections.forEach((sec) => {
+        const rect = sec.getBoundingClientRect();
+        if (rect.top <= sampleY && rect.bottom >= sampleY) {
+          overDark = true;
+        }
+      });
+      setIsHeaderDark(overDark);
+    };
+
+    const onScroll = () => {
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(checkScroll);
       }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('mousedown', handleClickOutside)
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    checkScroll();
+
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, [location.pathname]);
+
+  // Append .link-dot to all .text-link elements automatically like Studio Unlmtd's Pl()
+  useEffect(() => {
+    const links = document.querySelectorAll('.text-link');
+    links.forEach((el) => {
+      if (!el.querySelector('.link-dot')) {
+        const dot = document.createElement('span');
+        dot.className = 'link-dot';
+        dot.setAttribute('aria-hidden', 'true');
+        el.appendChild(dot);
+      }
+    });
+  });
+
+  const openMenu = () => {
+    setIsMenuOpen(true);
+    if (dialogRef.current && !dialogRef.current.open) {
+      dialogRef.current.showModal();
     }
-  }, [])
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    if (dialogRef.current?.open) {
+      dialogRef.current.close();
+    }
+    document.body.style.overflow = '';
+  };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] font-sans antialiased flex flex-col selection:bg-[var(--accent-orange)] selection:text-white relative">
-      <ParticleField />
-      {/* ── 0. Accessibility Skip Link ── */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 z-50 px-5 py-2.5 rounded-full bg-[var(--accent-orange)] text-white text-xs font-semibold shadow-lg outline-none"
-      >
-        Skip to main content
+    <>
+      <div className="load-progress" aria-hidden="true"></div>
+      <a className="skip-link" href="#main">
+        Skip to content
       </a>
 
-      {/* ── 1. Restyled Top Vacancy Ribbon ── */}
-      <aside aria-label="Announcement" className="w-full bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] text-xs font-medium py-2.5 px-4 sm:px-8 relative z-30">
-        <div className="max-w-[1240px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--accent-orange)] text-xs tracking-tight">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)] animate-pulse shrink-0" />
-              Applications Open:
-            </span>
-            <span className="text-[13px] text-[var(--text-muted)] font-normal">
-              Student Research Internship & Fellowship Vacancies Open for Fall 2026 — NEDUET CSIT
-            </span>
-          </div>
+      {/* STUDIO UNLMTD HEADER */}
+      <header className={`site-header ${isHeaderDark ? 'is-dark' : ''}`}>
+        <Link className="brand" to="/" aria-label="AIR Lab — Home">
+          <span className="brand-wordmark">
+            AIR LAB
+            <small>NED UNIVERSITY · CSIT</small>
+          </span>
+        </Link>
 
-          <div className="flex items-center gap-4 shrink-0">
-            <a
-              href="mailto:contact@airlab.neduet.edu.pk"
-              className="inline-flex items-center gap-1.5 text-[12px] font-sans text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-              <span>contact@airlab.neduet.edu.pk</span>
-            </a>
-            <span className="text-[var(--border-hairline)]">|</span>
-            <a
-              href="https://cct.neduet.edu.pk/AIR"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[12px] font-sans text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
-            >
-              <span>NED University</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-        </div>
-      </aside>
-
-      {/* ── 2. Slim Sticky Navbar with Ai2-Inspired Themed Mega Dropdowns ── */}
-      <header
-        ref={navRef}
-        className={`sticky top-0 z-40 h-[72px] transition-all duration-200 ${scrolled
-            ? 'bg-[var(--bg-surface-glass)] backdrop-blur-md border-b border-[var(--border-hairline)] shadow-sm'
-            : 'bg-[var(--bg-page)] border-b border-[var(--border-hairline)]'
-          }`}
-      >
-        <div className="max-w-[1240px] h-full mx-auto px-4 sm:px-8 flex items-center justify-between gap-4">
-          {/* Logo with 7-tap admin easter egg */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 group shrink-0 select-none cursor-pointer"
-            aria-label="AIR Lab Home"
-          >
-            <AirLabLogo height={36} />
+        <div className="header-right">
+          <Link className="header-contact" to="/contact">
+            LET’S TALK<span className="link-dot" aria-hidden="true"></span>
           </Link>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-2">
-            {/* Home */}
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `px-3.5 py-2 rounded-full text-[14px] font-medium transition-all ${isActive
-                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
-                }`
-              }
-            >
-              Home
-            </NavLink>
-
-            {/* Research Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setActiveDropdown('research')}
-              onMouseLeave={() => setActiveDropdown(null)}
-            >
-              <button
-                type="button"
-                onClick={() => setActiveDropdown(activeDropdown === 'research' ? null : 'research')}
-                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'research' || location.pathname.includes('/projects') || location.pathname.includes('/grants') || location.pathname.includes('/publications')
-                    ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
-                  }`}
-                aria-expanded={activeDropdown === 'research'}
-              >
-                <span>Research</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'research' ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {activeDropdown === 'research' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="absolute top-full left-0 mt-1.5 w-[520px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
-                  >
-                    <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
-                        EXPLORE PORTFOLIO
-                      </div>
-                      <div className="space-y-1">
-                        <Link
-                          to="/projects"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Layers className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Projects Catalog</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Applied AI, edge perception, robotics, and healthcare
-                          </p>
-                        </Link>
-
-                        <Link
-                          to="/grants"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Award className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Research Grants</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Sponsored research funding and national initiatives
-                          </p>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
-                        ARTICLES
-                      </div>
-                      <div className="space-y-1">
-                        <Link
-                          to="/publications"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <BookOpen className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Publications</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Peer-reviewed conference papers, journals, and citations
-                          </p>
-                        </Link>
-
-                        <Link
-                          to="/publications#blogs"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <FileText className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Blogs</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Technical breakdowns, research notes, and lab stories
-                          </p>
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* People Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setActiveDropdown('people')}
-              onMouseLeave={() => setActiveDropdown(null)}
-            >
-              <button
-                type="button"
-                onClick={() => setActiveDropdown(activeDropdown === 'people' ? null : 'people')}
-                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'people' || location.pathname.includes('/team') || location.pathname.includes('/interns') || location.pathname.includes('/performers')
-                    ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
-                  }`}
-                aria-expanded={activeDropdown === 'people'}
-              >
-                <span>People</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'people' ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {activeDropdown === 'people' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="absolute top-full left-0 mt-1.5 w-[560px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
-                  >
-                    <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
-                        LAB MEMBERS
-                      </div>
-                      <div className="space-y-1">
-                        <Link
-                          to="/team?tab=faculty"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Users className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Faculty Leads</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Principal investigators, professors, and advisors
-                          </p>
-                        </Link>
-
-                        <Link
-                          to="/team?tab=interns"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <GraduationCap className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Research Interns</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Active student researchers and lab fellows
-                          </p>
-                        </Link>
-
-                        <Link
-                          to="/team?tab=previous"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Users className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Past Interns</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Past fellows and where they are today
-                          </p>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
-                        COMMUNITY & SPOTLIGHT
-                      </div>
-                      <div className="space-y-1">
-                        <Link
-                          to="/interns"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <GraduationCap className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Fellowship Program</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Internship trajectories and application tracks
-                          </p>
-                        </Link>
-
-                        <Link
-                          to="/performers"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Award className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Performer of the Month</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Monthly research honors and milestones
-                          </p>
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* About & Community Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setActiveDropdown('about')}
-              onMouseLeave={() => setActiveDropdown(null)}
-            >
-              <button
-                type="button"
-                onClick={() => setActiveDropdown(activeDropdown === 'about' ? null : 'about')}
-                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'about' || location.pathname.includes('/about') || location.pathname.includes('/collaborations') || location.pathname.includes('/gallery')
-                    ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
-                  }`}
-                aria-expanded={activeDropdown === 'about'}
-              >
-                <span>About</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'about' ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {activeDropdown === 'about' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="absolute top-full left-0 mt-1.5 w-[520px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
-                  >
-                    <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
-                        ABOUT US
-                      </div>
-                      <div className="space-y-1">
-                        <Link
-                          to="/about"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Building className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>About AIR Lab</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Mission, foundational pillars, and department leadership
-                          </p>
-                        </Link>
-
-                        <Link
-                          to="/collaborations"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Building className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Collaborations</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Enterprise sponsors and academic research partners
-                          </p>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
-                        LIFE AT THE LAB
-                      </div>
-                      <div className="space-y-1">
-                        <Link
-                          to="/gallery"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <GalleryIcon className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Lab Gallery</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Milestones, hackathons, and technical workshops
-                          </p>
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Direct Contact Link */}
-            <NavLink
-              to="/contact"
-              className={({ isActive }) =>
-                `px-3.5 py-2 rounded-full text-[14px] font-medium transition-all ${isActive
-                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
-                }`
-              }
-            >
-              Contact
-            </NavLink>
-          </nav>
-
-          {/* Right Action CTA: Theme Toggle & Apply Now */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            {/* Desktop Theme Switcher (3 Color Themes) */}
-            <div className="hidden md:block">
-              <ThemeToggle />
-            </div>
-
-            {/* Mobile/Compact Theme Toggle Button */}
-            <div className="md:hidden">
-              <ThemeToggle compact />
-            </div>
-
-            <Link
-              to="/contact"
-              className="hidden xl:inline-flex text-[13.5px] font-medium text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors items-center gap-1.5 px-3 py-1.5 rounded-full"
-            >
-              <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-              <span>Inquiries</span>
-            </Link>
-
-            <button
-              onClick={() => setApplyModalOpen(true)}
-              className="group inline-flex items-center justify-center gap-2 h-10 px-4 sm:px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-medium tracking-tight transition-all duration-150 cursor-pointer shadow-sm active:translate-y-[1px]"
-            >
-              <span>Apply Now</span>
-              <span className="text-[12px] leading-none transition-transform duration-150 group-hover:translate-x-0.5">
-                ↳
-              </span>
-            </button>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(prev => !prev)}
-              className="lg:hidden p-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] hover:border-[var(--accent-orange)] transition-colors cursor-pointer"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
+          <button
+            type="button"
+            className="header-contact"
+            onClick={() => setIsApplicationOpen(true)}
+          >
+            FELLOWSHIP<span className="link-dot" aria-hidden="true"></span>
+          </button>
+          <button
+            id="menu-toggle"
+            className="menu-toggle"
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls="site-menu"
+            aria-expanded={isMenuOpen}
+            onClick={openMenu}
+          >
+            <span className="menu-label">MENU</span>
+            <span className="burger" aria-hidden="true">
+              <i></i>
+              <i></i>
+            </span>
+          </button>
         </div>
-
-        {/* Mobile Slide-Down Accordion Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="lg:hidden absolute top-[72px] left-0 right-0 bg-[var(--bg-surface-elevated)] border-b border-[var(--border-hairline)] px-6 py-6 shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto"
-            >
-              <div className="flex items-center justify-between p-3 mb-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)]">
-                <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
-                  Theme
-                </span>
-                <ThemeToggle />
-              </div>
-
-              <div className="space-y-2 mb-6">
-                <Link
-                  to="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-[var(--bg-surface)] text-[var(--text-primary)]"
-                >
-                  Home
-                </Link>
-
-                {/* Research Accordion */}
-                <div className="border border-[var(--border-hairline)] rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setMobileAccordion(mobileAccordion === 'research' ? null : 'research')}
-                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left"
-                  >
-                    <span>Research</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${mobileAccordion === 'research' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {mobileAccordion === 'research' && (
-                    <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
-                      <Link to="/projects" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Projects Catalog
-                      </Link>
-                      <Link to="/grants" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Research Grants
-                      </Link>
-                      <Link to="/publications" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Publications
-                      </Link>
-                      <Link to="/publications#blogs" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Blogs
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                {/* People Accordion */}
-                <div className="border border-[var(--border-hairline)] rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setMobileAccordion(mobileAccordion === 'people' ? null : 'people')}
-                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left"
-                  >
-                    <span>People</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${mobileAccordion === 'people' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {mobileAccordion === 'people' && (
-                    <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
-                      <Link to="/team?tab=faculty" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Faculty Leads
-                      </Link>
-                      <Link to="/team?tab=interns" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Research Interns
-                      </Link>
-                      <Link to="/team?tab=previous" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Past Interns
-                      </Link>
-                      <Link to="/interns" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Fellowship Program
-                      </Link>
-                      <Link to="/performers" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Performer of the Month
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                {/* About Accordion */}
-                <div className="border border-[var(--border-hairline)] rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setMobileAccordion(mobileAccordion === 'about' ? null : 'about')}
-                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left"
-                  >
-                    <span>About</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${mobileAccordion === 'about' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {mobileAccordion === 'about' && (
-                    <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
-                      <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        About AIR Lab
-                      </Link>
-                      <Link to="/collaborations" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Collaborations
-                      </Link>
-                      <Link to="/gallery" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Lab Gallery
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                <Link
-                  to="/contact"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-[var(--bg-surface)] text-[var(--text-primary)]"
-                >
-                  Contact
-                </Link>
-              </div>
-
-              <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-3">
-                <a
-                  href="mailto:contact@airlab.neduet.edu.pk"
-                  className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-orange)] flex items-center gap-1.5 font-sans"
-                >
-                  <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                  <span>contact@airlab.neduet.edu.pk</span>
-                </a>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setApplyModalOpen(true)
-                  }}
-                  className="w-full sm:w-auto h-10 px-6 rounded-full bg-[var(--accent-orange)] text-white text-xs font-semibold"
-                >
-                  Apply Now ↳
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </header>
 
-      {/* ── 3. Main Outlet ── */}
-      <main id="main-content" className="flex-1 relative">
-        <Outlet />
-      </main>
-
-      {/* ── 4. Structured Multi-Column Ai2-Inspired Footer (Deep Ink Band) ── */}
-      <footer className="w-full bg-[var(--ink-dark)] text-[var(--text-on-dark)] pt-20 pb-14 relative font-sans border-t border-[var(--border-hairline)]">
-        <div className="max-w-[1240px] mx-auto px-6 sm:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-16 border-b border-white/10">
-            {/* Column 1: Lab Charter & Location */}
-            <div className="space-y-4">
-              <Link to="/" className="inline-block" aria-label="AIR Lab Home">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-white font-bold text-lg font-head">
-                    AI
-                  </div>
-                  <div>
-                    <div className="text-base font-bold tracking-tight text-white font-head leading-none">AIR Lab</div>
-                    <div className="text-[11px] text-white/60 tracking-wider uppercase font-sans mt-1">NED UNIVERSITY · CSIT</div>
-                  </div>
-                </div>
-              </Link>
-              <p className="text-[13.5px] text-[var(--text-on-dark-muted)] leading-relaxed max-w-sm">
-                The Artificial Intelligence Research Laboratory, Department of Computer Science & Information Technology (CSIT), NED University of Engineering & Technology. Advancing foundation models, edge perception, and robotics.
-              </p>
-              <div className="pt-2 text-[12px] text-white/60 space-y-1.5 font-sans">
-                <div>NED University Main Campus, Karachi 75270</div>
-                <div>
-                  <a
-                    href="mailto:contact@airlab.neduet.edu.pk"
-                    className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 font-semibold"
-                  >
-                    <Mail className="w-3.5 h-3.5" />
-                    <span>contact@airlab.neduet.edu.pk</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Column 2: Research */}
-            <div>
-              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
-                Research
-              </h5>
-              <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
-                <li><Link to="/about" className="hover:text-white transition-colors">About AIR Lab</Link></li>
-                <li><Link to="/projects" className="hover:text-white transition-colors">Projects Catalog</Link></li>
-                <li><Link to="/grants" className="hover:text-white transition-colors">Research Grants</Link></li>
-                <li><Link to="/publications" className="hover:text-white transition-colors">Publications</Link></li>
-                <li><Link to="/gallery" className="hover:text-white transition-colors">Lab Gallery</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 3: People & Partners */}
-            <div>
-              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
-                People & Partners
-              </h5>
-              <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
-                <li><Link to="/team" className="hover:text-white transition-colors">Faculty & Scholars</Link></li>
-                <li><Link to="/collaborations" className="hover:text-white transition-colors">Collaborations & Industry</Link></li>
-                <li><Link to="/performers" className="hover:text-white transition-colors">Performers of the Month</Link></li>
-                <li><Link to="/interns" className="hover:text-white transition-colors">Research Interns</Link></li>
-                <li><Link to="/contact" className="hover:text-white transition-colors">Contact Coordination</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 4: NED CSIT & Inquiries */}
-            <div>
-              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
-                NED CSIT & Inquiries
-              </h5>
-              <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
-                <li>
-                  <a
-                    href="https://cct.neduet.edu.pk/AIR"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors inline-flex items-center gap-1"
-                  >
-                    Department Website <ExternalLink className="w-3 h-3 text-white/40" />
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://www.neduet.edu.pk"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors inline-flex items-center gap-1"
-                  >
-                    NED University <ExternalLink className="w-3 h-3 text-white/40" />
-                  </a>
-                </li>
-                <li>
-                  <button
-                    onClick={() => setApplyModalOpen(true)}
-                    className="hover:text-[var(--accent-orange)] transition-colors cursor-pointer text-left text-white/90"
-                  >
-                    Apply for Internship
-                  </button>
-                </li>
-                <li>
-                  <a
-                    href="mailto:contact@airlab.neduet.edu.pk"
-                    className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1 font-semibold"
-                  >
-                    <Mail className="w-3 h-3" />
-                    <span>contact@airlab.neduet.edu.pk</span>
-                  </a>
-                </li>
-              </ul>
+      {/* STUDIO UNLMTD FULL-SCREEN DIALOG MENU */}
+      <dialog
+        id="site-menu"
+        ref={dialogRef}
+        className={`site-menu ${isMenuOpen ? 'is-open' : ''}`}
+        aria-label="Navigation"
+        onClose={() => {
+          setIsMenuOpen(false);
+          document.body.style.overflow = '';
+        }}
+      >
+        <div className="menu-body">
+          <div className="menu-head">
+            <Link className="brand" to="/" aria-label="AIR Lab — Home" onClick={closeMenu}>
+              <span className="brand-wordmark">
+                AIR LAB
+                <small>NED UNIVERSITY · CSIT</small>
+              </span>
+            </Link>
+            <div className="menu-head-actions">
+              <button
+                id="menu-close"
+                className="menu-close"
+                type="button"
+                onClick={closeMenu}
+              >
+                <span>CLOSE</span>
+                <span className="menu-close-lines" aria-hidden="true">
+                  <i></i>
+                  <i></i>
+                </span>
+              </button>
             </div>
           </div>
 
-          {/* Subdued Brand Signature */}
-          <div className="pt-10 pb-4 text-center select-none overflow-hidden">
-            <span className="block text-[clamp(44px,11vw,110px)] font-bold tracking-tight text-white/[0.04] font-head leading-none whitespace-nowrap">
-              AIR LAB NEDUET
+          <nav aria-label="Main pages">
+            {MENU_ITEMS.map((item) => {
+              const isCurrent = item.match.includes(location.pathname);
+              return (
+                <Link
+                  key={item.num}
+                  to={item.to}
+                  aria-current={isCurrent ? 'page' : undefined}
+                  onClick={closeMenu}
+                >
+                  <span className="menu-number">{item.num}</span>
+                  <span className="menu-entry">
+                    <span className="menu-word-mask">
+                      <span className="menu-word liquid-word">
+                        {item.word}
+                        <span className="menu-dot"></span>
+                      </span>
+                    </span>
+                    <small className="menu-line">{item.line}</small>
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="menu-foot">
+            <span>HUMAN DIRECTION. AI ACCELERATION.</span>
+            <div className="menu-foot-right">
+              <span className="menu-time">
+                Karachi <time>{karachiTime}</time>
+              </span>
+              <div className="language-switch" aria-label="Laboratory Portals">
+                <Link to="/team" onClick={closeMenu}>
+                  TEAM
+                </Link>
+                <span aria-hidden="true">/</span>
+                <Link to="/grants" onClick={closeMenu}>
+                  GRANTS
+                </Link>
+                <span aria-hidden="true">/</span>
+                <Link to="/interns" onClick={closeMenu}>
+                  FELLOWS
+                </Link>
+                <span aria-hidden="true">/</span>
+                <Link to="/performers" onClick={closeMenu}>
+                  PERFORMERS
+                </Link>
+                <span aria-hidden="true">/</span>
+                <Link to="/collaborations" onClick={closeMenu}>
+                  PARTNERS
+                </Link>
+                <span aria-hidden="true">/</span>
+                <Link to="/gallery" onClick={closeMenu}>
+                  GALLERY
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </dialog>
+
+      {/* MAIN CONTENT */}
+      <main id="main" tabIndex={-1} data-route={location.pathname}>
+        <Outlet
+          context={{
+            openApplicationModal: () => setIsApplicationOpen(true),
+            openDrawer: () => setIsDrawerOpen(true),
+          }}
+        />
+      </main>
+
+      {/* STUDIO UNLMTD FOOTER */}
+      <footer className="site-footer">
+        <div className="footer-top">
+          <span className="section-label reveal is-visible">YOUR TURN.</span>
+          <p className="footer-story reveal is-visible">
+            Every sovereign AI system started as a limit someone decided not to accept. What’s yours?
+          </p>
+          <Link
+            className="footer-cta reveal is-visible"
+            to="/contact"
+            style={{ '--cta-chars': 8 } as React.CSSProperties}
+          >
+            <span className="gradient liquid-word">
+              GIVE US
+              <br />A LIMIT<span className="word-dot"></span>
+            </span>
+          </Link>
+        </div>
+
+        <div className="footer-dark studio-dark">
+          <div className="footer-col">
+            <span className="section-label">STUDIO &amp; LAB</span>
+            <address className="footer-address">
+              <span>Department of CSIT, AIR Lab</span>
+              <span>NED University of Engineering &amp; Technology</span>
+              <span>University Road, Karachi 75270, Pakistan</span>
+            </address>
+            <a
+              className="text-link"
+              href="https://maps.google.com/?q=NED+University+of+Engineering+and+Technology+Karachi"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Google Maps
+            </a>
+            <span className="footer-gps" aria-label="GPS coordinates">
+              24.9339° N, 67.1116° E
             </span>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between text-[12px] text-white/50 gap-3 pt-6 border-t border-white/10 font-sans">
-            <div>
-              &copy; {new Date().getFullYear()} Artificial Intelligence Research Lab &bull; Department of CSIT, NED University.
-            </div>
-            <div className="flex items-center gap-3">
-              <a href="mailto:contact@airlab.neduet.edu.pk" className="hover:text-[var(--accent-orange)] transition-colors">
-                contact@airlab.neduet.edu.pk
-              </a>
-              <span>&bull;</span>
-              <span>Karachi, Pakistan</span>
-            </div>
+          <div className="footer-col">
+            <span className="section-label">FOLLOW &amp; ARCHIVES</span>
+            <ul className="footer-links">
+              <li>
+                <span className="social-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M3.6 5.9v7.5H1.1V5.9h2.5ZM2.4 2.4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5Zm5.5 3.5v1c.4-.7 1.2-1.2 2.3-1.2 1.8 0 3 1.1 3 3.4v4.3h-2.5V9.6c0-1-.4-1.7-1.3-1.7-.9 0-1.5.6-1.5 1.7v3.8H5.4V5.9h2.5Z"></path>
+                  </svg>
+                </span>
+                <a
+                  className="text-link"
+                  href="https://www.neduet.edu.pk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  LinkedIn — NED AIR Lab
+                </a>
+              </li>
+              <li>
+                <span className="social-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M15.4 4.7a2 2 0 0 0-1.4-1.4C12.8 3 8 3 8 3s-4.8 0-6 .3A2 2 0 0 0 .6 4.7 21 21 0 0 0 .3 8c0 1.1.1 2.2.3 3.3a2 2 0 0 0 1.4 1.4c1.2.3 6 .3 6 .3s4.8 0 6-.3a2 2 0 0 0 1.4-1.4c.2-1.1.3-2.2.3-3.3 0-1.1-.1-2.2-.3-3.3ZM6.5 10.1V5.9L10.4 8l-3.9 2.1Z"></path>
+                  </svg>
+                </span>
+                <Link className="text-link" to="/gallery">
+                  Lab Showreel &amp; Media
+                </Link>
+              </li>
+              <li>
+                <span className="social-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M9.3 6.8 14.5 1h-1.2L8.8 6 5.2 1H1l5.5 7.8L1 15h1.2l4.8-5.4L10.8 15H15L9.3 6.8Zm-1.7 1.9-.6-.8L2.7 1.9h1.9l3.6 5 .6.8 4.6 6.5h-1.9L7.6 8.7Z"></path>
+                  </svg>
+                </span>
+                <Link className="text-link" to="/publications">
+                  Research Papers &amp; Code
+                </Link>
+              </li>
+            </ul>
           </div>
+
+          <div className="footer-col">
+            <span className="section-label">LET’S TALK</span>
+            <ul className="footer-links">
+              <li>
+                <a className="text-link" href="mailto:airlab@neduet.edu.pk">
+                  airlab@neduet.edu.pk
+                </a>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="text-link"
+                  onClick={() => setIsApplicationOpen(true)}
+                >
+                  Apply for research fellowship
+                </button>
+              </li>
+              <li>
+                <Link className="text-link" to="/contact#write">
+                  Write us a message
+                </Link>
+              </li>
+              <li>
+                <Link className="text-link" to="/collaborations">
+                  Institutional R&amp;D partnerships
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="footer-col">
+            <span className="section-label">PORTALS</span>
+            <ul className="footer-languages" aria-label="Directory">
+              <li>
+                <Link
+                  to="/projects"
+                  aria-current={location.pathname === '/projects' ? 'page' : undefined}
+                >
+                  WORK
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/team"
+                  aria-current={location.pathname === '/team' ? 'page' : undefined}
+                >
+                  TEAM
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/grants"
+                  aria-current={location.pathname === '/grants' ? 'page' : undefined}
+                >
+                  GRANTS
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/performers"
+                  aria-current={location.pathname === '/performers' ? 'page' : undefined}
+                >
+                  HONORS
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <span className="brand-wordmark" style={{ fontSize: '15px' }}>
+            AIR LAB
+          </span>
+          <span>100% HUMAN. 100% AI. 200% UNLMTD.</span>
+          <span className="footer-copy">© 2026 AIR LAB — NED UNIVERSITY</span>
+          <span className="footer-legal">
+            <Link to="/about">Charter</Link>
+            <Link to="/interns">Fellowships</Link>
+            <button
+              type="button"
+              className="footer-consent"
+              onClick={() => setIsDrawerOpen(true)}
+            >
+              Quick Index
+            </button>
+          </span>
         </div>
       </footer>
 
-      {/* Global Student Application Modal */}
       <StudentApplicationModal
-        isOpen={applyModalOpen}
-        onClose={() => setApplyModalOpen(false)}
+        isOpen={isApplicationOpen}
+        onClose={() => setIsApplicationOpen(false)}
       />
-    </div>
-  )
+      <QuickDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+      />
+    </>
+  );
 }

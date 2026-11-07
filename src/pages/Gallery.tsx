@@ -1,160 +1,121 @@
-import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, X, Maximize2 } from 'lucide-react'
-import rawGallery from '../data/gallery.json'
-import type { GalleryItem } from '../types/data'
-
-const galleryData = rawGallery as unknown as GalleryItem[]
-import Badge from '../components/ui/Badge'
-import SectionReveal from '../components/ui/SectionReveal'
+import React, { useState } from 'react';
+import { getGalleryImages, getLabFacilities } from '../data/airlabData';
+import type { GalleryImageRecord } from '../data/airlabData';
 
 export default function Gallery() {
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => galleryData)
-  const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null)
-
-  useEffect(() => {
-    fetch('/api/content/gallery')
-      .then(r => r.ok ? r.json() : [])
-      .then(d => {
-        if (Array.isArray(d)) setGalleryItems(d)
-      })
-      .catch(() => {})
-  }, [])
-
-  // Safe scroll lock for lightbox modal
-  useEffect(() => {
-    if (selectedImage) {
-      const originalOverflow = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
-
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setSelectedImage(null)
-      }
-      window.addEventListener('keydown', handleKeyDown)
-
-      return () => {
-        document.body.style.overflow = originalOverflow
-        window.removeEventListener('keydown', handleKeyDown)
-      }
-    }
-  }, [selectedImage])
+  const images = getGalleryImages();
+  const facilities = getLabFacilities();
+  const [selectedImage, setSelectedImage] = useState<GalleryImageRecord | null>(null);
 
   return (
-    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
-      {/* Header */}
-      <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<Camera className="w-3.5 h-3.5 text-white" />}>
-              MEDIA, SIGHTS & LAB LIFE
-            </Badge>
-          </div>
-        </SectionReveal>
+    <>
+      {/* STUDIO UNLMTD GALLERY MASTHEAD */}
+      <section className="section portfolio-heading">
+        <div className="section-label reveal is-visible">
+          <span>VISUAL ARCHIVE</span>
+          <span>NED UNIVERSITY · DEPARTMENT OF CSIT</span>
+        </div>
+        <h1 className="reveal is-visible" data-fit="">
+          Lab.
+        </h1>
+        <p className="reveal is-visible">
+          Inside our deep learning GPU clusters, research workstations, and autonomous robotics
+          testbeds at NED University Main Campus.
+        </p>
+      </section>
 
-        <SectionReveal delay={0.08}>
-          <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Laboratory Gallery & Media
-          </h1>
-        </SectionReveal>
-
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Visual documentation of supercomputer commissioning, outdoor drone flight trials, hardware prototyping, and hackathons.
-          </p>
-        </SectionReveal>
-      </div>
-
-      {/* Image Grid with 24px Rounded Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 auto-rows-[300px] gap-6 text-left">
-        {galleryItems.length === 0 ? (
-          <div className="col-span-full text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-            <p className="text-sm font-sans text-[var(--text-muted)]">No media or gallery items published yet.</p>
-          </div>
-        ) : galleryItems.map((item, i) => (
-          <div
-            key={item.id}
-            className={`${item.span || ''} h-full`}
-          >
-            <div
-              onClick={() => setSelectedImage(item)}
-              className="h-full relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer group shadow-sm hover:border-[var(--accent-orange)]/50 hover:shadow-lg transition-all duration-300"
-              style={{ transitionDelay: `${i * 30}ms` }}
+      {/* STUDIO UNLMTD PORTFOLIO GRID FOR GALLERY PLATES */}
+      <section className="section portfolio-index" aria-label="Laboratory Photographs">
+        <div className="portfolio-grid">
+          {images.map((img, idx) => (
+            <a
+              key={img.id}
+              href={`#photo-${img.id}`}
+              className="project-link reveal is-visible"
+              onClick={(e) => {
+                e.preventDefault();
+                setSelectedImage(img);
+              }}
             >
-              <img
-                src={item.url}
-                alt={item.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-
-              <div className="absolute top-4 right-4 pointer-events-none">
-                <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center shadow-xs">
-                  <Maximize2 className="w-3.5 h-3.5" />
-                </span>
-              </div>
-
-              <div className="absolute bottom-5 left-5 right-5 pointer-events-none">
-                <h3 className="text-base sm:text-lg font-semibold font-head text-white leading-tight mb-1">
-                  {item.title}
-                </h3>
-                <p className="text-xs text-white/80 line-clamp-1">{item.desc}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Lightbox Modal rendered via Portal */}
-      {typeof document !== 'undefined' &&
-        createPortal(
-          <AnimatePresence>
-            {selectedImage && (
-              <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setSelectedImage(null)}
-                  className="absolute inset-0 bg-black/75 backdrop-blur-md"
+              <div
+                className="project-visual no-blend"
+                style={
+                  {
+                    background: idx % 2 === 0 ? '#0b0c0e' : '#e9eeed',
+                    color: idx % 2 === 0 ? '#ffffff' : '#0b0c0e',
+                  } as React.CSSProperties
+                }
+              >
+                <img
+                  src={img.src}
+                  alt={img.caption}
+                  width="1200"
+                  height="900"
+                  loading={idx < 2 ? 'eager' : 'lazy'}
                 />
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className="relative max-w-4xl w-full bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl overflow-hidden shadow-2xl z-10 text-left"
-                >
-                  <button
-                    onClick={() => setSelectedImage(null)}
-                    className="absolute top-5 right-5 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black transition-colors z-20 cursor-pointer shadow-md"
-                    aria-label="Close image modal"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-
-                  <div className="max-h-[65vh] w-full bg-black overflow-hidden flex items-center justify-center">
-                    <img
-                      src={selectedImage.url}
-                      alt={selectedImage.title}
-                      className="w-full h-full object-contain max-h-[65vh]"
-                    />
-                  </div>
-
-                  <div className="p-6 sm:p-8">
-                    <h3 className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)] mb-2">
-                      {selectedImage.title}
-                    </h3>
-                    <p className="text-sm text-[var(--text-muted)] leading-relaxed">{selectedImage.desc}</p>
-                  </div>
-                </motion.div>
+                <div className="visual-bottom" aria-hidden="true">
+                  <span>{img.category.toUpperCase()}</span>
+                </div>
               </div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
-    </div>
-  )
+              <div className="project-caption">
+                <h3>{img.category}</h3>
+                <span>{img.date || 'NED CSIT'}</span>
+                <span className="project-kind">{img.caption}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* HARDWARE & LABORATORY SPECIFICATIONS */}
+      <section className="section studio-dark">
+        <div className="section-label reveal is-visible">
+          <span>COMPUTE &amp; HARDWARE SPECIFICATIONS</span>
+          <span>4 CORE LABORATORY UNITS</span>
+        </div>
+        <div className="editorial-three" style={{ marginTop: '45px' }}>
+          {facilities.map((fac, idx) => (
+            <article key={fac.code} className="reveal is-visible">
+              <span>
+                {String(idx + 1).padStart(2, '0')} · {fac.metrics}
+              </span>
+              <h3>{fac.unit}</h3>
+              <p>
+                <strong>{fac.spec}:</strong> {fac.detail}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* LIGHTBOX DIALOG (STUDIO UNLMTD .project-gallery) */}
+      {selectedImage && (
+        <dialog
+          open
+          className="project-gallery"
+          aria-label="Image viewer"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="gallery-toolbar" onClick={(e) => e.stopPropagation()}>
+            <span className="gallery-count">{selectedImage.category.toUpperCase()}</span>
+            <button type="button" onClick={() => setSelectedImage(null)}>
+              Close <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <figure onClick={(e) => e.stopPropagation()}>
+            <div className="gallery-stage">
+              <img src={selectedImage.src} alt={selectedImage.caption} />
+            </div>
+            <figcaption>{selectedImage.caption}</figcaption>
+          </figure>
+          <div className="gallery-controls" onClick={(e) => e.stopPropagation()}>
+            <span>{selectedImage.date || 'NED University CSIT'}</span>
+            <button type="button" onClick={() => setSelectedImage(null)}>
+              Return to archive
+            </button>
+          </div>
+        </dialog>
+      )}
+    </>
+  );
 }

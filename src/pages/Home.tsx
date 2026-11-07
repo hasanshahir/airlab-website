@@ -1,459 +1,527 @@
-import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useRef } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
+import type { LayoutOutletContext } from '../components/Layout';
 import {
-  Brain,
-  Bot,
-  Database,
-  Zap,
-  Code,
-  LineChart,
-  Layers,
-  Users,
-  Award,
-  ArrowRight,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Cpu,
-  GraduationCap,
-} from 'lucide-react'
-import Button from '../components/ui/Button'
-import airLabMark from '../assets/air-lab-mark.png'
-import StudentApplicationModal from '../components/StudentApplicationModal'
-import QuickDrawer from '../components/QuickDrawer'
-import SponsorsGrid from '../components/SponsorsGrid'
-import ContactSection from '../components/ContactSection'
-import HeroBackgroundSlideshow from '../components/HeroBackgroundSlideshow'
+  getProjects,
+  getGrants,
+  getPublications,
+  getTeamMembers,
+  getSponsors,
+  RECENT_UPDATES,
+} from '../data/airlabData';
+import { getMemberAvatar, getProjectCover } from '../lib/placeholders';
 
-const recentUpdates = [
-  {
-    id: 'update-1',
-    category: 'NLP Research',
-    date: 'Recent Release',
-    title: 'Urdu Multilingual LLM Pretraining Milestone',
-    desc: 'Pretraining byte-level tokenizers and parameter-efficient LoRA fine-tuning pipelines tailored for low-resource regional dialects.',
-    badge: 'Benchmark',
-    link: '/projects',
-    actionText: 'Explore Project',
-    icon: Brain,
-  },
-  {
-    id: 'update-2',
-    category: 'Fellowships',
-    date: 'Admissions Open',
-    title: 'Fall 2026 Student Research Fellowships Open',
-    desc: 'Funded fellowship positions open for graduate and undergraduate scholars in edge AI, vision odometry, and TinyML acceleration.',
-    badge: 'Vacancies',
-    actionType: 'apply',
-    actionText: 'Apply for Vacancy',
-    icon: GraduationCap,
-  },
-  {
-    id: 'update-3',
-    category: 'Robotics Lab',
-    date: 'Lab Benchmark',
-    title: 'Autonomous UAV Edge Perception Trial Completed',
-    desc: 'Field testing real-time visual odometry and edge neural inference algorithms on embedded Jetson computing hardware.',
-    badge: 'Robotics',
-    link: '/projects',
-    actionText: 'View Benchmark',
-    icon: Bot,
-  },
-  {
-    id: 'update-4',
-    category: 'Student Spotlight',
-    date: 'Monthly Honors',
-    title: 'Performer of the Month Research Spotlight',
-    desc: 'Honoring student researchers and lab fellows for groundbreaking contributions to multi-modal clinical diagnostic models.',
-    badge: 'Honors',
-    link: '/performers',
-    actionText: 'Meet Performers',
-    icon: Award,
-  },
-  {
-    id: 'update-5',
-    category: 'Research Grants',
-    date: 'Active Grants',
-    title: 'National Infrastructure & Smart Grid Funding',
-    desc: 'Secured competitive collaborative funding for power grid surge forecasting and renewable dispatch transformer models.',
-    badge: 'Grants',
-    link: '/grants',
-    actionText: 'View Grants',
-    icon: Cpu,
-  },
-]
-
-const coreResearchAreas = [
-  {
-    icon: Brain,
-    title: 'Foundational Models & NLP',
-    desc: 'Pretraining multilingual LLMs tailored for low-resource regional dialects with advanced byte-level tokenizers and parameter-efficient fine-tuning.',
-    tag: 'Urdu & Multilingual NLP',
-  },
-  {
-    icon: Bot,
-    title: 'Autonomous Robotics & Edge AI',
-    desc: 'Real-time perception algorithms, spatial visual odometry, and edge TensorRT neural inference pipelines for robotic vehicles and aerial UAVs.',
-    tag: 'Robotics & Embedded Vision',
-  },
-  {
-    icon: Database,
-    title: 'Clinical Diagnostics & Healthcare',
-    desc: 'Deep multi-modal medical imaging classification, diagnostic explainability, and chest radiograph analysis deployed across partner clinics.',
-    tag: 'Medical AI Systems',
-  },
-  {
-    icon: Zap,
-    title: 'Smart Energy & Infrastructure',
-    desc: 'Forecasting power grid surge anomalies, localized microgrid load shedding schedules, and renewable power dispatch with transformer models.',
-    tag: 'Grid Intelligence',
-  },
-  {
-    icon: Code,
-    title: 'Efficient Computing & TinyML',
-    desc: 'Hardware-aware neural architecture search (NAS), INT8 quantization, and ultra-low-latency deployment on FPGAs and embedded SoCs.',
-    tag: 'TinyML & Edge Acceleration',
-  },
-  {
-    icon: LineChart,
-    title: 'AI Safety & Alignment',
-    desc: 'Ensuring robust, unbiased, and safe deployment of intelligent systems in critical healthcare, power grids, and national infrastructure.',
-    tag: 'AI Safety',
-  },
-]
+const PROJECT_THEMES = [
+  { bg: '#0b132b', fg: '#ffffff' },
+  { bg: '#e9eeed', fg: '#0b0c0e' },
+  { bg: '#161925', fg: '#ffffff' },
+  { bg: '#f2ece4', fg: '#111215' },
+  { bg: '#0f172a', fg: '#ffffff' },
+];
 
 export default function Home() {
-  const [applyModalOpen, setApplyModalOpen] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [drawerTab, setDrawerTab] = useState<'projects' | 'members'>('projects')
-  const updatesScrollRef = useRef<HTMLDivElement>(null)
+  const { openApplicationModal } = useOutletContext<LayoutOutletContext>();
+  const openingProjectRef = useRef<HTMLAnchorElement | null>(null);
 
-  // Side panel opens on click only (no hover trigger)
-  const openDrawer = (tab: 'projects' | 'members') => {
-    setDrawerTab(tab)
-    setDrawerOpen(true)
-  }
+  const projects = getProjects();
+  const grants = getGrants();
+  const publications = getPublications();
+  const team = getTeamMembers();
+  const sponsors = getSponsors();
 
-  const scrollUpdates = (direction: 'left' | 'right') => {
-    if (updatesScrollRef.current) {
-      const scrollAmount = 340
-      updatesScrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      })
-    }
-  }
+  const faculty = team.filter((m) => m.category === 'Faculty');
+  const leads = faculty.length >= 2 ? faculty.slice(0, 2) : team.slice(0, 2);
+
+  const featuredPrimary = projects[0];
+  const featuredSecondary = projects.slice(1, 5);
+
+  // Studio Unlmtd's exact `yl` scroll-linked --frame-inset animation on .opening-project
+  useEffect(() => {
+    const el = openingProjectRef.current;
+    if (!el) return;
+
+    let rafId = 0;
+    const updateInset = () => {
+      rafId = 0;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      const progress = Math.min(1, Math.max(0, (vh * 0.94 - rect.top) / (vh * 0.6)));
+      const eased = progress * progress * (3 - 2 * progress);
+      const maxInset = window.innerWidth < 601 ? 6 : 13;
+      const inset = ((1 - eased) * maxInset).toFixed(2);
+      el.style.setProperty('--frame-inset', `${inset}%`);
+    };
+
+    const onScroll = () => {
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(updateInset);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    updateInset();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  const referenceNames = [
+    ...sponsors.map((s) => s.name),
+    'Higher Education Commission (HEC)',
+    'IGNITE National Technology Fund',
+    'NED University CSIT',
+    'National Incubation Center Karachi',
+    'Clinical Diagnostic Partners',
+  ];
 
   return (
-    <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
-      {/* ── 1. FULL-WIDTH HERO SHOWCASE (Pans 100% of the screen horizontally, no padded rectangles) ── */}
-      <section className="relative w-full z-10">
-        <HeroBackgroundSlideshow autoPlayInterval={5000}>
-          <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-6">
-            {/* LOGO ON THE LEFT: Clean, iconic, white on imagery */}
-            <div className="shrink-0 flex items-center justify-center">
+    <>
+      {/* 1. STUDIO UNLMTD HERO */}
+      <section className="home-hero">
+        <div className="headline hero-headline">
+          <h1 data-pour="">
+            THE LIMITS
+            <br />
+            ARE NOW
+            <br />
+            <span className="pour">
+              <span className="gradient liquid-word">
+                OPPOR
+                <span className="mobile-break">
+                  -<br />
+                </span>
+                TUNITIES
+              </span>
+              <span className="word-dot"></span>
+            </span>
+          </h1>
+        </div>
+        <p className="tagline reveal is-visible">
+          <span>100% HUMAN.</span> <span>100% AI.</span> <span>200% AIR LAB.</span>
+        </p>
+        <div className="hero-bottom reveal is-visible">
+          <span>COMPUTER VISION. MULTILINGUAL LLMS. AUTONOMOUS ROBOTICS.</span>
+          <span>NED UNIVERSITY · DEPARTMENT OF CSIT · KARACHI</span>
+        </div>
+      </section>
+
+      {/* 2. STUDIO UNLMTD INTRO */}
+      <section className="section home-intro" id="studio-intro">
+        <div className="section-label reveal is-visible">
+          <span>THE LAB</span>
+        </div>
+        <div className="home-intro-copy">
+          <h2 className="reveal is-visible">
+            We unite foundational AI research and real-world engineering. Without academic silos.
+          </h2>
+          <p className="reveal is-visible">
+            <strong>
+              Artificial Intelligence &amp; Robotics Lab (AIR Lab) is NED University’s flagship
+              research and engineering studio. We take sovereign AI challenges from mathematical
+              formulation to deployed clinical, linguistic, and autonomous systems.
+            </strong>
+          </p>
+          <p className="reveal is-visible">
+            At every stage, our Principal Investigators and Research Fellows direct the
+            architecture, curate regional datasets, and validate benchmarks. High-throughput GPU
+            acceleration lets us test more hypotheses, compress models for sub-5W edge hardware, and
+            deliver production-grade systems.
+          </p>
+          <p className="reveal is-visible">
+            No hand-offs, no black-box abstractions: the scholars who author the peer-reviewed
+            papers are the engineers who deploy the models in hospitals, farms, and industrial
+            field trials.
+          </p>
+        </div>
+      </section>
+
+      {/* 3. STUDIO UNLMTD REFERENCES / SPONSORS */}
+      <section className="section home-references" aria-label="Sponsors and Institutional Partners">
+        <div className="section-label reveal is-visible">
+          <span>SPONSORS, GRANTS &amp; INSTITUTIONAL COLLABORATIONS</span>
+        </div>
+        <ul className="references-list reveal is-visible">
+          {Array.from(new Set(referenceNames)).map((name) => (
+            <li key={name}>{name}</li>
+          ))}
+        </ul>
+      </section>
+
+      {/* 4. STUDIO UNLMTD SELECTED WORK */}
+      <section className="section work-section home-work" id="selected">
+        <div className="section-label reveal is-visible">
+          <span>SELECTED WORK &amp; BENCHMARKS</span>
+          <span>{projects.length} ACTIVE &amp; COMPLETED SYSTEMS</span>
+        </div>
+        <div className="home-work-intro">
+          <h2 className="display reveal is-visible">FEATURED.</h2>
+          <div className="reveal is-visible">
+            <p>
+              Deployed machine learning systems, sovereign regional LLMs, medical diagnostic
+              pipelines, and autonomous robotics engineered at AIR Lab.
+            </p>
+            <Link className="text-link" to="/projects">
+              All projects ({projects.length})
+            </Link>
+          </div>
+        </div>
+
+        {/* Opening Full-Bleed Project with Scroll-Linked Inset */}
+        {featuredPrimary && (
+          <Link
+            ref={openingProjectRef}
+            className="project-link opening-project reveal is-visible"
+            to="/projects"
+            aria-label={`${featuredPrimary.title} — ${featuredPrimary.category}`}
+          >
+            <div
+              className="project-visual no-blend"
+              style={
+                {
+                  background: '#0b132b',
+                  color: '#ffffff',
+                } as React.CSSProperties
+              }
+            >
               <img
-                src={airLabMark}
-                alt="AIR Lab Mark"
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain brightness-0 invert drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
+                src={getProjectCover(featuredPrimary.coverImage)}
+                alt={featuredPrimary.title}
+                width="1600"
+                height="900"
+                loading="eager"
               />
-            </div>
-
-            {/* Subtle vertical separator on desktop */}
-            <div className="hidden md:block w-px h-24 bg-white/30 shrink-0" />
-
-            {/* TEXT ON THE RIGHT: Clean punchy slogan + concise narrative */}
-            <div className="text-center md:text-left flex flex-col items-center md:items-start max-w-2xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-head text-white tracking-tight leading-[1.08] drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] select-none">
-                Where Intelligence Meets Engineering.
-              </h1>
-              <p className="text-sm sm:text-base md:text-lg text-white/95 font-sans mt-3.5 leading-relaxed font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                The Artificial Intelligence Research Lab at NED University is pioneering foundational regional AI models, edge perception, and autonomous robotics benchmarks for national impact.
-              </p>
-
-              {/* Action Buttons directly on the photography */}
-              <div className="mt-7 flex flex-wrap items-center justify-center md:justify-start gap-3.5">
-                <button
-                  type="button"
-                  onClick={() => openDrawer('projects')}
-                  className="h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
-                >
-                  <Layers className="w-4 h-4 shrink-0" />
-                  <span>Explore Projects</span>
-                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => openDrawer('members')}
-                  className="h-12 px-7 bg-white/90 hover:bg-white text-[var(--ink-dark)] backdrop-blur-md text-sm font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
-                >
-                  <Users className="w-4 h-4 text-[var(--ink-dark)]/70 shrink-0" />
-                  <span>Lab Members</span>
-                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-                </button>
+              <div className="visual-bottom" aria-hidden="true">
+                <span>
+                  {featuredPrimary.title.toUpperCase()} —{' '}
+                  {(featuredPrimary.funding || featuredPrimary.category).toUpperCase()}
+                </span>
               </div>
             </div>
-          </div>
-        </HeroBackgroundSlideshow>
+            <div className="project-caption">
+              <h3>{featuredPrimary.title}</h3>
+              <span className="project-kind">
+                {featuredPrimary.category} · {featuredPrimary.funding || 'NED AIR Lab'}
+              </span>
+              <span>{featuredPrimary.status}</span>
+            </div>
+          </Link>
+        )}
 
-        {/* ── MINIMAL CLEAN QUICK LINKS STRIP ── */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-5 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
-          <div className="flex items-center gap-2 font-semibold text-[var(--text-primary)]">
-            <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
-            <span>Direct Research Portals:</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <Link
-              to="/projects"
-              className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
-            >
-              All Projects &rarr;
-            </Link>
-            <span className="text-[var(--border-hairline)]">•</span>
-            <Link
-              to="/grants"
-              className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
-            >
-              <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-              Active Grants &rarr;
-            </Link>
-            <span className="text-[var(--border-hairline)]">•</span>
-            <Link
-              to="/team"
-              className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
-            >
-              All Team Members &rarr;
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 2. RECENT UPDATES SECTION (Clean, Minimal, Directly Labeled) ── */}
-      <section className="py-10 sm:py-12 px-4 sm:px-8 max-w-[1240px] mx-auto relative z-10">
-        {/* Header Row with Prev/Next Controls */}
-        <div className="flex items-center justify-between gap-4 mb-6 pb-3 border-b border-[var(--border-hairline)]">
-          <h2 className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)]">
-            Recent Updates
-          </h2>
-
-          {/* Horizontal Navigation Arrow Buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => scrollUpdates('left')}
-              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-              aria-label="Previous updates"
-              title="Scroll left"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollUpdates('right')}
-              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-              aria-label="Next updates"
-              title="Scroll right"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Horizontal Scrollable Cards Rail */}
-        <div
-          ref={updatesScrollRef}
-          className="flex gap-5 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {recentUpdates.map(item => {
-            const Icon = item.icon
+        {/* Secondary Featured Portfolio Grid */}
+        <div className="portfolio-grid" style={{ marginTop: '65px' }}>
+          {featuredSecondary.map((proj, idx) => {
+            const theme = PROJECT_THEMES[(idx + 1) % PROJECT_THEMES.length];
             return (
-              <article
-                key={item.id}
-                className="min-w-[290px] sm:min-w-[340px] max-w-[360px] p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/50 shadow-xs hover:shadow-md transition-all shrink-0 snap-start flex flex-col justify-between group"
+              <Link
+                key={proj.id}
+                className="project-link reveal is-visible"
+                to="/projects"
+                aria-label={`${proj.title} — ${proj.category}`}
               >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold uppercase tracking-wider bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
-                      {item.badge}
-                    </span>
-                    <div className="flex items-center gap-1 text-[11px] text-[var(--text-subtle)] font-medium">
-                      <Calendar className="w-3 h-3" />
-                      <span>{item.date}</span>
-                    </div>
+                <div
+                  className="project-visual no-blend"
+                  style={
+                    {
+                      background: theme.bg,
+                      color: theme.fg,
+                    } as React.CSSProperties
+                  }
+                >
+                  <img
+                    src={getProjectCover(proj.coverImage)}
+                    alt={proj.title}
+                    width="1200"
+                    height="900"
+                    loading="lazy"
+                  />
+                  <div className="visual-bottom" aria-hidden="true">
+                    <span>{proj.category.toUpperCase()}</span>
                   </div>
-
-                  <div className="flex items-start gap-3 mb-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-white text-[var(--accent-orange)] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <h3 className="text-base font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug">
-                      {item.title}
-                    </h3>
-                  </div>
-
-                  <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-relaxed font-normal mt-2">
-                    {item.desc}
-                  </p>
                 </div>
-
-                <div className="pt-3 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
-                  <span className="text-[11px] text-[var(--text-subtle)] font-medium">
-                    {item.category}
+                <div className="project-caption">
+                  <h3>{proj.title}</h3>
+                  <span>{proj.status}</span>
+                  <span className="project-kind">
+                    {proj.category}, {proj.funding || 'AIR Lab R&D'}
                   </span>
-                  {item.actionType === 'apply' ? (
-                    <button
-                      type="button"
-                      onClick={() => setApplyModalOpen(true)}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                    >
-                      <span>{item.actionText}</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  ) : (
-                    <Link
-                      to={item.link!}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline group-hover:translate-x-0.5 transition-transform"
-                    >
-                      <span>{item.actionText}</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  )}
                 </div>
-              </article>
-            )
+              </Link>
+            );
           })}
         </div>
+
+        <div className="home-work-end reveal is-visible" style={{ marginTop: '48px' }}>
+          <p className="editorial-note">
+            {projects.length} research projects, {grants.length} national grants &amp;{' '}
+            {publications.length} peer-reviewed publications in the archive
+          </p>
+          <Link className="text-link" to="/projects">
+            View all projects
+          </Link>
+        </div>
       </section>
 
-      {/* ── 3. ABOUT AIR LAB SECTION (Full Bleed Deep Ink Band) ── */}
-      <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-20 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
-        <div className="max-w-[1240px] mx-auto">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-semibold uppercase tracking-wider mb-6">
-              <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
-              <span>About AIR Lab • NED University</span>
-            </div>
+      {/* 5. STUDIO UNLMTD DARK DIFFERENCE SECTION */}
+      <section className="section home-difference studio-dark">
+        <div className="section-label reveal is-visible">
+          <span>THE AIR LAB DIFFERENCE</span>
+          <span>HUMAN DIRECTION. AI ACCELERATION.</span>
+        </div>
+        <div className="difference-heading">
+          <h2 className="reveal is-visible">
+            Your research deserves
+            <br />
+            <span className="gradient liquid-word">
+              to go further<span className="dot">.</span>
+            </span>
+          </h2>
+        </div>
+        <div className="difference-points">
+          <article className="reveal is-visible">
+            <h3>What problem are we solving?</h3>
+            <p>
+              Before training a single parameter, we define the clinical, linguistic, or operational
+              constraint. We curate sovereign Pakistani datasets where generic global benchmarks
+              fail.
+            </p>
+          </article>
+          <article className="reveal is-visible">
+            <h3>Engineering guides our choices.</h3>
+            <p>
+              Our Principal Investigators and Fellows test multiple neural architectures in
+              parallel, benchmarking accuracy against latency, memory footprint, and explainability.
+            </p>
+          </article>
+          <article className="reveal is-visible">
+            <h3>Systems that come to life in the field.</h3>
+            <p>
+              We do not stop at simulation. We quantize, compile, and deploy our models onto hospital
+              workstations, NVIDIA Jetson UAVs, and RISC-V/FPGA edge nodes.
+            </p>
+          </article>
+        </div>
+      </section>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-white leading-tight font-head">
-              Empowering Regional AI Innovation at NED University
+      {/* 6. STUDIO UNLMTD CAPABILITIES / OUTCOMES SECTION */}
+      <section className="section capabilities-section home-capabilities studio-dark">
+        <div className="section-label reveal is-visible">
+          <span>WHAT WE PRODUCE</span>
+          <span>FOUR RESEARCH PILLARS</span>
+        </div>
+        <div className="capabilities-layout">
+          <div className="capabilities-heading">
+            <h2 className="reveal is-visible">
+              Four kinds
+              <br />
+              of proof.
             </h2>
-
-            <p className="text-base sm:text-lg text-white/85 leading-relaxed mb-6 font-normal">
-              The Artificial Intelligence Research Lab (AIR Lab) at NED University is dedicated to pushing the boundaries of machine learning, natural language processing, and computer vision.
+            <p className="reveal is-visible">
+              Depending on the domain, our work takes the shape of a clinical diagnostic tool, a
+              regional foundation model, an autonomous robotic system, or a national research grant.
             </p>
-
-            <p className="text-base sm:text-lg text-white/80 leading-relaxed mb-10 font-normal">
-              Our mission is to develop foundational models optimized for the region&apos;s unique linguistic and infrastructural challenges, ensuring AI benefits all segments of society.
-            </p>
-
-            <div className="pt-6 border-t border-white/15 flex flex-wrap gap-4 items-center">
-              <Button
-                to="/team"
-                variant="secondary"
-                size="md"
-                className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold"
-              >
-                Meet the Team
-              </Button>
+          </div>
+          <div>
+            <ol className="outcomes-list">
+              <li className="reveal is-visible">
+                <Link to="/projects">
+                  <span>01</span>
+                  <div>
+                    <h3>COMPUTER VISION &amp; CLINICAL AI</h3>
+                    <p>Explainable diagnostic imaging and high-speed industrial inspection.</p>
+                    <small>
+                      Retinal OCT Segmentation · Chest Radiography · Smart Agriculture · Defect
+                      Detection
+                    </small>
+                  </div>
+                  <span className="link-dot" aria-hidden="true"></span>
+                </Link>
+              </li>
+              <li className="reveal is-visible">
+                <Link to="/projects">
+                  <span>02</span>
+                  <div>
+                    <h3>MULTILINGUAL NLP &amp; URDU LLMS</h3>
+                    <p>Sovereign language models and speech pipelines for South Asian dialects.</p>
+                    <small>
+                      Byte-Level Tokenization · LoRA Fine-Tuning · Urdu &amp; Sindhi Corpora · RAG
+                      Systems
+                    </small>
+                  </div>
+                  <span className="link-dot" aria-hidden="true"></span>
+                </Link>
+              </li>
+              <li className="reveal is-visible">
+                <Link to="/projects">
+                  <span>03</span>
+                  <div>
+                    <h3>AUTONOMOUS ROBOTICS &amp; EDGE AI</h3>
+                    <p>Real-time perception and hardware acceleration under strict power limits.</p>
+                    <small>
+                      Visual-Inertial Odometry · ROS2 Swarms · NVIDIA Jetson · TinyML &amp; FPGA
+                      Co-Design
+                    </small>
+                  </div>
+                  <span className="link-dot" aria-hidden="true"></span>
+                </Link>
+              </li>
+              <li className="reveal is-visible">
+                <Link to="/publications">
+                  <span>04</span>
+                  <div>
+                    <h3>PUBLICATIONS &amp; NATIONAL GRANTS</h3>
+                    <p>
+                      {publications.length}+ peer-reviewed papers and {grants.length} funded R&amp;D
+                      initiatives.
+                    </p>
+                    <small>
+                      IEEE &amp; Springer Venues · HEC &amp; IGNITE Grants · Open Benchmarks ·
+                      Student Fellowships
+                    </small>
+                  </div>
+                  <span className="link-dot" aria-hidden="true"></span>
+                </Link>
+              </li>
+            </ol>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '28px', marginTop: '30px' }}>
+              <Link className="text-link reveal is-visible" to="/publications">
+                Explore publications &amp; papers
+              </Link>
+              <Link className="text-link reveal is-visible" to="/grants">
+                Explore funded grants ({grants.length})
+              </Link>
               <button
                 type="button"
-                onClick={() => setApplyModalOpen(true)}
-                className="h-10 px-5 rounded-full text-[13.5px] font-medium text-white hover:text-white/80 flex items-center gap-1.5 transition-colors cursor-pointer group"
+                className="text-link reveal is-visible"
+                onClick={openApplicationModal}
               >
-                <span>Apply for Internship</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                Apply for research fellowship
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 4. CORE RESEARCH AREAS (High-Contrast Clean Cards) ── */}
-      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-[var(--border-hairline)] pb-6 gap-4">
-          <div>
-            <span className="text-xs font-sans uppercase font-bold text-[var(--accent-orange)] tracking-wider">
-              LAB INITIATIVES
+      {/* 7. STUDIO UNLMTD QUOTE BAND */}
+      <section className="section quote-band">
+        <div className="quote-band-copy">
+          <h2 className="quote-band-heading reveal is-visible">
+            With AI, exploring costs less.
+            <br />
+            <span className="gradient liquid-word">
+              Engineering
+              <br className="mobile-break" /> matters more<span className="dot">.</span>
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head mt-1.5">
-              Core Research Areas
-            </h2>
-          </div>
-          <p className="text-sm sm:text-base text-[var(--text-muted)] max-w-md font-normal leading-relaxed">
-            Multi-disciplinary inquiry spanning regional foundational models, low-power edge vision, clinical diagnostics, and resilient national infrastructure.
+          </h2>
+          <Link className="text-link reveal is-visible" to="/about">
+            How we work inside AIR Lab
+          </Link>
+        </div>
+      </section>
+
+      {/* 8. LIVE LABORATORY DISPATCHES (ACCORDION IN STUDIO UNLMTD CAPABILITIES-LIST STYLE) */}
+      <section className="section editorial-section">
+        <div className="section-label reveal is-visible">
+          <span>LATEST DISPATCHES &amp; BENCHMARKS</span>
+          <span>NED CSIT RESEARCH LOG</span>
+        </div>
+        <div className="capabilities-list" style={{ marginTop: '35px' }}>
+          {RECENT_UPDATES.map((item, idx) => (
+            <details key={item.code} className="reveal is-visible" open={idx === 0}>
+              <summary>
+                <span>{String(idx + 1).padStart(2, '0')}</span>
+                <h3>{item.title}</h3>
+                <i aria-hidden="true">+</i>
+              </summary>
+              <div className="is-rich">
+                <p>
+                  <strong>
+                    {item.category} · {item.date}
+                  </strong>{' '}
+                  — {item.summary}
+                </p>
+                <p>
+                  <strong>{item.department}:</strong>{' '}
+                  {item.isApply ? (
+                    <button
+                      type="button"
+                      className="text-link"
+                      onClick={openApplicationModal}
+                      style={{ padding: 0 }}
+                    >
+                      {item.ctaLabel}
+                    </button>
+                  ) : (
+                    <Link className="text-link" to={item.to} style={{ padding: 0 }}>
+                      {item.ctaLabel}
+                    </Link>
+                  )}
+                </p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      {/* 9. STUDIO UNLMTD FOUNDERS / LEADERSHIP PAUSE */}
+      <section className="section studio-teaser founders-pause">
+        <div className="section-label reveal is-visible">
+          <span>THE PEOPLE MAKING THE CALLS</span>
+          <span>PRINCIPAL INVESTIGATORS &amp; LAB LEADERSHIP</span>
+        </div>
+        <div className="founders-intro">
+          <h2 className="display reveal is-visible">
+            TWO MINDS.
+            <br />
+            ONE DIRECTION.
+          </h2>
+          <p className="reveal is-visible">
+            Academic rigor.
+            <br />
+            Engineering velocity.
+            <br />
+            On every project, from start to finish.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {coreResearchAreas.map((area, idx) => {
-            const Icon = area.icon
-            return (
-              <div
-                key={idx}
-                className="p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group cursor-pointer"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-11 h-11 rounded-2xl bg-white border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all shadow-xs">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <span className="text-[11px] font-sans text-[var(--text-muted)] uppercase px-3 py-1 bg-white rounded-full border border-[var(--border-hairline)]">
-                      {area.tag}
-                    </span>
-                  </div>
-
-                  <h3 className="font-head font-semibold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors mb-2.5">
-                    {area.title}
-                  </h3>
-
-                  <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
-                    {area.desc}
-                  </p>
-                </div>
-
-                <div className="pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans font-medium text-[var(--accent-orange)]">
-                  <Link to="/projects" className="inline-flex items-center gap-1.5 hover:underline font-semibold">
-                    <span>View Projects</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            )
-          })}
+        <div className="founders-portraits">
+          {leads.map((member) => (
+            <figure key={member.id} className="founders-portrait reveal is-visible">
+              <img
+                src={getMemberAvatar(member.image)}
+                alt={`${member.name}, ${member.role}`}
+                width="900"
+                height="900"
+                loading="lazy"
+              />
+              <figcaption>
+                <strong>{member.name}</strong>
+                <span>
+                  <span>{member.designation || member.role}</span>
+                  <span>{member.researchFocus || member.department}</span>
+                </span>
+              </figcaption>
+            </figure>
+          ))}
         </div>
-      </section>
-
-      {/* ── 5. RESEARCH PARTNERS & SPONSORS ── */}
-      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--text-subtle)] text-xs font-bold uppercase tracking-wider mb-3">
-            <span>Collaboration</span>
+        <div className="founders-note reveal is-visible">
+          <p>
+            Supported by {faculty.length} faculty investigators, {team.length - faculty.length}{' '}
+            research fellows, and {publications.length}+ peer-reviewed publications at NED
+            University of Engineering &amp; Technology.
+          </p>
+          <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+            <Link className="text-link" to="/team">
+              Meet the full team ({team.length})
+            </Link>
+            <Link className="text-link" to="/about">
+              About the Lab
+            </Link>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-head">
-            Funded by National & Global Partners
-          </h2>
         </div>
-        <SponsorsGrid />
       </section>
-
-      {/* ── 6. CONTACT & INQUIRIES ── */}
-      <ContactSection />
-
-      {/* Student Application Modal */}
-      <StudentApplicationModal
-        isOpen={applyModalOpen}
-        onClose={() => setApplyModalOpen(false)}
-      />
-
-      {/* Interactive Quick Explorer Drawer */}
-      <QuickDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        initialTab={drawerTab}
-      />
-    </div>
-  )
+    </>
+  );
 }

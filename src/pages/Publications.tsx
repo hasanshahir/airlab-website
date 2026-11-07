@@ -1,336 +1,192 @@
-import { useState, useMemo, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Copy, Check, Award, FileText, Download, ExternalLink, Search, Clock, ArrowRight } from 'lucide-react'
-import { getPublications } from '../lib/data'
-import Badge from '../components/ui/Badge'
-import SectionReveal from '../components/ui/SectionReveal'
-
-const labBlogs = [
-  {
-    id: 'blog-1',
-    title: 'Fine-Tuning Transformer Architectures on Low-Resource Urdu Corpora',
-    author: 'AIR Lab NLP Group',
-    date: 'October 2026',
-    readTime: '6 min read',
-    tags: ['NLP', 'Transformers', 'Urdu LLM'],
-    excerpt: 'A technical deep-dive into byte-level BPE tokenization, vocabulary compression, and parameter-efficient LoRA adapters tailored for regional South Asian linguistic nuance.',
-  },
-  {
-    id: 'blog-2',
-    title: 'Optimizing TensorRT INT8 Neural Inference for Micro-UAV Robotics',
-    author: 'Robotics & Embedded Vision Team',
-    date: 'September 2026',
-    readTime: '8 min read',
-    tags: ['Robotics', 'TensorRT', 'Edge AI'],
-    excerpt: 'Achieving sub-12ms spatial visual odometry on embedded NVIDIA Jetson platforms while managing rigorous thermal constraints and limited flight power envelopes.',
-  },
-  {
-    id: 'blog-3',
-    title: 'Deployment Lessons: Explainable Deep Learning in Clinical Radiology Screening',
-    author: 'Medical AI Research Division',
-    date: 'August 2026',
-    readTime: '5 min read',
-    tags: ['Healthcare', 'Clinical AI', 'Explainability'],
-    excerpt: 'Key findings from hospital pilot trials evaluating vision-language models for assisted automated chest radiograph reporting across partner clinical centers.',
-  },
-]
+import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { getPublications, getLabBlogs } from '../data/airlabData';
 
 export default function Publications() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [copiedId, setCopiedId] = useState<number | null>(null)
+  const publications = getPublications();
+  const blogs = getLabBlogs();
 
-  const [pubData, setPubData] = useState<any[]>(() => getPublications())
+  const [selectedYear, setSelectedYear] = useState<string>('all');
 
-  useEffect(() => {
-    fetch('/api/content/publications')
-      .then(r => r.ok ? r.json() : [])
-      .then(d => {
-        if (Array.isArray(d)) setPubData(d)
-      })
-      .catch(() => {})
-  }, [])
+  const years = useMemo(() => {
+    const ySet = Array.from(new Set(publications.map((p) => String(p.year)))).sort(
+      (a, b) => Number(b) - Number(a)
+    );
+    return ['all', ...ySet];
+  }, [publications]);
 
-  // Enforce sorted order: recent papers at top (descending by year, then by id)
-  const sortedPublications = useMemo(() => {
-    return [...pubData].sort((a, b) => {
-      if (b.year !== a.year) return b.year - a.year
-      return b.id - a.id
-    })
-  }, [pubData])
-
-  const filtered = useMemo(() => {
-    if (!searchQuery.trim()) return sortedPublications
-    const q = searchQuery.toLowerCase()
-    return sortedPublications.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      p.authors.toLowerCase().includes(q) ||
-      p.venue.toLowerCase().includes(q) ||
-      (p.tags && p.tags.some((t: string) => t.toLowerCase().includes(q)))
-    )
-  }, [sortedPublications, searchQuery])
-
-  const copyBibtex = (p: typeof pubData[0]) => {
-    const bib = `@${p.type === 'Journal' ? 'article' : 'inproceedings'}{air_${p.id},\n  title={${p.title}},\n  author={${p.authors}},\n  ${p.type === 'Journal' ? 'journal' : 'booktitle'}={${p.venue}},\n  year={${p.year}}\n}`
-    navigator.clipboard.writeText(bib)
-    setCopiedId(p.id)
-    setTimeout(() => setCopiedId(null), 2000)
-  }
+  const filteredPublications = useMemo(() => {
+    if (selectedYear === 'all') return publications;
+    return publications.filter((p) => String(p.year) === selectedYear);
+  }, [publications, selectedYear]);
 
   return (
-    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
-      {/* Header */}
-      <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<BookOpen className="w-3.5 h-3.5 text-white" />}>
-              PEER-REVIEWED SCIENTIFIC OUTPUT
-            </Badge>
-          </div>
-        </SectionReveal>
-
-        <SectionReveal delay={0.08}>
-          <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Research Papers & Publications
+    <>
+      {/* STUDIO UNLMTD SERVICES / PUBLICATIONS MASTHEAD */}
+      <section className="section page-top">
+        <div className="section-label reveal is-visible">
+          <span>PUBLICATIONS &amp; RESEARCH OUTPUT</span>
+          <span>{publications.length} PEER-REVIEWED PAPERS</span>
+        </div>
+        <div className="headline inner-heading">
+          <h1 className="reveal is-visible">
+            WHAT WE
+            <br />
+            <span className="gradient liquid-word">
+              PUBLISH<span className="dot">.</span>
+            </span>
           </h1>
-        </SectionReveal>
-
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Groundbreaking peer-reviewed journals, international conference proceedings, and foundational preprints sorted chronologically by most recent first.
+        </div>
+        <div className="intro-row">
+          <p className="reveal is-visible">
+            Peer-reviewed journal articles, IEEE &amp; Springer conference proceedings, and open
+            technical dispatches authored by NED University AIR Lab.
           </p>
-        </SectionReveal>
-      </div>
-
-      {/* Search & Count Bar */}
-      <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-6 text-left">
-        <div className="text-xs font-sans text-[var(--text-muted)]">
-          Showing <span className="font-semibold text-[var(--text-primary)]">{filtered.length}</span> publications sorted by year
         </div>
+      </section>
 
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)]" />
-          <input
-            type="text"
-            placeholder="Search papers, authors, venues..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
-          />
+      {/* FILTER BAR */}
+      <section className="section portfolio-index" style={{ paddingBottom: '20px' }}>
+        <div className="portfolio-tools">
+          <div className="portfolio-filters" role="group" aria-label="Filter by publication year">
+            {years.map((yr) => (
+              <button
+                key={yr}
+                type="button"
+                aria-pressed={selectedYear === yr}
+                onClick={() => setSelectedYear(yr)}
+              >
+                {yr === 'all' ? 'All Years' : yr}
+              </button>
+            ))}
+            <a
+              href="#blogs"
+              style={{
+                whiteSpace: 'nowrap',
+                minHeight: '44px',
+                padding: '8px 0',
+                fontSize: '13px',
+                color: 'var(--ink)',
+                fontWeight: 600,
+              }}
+            >
+              Research Blogs ↓
+            </a>
+          </div>
+          <span className="portfolio-count">
+            {filteredPublications.length}{' '}
+            {filteredPublications.length === 1 ? 'publication' : 'publications'}
+          </span>
         </div>
-      </div>
+      </section>
 
-      {/* Publications List */}
-      <div className="space-y-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={searchQuery}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-6"
-          >
-            {filtered.map((pub, i) => {
-              const isJournal = pub.type === 'Journal'
-              return (
+      {/* PEER-REVIEWED PUBLICATIONS LIST (STUDIO UNLMTD SIGNL / EDITORIAL ARCHIVE STYLE) */}
+      <section className="section" style={{ paddingTop: '10px' }}>
+        <ol className="signl-signals" style={{ padding: 0 }}>
+          {filteredPublications.map((pub, idx) => (
+            <li key={pub.id} className="signl-signal reveal is-visible">
+              <div className="signl-rank">{String(idx + 1).padStart(2, '0')}</div>
+              <div className="signl-body">
+                <ul className="signl-themes">
+                  <li style={{ '--theme': '#219cf5' } as React.CSSProperties}>{pub.year}</li>
+                  <li style={{ '--theme': '#7157f5' } as React.CSSProperties}>
+                    {pub.type || 'Peer-Reviewed'}
+                  </li>
+                </ul>
+                <h2>{pub.title}</h2>
+                <div className="signl-retain">
+                  <p>
+                    <strong>Authors:</strong> {pub.authors}
+                  </p>
+                </div>
+                <div className="signl-facts">
+                  <p>
+                    <strong>Venue / Journal:</strong> {pub.venue} ({pub.year})
+                  </p>
+                </div>
+                {pub.link && (
+                  <a
+                    className="signl-source"
+                    href={pub.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>Read Paper / DOI</span>
+                    <span className="arrow-ne" aria-hidden="true">
+                      ↗
+                    </span>
+                  </a>
+                )}
+              </div>
+              <div className="signl-thumb" style={{ alignSelf: 'start' }}>
                 <div
-                  key={pub.id}
-                  className="p-8 sm:p-10 flex flex-col md:flex-row md:items-start justify-between gap-6 group hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 text-left bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl"
-                  style={{ transitionDelay: `${i * 20}ms` }}
+                  style={{
+                    padding: '18px',
+                    border: '1px solid var(--line)',
+                    fontSize: '11px',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}
                 >
-                  <div className="space-y-3.5 flex-1">
-                    {/* Header Badges */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      {isJournal ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
-                          <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                          Journal Paper
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white">
-                          <FileText className="w-3.5 h-3.5" />
-                          Conference Proceeding
-                        </span>
-                      )}
-
-                      {'impactFactor' in pub && pub.impactFactor && (
-                        <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]">
-                          {pub.impactFactor}
-                        </span>
-                      )}
-
-                      <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)]">
-                        Year: {pub.year}
-                      </span>
-                    </div>
-
-                    {/* Paper Title */}
-                    <h2 className="text-[20px] sm:text-[22px] font-semibold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug">
-                      {pub.title}
-                    </h2>
-
-                    {/* Venue */}
-                    <div className="text-sm font-medium text-[var(--text-muted)] flex items-center gap-2">
-                      <span className="text-[var(--ink-dark)] font-bold font-sans text-xs">VENUE:</span>
-                      <span>{pub.venue}</span>
-                    </div>
-
-                    {/* Authors */}
-                    <p className="text-xs sm:text-[13.5px] font-sans text-[var(--text-muted)]">
-                      Authors: <span className="text-[var(--text-primary)] font-semibold">{pub.authors}</span>
-                    </p>
-
-                    {/* DOI */}
-                    {pub.doi && (
-                      <div className="text-xs font-sans text-[var(--text-subtle)]">
-                        DOI: <a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener noreferrer" className="text-[var(--accent-orange)] hover:underline">{pub.doi}</a>
-                      </div>
-                    )}
-
-                    {/* Abstract snippet */}
-                    {pub.abstract && (
-                      <p className="text-xs sm:text-[14px] text-[var(--text-muted)] italic leading-relaxed pt-1 font-normal">
-                        "{pub.abstract}"
-                      </p>
-                    )}
-
-                    {/* Tags */}
-                    {pub.tags && Array.isArray(pub.tags) && (
-                      <div className="flex flex-wrap gap-1.5 pt-2">
-                        {pub.tags.map((tag: string, idx: number) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons: Read Link, PDF, BibTeX Cite */}
-                  <div className="flex sm:flex-col items-center sm:items-end gap-2.5 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--border-hairline)]">
-                    {pub.link && (
-                      <a
-                        href={pub.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-9 px-4 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                      >
-                        <span>Read Paper</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-
-                    {pub.pdf && (
-                      <a
-                        href={pub.pdf}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-9 px-4 rounded-full bg-[var(--ink-dark)] hover:bg-black text-white text-xs font-semibold shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download PDF</span>
-                      </a>
-                    )}
-
-                    <button
-                      onClick={() => copyBibtex(pub)}
-                      className="h-9 px-4 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--bg-surface)] text-xs font-sans flex items-center gap-1.5 transition-colors cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] whitespace-nowrap font-medium"
-                      title="Copy BibTeX Citation"
-                    >
-                      {copiedId === pub.id ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                          <span className="text-[var(--accent-orange)] font-semibold">Citation Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 text-[var(--text-subtle)]" />
-                          <span>Copy Citation</span>
-                        </>
-                      )}
-                    </button>
+                  <div style={{ opacity: 0.55, marginBottom: '6px' }}>INDEXED VENUE</div>
+                  <div style={{ fontWeight: 700, fontSize: '13px', lineHeight: 1.35 }}>
+                    {pub.venue}
                   </div>
                 </div>
-              )
-            })}
-          </motion.div>
-        </AnimatePresence>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-        {filtered.length === 0 && (
-          <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-            <p className="text-sm font-sans text-[var(--text-muted)]">
-              {searchQuery ? 'No publications matched your search criteria.' : 'No publications published yet.'}
+      {/* RESEARCH BLOGS & TECHNICAL DISPATCHES (#blogs) */}
+      <section id="blogs" className="section studio-dark">
+        <div className="section-label reveal is-visible">
+          <span>TECHNICAL DISPATCHES &amp; BLOGS</span>
+          <span>ENGINEERING NOTES FROM THE LAB</span>
+        </div>
+        <div className="editorial-pair" style={{ marginTop: '45px', marginBottom: '45px' }}>
+          <h2 className="reveal is-visible">
+            Inside our
+            <br />
+            <span className="gradient liquid-word">
+              engineering<span className="dot">.</span>
+            </span>
+          </h2>
+          <div className="reveal is-visible">
+            <p>
+              Deep-dive technical notes on low-resource Urdu tokenization, TensorRT quantization on
+              Jetson Orin, and explainable retinal OCT segmentation written by our research fellows.
             </p>
           </div>
-        )}
-      </div>
-
-      {/* ── 2. BLOGS SECTION (Underneath Publications) ── */}
-      <section id="blogs" className="mt-24 pt-16 border-t border-[var(--border-hairline)] text-left">
-        <div className="mb-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--accent-orange)] text-xs font-bold uppercase tracking-wider mb-3 border border-[var(--border-hairline)]">
-            <FileText className="w-3.5 h-3.5" />
-            <span>Articles & Technical Notes</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
-            Research Blogs & Dispatches
-          </h2>
-          <p className="text-sm sm:text-base text-[var(--text-muted)] mt-2 leading-relaxed font-normal">
-            In-depth architectural breakdowns, engineering postmortems, and field deployment dispatches authored by AIR Lab scientists and fellows.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {labBlogs.map(blog => (
-            <article
-              key={blog.id}
-              className="p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-4 font-medium">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                    <span>{blog.readTime}</span>
-                  </div>
-                  <span>{blog.date}</span>
-                </div>
-
-                <h3 className="text-lg font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-3">
-                  {blog.title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed font-normal mb-5">
-                  {blog.excerpt}
+        <div className="capabilities-list">
+          {blogs.map((blog, idx) => (
+            <details key={blog.code} className="reveal is-visible" open={idx === 0}>
+              <summary>
+                <span>{String(idx + 1).padStart(2, '0')}</span>
+                <h3>{blog.title}</h3>
+                <i aria-hidden="true">+</i>
+              </summary>
+              <div className="is-rich">
+                <p>
+                  <strong>
+                    {blog.category} · {blog.date}
+                  </strong>{' '}
+                  — {blog.summary}
                 </p>
-
-                <div className="flex flex-wrap gap-1.5 mb-6">
-                  {blog.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] font-medium"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
+                <p>
+                  <strong>Author:</strong> {blog.author} ({blog.readTime}) ·{' '}
+                  <Link className="text-link" to="/projects" style={{ padding: 0 }}>
+                    View related project
+                  </Link>
+                </p>
               </div>
-
-              <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
-                <span className="text-xs font-semibold text-[var(--text-primary)]">
-                  {blog.author}
-                </span>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:translate-x-1 transition-transform">
-                  <span>Read Notes</span>
-                  <ArrowRight className="w-3 h-3" />
-                </span>
-              </div>
-            </article>
+            </details>
           ))}
         </div>
       </section>
-    </div>
-  )
+    </>
+  );
 }

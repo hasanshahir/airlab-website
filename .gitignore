@@ -25,3 +25,6 @@ dist-ssr
 .vercel
 *.mp4
 .env*
+rea-main/
+REMAIN/
+

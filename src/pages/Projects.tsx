@@ -1,511 +1,240 @@
-import { useState, useMemo, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Search,
-  X,
-  CheckCircle2,
-  Clock,
-  Users,
-  ExternalLink,
-  ArrowRight,
-  Layers,
-} from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { getProjects, getTeamMembers } from '../lib/data'
-import type { ProjectItem, TeamMemberData } from '../types/data'
-import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
+import React, { useState, useMemo } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
+import type { LayoutOutletContext } from '../components/Layout';
+import { getProjects, getGrants } from '../data/airlabData';
+import { getProjectCover } from '../lib/placeholders';
+import type { ProjectItem } from '../types/data';
 
-function parseDateScore(dateStr?: string): number {
-  if (!dateStr) return 0
-  const months: Record<string, number> = {
-    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
-    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
-  }
-  const lower = dateStr.toLowerCase()
-  const yearMatch = lower.match(/\b(19\d\d|20\d\d)\b/)
-  const year = yearMatch ? parseInt(yearMatch[1], 10) : 0
-  let month = 0
-  for (const [m, num] of Object.entries(months)) {
-    if (lower.includes(m)) {
-      month = num
-      break
-    }
-  }
-  return year * 100 + month
-}
+const PORTFOLIO_THEMES = [
+  { bg: '#0b132b', fg: '#ffffff' },
+  { bg: '#e9eeed', fg: '#0b0c0e' },
+  { bg: '#161925', fg: '#ffffff' },
+  { bg: '#f2ece4', fg: '#111215' },
+  { bg: '#111827', fg: '#ffffff' },
+  { bg: '#eae6df', fg: '#0b0c0e' },
+];
 
 export default function Projects() {
-  const [activeCategory, setActiveCategory] = useState<string>('All')
-  const [query, setQuery] = useState('')
-  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
-  const [activeGalleryIndex, setActiveGalleryIndex] = useState<number>(0)
+  const { openApplicationModal } = useOutletContext<LayoutOutletContext>();
+  const projects = getProjects();
+  const grants = getGrants();
 
-  const [projectsData, setProjectsData] = useState<ProjectItem[]>(() => getProjects())
-  const [allMembers, setAllMembers] = useState<TeamMemberData[]>(() => getTeamMembers())
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [activeProject, setActiveProject] = useState<ProjectItem | null>(null);
 
-  useEffect(() => {
-    let active = true
-    Promise.all([
-      fetch('/api/content/projects').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/content/team').then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([projs, team]) => {
-      if (!active) return
-      if (Array.isArray(projs)) setProjectsData(projs)
-      if (Array.isArray(team)) setAllMembers(team)
-    })
-    return () => { active = false }
-  }, [])
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(projects.map((p) => p.category).filter(Boolean)));
+    return ['all', 'Ongoing', 'Finished', ...cats];
+  }, [projects]);
 
-  const categories = ['All', 'Funded', 'R&D', 'Undergraduate', 'Postgraduate']
-
-  // Prevent background layout shift & lock scroll safely when modal is open
-  useEffect(() => {
-    if (selectedProject) {
-      const scrollY = window.scrollY
-      const originalOverflow = document.body.style.overflow
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-
-      document.body.style.overflow = 'hidden'
-      if (scrollbarWidth > 0) {
-        document.body.style.paddingRight = `${scrollbarWidth}px`
-      }
-
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setSelectedProject(null)
-      }
-      window.addEventListener('keydown', handleKeyDown)
-
-      return () => {
-        document.body.style.overflow = originalOverflow
-        document.body.style.paddingRight = ''
-        window.scrollTo(0, scrollY)
-        window.removeEventListener('keydown', handleKeyDown)
-      }
+  const filteredProjects = useMemo(() => {
+    if (selectedCategory === 'all') return projects;
+    if (selectedCategory === 'Ongoing' || selectedCategory === 'Finished') {
+      return projects.filter((p) => p.status === selectedCategory);
     }
-  }, [selectedProject])
-
-  const filtered = useMemo(() => {
-    const list = projectsData.filter(p => {
-      const matchesCat = activeCategory === 'All' || p.category === activeCategory
-      const matchesSearch =
-        query === '' ||
-        p.title.toLowerCase().includes(query.toLowerCase()) ||
-        p.description.toLowerCase().includes(query.toLowerCase()) ||
-        p.funding.toLowerCase().includes(query.toLowerCase())
-      return matchesCat && matchesSearch
-    })
-
-    // Sort: Ongoing projects at the top, Finished / older projects at the bottom; within groups, most recent first
-    return list.slice().sort((a, b) => {
-      const isOngoingA = a.status === 'Ongoing'
-      const isOngoingB = b.status === 'Ongoing'
-
-      if (isOngoingA && !isOngoingB) return -1
-      if (!isOngoingA && isOngoingB) return 1
-
-      const scoreA = Math.max(parseDateScore(a.startDate), parseDateScore(a.timeTaken), parseDateScore(a.endDate))
-      const scoreB = Math.max(parseDateScore(b.startDate), parseDateScore(b.timeTaken), parseDateScore(b.endDate))
-
-      return scoreB - scoreA
-    })
-  }, [projectsData, activeCategory, query])
-
-  // Resolve team members associated with selected project
-  const projectMembers = useMemo(() => {
-    if (!selectedProject?.memberIds) return []
-    return selectedProject.memberIds
-      .map(id => allMembers.find(m => m.id === id))
-      .filter((m): m is NonNullable<typeof m> => Boolean(m))
-  }, [selectedProject, allMembers])
+    return projects.filter((p) => p.category === selectedCategory);
+  }, [projects, selectedCategory]);
 
   return (
-    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
-      {/* ── Section Header ── */}
-      <div className="mb-14 text-left max-w-3xl">
-        <div className="mb-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-xs font-sans font-semibold">
-            <Layers className="w-3.5 h-3.5" />
-            <span>FEATURED WORK & BENCHMARKS</span>
+    <>
+      {/* STUDIO UNLMTD PORTFOLIO HEADING */}
+      <section className="section portfolio-heading">
+        <div className="section-label reveal is-visible">
+          <span>PORTFOLIO</span>
+          <span>NED UNIVERSITY · AIR LAB</span>
+        </div>
+        <h1 className="reveal is-visible" data-fit="">
+          Work.
+        </h1>
+        <p className="reveal is-visible">
+          Selected AI research systems, clinical diagnostic pipelines, multilingual LLMs, and
+          autonomous robotics engineered from start to finish.
+        </p>
+      </section>
+
+      {/* STUDIO UNLMTD PORTFOLIO INDEX */}
+      <section className="section portfolio-index" aria-label="Projects">
+        <div className="portfolio-tools">
+          <div className="portfolio-filters" role="group" aria-label="Filter by discipline">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                aria-pressed={selectedCategory === cat}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat === 'all' ? 'All' : cat}
+              </button>
+            ))}
+          </div>
+          <span className="portfolio-count" role="status" aria-live="polite">
+            {filteredProjects.length} {filteredProjects.length === 1 ? 'project' : 'projects'}
+          </span>
+        </div>
+
+        {/* SELECTED PROJECT EDITORIAL SHEET (IF CLICKED) */}
+        {activeProject && (
+          <div
+            className="editorial-sheet reveal is-visible"
+            style={{
+              margin: '0 0 65px',
+              padding: '36px',
+              background: '#f4f4f5',
+              borderTop: '2px solid #000',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                width: '100%',
+                gap: '24px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div>
+                <span className="section-label" style={{ marginBottom: '10px', display: 'block' }}>
+                  {activeProject.category.toUpperCase()} · {activeProject.status.toUpperCase()}
+                </span>
+                <h2
+                  style={{
+                    fontSize: 'clamp(28px, 3.6vw, 52px)',
+                    fontWeight: 900,
+                    letterSpacing: '-0.035em',
+                    lineHeight: 1.02,
+                  }}
+                >
+                  {activeProject.title}
+                </h2>
+              </div>
+              <button
+                type="button"
+                className="sheet-online"
+                onClick={() => setActiveProject(null)}
+                style={{ '--project-ink': '#000', '--project-bg': '#fff' } as React.CSSProperties}
+              >
+                Close Case Study ×
+              </button>
+            </div>
+
+            <p style={{ maxWidth: '75ch', fontSize: '17px', lineHeight: 1.65 }}>
+              {activeProject.description}
+            </p>
+
+            <dl>
+              <div>
+                <dt>Status</dt>
+                <dd>{activeProject.status}</dd>
+              </div>
+              <div>
+                <dt>Funding / Sponsor</dt>
+                <dd>{activeProject.funding || 'NED University AIR Lab'}</dd>
+              </div>
+              <div>
+                <dt>Timeline</dt>
+                <dd>{activeProject.startDate || activeProject.timeTaken || '2024 – Present'}</dd>
+              </div>
+              {activeProject.teamMembers && activeProject.teamMembers.length > 0 && (
+                <div>
+                  <dt>Research Team</dt>
+                  <dd>
+                    <ul className="sheet-pills">
+                      {activeProject.teamMembers.map((member: string) => (
+                        <li key={member}>{member}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        )}
+
+        <div className="portfolio-grid">
+          {filteredProjects.map((proj, idx) => {
+            const theme = PORTFOLIO_THEMES[idx % PORTFOLIO_THEMES.length];
+            return (
+              <a
+                key={proj.id}
+                href={`#project-${proj.id}`}
+                className="project-link reveal is-visible"
+                aria-label={`${proj.title} — ${proj.category}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveProject(proj);
+                  window.scrollTo({ top: 280, behavior: 'smooth' });
+                }}
+              >
+                <div
+                  className="project-visual no-blend"
+                  style={
+                    {
+                      background: theme.bg,
+                      color: theme.fg,
+                    } as React.CSSProperties
+                  }
+                >
+                  <img
+                    src={getProjectCover(proj.coverImage)}
+                    alt={proj.title}
+                    width="1200"
+                    height="900"
+                    loading={idx < 2 ? 'eager' : 'lazy'}
+                  />
+                  <div className="visual-bottom" aria-hidden="true">
+                    <span>
+                      {proj.category.toUpperCase()} — {proj.status.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                <div className="project-caption">
+                  <h3>{proj.title}</h3>
+                  <span>{proj.startDate || proj.status}</span>
+                  <span className="project-kind">
+                    {proj.category} · {proj.funding || 'NED AIR Lab'}
+                  </span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+
+        {filteredProjects.length === 0 && (
+          <p className="portfolio-empty">No projects in this discipline yet.</p>
+        )}
+      </section>
+
+      {/* NATIONAL GRANTS & SPONSORED R&D TEASER */}
+      <section className="section studio-dark">
+        <div className="section-label reveal is-visible">
+          <span>SPONSORED R&amp;D</span>
+          <span>{grants.length} NATIONAL &amp; INDUSTRIAL GRANTS</span>
+        </div>
+        <div className="editorial-pair" style={{ marginTop: '45px' }}>
+          <h2 className="reveal is-visible">
+            Backed by national
+            <br />
+            <span className="gradient liquid-word">
+              funding<span className="dot">.</span>
+            </span>
+          </h2>
+          <div className="reveal is-visible">
+            <p>
+              Our projects are supported by competitive grants from the Higher Education Commission
+              (HEC), IGNITE National Technology Fund, and industry partners across Pakistan.
+            </p>
+            <div style={{ display: 'flex', gap: '28px', flexWrap: 'wrap', marginTop: '24px' }}>
+              <Link className="text-link" to="/grants">
+                Inspect all funded grants ({grants.length})
+              </Link>
+              <button type="button" className="text-link" onClick={openApplicationModal}>
+                Join a project as a Fellow
+              </button>
+            </div>
           </div>
         </div>
-
-        <h1 className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] mb-4 font-head">
-          Applied AI Systems & Projects
-        </h1>
-
-        <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-          Portfolio of foundation architectures, edge robotics pipelines, and clinical diagnostic benchmarks developed at AIR Lab.
-        </p>
-      </div>
-
-      {/* ── Category Filter Pills & Search ── */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 mb-10 pb-6 border-b border-[var(--border-hairline)]">
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center gap-2">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${
-                activeCategory === cat
-                  ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
-                  : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)] hover:border-[var(--accent-orange)]/40'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Search Input (Pill Shaped) */}
-        <div className="relative w-full lg:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)]" />
-          <input
-            type="text"
-            placeholder="Search projects, grants..."
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
-          />
-        </div>
-      </div>
-
-      {/* ── Project Cards Grid (Generous 28px Rounded Stone Cards) ── */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeCategory + query}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left"
-        >
-          {filtered.map(proj => {
-            const isOngoing = proj.status === 'Ongoing'
-            return (
-              <div
-                key={proj.id}
-                onClick={() => {
-                  setSelectedProject(proj)
-                  setActiveGalleryIndex(0)
-                }}
-                className="group bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl p-6 flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer relative"
-              >
-                <div>
-                  {/* Image Cover Banner */}
-                  <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] mb-5 border border-[var(--border-hairline)]">
-                    <img
-                      src={getProjectCover(proj.coverImage || proj.images?.[0])}
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_PROJECT_COVER
-                      }}
-                      alt={proj.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-                    {/* Status badge (Ongoing / Finished) */}
-                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[11px] font-sans font-semibold text-[var(--text-primary)] shadow-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)]" />
-                        {proj.category}
-                      </span>
-
-                      <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-sans font-semibold flex items-center gap-1.5 ${
-                          isOngoing
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-[var(--ink-dark)] text-white'
-                        }`}
-                      >
-                        {isOngoing ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
-                        {proj.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Title & Description */}
-                  <h3 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2.5 font-head line-clamp-2">
-                    {proj.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed mb-5 line-clamp-3 font-normal">
-                    {proj.description}
-                  </p>
-
-                  {/* Metadata Specs */}
-                  <div className="space-y-1.5 mb-5 text-[12px] font-sans text-[var(--text-muted)] bg-[var(--bg-page)] p-3.5 rounded-2xl border border-[var(--border-hairline)]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[var(--text-subtle)]">Timeline:</span>
-                      <span className="font-semibold text-[var(--text-primary)]">
-                        {proj.startDate} — {proj.endDate || 'Present'}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[var(--text-subtle)]">Funding:</span>
-                      <span className="font-semibold text-[var(--accent-orange)] truncate max-w-[180px]">
-                        {proj.funding}
-                      </span>
-                    </div>
-                    {proj.pi && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-[var(--text-subtle)]">PI:</span>
-                        <span className="font-medium text-[var(--text-primary)] truncate max-w-[180px]">
-                          {proj.pi}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Bottom Action Footer */}
-                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans">
-                  <span className="text-[var(--text-subtle)] uppercase tracking-wider text-[11px] font-medium">
-                    {proj.category}
-                  </span>
-                  <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1.5 group-hover:underline">
-                    <span>View Details</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-              </div>
-            )
-          })}
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Empty State */}
-      {filtered.length === 0 && (
-        <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-          <p className="text-sm font-sans text-[var(--text-muted)]">
-            {query ? `No projects match "${query}".` : 'No projects published yet.'}
-          </p>
-        </div>
-      )}
-
-      {/* ── Project Gallery & Specs Modal ── */}
-      {typeof document !== 'undefined' &&
-        createPortal(
-          <AnimatePresence>
-            {selectedProject && (
-              <div
-                className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto"
-                onClick={() => setSelectedProject(null)}
-              >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={e => e.stopPropagation()}
-                  className="w-full max-w-3xl bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-left relative my-auto font-sans"
-                >
-                  <div className="px-6 py-4 bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] flex items-center justify-between select-none">
-                    <div className="flex items-center gap-2.5">
-                      <span className="px-3 py-1 rounded-full bg-[var(--accent-orange)] text-white text-[11px] font-sans font-semibold">
-                        {selectedProject.status}
-                      </span>
-                      <span className="text-xs font-sans text-[var(--text-muted)]">
-                        airlab.neduet.edu.pk/projects/{selectedProject.id}
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => setSelectedProject(null)}
-                      className="p-1.5 text-[var(--text-subtle)] hover:text-[var(--text-primary)] rounded-full hover:bg-[var(--bg-page)] transition-colors cursor-pointer"
-                      aria-label="Close project modal"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="p-6 sm:p-8 overflow-y-auto flex-1">
-                    {/* Image Gallery Viewer */}
-                    {selectedProject.images && selectedProject.images.length > 0 && (
-                      <div className="mb-6">
-                        <div className="h-64 sm:h-80 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] border border-[var(--border-hairline)] mb-3">
-                          <img
-                            src={getProjectCover(selectedProject.images[activeGalleryIndex] || selectedProject.coverImage)}
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_PROJECT_COVER
-                            }}
-                            alt={`${selectedProject.title} preview ${activeGalleryIndex + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        {selectedProject.images.length > 1 && (
-                          <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
-                            {selectedProject.images.map((img, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => setActiveGalleryIndex(idx)}
-                                className={`w-20 h-14 rounded-xl overflow-hidden border shrink-0 transition-all cursor-pointer ${
-                                  activeGalleryIndex === idx
-                                    ? 'border-[var(--accent-orange)] ring-2 ring-[var(--accent-orange)]'
-                                    : 'border-[var(--border-hairline)] opacity-60 hover:opacity-100'
-                                }`}
-                              >
-                                <img src={img} alt="thumb" className="w-full h-full object-cover" />
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-3 font-head">
-                      {selectedProject.title}
-                    </h2>
-
-                    <p className="text-sm sm:text-base text-[var(--text-muted)] leading-relaxed mb-8 font-normal">
-                      {selectedProject.description}
-                    </p>
-
-                    {/* Specs Table */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs font-sans mb-8">
-                      <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                        <span className="text-[var(--text-subtle)] block mb-1">PROJECT TIMELINE</span>
-                        <span className="font-semibold text-[var(--text-primary)]">
-                          {selectedProject.startDate} — {selectedProject.endDate || 'Ongoing'}
-                          {selectedProject.timeTaken ? ` (${selectedProject.timeTaken})` : ''}
-                        </span>
-                      </div>
-                      <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                        <span className="text-[var(--text-subtle)] block mb-1">GRANT & FUNDING SOURCE</span>
-                        <Link to="/grants" onClick={() => setSelectedProject(null)} className="font-semibold text-[var(--accent-orange)] hover:underline">
-                          {selectedProject.funding} &rarr;
-                        </Link>
-                        {selectedProject.grantAmount && selectedProject.grantAmount !== 'NA' && (
-                          <div className="text-[11px] text-[var(--text-primary)] font-bold mt-1">
-                            Amount: {selectedProject.grantAmount}
-                          </div>
-                        )}
-                      </div>
-                      {selectedProject.pi && (
-                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                          <span className="text-[var(--text-subtle)] block mb-1">PRINCIPAL INVESTIGATOR</span>
-                          <span className="font-semibold text-[var(--text-primary)]">{selectedProject.pi}</span>
-                        </div>
-                      )}
-                      <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                        <span className="text-[var(--text-subtle)] block mb-1">STATUS</span>
-                        <span className="font-semibold text-[var(--accent-orange)]">{selectedProject.status} Review</span>
-                      </div>
-                      <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                        <span className="text-[var(--text-subtle)] block mb-1">PROJECT CATEGORY</span>
-                        <span className="font-semibold text-[var(--text-primary)]">{selectedProject.category}</span>
-                      </div>
-                      {selectedProject.funderUrl && (
-                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                          <span className="text-[var(--text-subtle)] block mb-1">SPONSOR WEBSITE</span>
-                          <a
-                            href={selectedProject.funderUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[var(--ink-dark)] hover:underline font-semibold flex items-center gap-1"
-                          >
-                            <span>Visit Website</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* ── Student Researchers & Engineers Section ── */}
-                    {selectedProject.teamMembers && selectedProject.teamMembers.length > 0 && (
-                      <div className="mb-6 pt-6 border-t border-[var(--border-hairline)]">
-                        <h4 className="text-xs font-sans font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3.5 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-[var(--accent-orange)]" /> Student Researchers & Engineers
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {selectedProject.teamMembers.map((member, idx) => (
-                            <div
-                              key={idx}
-                              className="px-4 py-2.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-xl flex items-center justify-between text-xs font-sans"
-                            >
-                              <span className="font-semibold text-[var(--text-primary)]">{member}</span>
-                              <span className="text-[10px] text-[var(--ink-dark)] bg-white px-2 py-0.5 rounded-full border border-[var(--border-hairline)]">
-                                Researcher
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* ── Project Team Members Section ── */}
-                    {projectMembers.length > 0 && (
-                      <div className="mb-2 pt-6 border-t border-[var(--border-hairline)]">
-                        <h4 className="text-xs font-sans font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3.5 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-[var(--ink-dark)]" /> Project Leads & Team
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                          {projectMembers.map(member => (
-                            <div
-                              key={member.id}
-                              className="p-3.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl flex items-center gap-3 group/member hover:border-[var(--accent-orange)] transition-all"
-                            >
-                              <img
-                                src={member.image || './pfp/marvi.jpeg'}
-                                alt={member.name}
-                                className="w-12 h-12 rounded-xl object-cover border border-[var(--border-hairline)] shrink-0 bg-white"
-                                onError={e => {
-                                  ;(e.target as HTMLImageElement).src =
-                                    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><rect width="44" height="44" fill="%23E5E1EA"/><text x="50%" y="55%" font-size="14" font-family="sans-serif" fill="%237A7A82" dominant-baseline="middle" text-anchor="middle">AI</text></svg>'
-                                }}
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="font-semibold text-xs text-[var(--text-primary)] truncate font-head group-hover/member:text-[var(--accent-orange)] transition-colors">
-                                  {member.name}
-                                </div>
-                                <div className="text-[11px] text-[var(--text-muted)] truncate font-sans">
-                                  {member.role || member.category}
-                                </div>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Link
-                                    to={`/team?member=${member.id}`}
-                                    onClick={() => setSelectedProject(null)}
-                                    className="text-[10px] font-sans text-[var(--accent-orange)] hover:underline inline-flex items-center gap-0.5 font-semibold"
-                                  >
-                                    Profile &rarr;
-                                  </Link>
-                                  {member.linkedin && (
-                                    <a
-                                      href={member.linkedin}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-[10px] font-sans text-[var(--text-subtle)] hover:text-[var(--ink-dark)] inline-flex items-center gap-0.5"
-                                      onClick={e => e.stopPropagation()}
-                                    >
-                                      LinkedIn <ExternalLink className="w-2.5 h-2.5" />
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="px-6 py-4 bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] flex items-center justify-end">
-                    <button
-                      onClick={() => setSelectedProject(null)}
-                      className="px-6 py-2.5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:translate-y-[1px]"
-                    >
-                      <X className="w-4 h-4" />
-                      <span>Close</span>
-                    </button>
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
-    </div>
-  )
+      </section>
+    </>
+  );
 }

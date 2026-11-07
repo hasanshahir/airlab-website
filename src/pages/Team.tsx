@@ -1,554 +1,284 @@
-import { useState, useMemo, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, ExternalLink, GraduationCap, Users, Calendar, Search, Sparkles, FileText } from 'lucide-react'
-import { getTeamMembers, getPreviousInterns } from '../lib/data'
-import type { TeamMemberData } from '../types/data'
-import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
-import { TeamMemberEntity } from '../entities/TeamMemberEntity'
-import Badge from '../components/ui/Badge'
-import SectionReveal from '../components/ui/SectionReveal'
-import StudentApplicationModal from '../components/StudentApplicationModal'
-
-const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
-  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
-  </svg>
-)
-
-type TabType = 'faculty' | 'interns' | 'previous'
+import { useSearchParams, useOutletContext } from 'react-router-dom';
+import type { LayoutOutletContext } from '../components/Layout';
+import { getTeamMembers, getAlumniMembers } from '../data/airlabData';
+import { getMemberAvatar } from '../lib/placeholders';
 
 export default function Team() {
-  const [searchParams] = useSearchParams()
-  const [activeTab, setActiveTab] = useState<TabType>('faculty')
-  const [applyModalOpen, setApplyModalOpen] = useState(false)
-  const [highlightedMemberId, setHighlightedMemberId] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
+  const { openApplicationModal } = useOutletContext<LayoutOutletContext>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'all';
 
-  useEffect(() => {
-    const tabParam = searchParams.get('tab') as TabType
-    const memberParam = searchParams.get('member')
-    if (tabParam && ['faculty', 'interns', 'previous'].includes(tabParam)) {
-      setActiveTab(tabParam)
-    } else if (tabParam === 'all' as unknown) {
-      setActiveTab('faculty')
+  const allMembers = getTeamMembers();
+  const previousInterns = getAlumniMembers();
+
+  const faculty = allMembers.filter((m) => m.category === 'Faculty');
+  const interns = allMembers.filter((m) => m.category !== 'Faculty' && m.category !== 'Alumni');
+
+  const setTab = (tab: string) => {
+    if (tab === 'all') {
+      setSearchParams({});
+    } else {
+      setSearchParams({ tab });
     }
-    if (memberParam) {
-      setHighlightedMemberId(memberParam)
-      setTimeout(() => {
-        const el = document.getElementById(`member-${memberParam}`)
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
-      }, 300)
-    }
-  }, [searchParams])
-
-  const [allMembersRaw, setAllMembersRaw] = useState<TeamMemberData[]>(() => getTeamMembers())
-  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>(() => getPreviousInterns())
-
-  useEffect(() => {
-    let active = true
-    Promise.all([
-      fetch('/api/content/team').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/content/previous-interns').then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([team, prev]) => {
-      if (!active) return
-      if (Array.isArray(team)) {
-        const fallbackFaculty = getTeamMembers().filter(m => m.category === 'Faculty')
-        const merged = [...fallbackFaculty]
-        for (const item of team) {
-          const idx = merged.findIndex(m => m.id === item.id || m.name.trim().toLowerCase() === item.name.trim().toLowerCase())
-          if (idx >= 0) {
-            merged[idx] = { ...merged[idx], ...item }
-          } else {
-            merged.push(item)
-          }
-        }
-        setAllMembersRaw(merged)
-      }
-      if (Array.isArray(prev)) setSortedPreviousInterns(prev)
-    })
-    return () => { active = false }
-  }, [])
-
-
-  const allMembers = useMemo(() => {
-    const list = TeamMemberEntity.fromArray(allMembersRaw)
-    return TeamMemberEntity.sortByRecent(list)
-  }, [allMembersRaw])
-
-  const facultyMembers = useMemo(() => {
-    return allMembers.filter(m => m.isFacultyLead() || m.category === 'Faculty')
-  }, [allMembers])
-
-  const internMembers = useMemo(() => {
-    return allMembers.filter(m => m.category === 'Research Interns')
-  }, [allMembers])
-
-  const filteredInterns = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase()
-    if (!query) return internMembers
-
-    return internMembers.filter(intern => {
-      const matchName = intern.name.toLowerCase().includes(query)
-      const matchFocus = Boolean(intern.researchFocus && intern.researchFocus.toLowerCase().includes(query))
-      const matchDept = Boolean(intern.department && intern.department.toLowerCase().includes(query))
-      return matchName || matchFocus || matchDept
-    })
-  }, [internMembers, searchQuery])
-
-  useEffect(() => {
-    if (highlightedMemberId) {
-      const timer = setTimeout(() => setHighlightedMemberId(null), 3500)
-      return () => clearTimeout(timer)
-    }
-  }, [highlightedMemberId])
-
-  const tabs: { id: TabType; label: string; count?: number }[] = [
-    { id: 'faculty', label: 'Faculty', count: facultyMembers.length },
-    { id: 'interns', label: 'Research Interns', count: internMembers.length },
-    { id: 'previous', label: 'Alumni Interns', count: sortedPreviousInterns.length },
-  ]
+  };
 
   return (
-    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-6 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
-      {/* Header */}
-      <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<Users className="w-3.5 h-3.5 text-white" />}>
-              RESEARCH FACULTY & SCHOLARS
-            </Badge>
-          </div>
-        </SectionReveal>
-
-        <SectionReveal delay={0.08}>
-          <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Our Research Team
-          </h1>
-        </SectionReveal>
-
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Faculty leads, research interns, and scholars driving foundational regional AI, computer vision, and autonomous robotics at NED University.
-          </p>
-        </SectionReveal>
-      </div>
-
-      {/* Tabs Control (Pill-shaped selectors) */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-6">
-        <div className="inline-flex items-center gap-2 p-1.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-full shadow-xs">
-          {tabs.map(tab => {
-            const isActive = activeTab === tab.id
-            return (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id)
-                  setHighlightedMemberId(null)
-                }}
-                className={`relative px-4 py-2 rounded-full text-[13.5px] font-medium transition-all duration-150 cursor-pointer select-none whitespace-nowrap flex items-center gap-2 ${
-                  isActive
-                    ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)]'
-                }`}
-              >
-                <span>{tab.label}</span>
-                {tab.count !== undefined && (
-                  <span
-                    className={`text-[11px] font-sans px-2 py-0.5 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]'
-                    }`}
-                  >
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            )
-          })}
+    <>
+      {/* STUDIO UNLMTD TEAM MASTHEAD */}
+      <section className="section page-top">
+        <div className="section-label reveal is-visible">
+          <span>THE TEAM</span>
+          <span>FACULTY, FELLOWS &amp; ALUMNI</span>
         </div>
+        <div className="headline inner-heading">
+          <h1 className="reveal is-visible">
+            THE PEOPLE
+            <br />
+            <span className="gradient liquid-word">
+              BEHIND IT<span className="dot">.</span>
+            </span>
+          </h1>
+        </div>
+        <div className="intro-row">
+          <p className="reveal is-visible">
+            Principal Investigators, Faculty Supervisors, Active Research Fellows, and Alumni
+            engineering sovereign AI systems at NED University.
+          </p>
+        </div>
+      </section>
 
-        {/* Search bar inside interns tab */}
-        {activeTab === 'interns' && (
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)]" />
-            <input
-              type="text"
-              placeholder="Search by name or focus area..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
-            />
+      {/* STUDIO UNLMTD FILTER TOOLS */}
+      <section className="section portfolio-index" style={{ paddingBottom: '20px' }}>
+        <div className="portfolio-tools">
+          <div className="portfolio-filters" role="group" aria-label="Filter team by cohort">
+            <button
+              type="button"
+              aria-pressed={activeTab === 'all'}
+              onClick={() => setTab('all')}
+            >
+              All ({faculty.length + interns.length + previousInterns.length})
+            </button>
+            <button
+              type="button"
+              aria-pressed={activeTab === 'faculty'}
+              onClick={() => setTab('faculty')}
+            >
+              Faculty &amp; PIs ({faculty.length})
+            </button>
+            <button
+              type="button"
+              aria-pressed={activeTab === 'interns'}
+              onClick={() => setTab('interns')}
+            >
+              Active Fellows ({interns.length})
+            </button>
+            <button
+              type="button"
+              aria-pressed={activeTab === 'previous'}
+              onClick={() => setTab('previous')}
+            >
+              Alumni ({previousInterns.length})
+            </button>
           </div>
-        )}
-      </div>
+          <span className="portfolio-count">
+            NED University · Department of CSIT
+          </span>
+        </div>
+      </section>
 
-      {/* Tab Content Display */}
-      <AnimatePresence mode="wait">
-        {/* TAB 1: FACULTY */}
-        {activeTab === 'faculty' && (
-          <motion.div
-            key="faculty"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-8"
-          >
-            <div className="max-w-4xl mx-auto space-y-6">
-              {facultyMembers.length === 0 && (
-                <div className="text-center py-16 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-                  <p className="text-sm font-sans text-[var(--text-muted)]">No faculty members listed yet.</p>
-                </div>
-              )}
-              {facultyMembers.map(f => {
-                const raw = allMembersRaw.find(m => m.id === f.id)
-                const isHighlighted = highlightedMemberId === f.id
-                return (
-                  <div
-                    id={`member-${f.id}`}
-                    key={f.id}
-                    className={`p-8 sm:p-10 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden group transition-all duration-200 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg ${
-                      isHighlighted ? 'ring-2 ring-[var(--accent-orange)] shadow-xl' : ''
-                    }`}
-                  >
-                    <div
-                      onClick={() => {
-                        if (f.hasLinkedIn()) window.open(f.getLinkedInUrl()!, '_blank')
-                        else if (f.cvUrl) window.open(f.cvUrl, '_blank')
-                        else if (f.hasEmail()) window.location.href = f.getEmailFallback()!
-                      }}
-                      title="Click to view profile / Resume"
-                      className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden border border-[var(--border-hairline)] shrink-0 shadow-sm bg-[var(--bg-page)] cursor-pointer group-hover:scale-102 transition-transform"
-                    >
-                      <img
-                        src={getMemberAvatar(f.image)}
-                        onError={(e) => {
-                          e.currentTarget.src = DEFAULT_AVATAR
-                        }}
-                        alt={f.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="flex-1 space-y-4 relative z-10 text-left">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[var(--ink-dark)] text-white flex items-center gap-1.5 shadow-xs">
-                            <GraduationCap className="w-3.5 h-3.5" />
-                            {f.role}
-                          </span>
-                          <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)] flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            Active: {raw?.tenure || '2020 — Present'}
-                          </span>
-                        </div>
-
-                        <h2 className="text-2xl sm:text-3xl font-semibold font-head text-[var(--text-primary)]">
-                          {f.name}
-                        </h2>
-                        <p className="text-sm font-medium text-[var(--text-muted)] mt-1 font-sans">
-                          {f.designation} · {f.department}
-                        </p>
-
-                        {/* Research Tags */}
-                        {raw?.tags && (
-                          <div className="flex flex-wrap gap-1.5 mt-3">
-                            {raw.tags.map((t, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
-                              >
-                                #{t}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Action buttons: LinkedIn, Email, Resume */}
-                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-2.5 text-xs font-sans">
-                        {f.hasLinkedIn() ? (
-                          <a
-                            href={f.getLinkedInUrl()!}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-8.5 px-3.5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold inline-flex items-center gap-2 shadow-xs transition-colors"
-                          >
-                            <Linkedin className="w-3.5 h-3.5" />
-                            <span>LinkedIn ↳</span>
-                          </a>
-                        ) : (
-                          <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
-                            <Linkedin className="w-3.5 h-3.5" />
-                            <span>LinkedIn</span>
-                          </span>
-                        )}
-
-                        {f.hasEmail() ? (
-                          <a
-                            href={`mailto:${f.email}`}
-                            className="h-8.5 px-3.5 rounded-full bg-[var(--bg-page)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] text-xs font-medium inline-flex items-center gap-2 border border-[var(--border-hairline)] transition-colors truncate max-w-[220px]"
-                          >
-                            <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)] shrink-0" />
-                            <span className="truncate">{f.email}</span>
-                          </a>
-                        ) : (
-                          <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
-                            <Mail className="w-3.5 h-3.5 shrink-0" />
-                            <span>No Email</span>
-                          </span>
-                        )}
-
-                        {f.hasResume() ? (
-                          <a
-                            href={f.cvUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-8.5 px-3.5 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:bg-black transition-colors"
-                          >
-                            <FileText className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                            <span>Resume</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        ) : (
-                          <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
-                            <FileText className="w-3.5 h-3.5" />
-                            <span>Resume</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </motion.div>
-        )}
-
-        {/* TAB 3: CURRENT RESEARCH INTERNS */}
-        {activeTab === 'interns' && (
-          <motion.div
-            key="interns"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-8"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left">
-              {filteredInterns.length === 0 && (
-                <div className="col-span-full text-center py-16 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-                  <p className="text-sm font-sans text-[var(--text-muted)]">
-                    {searchQuery ? `No interns match "${searchQuery}".` : 'No research interns listed yet.'}
+      {/* FACULTY & PRINCIPAL INVESTIGATORS (STUDIO UNLMTD .founder SECTIONS) */}
+      {(activeTab === 'all' || activeTab === 'faculty') &&
+        faculty.map((member, idx) => {
+          const isDark = idx % 2 === 1;
+          return (
+            <section
+              key={member.id}
+              className={`section founder ${isDark ? 'studio-dark' : ''}`}
+            >
+              <div className="section-label reveal is-visible">
+                <span>{member.designation || member.role}</span>
+                <span>{member.department || 'NED UNIVERSITY · CSIT'}</span>
+              </div>
+              <div className="founder-grid">
+                <figure className="founder-portrait reveal is-visible">
+                  <img
+                    src={getMemberAvatar(member.image)}
+                    alt={`${member.name}, ${member.role}`}
+                    width="900"
+                    height="1125"
+                    loading={idx < 2 ? 'eager' : 'lazy'}
+                  />
+                </figure>
+                <div className="founder-copy">
+                  <h2 className="founder-name reveal is-visible">{member.name}.</h2>
+                  <p className="founder-line reveal is-visible">
+                    {member.researchFocus || member.role}
                   </p>
-                </div>
-              )}
-              {filteredInterns.map(intern => {
-                const raw = allMembersRaw.find(m => m.id === intern.id)
-                const isHighlighted = highlightedMemberId === intern.id
-                const primaryUrl = intern.getPrimaryActionUrl()
-
-                return (
-                  <div
-                    id={`member-${intern.id}`}
-                    key={intern.id}
-                    className={`p-6 sm:p-7 rounded-2xl flex flex-col justify-between group hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 bg-[var(--bg-surface)] border border-[var(--border-hairline)] ${
-                      isHighlighted ? 'ring-2 ring-[var(--accent-orange)] shadow-xl' : ''
-                    }`}
-                  >
+                  <p className="founder-body reveal is-visible">
+                    Supervising foundational and applied research at NED University’s Artificial
+                    Intelligence &amp; Robotics Lab across{' '}
+                    {member.researchFocus || 'machine learning and computer vision'}.
+                  </p>
+                  <dl className="founder-meta reveal is-visible">
                     <div>
-                      <div className="flex items-start gap-5 mb-4">
-                        <a
-                          href={primaryUrl}
-                          target={intern.hasLinkedIn() ? '_blank' : undefined}
-                          rel={intern.hasLinkedIn() ? 'noopener noreferrer' : undefined}
-                          className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shrink-0 bg-[var(--bg-page)] border border-[var(--border-hairline)] group-hover:border-[var(--accent-orange)] shadow-xs transition-all"
-                        >
-                          <img
-                            src={getMemberAvatar(intern.image)}
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_AVATAR
-                            }}
-                            alt={intern.name}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            loading="lazy"
-                          />
-                        </a>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-sans font-semibold bg-[var(--ink-dark)] text-white">
-                              {intern.role}
-                            </span>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-sans text-[var(--text-subtle)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1">
-                              <Calendar className="w-2.5 h-2.5" />
-                              {raw?.tenure || intern.term}
-                            </span>
-                          </div>
-
-                          <h3 className="text-lg sm:text-xl font-semibold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors truncate">
-                            {intern.name}
-                          </h3>
-
-                          <div className="text-[11px] text-[var(--text-muted)] font-sans mt-0.5">
-                            {intern.department}
-                          </div>
-
-                          {intern.researchFocus && (
-                            <div className="mt-2.5">
-                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-medium bg-[var(--bg-page)] text-[var(--ink-dark)] border border-[var(--border-hairline)]">
-                                <Sparkles className="w-3 h-3 text-[var(--accent-orange)]" />
-                                {intern.researchFocus}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      <dt>DESIGNATION</dt>
+                      <dd>{member.designation || member.role}</dd>
                     </div>
-
-                    {/* Action buttons: LinkedIn, Email, Resume */}
-                    <div className="pt-3 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-2 text-xs font-sans">
-                      {intern.hasLinkedIn() ? (
-                        <a
-                          href={intern.getLinkedInUrl()!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="h-8 px-3 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white font-semibold inline-flex items-center gap-1.5 shadow-xs transition-all"
-                        >
-                          <Linkedin className="w-3 h-3" />
-                          <span>LinkedIn ↳</span>
-                        </a>
-                      ) : (
-                        <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
-                          <Linkedin className="w-3 h-3" />
-                          <span>LinkedIn</span>
-                        </span>
-                      )}
-
-                      {intern.hasEmail() ? (
-                        <a
-                          href={`mailto:${intern.email}`}
-                          className="h-8 px-3 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] font-medium inline-flex items-center gap-1.5 transition-colors truncate max-w-[190px]"
-                        >
-                          <Mail className="w-3 h-3 text-[var(--accent-orange)] shrink-0" />
-                          <span className="truncate">{intern.email}</span>
-                        </a>
-                      ) : (
-                        <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
-                          <Mail className="w-3 h-3 shrink-0" />
-                          <span>No Email</span>
-                        </span>
-                      )}
-
-                      {intern.hasResume() ? (
-                        <a
-                          href={intern.cvUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="h-8 px-3 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:bg-black transition-colors"
-                        >
-                          <FileText className="w-3 h-3 text-[var(--accent-orange)]" />
-                          <span>Resume</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      ) : (
-                        <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
-                          <FileText className="w-3 h-3" />
-                          <span>Resume</span>
-                        </span>
-                      )}
+                    <div>
+                      <dt>CONTACT &amp; LINKS</dt>
+                      <dd>
+                        {member.email ? (
+                          <a href={`mailto:${member.email}`}>{member.email}</a>
+                        ) : (
+                          <span>Department of CSIT</span>
+                        )}
+                        {member.linkedin && (
+                          <>
+                            {' · '}
+                            <a
+                              href={member.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              LinkedIn
+                            </a>
+                          </>
+                        )}
+                      </dd>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          </motion.div>
-        )}
-
-        {/* TAB 4: PREVIOUS INTERNS & ALUMNI */}
-        {activeTab === 'previous' && (
-          <motion.div
-            key="previous"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-8 text-left"
-          >
-            <div className="overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-sm">
-              <div className="p-6 sm:p-8 border-b border-[var(--border-hairline)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-xl font-semibold font-head text-[var(--text-primary)]">
-                    Previous Research Interns & Alumni
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1 font-normal">
-                    Researchers and interns who completed their research terms at AIR Lab.
-                  </p>
+                  </dl>
                 </div>
-                <span className="px-3.5 py-1.5 rounded-full text-xs font-sans font-medium bg-[var(--ink-dark)] text-white shrink-0">
-                  {sortedPreviousInterns.length} Alumni Recorded
-                </span>
               </div>
+            </section>
+          );
+        })}
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs sm:text-sm font-sans">
-                  <thead>
-                    <tr className="border-b border-[var(--border-hairline)] font-sans text-[11px] uppercase tracking-wider text-[var(--text-subtle)] bg-[var(--bg-page)]">
-                      <th className="py-4 px-6 font-semibold">Name</th>
-                      <th className="py-4 px-6 font-semibold">Period & Department</th>
-                      <th className="py-4 px-6 font-semibold">Email</th>
-                      <th className="py-4 px-6 text-right font-semibold">LinkedIn</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--border-hairline)]">
-                    {sortedPreviousInterns.map((p: any) => (
-                      <tr
-                        key={p.id}
-                        id={`member-${p.id}`}
-                        className={`hover:bg-[var(--bg-page)] transition-colors ${
-                          highlightedMemberId === p.id ? 'bg-[var(--accent-orange)]/15 ring-2 ring-[var(--accent-orange)]' : ''
-                        }`}
-                      >
-                        <td className="py-4 px-6 font-semibold text-[var(--text-primary)]">
-                          {p.name}
-                        </td>
-                        <td className="py-4 px-6 text-[var(--text-muted)] font-sans text-xs">
-                          {p.tenure || 'Former Research Intern'} • {p.department}
-                        </td>
-                        <td className="py-4 px-6 font-sans text-xs text-[var(--text-muted)]">
-                          <a href={`mailto:${p.email}`} className="text-[var(--accent-orange)] hover:underline flex items-center gap-1 font-semibold">
-                            <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                            {p.email}
-                          </a>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <a
-                            href={p.linkedin}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--bg-page)] text-[var(--ink-dark)] hover:bg-[var(--ink-dark)] hover:text-white transition-all text-xs font-sans border border-[var(--border-hairline)] font-medium"
-                          >
-                            <Linkedin className="w-3.5 h-3.5" />
-                            <span>LinkedIn ↳</span>
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+      {/* ACTIVE RESEARCH FELLOWS & INTERNS */}
+      {(activeTab === 'all' || activeTab === 'interns') && (
+        <section className="section founders-pause">
+          <div className="section-label reveal is-visible">
+            <span>ACTIVE COHORT</span>
+            <span>{interns.length} RESEARCH FELLOWS &amp; INTERNS</span>
+          </div>
+          <div className="founders-intro">
+            <h2 className="display reveal is-visible">
+              RESEARCH
+              <br />
+              FELLOWS.
+            </h2>
+            <p className="reveal is-visible">
+              Undergraduate &amp; postgraduate scholars
+              <br />
+              training models, curating datasets,
+              <br />
+              and deploying edge AI.
+            </p>
+          </div>
+
+          <div
+            className="founders-portraits"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '45px 30px',
+            }}
+          >
+            {interns.map((fellow) => (
+              <figure key={fellow.id} className="founders-portrait reveal is-visible">
+                <img
+                  src={getMemberAvatar(fellow.image)}
+                  alt={`${fellow.name}, ${fellow.role}`}
+                  width="600"
+                  height="600"
+                  loading="lazy"
+                />
+                <figcaption>
+                  <strong>{fellow.name}</strong>
+                  <span>
+                    <span>{fellow.designation || fellow.role}</span>
+                    {fellow.researchFocus && <span>{fellow.researchFocus}</span>}
+                    {fellow.linkedin && (
+                      <span>
+                        <a
+                          href={fellow.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-link"
+                          style={{ padding: 0, fontSize: '12px' }}
+                        >
+                          LinkedIn Profile
+                        </a>
+                      </span>
+                    )}
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+
+          <div className="founders-note reveal is-visible">
+            <p>
+              Interested in joining the active cohort of research fellows at NED University AIR
+              Lab?
+            </p>
+            <button type="button" className="text-link" onClick={openApplicationModal}>
+              Apply for Fellowship
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* ALUMNI / PREVIOUS INTERNS */}
+      {(activeTab === 'all' || activeTab === 'previous') && previousInterns.length > 0 && (
+        <section className="section studio-dark">
+          <div className="section-label reveal is-visible">
+            <span>ALUMNI ARCHIVE</span>
+            <span>{previousInterns.length} GRADUATED FELLOWS</span>
+          </div>
+          <div className="editorial-pair" style={{ marginTop: '45px', marginBottom: '45px' }}>
+            <h2 className="reveal is-visible">
+              Graduated
+              <br />
+              <span className="gradient liquid-word">
+                scholars<span className="dot">.</span>
+              </span>
+            </h2>
+            <div className="reveal is-visible">
+              <p>
+                Former AIR Lab research fellows who contributed to our foundational datasets,
+                clinical AI pipelines, and national grants before advancing to global graduate
+                programs and industry R&amp;D roles.
+              </p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
 
-      {/* Student Fellowship Modal */}
-      <StudentApplicationModal
-        isOpen={applyModalOpen}
-        onClose={() => setApplyModalOpen(false)}
-      />
-    </div>
-  )
+          <div
+            className="founders-portraits"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+              gap: '40px 28px',
+            }}
+          >
+            {previousInterns.map((alum) => (
+              <figure key={alum.id} className="founders-portrait reveal is-visible">
+                <img
+                  src={getMemberAvatar(alum.image)}
+                  alt={alum.name}
+                  width="500"
+                  height="500"
+                  loading="lazy"
+                />
+                <figcaption>
+                  <strong style={{ color: '#fff' }}>{alum.name}</strong>
+                  <span style={{ color: '#b9bbbe' }}>
+                    <span>{alum.designation || alum.role}</span>
+                    {alum.researchFocus && <span>{alum.researchFocus}</span>}
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  );
 }

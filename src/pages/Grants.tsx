@@ -1,182 +1,177 @@
-import { useState, useMemo, useEffect } from 'react'
-import { Award, ExternalLink, Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
-import { getGrants } from '../lib/data'
-import type { Grant } from '../types/data'
-import Badge from '../components/ui/Badge'
-import SectionReveal from '../components/ui/SectionReveal'
-import PlaceholderBadge from '../components/ui/PlaceholderBadge'
-
-function parseGrantDateScore(durationStr?: string): number {
-  if (!durationStr) return 0
-  const lower = durationStr.toLowerCase()
-  const yearMatch = lower.match(/\b(19\d\d|20\d\d)\b/)
-  return yearMatch ? parseInt(yearMatch[1], 10) : 0
-}
+import { Link, useOutletContext } from 'react-router-dom';
+import type { LayoutOutletContext } from '../components/Layout';
+import { getGrants, getSponsors } from '../data/airlabData';
 
 export default function Grants() {
-  const [grants, setGrants] = useState<Grant[]>(() => getGrants())
-
-  useEffect(() => {
-    fetch('/api/content/grants')
-      .then(r => r.ok ? r.json() : [])
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) setGrants(data)
-      })
-      .catch(() => {})
-  }, [])
-
-  // Sort: Active grants at top, Completed / older grants at bottom
-  const sortedGrants = useMemo(() => {
-    return grants.slice().sort((a, b) => {
-      const isActiveA = a.status === 'Active'
-      const isActiveB = b.status === 'Active'
-
-      if (isActiveA && !isActiveB) return -1
-      if (!isActiveA && isActiveB) return 1
-
-      return parseGrantDateScore(b.duration) - parseGrantDateScore(a.duration)
-    })
-  }, [grants])
+  const { openApplicationModal } = useOutletContext<LayoutOutletContext>();
+  const grants = getGrants();
+  const sponsors = getSponsors();
 
   return (
-    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
-      {/* Header */}
-      <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<Award className="w-3.5 h-3.5 text-white" />}>
-              RESEARCH FUNDING & GRANTS
-            </Badge>
-          </div>
-        </SectionReveal>
-
-        <SectionReveal delay={0.08}>
-          <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Research Funding & Sponsored Grants
+    <>
+      {/* STUDIO UNLMTD SERVICES/OUTCOMES MASTHEAD */}
+      <section className="section page-top">
+        <div className="section-label reveal is-visible">
+          <span>GRANTS &amp; FUNDING</span>
+          <span>SPONSORED RESEARCH LEDGER</span>
+        </div>
+        <div className="headline inner-heading">
+          <h1 className="reveal is-visible">
+            NATIONAL
+            <br />
+            <span className="gradient liquid-word">
+              GRANTS<span className="dot">.</span>
+            </span>
           </h1>
-        </SectionReveal>
-
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Official government research programs, Sindh Higher Education Commission awards, national technology grants, and international fellowships supporting computational intelligence at AIR Lab.
+        </div>
+        <div className="intro-row">
+          <p className="reveal is-visible">
+            Competitive national research awards, industry-sponsored benchmarks, and sovereign
+            compute funding powering NED University AIR Lab.
           </p>
-        </SectionReveal>
-      </div>
+        </div>
+      </section>
 
-      {/* Grants Cards (Generous 28px Rounded Stone Cards) */}
-      <div className="space-y-6">
-        <div className="space-y-6 text-left">
-          {sortedGrants.map(grant => {
-              const isActive = grant.status === 'Active'
-              return (
-                <div
-                  key={grant.id}
-                  className="p-8 sm:p-10 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200"
-                >
-                  <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Grant Image preview if available */}
-                    {grant.image && (
-                      <div className="w-full lg:w-72 h-48 sm:h-56 rounded-2xl overflow-hidden shrink-0 bg-[var(--bg-page)] border border-[var(--border-hairline)]">
-                        <img
-                          src={grant.image}
-                          alt={grant.title}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
+      {/* INDEX NAV BAR */}
+      <nav className="services-index" aria-label="Grants Index">
+        {grants.map((grant, idx) => (
+          <a key={grant.id} href={`#grant-${grant.id}`}>
+            <span>{String(idx + 1).padStart(2, '0')}</span>
+            {grant.funder}
+          </a>
+        ))}
+      </nav>
 
-                    <div className="flex-1">
-                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <span
-                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-sans font-semibold ${isActive
-                                  ? 'bg-emerald-600 text-white'
-                                  : 'bg-[var(--ink-dark)] text-white'
-                                }`}
-                            >
-                              {isActive ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
-                              {grant.status}
-                            </span>
-
-                            {grant.programTitle && (
-                              <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--ink-dark)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium">
-                                <Landmark className="w-3 h-3" />
-                                {grant.programTitle}
-                              </span>
-                            )}
-
-                            <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)]">
-                              {grant.duration}
-                            </span>
-
-                            {grant.placeholder && <PlaceholderBadge />}
-                          </div>
-
-                          <h2 className="text-xl sm:text-2xl font-head font-semibold text-[var(--text-primary)] leading-snug">
-                            {grant.title}
-                          </h2>
-                          <div className="text-sm font-semibold text-[var(--accent-orange)] font-sans mt-1.5">
-                            Grant Supplier: {grant.funder}
-                          </div>
-                        </div>
-
-                        {grant.amount && (
-                          <div className="px-4 py-2.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-left md:text-right shrink-0">
-                            <div className="text-[10px] font-sans text-[var(--text-subtle)] uppercase">Granted Amount</div>
-                            <div className="text-base sm:text-lg font-bold font-sans text-[var(--text-primary)] mt-0.5">
-                              {grant.amount}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {grant.description && (
-                        <p className="text-sm sm:text-[14.5px] text-[var(--text-muted)] leading-relaxed mb-6 font-normal">
-                          {grant.description}
-                        </p>
-                      )}
-
-                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-4 text-xs font-sans">
-                        <div className="flex flex-wrap items-center gap-4 text-[var(--text-subtle)]">
-                          {grant.leadInvestigator && (
-                            <span className="flex items-center gap-1.5">
-                              <User className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                              <span>PI: <strong className="text-[var(--text-primary)]">{grant.leadInvestigator}</strong></span>
-                            </span>
-                          )}
-                          <span className="flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span>Timeline: {grant.duration}</span>
-                          </span>
-                        </div>
-
-                        {grant.url && (
-                          <a
-                            href={grant.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 font-semibold"
-                          >
-                            <span>Funder Website</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
+      {/* ALTERNATING LIGHT / DARK OUTCOME SECTIONS FOR EACH GRANT */}
+      {grants.map((grant, idx) => {
+        const isDark = idx % 2 === 1;
+        const num = String(idx + 1).padStart(2, '0');
+        return (
+          <section
+            key={grant.id}
+            id={`grant-${grant.id}`}
+            className={`section service outcome ${isDark ? 'studio-dark' : ''}`}
+          >
+            <div className="section-label reveal is-visible">
+              <span>
+                {num} / {grant.status.toUpperCase()} GRANT
+              </span>
+              <span>{grant.duration}</span>
+            </div>
+            <h2 className="outcome-title display reveal is-visible">{grant.funder}.</h2>
+            <div className="outcome-grid">
+              <div className="outcome-text">
+                <p className="outcome-key reveal is-visible">{grant.title}</p>
+                <p className="service-body reveal is-visible">{grant.description}</p>
+                {grant.programTitle && (
+                  <p className="service-body reveal is-visible">
+                    <strong>Program:</strong> {grant.programTitle}
+                  </p>
+                )}
+              </div>
+              <div className="outcome-side">
+                <div className="outcome-show reveal is-visible">
+                  <span className="section-label">GRANT ALLOCATION &amp; LEADERSHIP</span>
+                  <p>{grant.amount || 'Sponsored National Grant'}</p>
+                  <p className="outcome-case">
+                    <Link className="text-link" to="/projects">
+                      Principal Investigator: {grant.leadInvestigator || 'AIR Lab Directorate'}
+                    </Link>
+                  </p>
+                </div>
+                <div className="outcome-deliver reveal is-visible">
+                  <span className="section-label">DELIVERABLES &amp; SCOPE</span>
+                  <div className="outcome-offer">
+                    <h3>Datasets &amp; Model Weights</h3>
+                    <p>
+                      Curated regional datasets, benchmark evaluations, and reproducible training
+                      pipelines.
+                    </p>
+                  </div>
+                  <div className="outcome-offer">
+                    <h3>Field Deployment &amp; Publications</h3>
+                    <p>
+                      Hardware-in-the-loop validation and peer-reviewed publications at
+                      international AI venues.
+                    </p>
                   </div>
                 </div>
-              )
-            })}
-        </div>
+              </div>
+            </div>
+          </section>
+        );
+      })}
 
-        {sortedGrants.length === 0 && (
-          <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)] mt-8">
-            <p className="text-sm font-sans text-[var(--text-muted)]">No research grants published yet.</p>
+      {/* PAIR CARDS — SPONSORS & FELLOWSHIP FUNDING */}
+      <section className="section editorial-section pair-section">
+        <div className="section-label reveal is-visible">
+          <span>PARTNERSHIP MODEL</span>
+          <span>INSTITUTIONAL &amp; INDUSTRIAL ALLIANCES</span>
+        </div>
+        <div className="editorial-pair">
+          <h2 className="reveal is-visible">
+            Two ways to
+            <br />
+            <span className="gradient liquid-word">
+              partner<span className="dot">.</span>
+            </span>
+          </h2>
+          <div className="reveal is-visible">
+            <p>
+              We collaborate with national funding agencies, hospitals, agricultural institutes, and
+              technology enterprises across {sponsors.length}+ active sponsorship programs.
+            </p>
+            <p>
+              Every grant directly funds graduate and undergraduate research fellowships, GPU
+              compute infrastructure, and open-source regional benchmarks.
+            </p>
           </div>
-        )}
-      </div>
-    </div>
-  )
+        </div>
+        <div className="pair-cards">
+          <article className="pair-card reveal is-visible">
+            <span className="pair-card-eyebrow">FOR INSTITUTIONS &amp; INDUSTRY</span>
+            <h3>
+              <span className="gradient liquid-word">SPONSOR A RESEARCH TRACK.</span>
+            </h3>
+            <div className="pair-card-body">
+              <p>
+                Commission custom computer vision, Urdu LLM, or embedded edge AI research supervised
+                by NED University Principal Investigators.
+              </p>
+              <p>
+                Includes dedicated research fellows, milestone deliverables, and IP/deployment
+                handover.
+              </p>
+              <div style={{ marginTop: '12px' }}>
+                <Link className="text-link" to="/collaborations">
+                  View institutional partners
+                </Link>
+              </div>
+            </div>
+          </article>
+          <article className="pair-card reveal is-visible">
+            <span className="pair-card-eyebrow">FOR SCHOLARS &amp; ENGINEERS</span>
+            <h3>
+              <span className="gradient liquid-word">FUNDED FELLOWSHIPS.</span>
+            </h3>
+            <div className="pair-card-body">
+              <p>
+                Work directly on HEC and IGNITE funded research grants with full access to our GPU
+                compute cluster and robotics testbeds.
+              </p>
+              <p>
+                Author peer-reviewed publications and graduate with deployed production systems in
+                your portfolio.
+              </p>
+              <div style={{ marginTop: '12px' }}>
+                <button type="button" className="text-link" onClick={openApplicationModal}>
+                  Apply for a funded fellowship
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </>
+  );
 }
