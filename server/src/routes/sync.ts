@@ -1,6 +1,12 @@
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { env } from '../config/env.js'
 import { contentModels } from '../models/content.js'
+import { ApplicationModel } from '../models/Application.js'
+import {
+  normalizeVacancyInput,
+  saveVacancySettings,
+  saveSheetsWebhookUrl,
+} from '../services/siteSettings.js'
 
 export const syncRouter = Router()
 
@@ -141,6 +147,46 @@ syncRouter.get('/sheets/export', async (_req, res, next) => {
 })
 
 /**
+ * GET /api/sync/applications?since=<ISO date>
+ * Lets the sheet "pull" applications (backfill / safety net for the live webhook).
+ * CV binaries are never included – only metadata.
+ */
+syncRouter.get('/applications', async (req, res, next) => {
+  try {
+    const filter: Record<string, unknown> = {}
+    const since = typeof req.query.since === 'string' ? new Date(req.query.since) : null
+    if (since && !isNaN(since.getTime())) filter.createdAt = { $gt: since }
+
+    const docs = await ApplicationModel.find(filter)
+      .select('-cv.key -adminNotes')
+      .sort({ createdAt: 1 })
+      .limit(1000)
+      .lean()
+
+    res.json({
+      success: true,
+      count: docs.length,
+      applications: docs.map((d: any) => ({
+        applicationId: String(d._id),
+        submittedAt: d.createdAt,
+        name: d.name,
+        email: d.email,
+        phone: d.phone,
+        university: d.university,
+        degreeYear: d.degreeYear,
+        statement: d.coverNote,
+        portfolio: d.github,
+        linkedin: d.linkedin,
+        cvFileName: d.cv?.originalName,
+        status: d.status,
+      })),
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
  * POST /api/sync/cleanup
  * Wipes out legacy mock/placeholder records across all collections.
  */
@@ -200,6 +246,8 @@ syncRouter.post('/sheets', async (req, res, next) => {
       facultyAndInterns,
       undergraduateProjects,
       fundedProjects,
+      vacancySettings,
+      webhookUrl,
       people,
       works,
       dryRun = false,
@@ -217,6 +265,20 @@ syncRouter.post('/sheets', async (req, res, next) => {
 
     const teamModel = contentModels.get('team')!
     const projectsModel = contentModels.get('projects')!
+
+    // =========================================================================
+    // 0. Vacancy settings tab + live-sync webhook registration
+    // =========================================================================
+    let vacancyResult: Record<string, unknown> | null = null
+    if (!dryRun && vacancySettings) {
+      const partial = normalizeVacancyInput(vacancySettings)
+      vacancyResult = (await saveVacancySettings(partial)) as unknown as Record<string, unknown>
+    }
+    let webhookRegistered = false
+    if (!dryRun && typeof webhookUrl === 'string' && webhookUrl.trim()) {
+      await saveSheetsWebhookUrl(webhookUrl.trim())
+      webhookRegistered = true
+    }
 
     // =========================================================================
     if (!dryRun) {
@@ -453,6 +515,8 @@ syncRouter.post('/sheets', async (req, res, next) => {
       success: true,
       message: dryRun ? 'Dry run completed successfully.' : 'Google Sheets data synchronized to database.',
       stats,
+      vacancy: vacancyResult,
+      webhookRegistered,
     })
   } catch (err) {
     next(err)

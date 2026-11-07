@@ -20,6 +20,7 @@ import AirLabLogo from './AirLabLogo'
 import ParticleField from './ParticleField'
 import StudentApplicationModal from './StudentApplicationModal'
 import ThemeToggle from './ThemeToggle'
+import { useVacancySettings } from '../lib/vacancy'
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -29,6 +30,8 @@ export default function Layout() {
   const [scrolled, setScrolled] = useState(false)
   const navRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
+  const vacancy = useVacancySettings()
+  const isClosed = vacancy.status === 'Closed'
 
 
   useEffect(() => {
@@ -81,12 +84,12 @@ export default function Layout() {
       <aside aria-label="Announcement" className="w-full bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] text-xs font-medium py-2.5 px-4 sm:px-8 relative z-30">
         <div className="max-w-[1240px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--accent-orange)] text-xs tracking-tight">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)] animate-pulse shrink-0" />
-              Applications Open:
+            <span className={`inline-flex items-center gap-1.5 font-semibold text-xs tracking-tight ${isClosed ? 'text-rose-500' : 'text-[var(--accent-orange)]'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isClosed ? 'bg-rose-500' : 'bg-[var(--accent-orange)] animate-pulse'}`} />
+              {isClosed && vacancy.ribbonLabel.toLowerCase().includes('open') ? 'Applications Closed:' : vacancy.ribbonLabel}
             </span>
             <span className="text-[13px] text-[var(--text-muted)] font-normal">
-              Student Research Internship & Fellowship Vacancies Open for Fall 2026 — NEDUET CSIT
+              {isClosed ? vacancy.closedMessage : vacancy.ribbonText}
             </span>
           </div>
 

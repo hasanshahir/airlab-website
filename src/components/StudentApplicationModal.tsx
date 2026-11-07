@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Sparkles, Check, GraduationCap, FileText, User, Mail, BookOpen, Phone, Loader2, ArrowRight } from 'lucide-react'
+import { useVacancySettings } from '../lib/vacancy'
 
 interface StudentApplicationModalProps {
   isOpen: boolean
@@ -9,6 +10,8 @@ interface StudentApplicationModalProps {
 }
 
 export default function StudentApplicationModal({ isOpen, onClose }: StudentApplicationModalProps) {
+  const vacancy = useVacancySettings()
+  const isClosed = vacancy.status === 'Closed'
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -72,6 +75,12 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
       data.append('coverNote', `[Track: ${formData.track}] ${formData.statement}`)
       data.append('github', formData.resumeUrl)
       data.append('resumeUrl', formData.resumeUrl)
+      // Structured copies of the fields so Google Sheets gets clean, separate columns
+      data.append('rollNo', formData.rollNo)
+      data.append('department', formData.department)
+      data.append('program', formData.program)
+      data.append('track', formData.track)
+      data.append('statement', formData.statement)
 
       if (cvFile) {
         if (cvFile.size > 4 * 1024 * 1024) {
@@ -190,13 +199,13 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                   <div className="min-w-0 pr-2">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-[11px] font-sans font-semibold mb-2">
                       <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">FELLOWSHIP &amp; INTERNSHIP ADMISSIONS</span>
+                      <span className="truncate">{vacancy.badge}</span>
                     </div>
                     <h2 id="vacancy-modal-title" className="text-xl sm:text-2xl font-bold tracking-tight font-head text-[var(--text-primary)]">
-                      Apply for Research Vacancy
+                      {vacancy.title}
                     </h2>
-                    <p className="text-xs sm:text-[13.5px] text-[var(--text-muted)] mt-1 font-sans leading-relaxed line-clamp-2">
-                      Department of CSIT · NED University. Work directly with faculty on LLMs, edge perception, and robotics testbeds.
+                    <p className="text-xs sm:text-[13.5px] text-[var(--text-muted)] mt-1 font-sans leading-relaxed line-clamp-3 whitespace-pre-line">
+                      {vacancy.description}
                     </p>
                   </div>
 
@@ -218,6 +227,13 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                     </div>
                   )}
 
+                  {isClosed && (
+                    <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[13px] text-[var(--text-muted)] leading-relaxed">
+                      {vacancy.closedMessage}
+                    </div>
+                  )}
+
+                  <fieldset disabled={isClosed} className={`space-y-4 ${isClosed ? 'opacity-50' : ''}`}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                     {/* Full Name */}
                     <div>
@@ -391,13 +407,14 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                       className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all resize-none font-sans"
                     />
                   </div>
+                  </fieldset>
                 </div>
 
                 {/* ── 3. Fixed Footer with Submit Action (Always visible & accessible) ── */}
                 <div className="p-4 sm:px-8 sm:py-4 border-t border-[var(--border-hairline)] bg-[var(--bg-surface)] flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
                   <div className="text-[11.5px] text-[var(--text-subtle)] flex items-center gap-1.5 self-start sm:self-auto">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                    <span>Fall 2026 Admissions &bull; Reviewed Rolling</span>
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${isClosed ? 'bg-[var(--text-subtle)]' : 'bg-emerald-500'}`} />
+                    <span>{isClosed ? 'Applications Closed' : 'Applications Open \u2022 Reviewed Rolling'}</span>
                   </div>
 
                   <div className="flex items-center gap-2.5 w-full sm:w-auto">
@@ -410,7 +427,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                     </button>
                     <button
                       type="submit"
-                      disabled={loading}
+                      disabled={loading || isClosed}
                       className="flex-1 sm:flex-initial h-10 sm:h-11 px-7 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer active:translate-y-[1px] disabled:opacity-50"
                     >
                       {loading ? (
