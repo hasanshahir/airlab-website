@@ -163,23 +163,66 @@ syncRouter.get('/applications', async (req, res, next) => {
       .limit(1000)
       .lean()
 
-    res.json({
-      success: true,
-      count: docs.length,
-      applications: docs.map((d: any) => ({
+    const mapped = docs.map((d: any) => {
+      // Parse structured fields if stored in combined degreeYear / coverNote strings on older entries
+      let rollNo = d.rollNo || ''
+      let department = d.department || ''
+      let program = d.program || ''
+      const degStr = String(d.degreeYear || '')
+      if ((!rollNo || !department || !program) && degStr) {
+        const rollMatch = degStr.match(/-\s*Roll:\s*(.+)$/i)
+        if (!rollNo && rollMatch) rollNo = rollMatch[1].trim()
+        const withoutRoll = degStr.replace(/\s*-\s*Roll:\s*.+$/i, '').trim()
+        const deptMatch = withoutRoll.match(/^(.*)\(([^()]+)\)\s*$/)
+        if (deptMatch) {
+          if (!program) program = deptMatch[1].trim()
+          if (!department) department = deptMatch[2].trim()
+        } else if (!program) {
+          program = withoutRoll
+        }
+      }
+
+      let track = d.track || ''
+      let statement = d.statement || ''
+      const coverStr = String(d.coverNote || '')
+      if ((!track || !statement) && coverStr) {
+        const trackMatch = coverStr.match(/^\[Track:\s*([^\]]+)\]\s*(.*)$/is)
+        if (trackMatch) {
+          if (!track) track = trackMatch[1].trim()
+          if (!statement) statement = trackMatch[2].trim()
+        } else if (!statement) {
+          statement = coverStr
+        }
+      }
+
+      return {
         applicationId: String(d._id),
         submittedAt: d.createdAt,
         name: d.name,
+        fullName: d.name,
         email: d.email,
         phone: d.phone,
+        rollNo,
+        department,
+        program,
+        track,
         university: d.university,
         degreeYear: d.degreeYear,
-        statement: d.coverNote,
+        statement,
         portfolio: d.github,
+        portfolioUrl: d.github,
         linkedin: d.linkedin,
         cvFileName: d.cv?.originalName,
+        resumeFileName: d.cv?.originalName,
         status: d.status,
-      })),
+      }
+    })
+
+    res.json({
+      success: true,
+      count: mapped.length,
+      applications: mapped,
+      data: mapped,
     })
   } catch (err) {
     next(err)

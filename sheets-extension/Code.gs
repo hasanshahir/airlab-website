@@ -15,11 +15,9 @@
  * 1. In your Google Spreadsheet, click "Extensions" -> "Apps Script".
  * 2. Select all existing code, delete it, and paste this entire code.
  * 3. Click the Save icon (💾 or Ctrl + S).
- * 4. For LIVE instant form rows: Click "Deploy" -> "New deployment" ->
- *    Select type: "Web app" -> Execute as: "Me" -> Who has access: "Anyone" -> Deploy.
- * 5. Refresh your Google Spreadsheet, then click:
- *    - "⚡ AIR Lab" -> "📋 Setup 'Vacancies' & 'Student Applications' Tabs"
- *    - "⚡ AIR Lab" -> "🚀 Sync All to Website"
+ * 4. Refresh your Google Spreadsheet, then click:
+ *    - "⚡ AIR Lab" -> "📥 Pull Student Applications from Website" (or "🚀 Sync All to Website")
+ *    (This also activates automatic live background sync every minute + on every sheet refresh!)
  * ============================================================================
  */
 
@@ -56,7 +54,7 @@ const DEFAULT_VACANCY_ROWS = [
     'Department of CSIT · NED University. Work directly with faculty on LLMs, edge perception, and robotics testbeds.',
     'Subtitle / description text shown directly below the modal heading',
   ],
-  ['Modal Badge', 'Student Portal', 'Small pill badge shown above the modal heading'],
+  ['Modal Badge', 'FELLOWSHIP & INTERNSHIP ADMISSIONS', 'Small pill badge shown above the modal heading'],
   ['Top Ribbon Label', 'Applications Open:', 'Bold accent prefix in the top announcement bar'],
   [
     'Top Ribbon Text',
@@ -155,6 +153,39 @@ function onOpen() {
 }
 
 /**
+ * Automatically installs background triggers (1-minute timer + onOpen refresh trigger)
+ * so new student applications appear in "Student Applications" automatically!
+ */
+function ensureAutoPullTriggers() {
+  try {
+    const triggers = ScriptApp.getProjectTriggers()
+    let hasTimeTrigger = false
+    let hasOpenTrigger = false
+
+    for (let i = 0; i < triggers.length; i++) {
+      const fn = triggers[i].getHandlerFunction()
+      if (fn === 'autoPullApplicationsSilent') {
+        const type = triggers[i].getEventType()
+        if (type === ScriptApp.EventType.CLOCK) hasTimeTrigger = true
+        if (type === ScriptApp.EventType.ON_OPEN) hasOpenTrigger = true
+      }
+    }
+
+    if (!hasTimeTrigger) {
+      ScriptApp.newTrigger('autoPullApplicationsSilent').timeBased().everyMinutes(1).create()
+    }
+    if (!hasOpenTrigger) {
+      const ss = SpreadsheetApp.getActiveSpreadsheet()
+      if (ss) {
+        ScriptApp.newTrigger('autoPullApplicationsSilent').forSpreadsheet(ss).onOpen().create()
+      }
+    }
+  } catch (e) {
+    // Ignore trigger creation errors if already at limit
+  }
+}
+
+/**
  * Finds a sheet tab flexibly (case-insensitive and typo-tolerant).
  */
 function findSheetFlexible(sheetName) {
@@ -222,8 +253,6 @@ function readVacancySettings() {
   const rows = readSheetToObjects(sheetName)
   if (!rows || rows.length === 0) return null
 
-  // If the user left row 1 without "Setting | Value" headers and started directly with key-value pairs,
-  // also parse raw cells so no rows are missed.
   const raw = sheet.getDataRange().getValues()
   if (raw.length >= 1 && raw[0].length >= 2) {
     const firstColHeader = String(raw[0][0] || '').trim().toLowerCase()
@@ -231,7 +260,6 @@ function readVacancySettings() {
     if (isStandardKeyValueHeader) {
       return rows
     }
-    // Check if first column looks like setting names directly without a header row
     const directPairs = []
     for (let r = 0; r < raw.length; r++) {
       const k = String(raw[r][0] || '').trim()
@@ -332,43 +360,44 @@ function ensureVacanciesSheet() {
 
 /**
  * 📋 One-click setup for "Vacancies" and "Student Applications" tabs
+ * Also pulls all submitted applications from the website & activates auto-sync triggers!
  */
 function setupVacancyAndApplicationTabs() {
   const vacResult = ensureVacanciesSheet()
   const appSheet = ensureApplicationsSheet()
-  const webhookUrl = getDetectedWebhookUrl()
+  ensureAutoPullTriggers()
+  const pulled = fetchAndAppendApplicationsSilent()
 
-  let msg =
-    '✅ Both tabs are ready!\n\n' +
+  const msg =
+    '✅ Both tabs are ready and synced!\n\n' +
     '1. "' +
     vacResult.sheet.getName() +
     '" — Edit the "Value" column (Column B) anytime to change the Vacancy Modal Title, Description, Top Ribbon, or Open/Closed status, then click "🚀 Sync All to Website" (or "📢 Sync Vacancy Settings Only").\n\n' +
     '2. "' +
     appSheet.getName() +
-    '" — Stores all student vacancy form submissions.\n\n'
+    '" — Checked ' +
+    pulled.total +
+    ' website application(s), added ' +
+    pulled.added +
+    ' new row(s).\n\n' +
+    '⚡ Live Auto-Sync is now ACTIVE: New student applications will automatically appear here every minute and whenever you refresh or open this sheet!'
 
-  if (webhookUrl) {
-    msg += '🔗 Live Webhook Detected:\n' + webhookUrl + '\n(Click "🚀 Sync All to Website" once to register it with the website.)'
-  } else {
-    msg +=
-      '💡 For instant real-time row insertion when a student submits the form:\n' +
-      'In Apps Script, click "Deploy" -> "New deployment" -> Type: "Web app" -> Execute as: "Me" -> Who has access: "Anyone" -> Deploy, then run "🚀 Sync All to Website".\n' +
-      '(You can also click "📥 Pull Student Applications from Website" anytime!)'
-  }
-
-  SpreadsheetApp.getUi().alert('Tabs Ready', msg, SpreadsheetApp.getUi().ButtonSet.OK)
+  SpreadsheetApp.getUi().alert('Tabs Ready & Live Sync Active', msg, SpreadsheetApp.getUi().ButtonSet.OK)
 }
 
 /**
  * Appends a single student application object to "Student Applications" if not already present.
+ * Handles both structured fields and combined degreeYear / statement strings.
  * Returns true if appended, false if skipped as duplicate.
  */
 function appendApplicationRowIfNew(sheet, app) {
   if (!app) return false
 
   const appId = String(app.applicationId || app._id || '').trim()
+  const fullName = String(app.fullName || app.name || '').trim()
   const email = String(app.email || '').trim().toLowerCase()
   const submittedAt = String(app.submittedAt || app.createdAt || new Date().toISOString()).trim()
+  const formattedDate = submittedAt.replace('T', ' ').replace(/\.\d+Z$/, ' UTC')
 
   const lastRow = sheet.getLastRow()
   if (lastRow >= 2) {
@@ -381,29 +410,61 @@ function appendApplicationRowIfNew(sheet, app) {
       if (appId && rowAppId && rowAppId === appId) {
         return false
       }
-      if (!appId && email && rowEmail === email && rowSubmittedAt === submittedAt) {
+      if (email && rowEmail === email && (rowSubmittedAt === formattedDate || rowSubmittedAt === submittedAt)) {
         return false
       }
     }
   }
 
-  const portfolioParts = []
-  if (app.portfolioUrl) portfolioParts.push(String(app.portfolioUrl).trim())
-  if (app.resumeFileName) portfolioParts.push('Resume: ' + String(app.resumeFileName).trim())
-  const portfolioCell = portfolioParts.join(' | ') || '—'
+  // Extract Roll No, Department, and Program (from explicit fields or from combined degreeYear string)
+  let rollNo = String(app.rollNo || '').trim()
+  let department = String(app.department || '').trim()
+  let program = String(app.program || '').trim()
+  const degStr = String(app.degreeYear || '').trim()
+  if ((!rollNo || !department || !program) && degStr) {
+    const rollMatch = degStr.match(/-\s*Roll:\s*(.+)$/i)
+    if (!rollNo && rollMatch) rollNo = rollMatch[1].trim()
+    const withoutRoll = degStr.replace(/\s*-\s*Roll:\s*.+$/i, '').trim()
+    const deptMatch = withoutRoll.match(/^(.*)\(([^()]+)\)\s*$/)
+    if (deptMatch) {
+      if (!program) program = deptMatch[1].trim()
+      if (!department) department = deptMatch[2].trim()
+    } else if (!program) {
+      program = withoutRoll
+    }
+  }
 
-  const formattedDate = submittedAt.replace('T', ' ').replace(/\.\d+Z$/, ' UTC')
+  // Extract Track and Statement (from explicit fields or from "[Track: ...] statement")
+  let track = String(app.track || '').trim()
+  let statement = String(app.statement || app.coverNote || '').trim()
+  if (statement) {
+    const trackMatch = statement.match(/^\[Track:\s*([^\]]+)\]\s*([\s\S]*)$/i)
+    if (trackMatch) {
+      if (!track) track = trackMatch[1].trim()
+      statement = trackMatch[2].trim()
+    }
+  }
+
+  const portfolioUrl = String(app.portfolioUrl || app.portfolio || app.github || '').trim()
+  const resumeFile = String(
+    app.resumeFileName || app.cvFileName || (app.cv && app.cv.fileName) || ''
+  ).trim()
+
+  const portfolioParts = []
+  if (portfolioUrl) portfolioParts.push(portfolioUrl)
+  if (resumeFile) portfolioParts.push('PDF: ' + resumeFile)
+  const portfolioCell = portfolioParts.join(' | ') || '—'
 
   sheet.appendRow([
     formattedDate,
-    String(app.fullName || ''),
+    fullName,
     String(app.email || ''),
-    String(app.rollNo || ''),
-    String(app.department || ''),
-    String(app.program || ''),
-    String(app.track || ''),
+    rollNo || '—',
+    department || '—',
+    program || '—',
+    track || '—',
     portfolioCell,
-    String(app.statement || ''),
+    statement || '—',
     appId || '—',
   ])
 
@@ -458,11 +519,9 @@ function doPost(e) {
 }
 
 /**
- * 📥 Pulls all student applications from MongoDB (`/api/sync/applications`)
- * and appends any missing entries into the "Student Applications" sheet tab.
+ * Silent background pull of student applications (used by onOpen & 1-minute timer triggers).
  */
-function pullApplicationsFromWebsite() {
-  const ui = SpreadsheetApp.getUi()
+function fetchAndAppendApplicationsSilent() {
   const cleanBase = getCleanEndpoint().replace(/\/api\/sync\/sheets\/?$/, '')
   const endpoint = cleanBase + '/api/sync/applications'
   const syncSecret = String(getSetting('SYNC_SECRET') || DEFAULT_CONFIG.SYNC_SECRET).trim()
@@ -476,42 +535,63 @@ function pullApplicationsFromWebsite() {
   }
 
   try {
-    SpreadsheetApp.getActiveSpreadsheet().toast('Fetching student applications from website...', 'AIR Lab Sync', 10)
     const res = UrlFetchApp.fetch(endpoint, options)
     const code = res.getResponseCode()
-    const text = res.getContentText()
-
     if (code >= 200 && code < 300) {
-      const parsed = JSON.parse(text)
-      const apps = (parsed && parsed.data) || []
+      const parsed = JSON.parse(res.getContentText())
+      const apps = (parsed && (parsed.applications || parsed.data)) || []
       const sheet = ensureApplicationsSheet()
 
-      // Append in chronological order (oldest first so newest is at bottom)
-      const chronological = apps.slice().reverse()
       let addedCount = 0
-      for (let i = 0; i < chronological.length; i++) {
-        if (appendApplicationRowIfNew(sheet, chronological[i])) {
+      for (let i = 0; i < apps.length; i++) {
+        if (appendApplicationRowIfNew(sheet, apps[i])) {
           addedCount++
         }
       }
-
-      ui.alert(
-        'Applications Synced',
-        '📥 Checked ' +
-          apps.length +
-          ' total application(s) from the website database.\n' +
-          '✨ Added ' +
-          addedCount +
-          ' new row(s) to "' +
-          sheet.getName() +
-          '".',
-        ui.ButtonSet.OK
-      )
-    } else {
-      ui.alert('Failed to Pull Applications (HTTP ' + code + ')', text || 'Check URL or Secret Key', ui.ButtonSet.OK)
+      if (addedCount > 0) {
+        SpreadsheetApp.flush()
+      }
+      return { ok: true, total: apps.length, added: addedCount, sheetName: sheet.getName() }
     }
+    return { ok: false, total: 0, added: 0, error: 'HTTP ' + code }
   } catch (err) {
-    ui.alert('Connection Error', err.toString(), ui.ButtonSet.OK)
+    return { ok: false, total: 0, added: 0, error: err.toString() }
+  }
+}
+
+/**
+ * Handler invoked automatically by the installable onOpen & 1-minute clock triggers.
+ */
+function autoPullApplicationsSilent() {
+  fetchAndAppendApplicationsSilent()
+}
+
+/**
+ * 📥 Pulls all student applications from MongoDB (`/api/sync/applications`)
+ * and appends any missing entries into the "Student Applications" sheet tab.
+ */
+function pullApplicationsFromWebsite() {
+  const ui = SpreadsheetApp.getUi()
+  SpreadsheetApp.getActiveSpreadsheet().toast('Fetching student applications from website...', 'AIR Lab Sync', 5)
+  ensureAutoPullTriggers()
+
+  const result = fetchAndAppendApplicationsSilent()
+  if (result.ok) {
+    ui.alert(
+      'Applications Synced',
+      '📥 Checked ' +
+        result.total +
+        ' total application(s) from the website database.\n' +
+        '✨ Added ' +
+        result.added +
+        ' new row(s) to "' +
+        result.sheetName +
+        '".\n\n' +
+        '⚡ Auto-Sync is active (new submissions will automatically appear every minute and on sheet refresh).',
+      ui.ButtonSet.OK
+    )
+  } else {
+    ui.alert('Failed to Pull Applications', result.error || 'Check URL or Secret Key', ui.ButtonSet.OK)
   }
 }
 
@@ -521,6 +601,8 @@ function pullApplicationsFromWebsite() {
 function sendSyncPayload(payload) {
   const endpoint = getCleanEndpoint()
   const syncSecret = String(getSetting('SYNC_SECRET') || DEFAULT_CONFIG.SYNC_SECRET).trim()
+
+  ensureAutoPullTriggers()
 
   // Automatically attach deployed Web App URL if available so live application sync works automatically
   const webhookUrl = getDetectedWebhookUrl()
@@ -544,6 +626,9 @@ function sendSyncPayload(payload) {
     const code = res.getResponseCode()
     const text = res.getContentText()
 
+    // Also pull any new student applications into "Student Applications" tab during sync
+    const appPull = fetchAndAppendApplicationsSilent()
+
     if (code >= 200 && code < 300) {
       let result = {}
       try {
@@ -565,11 +650,11 @@ function sendSyncPayload(payload) {
         summary += `💰 Funded Projects: ${st.fundedProjects.updated} updated, ${st.fundedProjects.created} added (${st.fundedProjects.processed} total)\n`
       }
       if (st.vacancySettings && st.vacancySettings.updated) {
-        const vs = result.vacancySettings || {}
+        const vs = result.vacancy || result.vacancySettings || {}
         summary += `📢 Vacancy Form Settings: Updated (Status: ${vs.status || 'Open'}, Heading: "${vs.title || 'Apply for Research Vacancy'}")\n`
       }
-      if (webhookUrl) {
-        summary += `🔗 Live Applications Webhook: Active\n`
+      if (appPull && appPull.ok) {
+        summary += `📥 Student Applications: ${appPull.added} new added (${appPull.total} total in sheet)\n`
       }
 
       SpreadsheetApp.getUi().alert('Sync Complete', summary, SpreadsheetApp.getUi().ButtonSet.OK)
