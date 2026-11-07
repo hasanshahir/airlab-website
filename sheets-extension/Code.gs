@@ -452,7 +452,14 @@ function appendApplicationRowIfNew(sheet, app) {
 
   const portfolioParts = []
   if (portfolioUrl) portfolioParts.push(portfolioUrl)
-  if (resumeFile) portfolioParts.push('PDF: ' + resumeFile)
+  if (resumeFile && appId) {
+    const cleanBase = getCleanEndpoint().replace(/\/api\/sync\/sheets\/?$/, '')
+    const syncSecret = encodeURIComponent(String(getSetting('SYNC_SECRET') || DEFAULT_CONFIG.SYNC_SECRET).trim())
+    const cvUrl = cleanBase + '/api/sync/applications/' + encodeURIComponent(appId) + '/cv?secret=' + syncSecret
+    portfolioParts.push(cvUrl)
+  } else if (resumeFile) {
+    portfolioParts.push('PDF: ' + resumeFile)
+  }
   const portfolioCell = portfolioParts.join(' | ') || '—'
 
   sheet.appendRow([

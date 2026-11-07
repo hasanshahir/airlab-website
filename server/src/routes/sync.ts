@@ -230,6 +230,34 @@ syncRouter.get('/applications', async (req, res, next) => {
 })
 
 /**
+ * GET /api/sync/applications/:id/cv?secret=...
+ * Streams the applicant's uploaded PDF resume directly so the link in Google Sheets is clickable.
+ */
+syncRouter.get('/applications/:id/cv', async (req, res, next) => {
+  try {
+    const doc = await ApplicationModel.findById(req.params.id).lean()
+    if (!doc || !doc.cv || !doc.cv.key) {
+      return res.status(404).send('CV not found for this application.')
+    }
+    const key = String(doc.cv.key)
+    const fileName = String(doc.cv.originalName || 'resume.pdf').replace(/[^a-zA-Z0-9._-]/g, '_')
+    if (key.startsWith('data:application/pdf;base64,')) {
+      const base64 = key.replace(/^data:application\/pdf;base64,/, '')
+      const buf = Buffer.from(base64, 'base64')
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Disposition', `inline; filename="${fileName}"`)
+      return res.send(buf)
+    }
+    if (key.startsWith('http://') || key.startsWith('https://')) {
+      return res.redirect(key)
+    }
+    return res.status(404).send('No PDF binary stored for this application.')
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
  * POST /api/sync/cleanup
  * Wipes out legacy mock/placeholder records across all collections.
  */
