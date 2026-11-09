@@ -1,6 +1,12 @@
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { env } from '../config/env.js'
 import { contentModels } from '../models/content.js'
+import { ApplicationModel } from '../models/Application.js'
+import {
+  normalizeVacancyInput,
+  saveVacancySettings,
+  saveSheetsWebhookUrl,
+} from '../services/siteSettings.js'
 
 export const syncRouter = Router()
 
@@ -141,6 +147,117 @@ syncRouter.get('/sheets/export', async (_req, res, next) => {
 })
 
 /**
+ * GET /api/sync/applications?since=<ISO date>
+ * Lets the sheet "pull" applications (backfill / safety net for the live webhook).
+ * CV binaries are never included – only metadata.
+ */
+syncRouter.get('/applications', async (req, res, next) => {
+  try {
+    const filter: Record<string, unknown> = {}
+    const since = typeof req.query.since === 'string' ? new Date(req.query.since) : null
+    if (since && !isNaN(since.getTime())) filter.createdAt = { $gt: since }
+
+    const docs = await ApplicationModel.find(filter)
+      .select('-cv.key -adminNotes')
+      .sort({ createdAt: 1 })
+      .limit(1000)
+      .lean()
+
+    const mapped = docs.map((d: any) => {
+      // Parse structured fields if stored in combined degreeYear / coverNote strings on older entries
+      let rollNo = d.rollNo || ''
+      let department = d.department || ''
+      let program = d.program || ''
+      const degStr = String(d.degreeYear || '')
+      if ((!rollNo || !department || !program) && degStr) {
+        const rollMatch = degStr.match(/-\s*Roll:\s*(.+)$/i)
+        if (!rollNo && rollMatch) rollNo = rollMatch[1].trim()
+        const withoutRoll = degStr.replace(/\s*-\s*Roll:\s*.+$/i, '').trim()
+        const deptMatch = withoutRoll.match(/^(.*)\(([^()]+)\)\s*$/)
+        if (deptMatch) {
+          if (!program) program = deptMatch[1].trim()
+          if (!department) department = deptMatch[2].trim()
+        } else if (!program) {
+          program = withoutRoll
+        }
+      }
+
+      let track = d.track || ''
+      let statement = d.statement || ''
+      const coverStr = String(d.coverNote || '')
+      if ((!track || !statement) && coverStr) {
+        const trackMatch = coverStr.match(/^\[Track:\s*([^\]]+)\]\s*(.*)$/is)
+        if (trackMatch) {
+          if (!track) track = trackMatch[1].trim()
+          if (!statement) statement = trackMatch[2].trim()
+        } else if (!statement) {
+          statement = coverStr
+        }
+      }
+
+      return {
+        applicationId: String(d._id),
+        submittedAt: d.createdAt,
+        name: d.name,
+        fullName: d.name,
+        email: d.email,
+        phone: d.phone,
+        rollNo,
+        department,
+        program,
+        track,
+        university: d.university,
+        degreeYear: d.degreeYear,
+        statement,
+        portfolio: d.github,
+        portfolioUrl: d.github,
+        linkedin: d.linkedin,
+        cvFileName: d.cv?.originalName,
+        resumeFileName: d.cv?.originalName,
+        status: d.status,
+      }
+    })
+
+    res.json({
+      success: true,
+      count: mapped.length,
+      applications: mapped,
+      data: mapped,
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
+ * GET /api/sync/applications/:id/cv?secret=...
+ * Streams the applicant's uploaded PDF resume directly so the link in Google Sheets is clickable.
+ */
+syncRouter.get('/applications/:id/cv', async (req, res, next) => {
+  try {
+    const doc = await ApplicationModel.findById(req.params.id).lean()
+    if (!doc || !doc.cv || !doc.cv.key) {
+      return res.status(404).send('CV not found for this application.')
+    }
+    const key = String(doc.cv.key)
+    const fileName = String(doc.cv.originalName || 'resume.pdf').replace(/[^a-zA-Z0-9._-]/g, '_')
+    if (key.startsWith('data:application/pdf;base64,')) {
+      const base64 = key.replace(/^data:application\/pdf;base64,/, '')
+      const buf = Buffer.from(base64, 'base64')
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Disposition', `inline; filename="${fileName}"`)
+      return res.send(buf)
+    }
+    if (key.startsWith('http://') || key.startsWith('https://')) {
+      return res.redirect(key)
+    }
+    return res.status(404).send('No PDF binary stored for this application.')
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
  * POST /api/sync/cleanup
  * Wipes out legacy mock/placeholder records across all collections.
  */
@@ -200,6 +317,8 @@ syncRouter.post('/sheets', async (req, res, next) => {
       facultyAndInterns,
       undergraduateProjects,
       fundedProjects,
+      vacancySettings,
+      webhookUrl,
       people,
       works,
       dryRun = false,
@@ -217,6 +336,20 @@ syncRouter.post('/sheets', async (req, res, next) => {
 
     const teamModel = contentModels.get('team')!
     const projectsModel = contentModels.get('projects')!
+
+    // =========================================================================
+    // 0. Vacancy settings tab + live-sync webhook registration
+    // =========================================================================
+    let vacancyResult: Record<string, unknown> | null = null
+    if (!dryRun && vacancySettings) {
+      const partial = normalizeVacancyInput(vacancySettings)
+      vacancyResult = (await saveVacancySettings(partial)) as unknown as Record<string, unknown>
+    }
+    let webhookRegistered = false
+    if (!dryRun && typeof webhookUrl === 'string' && webhookUrl.trim()) {
+      await saveSheetsWebhookUrl(webhookUrl.trim())
+      webhookRegistered = true
+    }
 
     // =========================================================================
     if (!dryRun) {
@@ -453,6 +586,8 @@ syncRouter.post('/sheets', async (req, res, next) => {
       success: true,
       message: dryRun ? 'Dry run completed successfully.' : 'Google Sheets data synchronized to database.',
       stats,
+      vacancy: vacancyResult,
+      webhookRegistered,
     })
   } catch (err) {
     next(err)

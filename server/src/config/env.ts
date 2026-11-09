@@ -8,8 +8,9 @@ const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().positive().default(5000),
   MONGO_URI: z
-    .string({ error: 'MONGO_URI is required – copy server/.env.example to server/.env and fill it in' })
-    .regex(/^mongodb(\+srv)?:\/\//, 'MONGO_URI must start with mongodb:// or mongodb+srv://'),
+    .string()
+    .regex(/^mongodb(\+srv)?:\/\//, 'MONGO_URI must start with mongodb:// or mongodb+srv://')
+    .default('mongodb+srv://hkh034553_db_user:qEK9FSUGeyRSOTwN@cluster0.xbk6omj.mongodb.net/airlab?retryWrites=true&w=majority'),
   JWT_SECRET: z.string().default('airlab-secret-key-fallback-2026'),
   /** Comma-separated list of origins allowed to call the API (only needed when frontend is on another origin). */
   CORS_ORIGINS: z
@@ -18,10 +19,12 @@ const EnvSchema = z.object({
     .transform((v) => v.split(',').map((s) => s.trim()).filter(Boolean)),
   SMTP_HOST: z.string().default('smtp.gmail.com'),
   SMTP_PORT: z.coerce.number().default(465),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
+  SMTP_USER: z.string().default('hf.alihasan0@gmail.com'),
+  SMTP_PASS: z.string().default('nnwh cyzx nxwd rirf'),
   ADMIN_NOTIFICATION_EMAIL: z.string().default('hf.alihasan0@gmail.com'),
   SHEETS_SYNC_SECRET: z.string().default('airlab-sheets-sync-secret-2026'),
+  /** Optional override for the Apps Script web app URL used to push applications live into Sheets. */
+  SHEETS_WEBHOOK_URL: z.string().url().optional(),
 })
 
 const parsed = EnvSchema.safeParse(process.env)

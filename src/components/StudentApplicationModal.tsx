@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Sparkles, Check, GraduationCap, FileText, User, Mail, BookOpen, Phone, Loader2, ArrowRight } from 'lucide-react'
+import { useVacancySettings } from '../lib/vacancy'
 
 interface StudentApplicationModalProps {
   isOpen: boolean
@@ -9,6 +10,8 @@ interface StudentApplicationModalProps {
 }
 
 export default function StudentApplicationModal({ isOpen, onClose }: StudentApplicationModalProps) {
+  const vacancy = useVacancySettings()
+  const isClosed = vacancy.status === 'Closed'
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -67,6 +70,11 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
       data.append('name', formData.name)
       data.append('email', formData.email)
       data.append('phone', formData.phone || formData.rollNo)
+      data.append('rollNo', formData.rollNo)
+      data.append('department', formData.department)
+      data.append('program', formData.program)
+      data.append('track', formData.track)
+      data.append('statement', formData.statement)
       data.append('university', 'NED University of Engineering & Technology')
       data.append('degreeYear', `${formData.program} (${formData.department}) - Roll: ${formData.rollNo}`)
       data.append('coverNote', `[Track: ${formData.track}] ${formData.statement}`)
@@ -190,13 +198,13 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                   <div className="min-w-0 pr-2">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-[11px] font-sans font-semibold mb-2">
                       <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">FELLOWSHIP &amp; INTERNSHIP ADMISSIONS</span>
+                      <span className="truncate">{vacancy.badge}</span>
                     </div>
                     <h2 id="vacancy-modal-title" className="text-xl sm:text-2xl font-bold tracking-tight font-head text-[var(--text-primary)]">
-                      Apply for Research Vacancy
+                      {vacancy.title}
                     </h2>
                     <p className="text-xs sm:text-[13.5px] text-[var(--text-muted)] mt-1 font-sans leading-relaxed line-clamp-2">
-                      Department of CSIT · NED University. Work directly with faculty on LLMs, edge perception, and robotics testbeds.
+                      {isClosed ? vacancy.closedMessage : vacancy.description}
                     </p>
                   </div>
 

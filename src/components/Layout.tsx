@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import StudentApplicationModal from './StudentApplicationModal';
 import QuickDrawer from './QuickDrawer';
 import {
@@ -271,6 +271,7 @@ const MENU_ITEMS: {
 ];
 
 export default function Layout() {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHeaderDark, setIsHeaderDark] = useState(false);
   const [isApplicationOpen, setIsApplicationOpen] = useState(false);
@@ -281,6 +282,23 @@ export default function Layout() {
     null
   );
   const [expandedMenuRow, setExpandedMenuRow] = useState<string | null>(null);
+
+  // Secret 7-tap easter egg on the logo to open Admin Portal
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleLogoTap = (e: React.MouseEvent) => {
+    tapCountRef.current += 1;
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+    tapTimerRef.current = setTimeout(() => {
+      tapCountRef.current = 0;
+    }, 2000);
+    if (tapCountRef.current >= 7) {
+      e.preventDefault();
+      tapCountRef.current = 0;
+      navigate('/admin');
+    }
+  };
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const toggleBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -839,7 +857,7 @@ export default function Layout() {
 
       {/* STUDIO UNLMTD HEADER WITH CATEGORIZED MEGA-DROPDOWNS */}
       <header className={`site-header ${isHeaderDark ? 'is-dark' : ''}`}>
-        <Link className="brand" to="/" aria-label="AIR Lab — Home">
+        <Link className="brand" to="/" onClick={handleLogoTap} aria-label="AIR Lab — Home">
           <span className="brand-wordmark">
             AIR LAB
             <small>NED UNIVERSITY · CSIT</small>
