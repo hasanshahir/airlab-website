@@ -1,0 +1,8 @@
+Setting,Value,Notes / Help
+Status,Open,"Set to ""Open"" or ""Closed"" to enable/disable the student application form"
+Modal Title,Apply for Research Vacancy,Main heading inside the Student Application popup modal
+Modal Description,Department of CSIT · NED University. Work directly with faculty on LLMs, edge perception, and robotics testbeds.,Subtitle / description text shown directly below the modal heading
+Modal Badge,FELLOWSHIP & INTERNSHIP ADMISSIONS,Small pill badge shown above the modal heading
+Top Ribbon Label,Applications Open:,Bold accent prefix in the top announcement bar
+Top Ribbon Text,Student Research Internship & Fellowship Vacancies Open for Fall 2026 — NEDUET CSIT,Announcement text displayed at the very top of the website
+Closed Message,Applications are currently closed. Please check back later for upcoming research vacancy cycles.,Message shown to students when Status is set to "Closed"

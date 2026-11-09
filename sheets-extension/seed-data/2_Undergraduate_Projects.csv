@@ -1,0 +1,33 @@
+Title,Status,Team Members,Grant Supplier,Grant Amount,Time Taken,Pictures,Project Details
+AutoGradeHub – Automated Assignment Grading and Feedback System,Finished,"Duaa Salman (CT-22009)
+Maryam Shaikh (CT-22012)
+Muhammad Ali (CT-22044)
+Zaid Rahman (CT-22047)",Undergraduate FYDP,NA,Aug 25 - May 26,https://i.ibb.co/hx2y1jNQ/project-01.jpg,"AutoGradeHub is an AI-powered system that automatically grades programming assignments by running code in a secure environment against predefined test cases. It gives students detailed feedback, flags plagiarism, and gives teachers analytics on class performance. This saves teachers grading time and helps students learn from consistent, timely feedback."
+Development of Voice Based Agent for Collecting Post-Ambulance Service Feedback,Finished,"Hasan Mohi Uddin (CT-22024)
+Kumel Ahmed (CT-22034)
+Muhammad Azlan Asim (CT-22036)
+Shahzaib Ahmed (CT-22042)",Undergraduate FYDP (in collaboration with SIEHS),NA,Aug 25 - May 26,https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80,"This project develops a voice agent that calls patients after they use an ambulance service, speaks to them in Urdu or English, and gathers feedback on the care they received. By automating these calls, ambulance services can consistently hear from more patients without increasing call-centre workloads. The system converts speech to text, understands spoken responses, and summarises the results for service quality managers."
+Strategic Agent – Real-Time Market Intelligence System for Smart Insights,Finished,"Aisha Siddiqa (CT-22001)
+Syed Muhammad Daniyal (CT-22014)
+Abdul Ahad (CT-22019)
+Muhammad Daniyal (CT-22031)",Undergraduate FYDP,NA,Aug 25 - May 26,https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80,"Strategic Agent is an AI platform that continuously collects market news, earnings reports, regulatory updates and social discussion, and turns them into concise, actionable summaries for business decision-makers. It extracts key trends, tracks competitors and flags sudden market shifts, replacing hours of manual searching with a single automated dashboard."
+An Agentic AI-Powered Tour Guide for Safer and Smarter Travel in Pakistan,Finished,"Syed Muhammad Danial (DT-22009)
+Muhammad Asjad (DT-22020)
+Muhammad Anas (DT-22026)
+Syeda Maria Zaidi (DT-22032)",NEDAASC Funded,NA,Aug 25 - May 26,https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80,"This project builds an autonomous AI travel assistant that creates custom travel itineraries for Pakistan and monitors trips in real time. It factors in safety, weather, road conditions and personal preferences, and can adjust plans on the fly if routes close or conditions change. The system uses multiple specialized AI agents working together to give travelers a safer, more predictable journey."
+Familiar: Quality-Aware Face Recognition System for Pakistani Subjects,Ongoing,"Muhammad Ayan (CT-23010)
+Hamza Masood (CT-23016)
+Muhammad Anas (CT-23035)
+Bilal Ahmed (CT-23048)",Indigenous Dataset Collection & Research Project,NA,Aug 26 - May 27,https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80,"Familiar is a face recognition system evaluated on a newly collected, regionally diverse Pakistani dataset. It checks image quality before attempting recognition and adapts to local variations in lighting, glasses and facial hair, while remaining efficient on large databases. The prototype is intended for authorized uses such as searching campus camera footage, with humans making the final decision."
+ScholarX: Locally Hosted SLM-Powered Platform for End-to-End Academic Research,Ongoing,"Muhammad Ahmed Hasan (DT-23014)
+Muhammad Raahim Rizwan (DT-23015)
+Muhammad Huzaifa Baig (DT-23018)
+Muhammad Uzaim Naseem (DT-23047)",On-Premises SLM Infrastructure,NA,Aug 26 - May 27,https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80,"This project proposes a locally hosted, web-based research assistant for NED UET that uses small language models to summarize papers, compare them thematically and methodologically, and help draft new papers with LaTeX support. Because everything runs on campus hardware, unpublished research never leaves the institution, which avoids the privacy and IP risks of cloud LLMs while still delivering competitive quality."
+MemTrace: Lifecycle-Aware Provenance for Detecting and Mitigating Memory Poisoning Attacks in LLM Agents,Ongoing,"Rameen (CT-23004)
+Tooba Rehman (CT-23011)
+Fatima (CT-23012)
+Huda Imran (CT-23015)",LLM Security & Agent Provenance Research,NA,Aug 26 - May 27,https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80,"MemTrace is a security framework that protects LLM agents’ persistent memory from poisoning, where false or malicious information gets stored and later influences the agent across sessions. Instead of checking memory at only one stage, it tracks each entry’s origin, trust level and history through six lifecycle stages (write, store, retrieve, use, propagate, forget/rollback) and uses that provenance to flag, isolate, delete or roll back suspicious memories."
+Naqshkaar: A Multimodal AI System for Constraint-Aware 3D Interior Design Generation,Ongoing,"Mureed Hussain (Team Lead - CT-23036)
+Muhammad Sami (CT-23027)
+Faiq Ahmed (CT-23030)
+Muhammad Sameed (CT-23046)",Multimodal Generative 3D Platform,NA,Aug 26 - May 27,https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80,"Naqshkaar is an AI interior design platform for Pakistan that generates 3D room designs from a real catalogue of purchasable local products, scaled to true room dimensions and checked against space and budget limits. Unlike tools such as Planner 5D or RoomGPT, it uses PKR prices, accounts for local needs like ceiling-fan clearance, AC and UPS placement, and prayer space, and lets users pick each item from AI-shortlisted options. The result is a design they can visualize and buy, with an itemised cost estimate and direct purchase links."

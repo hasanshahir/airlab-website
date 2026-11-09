@@ -137,6 +137,8 @@ function onOpen() {
     .addItem('🚀 Sync All to Website', 'syncAllTabs')
     .addItem('🔄 Fresh Sync (Wipe & Re-Upload Sheet Data)', 'freshSyncAllTabs')
     .addSeparator()
+    .addItem('🌱 Seed Official NED AIR Lab Data (All Tabs)', 'seedOfficialNedAirlabData')
+    .addSeparator()
     .addItem('📢 Sync Vacancy Settings Only', 'syncVacancyOnly')
     .addItem('📥 Pull Student Applications from Website', 'pullApplicationsFromWebsite')
     .addItem('📋 Setup "Vacancies" & "Student Applications" Tabs', 'setupVacancyAndApplicationTabs')
@@ -933,4 +935,201 @@ function resetToDefaults() {
     props.deleteProperty('WEBHOOK_URL')
     ui.alert('Reset Complete', 'Configuration restored to defaults.\nTarget Endpoint:\n' + getCleanEndpoint(), ui.ButtonSet.OK)
   }
+}
+
+/**
+ * 🌱 Seeds all official AIR Lab data extracted from NED University's official records into the spreadsheet:
+ *   1. "Faculty & Interns" (16 members: 6 Faculty Leads & Members + 10 Official Research Interns)
+ *   2. "Undergraduate Projects" (8 FYDP projects with full student names & NED roll numbers)
+ *   3. "Funded Projects" (2 Sindh HEC Grants: Connected Identity & Integrated Discovery)
+ *   4. "Vacancies" (Fall 2026 admissions configuration)
+ */
+function seedOfficialNedAirlabData() {
+  const ui = SpreadsheetApp.getUi()
+  const response = ui.alert(
+    '🌱 Seed Official NED AIR Lab Data',
+    'This will populate your spreadsheet tabs ("Faculty & Interns", "Undergraduate Projects", "Funded Projects", and "Vacancies") with the complete official data extracted from NED University CSIT AIR Lab records.\n\nExisting sheets will be updated and formatted with official records.\n\nDo you want to proceed?',
+    ui.ButtonSet.YES_NO
+  )
+  if (response !== ui.Button.YES) return
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+
+  // 1. Seed Faculty & Interns
+  const facultyRows = [
+    ['Name', 'Role', 'Email', 'Linkedin', 'Specialty', 'Resume'],
+    ['Dr. Murk Marvi', 'Faculty Coordinator & PI', 'marvi@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/murk-marvi/', 'NLP & LLMs, Distributed Systems & HPC, Digital Identity', 'https://cct.neduet.edu.pk/sites/default/files/csit/CV_new/Marvi25.pdf'],
+    ['Prof. Dr. Muhammad Mubashir Khan', 'Principal Investigator & Professor', 'mmkhan@neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-mubashir-khan-phd-smieee-facp-728b1424/', 'Digital Investigation, Information Discovery, Cybersecurity', 'https://cct.neduet.edu.pk/faculty/dr-muhammad-mubashir-khan'],
+    ['Ms. Saadia Arshad', 'Faculty Member', 'saadia@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/saadiaaarshad', 'Information Security, Cybersecurity, Network Security', 'https://cct.neduet.edu.pk/faculty/saadia-arshad'],
+    ['Mr. Muhammad Arsalan', 'Faculty Member', 'arsalansaleem@neduet.edu.pk', 'https://www.linkedin.com/in/arsalansaleem', 'Wireless Security, Software-Defined Radio, RF Intelligence', 'https://cct.neduet.edu.pk/faculty/muhammad-arsalan'],
+    ['Ms. Maham Ashraf', 'Faculty Member', 'mahamashraf820@gmail.com', 'https://www.linkedin.com/in/maham-ashraf-74600b1a1', 'Computer Vision, NLP & LLMs, Multimodal AI, RAG', 'https://cct.neduet.edu.pk/faculty/maham-ashraf'],
+    ['Ms. Shiza Hassan', 'Faculty Member', 'shizahassan@cloud.neduet.edu.pk', 'https://pk.linkedin.com/in/shiza-hassan-5057b9216', 'Artificial Intelligence, Machine Learning, Generative AI, Data Science & RAG', 'https://cct.neduet.edu.pk/faculty/shiza-hassan'],
+    ['Muhammad Shaheer Khan', 'Research Intern', 'khan4731403@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-shaheer-86043359/', 'Computer Vision, RAG Systems, Embedding Models, AI Automation', ''],
+    ['Kashaf Zia', 'Research Intern', 'zia4630038@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/kashaf-zia-24774a2ba/', 'Web & Mobile Dev, Machine Learning, Generative AI', ''],
+    ['Haseeb Yaqoob', 'Research Intern', 'yaqoob4705143@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/haseeb-yaqoob-864360287/', 'NLP & LLMs, Computer Vision', ''],
+    ['Muhammad Umer Safee', 'Research Intern', 'safee4600033@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-umer-safee-b48256296', 'AI Agents, Autonomous Systems, Machine Learning', ''],
+    ['Syed Omer Ahmed Shamsi', 'Research Intern', 'shamsi4601801@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syed-omer-ahmed-shamsi-b3aa6a251', 'Machine Learning, Deep Learning, Pipelines', ''],
+    ['Syed Shujauddin Hashmi', 'Research Intern', 'hashmi4630439@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syed-shujauddin-hashmi-612050291/', 'Malware Analysis, Reverse Engineering, Multi-Agent Frameworks, Cyberthreat Intelligence', ''],
+    ['Syed Muhammed Ahmed', 'Research Intern', 'ahmed4605214@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syedmuhammedahmed/', 'Data Science, Machine Learning, RAG Systems, Generative AI', ''],
+    ['Roshaan Tahir', 'Research Intern', 'tahir4600051@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/roshaantahir/', 'Deep Learning, Multi-Agent Systems, Distributed Systems, Data Engineering', ''],
+    ['Muhammad Hammad Khan', 'Research Intern', 'khan4600572@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/hammad-khan-308395286/', 'Data Science, RAG Systems, Agentic AI, AI Engineering', ''],
+    ['Areeba Zehra Jafri', 'Research Intern', 'jafrri4603155@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/areeba-zehra-jafri', 'Cybersecurity, Adversarial ML, Machine Learning, Network Security', ''],
+  ]
+  seedTabRows(ss, DEFAULT_CONFIG.TAB_FACULTY_INTERNS, facultyRows)
+
+  // 2. Seed Undergraduate Projects
+  const ugRows = [
+    ['Title', 'Status', 'Team Members', 'Grant Supplier', 'Grant Amount', 'Time Taken', 'Pictures', 'Project Details'],
+    [
+      'AutoGradeHub – Automated Assignment Grading and Feedback System',
+      'Finished',
+      'Duaa Salman (CT-22009)\nMaryam Shaikh (CT-22012)\nMuhammad Ali (CT-22044)\nZaid Rahman (CT-22047)',
+      'Undergraduate FYDP',
+      'NA',
+      'Aug 25 - May 26',
+      'https://i.ibb.co/hx2y1jNQ/project-01.jpg',
+      'AutoGradeHub is an AI-powered system that automatically grades programming assignments by running code in a secure environment against predefined test cases. It gives students detailed feedback, flags plagiarism, and gives teachers analytics on class performance. This saves teachers grading time and helps students learn from consistent, timely feedback.'
+    ],
+    [
+      'Development of Voice Based Agent for Collecting Post-Ambulance Service Feedback',
+      'Finished',
+      'Hasan Mohi Uddin (CT-22024)\nKumel Ahmed (CT-22034)\nMuhammad Azlan Asim (CT-22036)\nShahzaib Ahmed (CT-22042)',
+      'Undergraduate FYDP (in collaboration with SIEHS)',
+      'NA',
+      'Aug 25 - May 26',
+      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
+      'This project develops a voice agent that calls patients after they use an ambulance service, speaks to them in Urdu or English, and gathers feedback on the care they received. By automating these calls, ambulance services can consistently hear from more patients without increasing call-centre workloads. The system converts speech to text, understands spoken responses, and summarises the results for service quality managers.'
+    ],
+    [
+      'Strategic Agent – Real-Time Market Intelligence System for Smart Insights',
+      'Finished',
+      'Aisha Siddiqa (CT-22001)\nSyed Muhammad Daniyal (CT-22014)\nAbdul Ahad (CT-22019)\nMuhammad Daniyal (CT-22031)',
+      'Undergraduate FYDP',
+      'NA',
+      'Aug 25 - May 26',
+      'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
+      'Strategic Agent is an AI platform that continuously collects market news, earnings reports, regulatory updates and social discussion, and turns them into concise, actionable summaries for business decision-makers. It extracts key trends, tracks competitors and flags sudden market shifts, replacing hours of manual searching with a single automated dashboard.'
+    ],
+    [
+      'An Agentic AI-Powered Tour Guide for Safer and Smarter Travel in Pakistan',
+      'Finished',
+      'Syed Muhammad Danial (DT-22009)\nMuhammad Asjad (DT-22020)\nMuhammad Anas (DT-22026)\nSyeda Maria Zaidi (DT-22032)',
+      'NEDAASC Funded',
+      'NA',
+      'Aug 25 - May 26',
+      'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80',
+      'This project builds an autonomous AI travel assistant that creates custom travel itineraries for Pakistan and monitors trips in real time. It factors in safety, weather, road conditions and personal preferences, and can adjust plans on the fly if routes close or conditions change. The system uses multiple specialized AI agents working together to give travelers a safer, more predictable journey.'
+    ],
+    [
+      'Familiar: Quality-Aware Face Recognition System for Pakistani Subjects',
+      'Ongoing',
+      'Muhammad Ayan (CT-23010)\nHamza Masood (CT-23016)\nMuhammad Anas (CT-23035)\nBilal Ahmed (CT-23048)',
+      'Indigenous Dataset Collection & Research Project',
+      'NA',
+      'Aug 26 - May 27',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+      'Familiar is a face recognition system evaluated on a newly collected, regionally diverse Pakistani dataset. It checks image quality before attempting recognition and adapts to local variations in lighting, glasses and facial hair, while remaining efficient on large databases. The prototype is intended for authorized uses such as searching campus camera footage, with humans making the final decision.'
+    ],
+    [
+      'ScholarX: Locally Hosted SLM-Powered Platform for End-to-End Academic Research',
+      'Ongoing',
+      'Muhammad Ahmed Hasan (DT-23014)\nMuhammad Raahim Rizwan (DT-23015)\nMuhammad Huzaifa Baig (DT-23018)\nMuhammad Uzaim Naseem (DT-23047)',
+      'On-Premises SLM Infrastructure',
+      'NA',
+      'Aug 26 - May 27',
+      'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
+      'This project proposes a locally hosted, web-based research assistant for NED UET that uses small language models to summarize papers, compare them thematically and methodologically, and help draft new papers with LaTeX support. Because everything runs on campus hardware, unpublished research never leaves the institution, which avoids the privacy and IP risks of cloud LLMs while still delivering competitive quality.'
+    ],
+    [
+      'MemTrace: Lifecycle-Aware Provenance for Detecting and Mitigating Memory Poisoning Attacks in LLM Agents',
+      'Ongoing',
+      'Rameen (CT-23004)\nTooba Rehman (CT-23011)\nFatima (CT-23012)\nHuda Imran (CT-23015)',
+      'LLM Security & Agent Provenance Research',
+      'NA',
+      'Aug 26 - May 27',
+      'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80',
+      'MemTrace is a security framework that protects LLM agents’ persistent memory from poisoning, where false or malicious information gets stored and later influences the agent across sessions. Instead of checking memory at only one stage, it tracks each entry’s origin, trust level and history through six lifecycle stages (write, store, retrieve, use, propagate, forget/rollback) and uses that provenance to flag, isolate, delete or roll back suspicious memories.'
+    ],
+    [
+      'Naqshkaar: A Multimodal AI System for Constraint-Aware 3D Interior Design Generation',
+      'Ongoing',
+      'Mureed Hussain (Team Lead - CT-23036)\nMuhammad Sami (CT-23027)\nFaiq Ahmed (CT-23030)\nMuhammad Sameed (CT-23046)',
+      'Multimodal Generative 3D Platform',
+      'NA',
+      'Aug 26 - May 27',
+      'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80',
+      'Naqshkaar is an AI interior design platform for Pakistan that generates 3D room designs from a real catalogue of purchasable local products, scaled to true room dimensions and checked against space and budget limits. Unlike tools such as Planner 5D or RoomGPT, it uses PKR prices, accounts for local needs like ceiling-fan clearance, AC and UPS placement, and prayer space, and lets users pick each item from AI-shortlisted options. The result is a design they can visualize and buy, with an itemised cost estimate and direct purchase links.'
+    ],
+  ]
+  seedTabRows(ss, DEFAULT_CONFIG.TAB_UG_PROJECTS, ugRows)
+
+  // 3. Seed Funded Projects
+  const fundedRows = [
+    ['Program Title', 'Project Title', 'Status', 'Grant Supplier', 'Time Taken', 'Project Details', 'Name of PI', 'Grant Amount', 'Funder Website'],
+    [
+      'Sindh Research Support Program',
+      'Connected Identity Intelligence Platform for Digital Investigation',
+      'Ongoing',
+      'Government of Sindh — Sindh Higher Education Commission (Sindh HEC)',
+      'June 26 - Present',
+      'This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.',
+      'Dr. Murk Marvi',
+      'Rs. 5 million',
+      'https://sindhhec.gov.pk/'
+    ],
+    [
+      'Sindh Research Support Program',
+      'Integrated Information Discovery System for Digital Investigation',
+      'Ongoing',
+      'Government of Sindh — Sindh Higher Education Commission (Sindh HEC)',
+      'June 26 - Present',
+      'This project builds an on-premises investigation workspace for regulatory, compliance, audit, and journalistic work. Investigators usually start with little information about a subject and spend hours gathering and cross-checking public data from disconnected sites and tools. The platform cuts that work to minutes while keeping every result traceable to its source and a human in control.',
+      'Prof. Dr. Muhammad Mubashir Khan',
+      'Rs. 5 million',
+      'https://sindhhec.gov.pk/'
+    ],
+  ]
+  seedTabRows(ss, DEFAULT_CONFIG.TAB_FUNDED_PROJECTS, fundedRows)
+
+  // 4. Seed Vacancies
+  ensureVacanciesSheet()
+
+  // 5. Ensure Student Applications header
+  ensureApplicationsSheet()
+
+  ui.alert(
+    '🎉 Official NED AIR Lab Data Seeded!',
+    'All tabs have been populated with official NED University AIR Lab data:\n\n' +
+      '• "Faculty & Interns": 16 members (6 Faculty Leads + 10 Official Research Interns)\n' +
+      '• "Undergraduate Projects": 8 FYDP projects with full team roll numbers & details\n' +
+      '• "Funded Projects": 2 Sindh HEC Grants (Rs. 5M each)\n' +
+      '• "Vacancies": Active Fall 2026 admissions configuration\n\n' +
+      '👉 Click "⚡ AIR Lab" -> "🚀 Sync All to Website" whenever you want to update the live website from this sheet.',
+    ui.ButtonSet.OK
+  )
+}
+
+function seedTabRows(ss, sheetName, rows) {
+  let sheet = ss.getSheetByName(sheetName)
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName)
+  }
+  sheet.clear()
+
+  const numRows = rows.length
+  const numCols = rows[0].length
+  const range = sheet.getRange(1, 1, numRows, numCols)
+  range.setValues(rows)
+
+  // Header styling
+  const header = sheet.getRange(1, 1, 1, numCols)
+  header.setBackground('#111827')
+  header.setFontColor('#ffffff')
+  header.setFontWeight('bold')
+  header.setFontSize(10)
+  sheet.setFrozenRows(1)
+
+  // Data rows wrap & padding
+  sheet.getRange(2, 1, numRows - 1, numCols).setWrap(true).setFontSize(10)
+  sheet.autoResizeColumns(1, numCols)
 }
