@@ -1110,7 +1110,7 @@ function seedOfficialNedAirlabData() {
 }
 
 function seedTabRows(ss, sheetName, rows) {
-  let sheet = ss.getSheetByName(sheetName)
+  let sheet = findSheetFlexible(sheetName)
   if (!sheet) {
     sheet = ss.insertSheet(sheetName)
   }
