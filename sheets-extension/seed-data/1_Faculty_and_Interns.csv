@@ -1,17 +1,17 @@
-Name,Role,Email,Linkedin,Specialty,Resume
-Dr. Murk Marvi,Faculty Coordinator & PI,marvi@cloud.neduet.edu.pk,https://www.linkedin.com/in/murk-marvi/,"NLP & LLMs, Distributed Systems & HPC, Digital Identity",https://cct.neduet.edu.pk/sites/default/files/csit/CV_new/Marvi25.pdf
-Prof. Dr. Muhammad Mubashir Khan,Principal Investigator & Professor,mmkhan@neduet.edu.pk,https://www.linkedin.com/in/muhammad-mubashir-khan-phd-smieee-facp-728b1424/,"Digital Investigation, Information Discovery, Cybersecurity",https://cct.neduet.edu.pk/faculty/dr-muhammad-mubashir-khan
-Ms. Saadia Arshad,Faculty Member,saadia@cloud.neduet.edu.pk,https://www.linkedin.com/in/saadiaaarshad,"Information Security, Cybersecurity, Network Security",https://cct.neduet.edu.pk/faculty/saadia-arshad
-Mr. Muhammad Arsalan,Faculty Member,arsalansaleem@neduet.edu.pk,https://www.linkedin.com/in/arsalansaleem,"Wireless Security, Software-Defined Radio, RF Intelligence",https://cct.neduet.edu.pk/faculty/muhammad-arsalan
-Ms. Maham Ashraf,Faculty Member,mahamashraf820@gmail.com,https://www.linkedin.com/in/maham-ashraf-74600b1a1,"Computer Vision, NLP & LLMs, Multimodal AI, RAG",https://cct.neduet.edu.pk/faculty/maham-ashraf
-Ms. Shiza Hassan,Faculty Member,shizahassan@cloud.neduet.edu.pk,https://pk.linkedin.com/in/shiza-hassan-5057b9216,"Artificial Intelligence, Machine Learning, Generative AI, Data Science & RAG",https://cct.neduet.edu.pk/faculty/shiza-hassan
-Muhammad Shaheer Khan,Research Intern,khan4731403@cloud.neduet.edu.pk,https://www.linkedin.com/in/muhammad-shaheer-86043359/,"Computer Vision, RAG Systems, Embedding Models, AI Automation",
-Kashaf Zia,Research Intern,zia4630038@cloud.neduet.edu.pk,https://www.linkedin.com/in/kashaf-zia-24774a2ba/,"Web & Mobile Dev, Machine Learning, Generative AI",
-Haseeb Yaqoob,Research Intern,yaqoob4705143@cloud.neduet.edu.pk,https://www.linkedin.com/in/haseeb-yaqoob-864360287/,"NLP & LLMs, Computer Vision",
-Muhammad Umer Safee,Research Intern,safee4600033@cloud.neduet.edu.pk,https://www.linkedin.com/in/muhammad-umer-safee-b48256296,"AI Agents, Autonomous Systems, Machine Learning",
-Syed Omer Ahmed Shamsi,Research Intern,shamsi4601801@cloud.neduet.edu.pk,https://www.linkedin.com/in/syed-omer-ahmed-shamsi-b3aa6a251,"Machine Learning, Deep Learning, Pipelines",
-Syed Shujauddin Hashmi,Research Intern,hashmi4630439@cloud.neduet.edu.pk,https://www.linkedin.com/in/syed-shujauddin-hashmi-612050291/,"Malware Analysis, Reverse Engineering, Multi-Agent Frameworks, Cyberthreat Intelligence",
-Syed Muhammed Ahmed,Research Intern,ahmed4605214@cloud.neduet.edu.pk,https://www.linkedin.com/in/syedmuhammedahmed/,"Data Science, Machine Learning, RAG Systems, Generative AI",
-Roshaan Tahir,Research Intern,tahir4600051@cloud.neduet.edu.pk,https://www.linkedin.com/in/roshaantahir/,"Deep Learning, Multi-Agent Systems, Distributed Systems, Data Engineering",
-Muhammad Hammad Khan,Research Intern,khan4600572@cloud.neduet.edu.pk,https://www.linkedin.com/in/hammad-khan-308395286/,"Data Science, RAG Systems, Agentic AI, AI Engineering",
-Areeba Zehra Jafri,Research Intern,jafrri4603155@cloud.neduet.edu.pk,https://www.linkedin.com/in/areeba-zehra-jafri,"Cybersecurity, Adversarial ML, Machine Learning, Network Security",
+Name,Role,Email,Linkedin,Specialty,Dept,Resume
+Dr. Murk Marvi,Faculty Coordinator & PI,marvi@cloud.neduet.edu.pk,https://www.linkedin.com/in/murk-marvi/,"NLP & LLMs, Distributed Systems & HPC, Digital Identity",Department of CSIT,https://cct.neduet.edu.pk/sites/default/files/csit/CV_new/Marvi25.pdf
+Prof. Dr. Muhammad Mubashir Khan,Principal Investigator & Professor,mmkhan@neduet.edu.pk,https://www.linkedin.com/in/muhammad-mubashir-khan-phd-smieee-facp-728b1424/,"Digital Investigation, Information Discovery, Cybersecurity",Department of CSIT,https://cct.neduet.edu.pk/faculty/dr-muhammad-mubashir-khan
+Ms. Saadia Arshad,Faculty Member,saadia@cloud.neduet.edu.pk,https://www.linkedin.com/in/saadiaaarshad,"Information Security, Cybersecurity, Network Security",Department of CSIT,https://cct.neduet.edu.pk/faculty/saadia-arshad
+Mr. Muhammad Arsalan,Faculty Member,arsalansaleem@neduet.edu.pk,https://www.linkedin.com/in/arsalansaleem,"Wireless Security, Software-Defined Radio, RF Intelligence",Department of CSIT,https://cct.neduet.edu.pk/faculty/muhammad-arsalan
+Ms. Maham Ashraf,Faculty Member,mahamashraf820@gmail.com,https://www.linkedin.com/in/maham-ashraf-74600b1a1,"Computer Vision, NLP & LLMs, Multimodal AI, RAG",Department of CSIT,https://cct.neduet.edu.pk/faculty/maham-ashraf
+Ms. Shiza Hassan,Faculty Member,shizahassan@cloud.neduet.edu.pk,https://pk.linkedin.com/in/shiza-hassan-5057b9216,"Artificial Intelligence, Machine Learning, Generative AI, Data Science & RAG",Department of CSIT,https://cct.neduet.edu.pk/faculty/shiza-hassan
+Muhammad Shaheer Khan,Research Intern,khan4731403@cloud.neduet.edu.pk,https://www.linkedin.com/in/muhammad-shaheer-86043359/,"Computer Vision, RAG Systems, Embedding Models, AI Automation",CSIT,
+Kashaf Zia,Research Intern,zia4630038@cloud.neduet.edu.pk,https://www.linkedin.com/in/kashaf-zia-24774a2ba/,"Web & Mobile Dev, Machine Learning, Generative AI",CSIT,
+Haseeb Yaqoob,Research Intern,yaqoob4705143@cloud.neduet.edu.pk,https://www.linkedin.com/in/haseeb-yaqoob-864360287/,"NLP & LLMs, Computer Vision",CSIT,
+Muhammad Umer Safee,Research Intern,safee4600033@cloud.neduet.edu.pk,https://www.linkedin.com/in/muhammad-umer-safee-b48256296,"AI Agents, Autonomous Systems, Machine Learning",CSIT,
+Syed Omer Ahmed Shamsi,Research Intern,shamsi4601801@cloud.neduet.edu.pk,https://www.linkedin.com/in/syed-omer-ahmed-shamsi-b3aa6a251,"Machine Learning, Deep Learning, Pipelines",CSIT,
+Syed Shujauddin Hashmi,Research Intern,hashmi4630439@cloud.neduet.edu.pk,https://www.linkedin.com/in/syed-shujauddin-hashmi-612050291/,"Malware Analysis, Reverse Engineering, Multi-Agent Frameworks, Cyberthreat Intelligence",CSIT,
+Syed Muhammed Ahmed,Research Intern,ahmed4605214@cloud.neduet.edu.pk,https://www.linkedin.com/in/syedmuhammedahmed/,"Data Science, Machine Learning, RAG Systems, Generative AI",CSIT,
+Roshaan Tahir,Research Intern,tahir4600051@cloud.neduet.edu.pk,https://www.linkedin.com/in/roshaantahir/,"Deep Learning, Multi-Agent Systems, Distributed Systems, Data Engineering",CSIT,
+Muhammad Hammad Khan,Research Intern,khan4600572@cloud.neduet.edu.pk,https://www.linkedin.com/in/hammad-khan-308395286/,"Data Science, RAG Systems, Agentic AI, AI Engineering",CSIT,
+Areeba Zehra Jafri,Research Intern,jafrri4603155@cloud.neduet.edu.pk,https://www.linkedin.com/in/areeba-zehra-jafri,"Cybersecurity, Adversarial ML, Machine Learning, Network Security",CSIT,

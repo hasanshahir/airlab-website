@@ -11,8 +11,8 @@ You can directly import these 4 CSV files into your Google Spreadsheet (`File` â
 1. **[`1_Faculty_and_Interns.csv`](file:///c:/vibes/Air%20Lab/sheets-extension/seed-data/1_Faculty_and_Interns.csv)**
    - **Tab Name in Google Sheets**: `Faculty & Interns`
    - **Records**: 16 members (6 Faculty Leads & Members + 10 Official Research Interns)
-   - **Fields**: `Name`, `Role`, `Email`, `Linkedin`, `Specialty`, `Resume`
-   - **Highlights**: Real `@cloud.neduet.edu.pk` emails, official NED faculty CV links, and researched focus areas.
+   - **Fields**: `Name`, `Role`, `Email`, `Linkedin`, `Specialty`, `Dept`, `Resume`
+   - **Highlights**: Real `@cloud.neduet.edu.pk` emails, Dept (`Department of CSIT`), official faculty CV links at last, and researched focus areas.
 
 2. **[`2_Undergraduate_Projects.csv`](file:///c:/vibes/Air%20Lab/sheets-extension/seed-data/2_Undergraduate_Projects.csv)**
    - **Tab Name in Google Sheets**: `Undergraduate Projects`
@@ -23,8 +23,8 @@ You can directly import these 4 CSV files into your Google Spreadsheet (`File` â
 3. **[`3_Funded_Projects.csv`](file:///c:/vibes/Air%20Lab/sheets-extension/seed-data/3_Funded_Projects.csv)**
    - **Tab Name in Google Sheets**: `Funded Projects`
    - **Records**: 2 Major Government Grants
-   - **Fields**: `Program Title`, `Project Title`, `Status`, `Grant Supplier`, `Time Taken`, `Project Details`, `Name of PI`, `Grant Amount`, `Funder Website`
-   - **Highlights**: Sindh Research Support Program (Sindh HEC) grants (Rs. 5M each) led by Dr. Murk Marvi and Prof. Dr. Muhammad Mubashir Khan.
+   - **Fields**: `Program Title`, `Project Title`, `Status`, `Grant Supplier`, `Grant Amount`, `Time Taken`, `Pictures`, `Project Details`, `Name of PI`, `Funder Website`
+   - **Highlights**: Sindh Research Support Program (Sindh HEC) grants (Rs. 5M each) led by Dr. Murk Marvi and Prof. Dr. Muhammad Mubashir Khan, including project cover pictures.
 
 4. **[`4_Vacancies.csv`](file:///c:/vibes/Air%20Lab/sheets-extension/seed-data/4_Vacancies.csv)**
    - **Tab Name in Google Sheets**: `Vacancies`
@@ -53,3 +53,4 @@ The shared MongoDB Atlas database (`cluster0.xbk6omj.mongodb.net/airlab`) has **
 - `https://airlab-website-peach.vercel.app` (Production Main)
 - `https://airlab-studio.vercel.app` (New Studio UI)
 are currently serving this verified data to visitors and clients.
+

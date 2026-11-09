@@ -405,6 +405,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
         const linkedin = parseString(row.Linkedin || row.linkedin)
         const cvUrl = parseString(row.Resume || row.resume || row.CV || row.cv || row.cvUrl || row['Resume Link'] || row['CV Link'])
         const specialty = parseString(row.Specialty || row.specialty || row.tags)
+        const dept = parseString(row.Dept || row.dept || row.Department || row.department) || 'Department of CSIT'
         const tags = specialty ? parseStringList(specialty) : []
 
         // ID resolution: use explicit ID if provided, otherwise stable slug derived from name
@@ -419,6 +420,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
           linkedin,
           cvUrl: cvUrl || '',
           researchFocus: specialty,
+          department: dept,
           tags,
           isLead,
           image,
@@ -517,6 +519,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
         const pi = parseString(row['Name of PI'] || row.pi || row.leadInvestigator)
         const grantAmount = parseString(row['Grant Amour'] || row['Grant Amount'] || row.grantAmount)
         const funderUrl = parseString(row['Funder Website'] || row.funderUrl)
+        const pictures = parseString(row.Pictures || row.pictures || row.coverImage || row['Project Image'] || row['Cover Image'])
 
         const rawId = parseString(row.id || row.ID) || `fnd-${slugify(title).slice(0, 36)}`
 
@@ -530,6 +533,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
           funding: grantSupplier || '',
           timeTaken: timeTaken || '',
           startDate: timeTaken || '',
+          coverImage: pictures || '',
           description: projectDetails || '',
           pi: pi || '',
           grantAmount: grantAmount || '',

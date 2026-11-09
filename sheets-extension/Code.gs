@@ -957,23 +957,23 @@ function seedOfficialNedAirlabData() {
 
   // 1. Seed Faculty & Interns
   const facultyRows = [
-    ['Name', 'Role', 'Email', 'Linkedin', 'Specialty', 'Resume'],
-    ['Dr. Murk Marvi', 'Faculty Coordinator & PI', 'marvi@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/murk-marvi/', 'NLP & LLMs, Distributed Systems & HPC, Digital Identity', 'https://cct.neduet.edu.pk/sites/default/files/csit/CV_new/Marvi25.pdf'],
-    ['Prof. Dr. Muhammad Mubashir Khan', 'Principal Investigator & Professor', 'mmkhan@neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-mubashir-khan-phd-smieee-facp-728b1424/', 'Digital Investigation, Information Discovery, Cybersecurity', 'https://cct.neduet.edu.pk/faculty/dr-muhammad-mubashir-khan'],
-    ['Ms. Saadia Arshad', 'Faculty Member', 'saadia@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/saadiaaarshad', 'Information Security, Cybersecurity, Network Security', 'https://cct.neduet.edu.pk/faculty/saadia-arshad'],
-    ['Mr. Muhammad Arsalan', 'Faculty Member', 'arsalansaleem@neduet.edu.pk', 'https://www.linkedin.com/in/arsalansaleem', 'Wireless Security, Software-Defined Radio, RF Intelligence', 'https://cct.neduet.edu.pk/faculty/muhammad-arsalan'],
-    ['Ms. Maham Ashraf', 'Faculty Member', 'mahamashraf820@gmail.com', 'https://www.linkedin.com/in/maham-ashraf-74600b1a1', 'Computer Vision, NLP & LLMs, Multimodal AI, RAG', 'https://cct.neduet.edu.pk/faculty/maham-ashraf'],
-    ['Ms. Shiza Hassan', 'Faculty Member', 'shizahassan@cloud.neduet.edu.pk', 'https://pk.linkedin.com/in/shiza-hassan-5057b9216', 'Artificial Intelligence, Machine Learning, Generative AI, Data Science & RAG', 'https://cct.neduet.edu.pk/faculty/shiza-hassan'],
-    ['Muhammad Shaheer Khan', 'Research Intern', 'khan4731403@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-shaheer-86043359/', 'Computer Vision, RAG Systems, Embedding Models, AI Automation', ''],
-    ['Kashaf Zia', 'Research Intern', 'zia4630038@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/kashaf-zia-24774a2ba/', 'Web & Mobile Dev, Machine Learning, Generative AI', ''],
-    ['Haseeb Yaqoob', 'Research Intern', 'yaqoob4705143@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/haseeb-yaqoob-864360287/', 'NLP & LLMs, Computer Vision', ''],
-    ['Muhammad Umer Safee', 'Research Intern', 'safee4600033@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-umer-safee-b48256296', 'AI Agents, Autonomous Systems, Machine Learning', ''],
-    ['Syed Omer Ahmed Shamsi', 'Research Intern', 'shamsi4601801@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syed-omer-ahmed-shamsi-b3aa6a251', 'Machine Learning, Deep Learning, Pipelines', ''],
-    ['Syed Shujauddin Hashmi', 'Research Intern', 'hashmi4630439@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syed-shujauddin-hashmi-612050291/', 'Malware Analysis, Reverse Engineering, Multi-Agent Frameworks, Cyberthreat Intelligence', ''],
-    ['Syed Muhammed Ahmed', 'Research Intern', 'ahmed4605214@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syedmuhammedahmed/', 'Data Science, Machine Learning, RAG Systems, Generative AI', ''],
-    ['Roshaan Tahir', 'Research Intern', 'tahir4600051@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/roshaantahir/', 'Deep Learning, Multi-Agent Systems, Distributed Systems, Data Engineering', ''],
-    ['Muhammad Hammad Khan', 'Research Intern', 'khan4600572@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/hammad-khan-308395286/', 'Data Science, RAG Systems, Agentic AI, AI Engineering', ''],
-    ['Areeba Zehra Jafri', 'Research Intern', 'jafrri4603155@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/areeba-zehra-jafri', 'Cybersecurity, Adversarial ML, Machine Learning, Network Security', ''],
+    ['Name', 'Role', 'Email', 'Linkedin', 'Specialty', 'Dept', 'Resume'],
+    ['Dr. Murk Marvi', 'Faculty Coordinator & PI', 'marvi@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/murk-marvi/', 'NLP & LLMs, Distributed Systems & HPC, Digital Identity', 'Department of CSIT', 'https://cct.neduet.edu.pk/sites/default/files/csit/CV_new/Marvi25.pdf'],
+    ['Prof. Dr. Muhammad Mubashir Khan', 'Principal Investigator & Professor', 'mmkhan@neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-mubashir-khan-phd-smieee-facp-728b1424/', 'Digital Investigation, Information Discovery, Cybersecurity', 'Department of CSIT', 'https://cct.neduet.edu.pk/faculty/dr-muhammad-mubashir-khan'],
+    ['Ms. Saadia Arshad', 'Faculty Member', 'saadia@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/saadiaaarshad', 'Information Security, Cybersecurity, Network Security', 'Department of CSIT', 'https://cct.neduet.edu.pk/faculty/saadia-arshad'],
+    ['Mr. Muhammad Arsalan', 'Faculty Member', 'arsalansaleem@neduet.edu.pk', 'https://www.linkedin.com/in/arsalansaleem', 'Wireless Security, Software-Defined Radio, RF Intelligence', 'Department of CSIT', 'https://cct.neduet.edu.pk/faculty/muhammad-arsalan'],
+    ['Ms. Maham Ashraf', 'Faculty Member', 'mahamashraf820@gmail.com', 'https://www.linkedin.com/in/maham-ashraf-74600b1a1', 'Computer Vision, NLP & LLMs, Multimodal AI, RAG', 'Department of CSIT', 'https://cct.neduet.edu.pk/faculty/maham-ashraf'],
+    ['Ms. Shiza Hassan', 'Faculty Member', 'shizahassan@cloud.neduet.edu.pk', 'https://pk.linkedin.com/in/shiza-hassan-5057b9216', 'Artificial Intelligence, Machine Learning, Generative AI, Data Science & RAG', 'Department of CSIT', 'https://cct.neduet.edu.pk/faculty/shiza-hassan'],
+    ['Muhammad Shaheer Khan', 'Research Intern', 'khan4731403@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-shaheer-86043359/', 'Computer Vision, RAG Systems, Embedding Models, AI Automation', 'CSIT', ''],
+    ['Kashaf Zia', 'Research Intern', 'zia4630038@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/kashaf-zia-24774a2ba/', 'Web & Mobile Dev, Machine Learning, Generative AI', 'CSIT', ''],
+    ['Haseeb Yaqoob', 'Research Intern', 'yaqoob4705143@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/haseeb-yaqoob-864360287/', 'NLP & LLMs, Computer Vision', 'CSIT', ''],
+    ['Muhammad Umer Safee', 'Research Intern', 'safee4600033@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/muhammad-umer-safee-b48256296', 'AI Agents, Autonomous Systems, Machine Learning', 'CSIT', ''],
+    ['Syed Omer Ahmed Shamsi', 'Research Intern', 'shamsi4601801@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syed-omer-ahmed-shamsi-b3aa6a251', 'Machine Learning, Deep Learning, Pipelines', 'CSIT', ''],
+    ['Syed Shujauddin Hashmi', 'Research Intern', 'hashmi4630439@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syed-shujauddin-hashmi-612050291/', 'Malware Analysis, Reverse Engineering, Multi-Agent Frameworks, Cyberthreat Intelligence', 'CSIT', ''],
+    ['Syed Muhammed Ahmed', 'Research Intern', 'ahmed4605214@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/syedmuhammedahmed/', 'Data Science, Machine Learning, RAG Systems, Generative AI', 'CSIT', ''],
+    ['Roshaan Tahir', 'Research Intern', 'tahir4600051@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/roshaantahir/', 'Deep Learning, Multi-Agent Systems, Distributed Systems, Data Engineering', 'CSIT', ''],
+    ['Muhammad Hammad Khan', 'Research Intern', 'khan4600572@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/hammad-khan-308395286/', 'Data Science, RAG Systems, Agentic AI, AI Engineering', 'CSIT', ''],
+    ['Areeba Zehra Jafri', 'Research Intern', 'jafrri4603155@cloud.neduet.edu.pk', 'https://www.linkedin.com/in/areeba-zehra-jafri', 'Cybersecurity, Adversarial ML, Machine Learning, Network Security', 'CSIT', ''],
   ]
   seedTabRows(ss, DEFAULT_CONFIG.TAB_FACULTY_INTERNS, facultyRows)
 
@@ -1063,18 +1063,19 @@ function seedOfficialNedAirlabData() {
   ]
   seedTabRows(ss, DEFAULT_CONFIG.TAB_UG_PROJECTS, ugRows)
 
-  // 3. Seed Funded Projects
+  // 3. Seed Funded Projects (with Pictures column)
   const fundedRows = [
-    ['Program Title', 'Project Title', 'Status', 'Grant Supplier', 'Time Taken', 'Project Details', 'Name of PI', 'Grant Amount', 'Funder Website'],
+    ['Program Title', 'Project Title', 'Status', 'Grant Supplier', 'Grant Amount', 'Time Taken', 'Pictures', 'Project Details', 'Name of PI', 'Funder Website'],
     [
       'Sindh Research Support Program',
       'Connected Identity Intelligence Platform for Digital Investigation',
       'Ongoing',
       'Government of Sindh — Sindh Higher Education Commission (Sindh HEC)',
+      'Rs. 5 million',
       'June 26 - Present',
+      'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80',
       'This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.',
       'Dr. Murk Marvi',
-      'Rs. 5 million',
       'https://sindhhec.gov.pk/'
     ],
     [
@@ -1082,10 +1083,11 @@ function seedOfficialNedAirlabData() {
       'Integrated Information Discovery System for Digital Investigation',
       'Ongoing',
       'Government of Sindh — Sindh Higher Education Commission (Sindh HEC)',
+      'Rs. 5 million',
       'June 26 - Present',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
       'This project builds an on-premises investigation workspace for regulatory, compliance, audit, and journalistic work. Investigators usually start with little information about a subject and spend hours gathering and cross-checking public data from disconnected sites and tools. The platform cuts that work to minutes while keeping every result traceable to its source and a human in control.',
       'Prof. Dr. Muhammad Mubashir Khan',
-      'Rs. 5 million',
       'https://sindhhec.gov.pk/'
     ],
   ]
