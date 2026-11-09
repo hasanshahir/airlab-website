@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Menu,
@@ -20,6 +20,7 @@ import AirLabLogo from './AirLabLogo'
 import ParticleField from './ParticleField'
 import StudentApplicationModal from './StudentApplicationModal'
 import ThemeToggle from './ThemeToggle'
+import { useVacancySettings } from '../lib/vacancy'
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -29,6 +30,32 @@ export default function Layout() {
   const [scrolled, setScrolled] = useState(false)
   const navRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
+  const navigate = useNavigate()
+  const vacancy = useVacancySettings()
+  const isClosed = vacancy.status === 'Closed'
+
+  // Secret 7-tap easter egg on the logo to open Admin Portal
+  const tapCountRef = useRef(0)
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleLogoTap = (e: React.MouseEvent) => {
+    tapCountRef.current += 1
+
+    if (tapTimerRef.current) {
+      clearTimeout(tapTimerRef.current)
+    }
+
+    // Reset tap sequence if idle for more than 2 seconds
+    tapTimerRef.current = setTimeout(() => {
+      tapCountRef.current = 0
+    }, 2000)
+
+    if (tapCountRef.current >= 7) {
+      e.preventDefault()
+      tapCountRef.current = 0
+      navigate('/admin')
+    }
+  }
 
 
   useEffect(() => {
@@ -81,12 +108,12 @@ export default function Layout() {
       <aside aria-label="Announcement" className="w-full bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] text-xs font-medium py-2.5 px-4 sm:px-8 relative z-30">
         <div className="max-w-[1240px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--accent-orange)] text-xs tracking-tight">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)] animate-pulse shrink-0" />
-              Applications Open:
+            <span className={`inline-flex items-center gap-1.5 font-semibold text-xs tracking-tight ${isClosed ? 'text-rose-500' : 'text-[var(--accent-orange)]'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isClosed ? 'bg-rose-500' : 'bg-[var(--accent-orange)] animate-pulse'}`} />
+              {isClosed && vacancy.ribbonLabel.toLowerCase().includes('open') ? 'Applications Closed:' : vacancy.ribbonLabel}
             </span>
             <span className="text-[13px] text-[var(--text-muted)] font-normal">
-              Student Research Internship & Fellowship Vacancies Open for Fall 2026 — NEDUET CSIT
+              {isClosed ? vacancy.closedMessage : vacancy.ribbonText}
             </span>
           </div>
 
@@ -124,6 +151,7 @@ export default function Layout() {
           {/* Logo with 7-tap admin easter egg */}
           <Link
             to="/"
+            onClick={handleLogoTap}
             className="flex items-center gap-2 group shrink-0 select-none cursor-pointer"
             aria-label="AIR Lab Home"
           >
@@ -645,7 +673,7 @@ export default function Layout() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-16 border-b border-white/10">
             {/* Column 1: Lab Charter & Location */}
             <div className="space-y-4">
-              <Link to="/" className="inline-block" aria-label="AIR Lab Home">
+              <Link to="/" onClick={handleLogoTap} className="inline-block select-none" aria-label="AIR Lab Home">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-white font-bold text-lg font-head">
                     AI

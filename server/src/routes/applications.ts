@@ -6,6 +6,8 @@ import { PositionModel } from '../models/Position.js'
 import { HttpError } from '../middleware/errors.js'
 import { requireAdmin } from '../middleware/auth.js'
 import { sendApplicationNotification } from '../services/email.js'
+import { pushApplicationToSheets } from '../services/sheetsWebhook.js'
+import { getVacancySettings } from '../services/siteSettings.js'
 
 export const applicationsRouter = Router()
 
@@ -26,9 +28,16 @@ const upload = multer({
 applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
   try {
     const { positionId, name, email, phone, university, degreeYear, coverNote, github, linkedin } = req.body
+    // Structured fields (sent by the current form) so Sheets gets clean, separate columns.
+    const { rollNo, department, program, track, statement } = req.body
 
     if (!name || !email || !phone || !university || !degreeYear) {
       throw new HttpError(400, 'Missing required applicant fields')
+    }
+
+    const vacancy = await getVacancySettings()
+    if (vacancy.status === 'Closed') {
+      throw new HttpError(403, vacancy.closedMessage)
     }
 
     // Verify position or select default
@@ -64,6 +73,11 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
           phone,
           university,
           degreeYear,
+          rollNo,
+          department,
+          program,
+          track,
+          statement,
           coverNote,
           github,
           linkedin,
@@ -78,34 +92,66 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
 
     console.log(`📩 Application received from ${name} (${email})`)
 
-    // Dispatch instant notification email with attached CV
+    let positionTitle: string | undefined
     try {
-      let positionTitle: string | undefined
-      if (assignedPosition) {
+      if (assignedPosition && mongoose.connection.readyState === 1) {
         const posDoc = await PositionModel.findById(assignedPosition).lean()
         if (posDoc) positionTitle = posDoc.title
       }
+    } catch {
+      // ignore
+    }
 
-      await sendApplicationNotification({
-        applicantName: name,
-        applicantEmail: email,
-        applicantPhone: phone,
-        university,
-        degreeYear,
-        positionTitle,
-        coverNote,
-        github,
-        linkedin,
-        cvFile: req.file
-          ? {
-              originalName: req.file.originalname,
-              buffer: req.file.buffer,
-              contentType: req.file.mimetype,
-            }
-          : undefined,
-      })
-    } catch (mailErr) {
-      console.error('⚠️ Failed to dispatch application notification email:', mailErr)
+    // Email + live Google Sheets append run in parallel. Both are awaited (serverless
+    // functions are frozen once the response is sent) but neither can fail the request.
+    const emailTask = sendApplicationNotification({
+      applicantName: name,
+      applicantEmail: email,
+      applicantPhone: phone,
+      university,
+      degreeYear,
+      positionTitle,
+      coverNote,
+      github,
+      linkedin,
+      cvFile: req.file
+        ? {
+            originalName: req.file.originalname,
+            buffer: req.file.buffer,
+            contentType: req.file.mimetype,
+          }
+        : undefined,
+    })
+
+    const sheetsTask = pushApplicationToSheets({
+      applicationId: String(applicationId),
+      submittedAt: new Date().toISOString(),
+      name,
+      email,
+      phone,
+      rollNo,
+      department,
+      program,
+      track,
+      university,
+      degreeYear,
+      statement: statement ?? coverNote,
+      portfolio: req.body.resumeUrl || github,
+      linkedin,
+      vacancyTitle: positionTitle || vacancy.title,
+      status: 'New',
+      cv: req.file
+        ? {
+            fileName: req.file.originalname,
+            mimeType: req.file.mimetype || 'application/pdf',
+            base64: req.file.buffer.toString('base64'),
+          }
+        : undefined,
+    })
+
+    const [emailResult] = await Promise.allSettled([emailTask, sheetsTask])
+    if (emailResult.status === 'rejected') {
+      console.error('⚠️ Failed to dispatch application notification email:', emailResult.reason)
     }
 
     res.status(201).json({

@@ -22,6 +22,8 @@ const EnvSchema = z.object({
   SMTP_PASS: z.string().optional(),
   ADMIN_NOTIFICATION_EMAIL: z.string().default('hf.alihasan0@gmail.com'),
   SHEETS_SYNC_SECRET: z.string().default('airlab-sheets-sync-secret-2026'),
+  /** Optional override for the Apps Script web app URL used to push applications live into Sheets. */
+  SHEETS_WEBHOOK_URL: z.string().url().optional(),
 })
 
 const parsed = EnvSchema.safeParse(process.env)
