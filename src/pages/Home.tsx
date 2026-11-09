@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import type { LayoutOutletContext } from '../components/Layout';
 import {
@@ -10,6 +10,7 @@ import {
   RECENT_UPDATES,
 } from '../data/airlabData';
 import { getMemberAvatar, getProjectCover } from '../lib/placeholders';
+import type { ProjectItem, Grant, PublicationItem, TeamMemberData, Sponsor } from '../types/data';
 
 const PROJECT_THEMES = [
   { bg: '#0b132b', fg: '#ffffff' },
@@ -23,13 +24,34 @@ export default function Home() {
   const { openApplicationModal } = useOutletContext<LayoutOutletContext>();
   const openingProjectRef = useRef<HTMLAnchorElement | null>(null);
 
-  const projects = getProjects();
-  const grants = getGrants();
-  const publications = getPublications();
-  const team = getTeamMembers();
-  const sponsors = getSponsors();
+  const [projects, setProjects] = useState<ProjectItem[]>(() => getProjects());
+  const [grants, setGrants] = useState<Grant[]>(() => getGrants());
+  const [publications, setPublications] = useState<PublicationItem[]>(() => getPublications());
+  const [team, setTeam] = useState<TeamMemberData[]>(() => getTeamMembers());
+  const [sponsors, setSponsors] = useState<Sponsor[]>(() => getSponsors());
 
-  const faculty = team.filter((m) => m.category === 'Faculty');
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      fetch('/api/content/projects').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/grants').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/publications').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/team').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/sponsors').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+    ]).then(([p, g, pub, t, s]) => {
+      if (!active) return;
+      if (Array.isArray(p) && p.length > 0) setProjects(p);
+      if (Array.isArray(g) && g.length > 0) setGrants(g);
+      if (Array.isArray(pub) && pub.length > 0) setPublications(pub);
+      if (Array.isArray(t) && t.length > 0) setTeam(t);
+      if (Array.isArray(s) && s.length > 0) setSponsors(s);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const faculty = team.filter((m) => m.category === 'Faculty' || (m.role && m.role.toLowerCase().includes('fac')) || (m.role && m.role.toLowerCase().includes('prof')));
   const leads = faculty.length >= 2 ? faculty.slice(0, 2) : team.slice(0, 2);
 
   const featuredPrimary = projects[0];

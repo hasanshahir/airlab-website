@@ -1,11 +1,32 @@
+import { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import type { LayoutOutletContext } from '../components/Layout';
 import { getGrants, getSponsors } from '../data/airlabData';
+import type { Grant, Sponsor } from '../types/data';
 
 export default function Grants() {
   const { openApplicationModal } = useOutletContext<LayoutOutletContext>();
-  const grants = getGrants();
-  const sponsors = getSponsors();
+  const [grants, setGrants] = useState<Grant[]>(() => getGrants());
+  const [sponsors, setSponsors] = useState<Sponsor[]>(() => getSponsors());
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      fetch('/api/content/grants').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/sponsors').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+    ]).then(([grantsData, sponsorsData]) => {
+      if (!active) return;
+      if (Array.isArray(grantsData) && grantsData.length > 0) {
+        setGrants(grantsData);
+      }
+      if (Array.isArray(sponsorsData) && sponsorsData.length > 0) {
+        setSponsors(sponsorsData);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <>

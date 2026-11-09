@@ -1,10 +1,26 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getPublications, getLabBlogs } from '../data/airlabData';
+import { getPublications, getLabBlogs, type LabBlogRecord } from '../data/airlabData';
+import type { PublicationItem } from '../types/data';
 
 export default function Publications() {
-  const publications = getPublications();
-  const blogs = getLabBlogs();
+  const [publications, setPublications] = useState<PublicationItem[]>(() => getPublications());
+  const [blogs, setBlogs] = useState<LabBlogRecord[]>(() => getLabBlogs());
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      fetch('/api/content/publications').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/blogs').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+    ]).then(([pubData, blogData]) => {
+      if (!active) return;
+      if (Array.isArray(pubData) && pubData.length > 0) setPublications(pubData);
+      if (Array.isArray(blogData) && blogData.length > 0) setBlogs(blogData);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const [selectedYear, setSelectedYear] = useState<string>('all');
 

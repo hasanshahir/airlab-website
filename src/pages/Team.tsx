@@ -1,17 +1,38 @@
+import { useState, useEffect } from 'react';
 import { useSearchParams, useOutletContext } from 'react-router-dom';
 import type { LayoutOutletContext } from '../components/Layout';
 import { getTeamMembers, getAlumniMembers } from '../data/airlabData';
 import { getMemberAvatar } from '../lib/placeholders';
+import type { TeamMemberData } from '../types/data';
 
 export default function Team() {
   const { openApplicationModal } = useOutletContext<LayoutOutletContext>();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'all';
 
-  const allMembers = getTeamMembers();
-  const previousInterns = getAlumniMembers();
+  const [allMembers, setAllMembers] = useState<TeamMemberData[]>(() => getTeamMembers());
+  const [previousInterns, setPreviousInterns] = useState<any[]>(() => getAlumniMembers());
 
-  const faculty = allMembers.filter((m) => m.category === 'Faculty');
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      fetch('/api/content/team').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/previous-interns').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+    ]).then(([teamData, prevData]) => {
+      if (!active) return;
+      if (Array.isArray(teamData) && teamData.length > 0) {
+        setAllMembers(teamData);
+      }
+      if (Array.isArray(prevData) && prevData.length > 0) {
+        setPreviousInterns(prevData);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const faculty = allMembers.filter((m) => m.category === 'Faculty' || (m.role && m.role.toLowerCase().includes('fac')) || (m.role && m.role.toLowerCase().includes('prof')));
   const interns = allMembers.filter((m) => m.category !== 'Faculty' && m.category !== 'Alumni');
 
   const setTab = (tab: string) => {

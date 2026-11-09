@@ -23,7 +23,7 @@
 
 // Default Configuration
 const DEFAULT_CONFIG = {
-  BACKEND_URL: 'https://airlab-website-peach.vercel.app',
+  BACKEND_URL: 'https://airlab-studio.vercel.app',
   SYNC_SECRET: 'airlab-sheets-sync-secret-2026',
   TAB_FACULTY_INTERNS: 'Faculty & Interns',
   TAB_UG_PROJECTS: 'Undergraduate Projects',

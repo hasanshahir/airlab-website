@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import type { LayoutOutletContext } from '../components/Layout';
 import { getProjects, getGrants } from '../data/airlabData';
 import { getProjectCover } from '../lib/placeholders';
-import type { ProjectItem } from '../types/data';
+import type { ProjectItem, Grant } from '../types/data';
 
 const PORTFOLIO_THEMES = [
   { bg: '#0b132b', fg: '#ffffff' },
@@ -16,8 +16,27 @@ const PORTFOLIO_THEMES = [
 
 export default function Projects() {
   const { openApplicationModal } = useOutletContext<LayoutOutletContext>();
-  const projects = getProjects();
-  const grants = getGrants();
+  const [projects, setProjects] = useState<ProjectItem[]>(() => getProjects());
+  const [grants, setGrants] = useState<Grant[]>(() => getGrants());
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      fetch('/api/content/projects').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/grants').then((r) => (r.ok ? r.json() : [])).catch(() => []),
+    ]).then(([projsData, grantsData]) => {
+      if (!active) return;
+      if (Array.isArray(projsData) && projsData.length > 0) {
+        setProjects(projsData);
+      }
+      if (Array.isArray(grantsData) && grantsData.length > 0) {
+        setGrants(grantsData);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [activeProject, setActiveProject] = useState<ProjectItem | null>(null);
