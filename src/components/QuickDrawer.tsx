@@ -141,16 +141,20 @@ export default function QuickDrawer({
               className="w-screen max-w-xl sm:max-w-2xl bg-[var(--bg-surface-elevated)] border-l border-[var(--border-hairline)] shadow-2xl flex flex-col text-left text-[var(--text-primary)] rounded-l-3xl overflow-hidden"
             >
               {/* ── Drawer Header ── */}
-              <div className="p-6 border-b border-[var(--border-hairline)] bg-[var(--bg-surface-elevated)] shrink-0">
+              <div className="p-6 border-b border-neutral-200 bg-white shrink-0">
                 <div className="flex items-center justify-between gap-3 mb-5">
                   <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[var(--accent-orange)] animate-pulse" />
+                    <span className="brand-wordmark !text-neutral-950" style={{ fontSize: '18px' }}>
+                      AIR LAB
+                      <small className="!text-neutral-500 !text-[8px] !tracking-[0.14em]">NED UNIVERSITY · CSIT</small>
+                    </span>
+                    <span className="h-5 w-px bg-neutral-200 hidden sm:block" aria-hidden="true" />
                     <div>
-                      <h3 className="font-head text-lg sm:text-xl font-bold tracking-tight text-[var(--text-primary)]">
-                        AIR Lab Explorer
+                      <h3 className="font-head text-base sm:text-lg font-bold tracking-tight text-neutral-950">
+                        Explorer
                       </h3>
-                      <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                        Research Projects &amp; Scholars Directory
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Projects &amp; Scholars Directory
                       </p>
                     </div>
                   </div>

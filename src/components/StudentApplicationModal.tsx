@@ -153,9 +153,16 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
               /* Success Screen */
               <div className="flex flex-col flex-1 overflow-hidden bg-white">
                 <div className="p-5 sm:p-6 border-b border-neutral-200 bg-white flex items-center justify-between shrink-0">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Application Received</span>
+                  <div className="flex items-center gap-3">
+                    <span className="brand-wordmark !text-neutral-950" style={{ fontSize: '17px' }}>
+                      AIR LAB
+                      <small className="!text-neutral-500 !text-[8px] !tracking-[0.14em]">NED UNIVERSITY · CSIT</small>
+                    </span>
+                    <span className="h-4 w-px bg-neutral-300" aria-hidden="true" />
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Application Received</span>
+                    </div>
                   </div>
                   <button
                     onClick={handleReset}
@@ -194,12 +201,19 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden bg-white">
-                {/* ── 1. Fixed Header (Always visible, 100% solid white background) ── */}
+                {/* ── 1. Fixed Header with AIR Lab Logo & Badge ── */}
                 <div className="p-5 sm:px-8 sm:py-5 border-b border-neutral-200 bg-white flex items-start justify-between gap-4 shrink-0">
                   <div className="min-w-0 pr-2">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-[#ff5500] border border-[#ff5500]/30 text-[11px] font-sans font-semibold mb-2">
-                      <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">{vacancy.badge}</span>
+                    <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-2.5">
+                      <span className="brand-wordmark !text-neutral-950" style={{ fontSize: '17px' }}>
+                        AIR LAB
+                        <small className="!text-neutral-500 !text-[8px] !tracking-[0.14em]">NED UNIVERSITY · CSIT</small>
+                      </span>
+                      <span className="h-4 w-px bg-neutral-300" aria-hidden="true" />
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-50 text-[#ff5500] border border-[#ff5500]/30 text-[10.5px] font-sans font-semibold">
+                        <Sparkles className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{vacancy.badge}</span>
+                      </div>
                     </div>
                     <h2 id="vacancy-modal-title" className="text-xl sm:text-2xl font-bold tracking-tight font-head text-neutral-950">
                       {vacancy.title}

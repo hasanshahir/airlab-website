@@ -1226,6 +1226,7 @@ export default function Layout() {
         <div className="footer-bottom">
           <span className="brand-wordmark" style={{ fontSize: '15px' }}>
             AIR LAB
+            <small>NED UNIVERSITY · CSIT</small>
           </span>
           <span>100% HUMAN. 100% AI. 200% UNLMTD.</span>
           <span className="footer-copy">© 2026 AIR LAB — NED UNIVERSITY</span>
