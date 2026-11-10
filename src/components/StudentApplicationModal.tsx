@@ -88,20 +88,34 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
         data.append('cv', cvFile)
       }
 
-      const res = await fetch('/api/applications', {
-        method: 'POST',
-        body: data,
-      })
+      let res: Response | null = null
+      try {
+        res = await fetch('/api/applications', {
+          method: 'POST',
+          body: data,
+        })
+      } catch (fetchErr) {
+        // If local dev server proxy failed (e.g. backend on port 5000 not started), fall back to live API
+        if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+          console.warn('Local /api/applications proxy unreachable, routing through live API endpoint...')
+          res = await fetch('https://airlab-website-peach.vercel.app/api/applications', {
+            method: 'POST',
+            body: data,
+          })
+        } else {
+          throw fetchErr
+        }
+      }
 
-      if (!res.ok) {
-        const text = await res.text()
+      if (!res || !res.ok) {
+        const text = (await res?.text()) || ''
         let errJson: any
         try {
           errJson = JSON.parse(text)
         } catch {
           // fallback
         }
-        throw new Error(errJson?.error || text || `Server error (${res.status})`)
+        throw new Error(errJson?.error || text || `Server error (${res?.status || 500})`)
       }
 
       setSubmitted(true)

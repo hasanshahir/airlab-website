@@ -131,5 +131,62 @@ export async function sendApplicationNotification(data: ApplicationEmailPayload)
   })
 
   console.log(`📧 Notification email sent to ${recipient}: ${info.messageId}`)
+
+  // Also send candidate confirmation receipt directly to the applicant's email address
+  if (data.applicantEmail && data.applicantEmail.includes('@')) {
+    try {
+      const applicantSubject = `Application Received: AIR Lab Fellowship & Research Vacancy`
+      const applicantHtml = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
+          <div style="margin-bottom: 20px; border-bottom: 2px solid #ff5500; padding-bottom: 12px;">
+            <h2 style="color: #0b0c0e; margin: 0; font-size: 20px; letter-spacing: -0.02em;">AIR LAB — NED UNIVERSITY</h2>
+            <p style="color: #555760; font-size: 13px; margin: 4px 0 0 0;">Department of Computer Science &amp; IT</p>
+          </div>
+          <p style="color: #0b0c0e; font-size: 15px; line-height: 1.6;">Dear <strong>${data.applicantName}</strong>,</p>
+          <p style="color: #334155; font-size: 14px; line-height: 1.6;">
+            Thank you for applying to the <strong>Artificial Intelligence Research Lab (AIR Lab)</strong> at NED University. We have successfully received your application for the <strong>${data.positionTitle || 'Research Vacancy'}</strong>.
+          </p>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin: 20px 0;">
+            <h4 style="margin: 0 0 10px 0; color: #0b0c0e; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Application Summary</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+              <tr>
+                <td style="padding: 4px 0; color: #64748b; width: 130px;">Applicant:</td>
+                <td style="padding: 4px 0; color: #0b0c0e; font-weight: 600;">${data.applicantName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; color: #64748b;">University / Dept:</td>
+                <td style="padding: 4px 0; color: #0b0c0e;">${data.university} (${data.degreeYear})</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; color: #64748b;">Contact Email:</td>
+                <td style="padding: 4px 0; color: #0b0c0e;">${data.applicantEmail}</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; color: #64748b;">Phone / WhatsApp:</td>
+                <td style="padding: 4px 0; color: #0b0c0e;">${data.applicantPhone}</td>
+              </tr>
+            </table>
+          </div>
+          <p style="color: #334155; font-size: 14px; line-height: 1.6;">
+            Our faculty review committee, led by Dr. Murk Marvi, reviews candidate applications on a rolling basis. Shortlisted candidates will be contacted directly for track interviews and technical testbed orientations.
+          </p>
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 12px; line-height: 1.5;">
+            <p style="margin: 0;"><strong>Artificial Intelligence Research Lab (AIR Lab)</strong><br />Department of CSIT, NED University of Engineering &amp; Technology<br />University Road, Karachi 75270, Pakistan</p>
+          </div>
+        </div>
+      `
+
+      await mailer.sendMail({
+        from: `"AIR Lab Admissions" <${env.SMTP_USER || process.env.SMTP_USER}>`,
+        to: data.applicantEmail,
+        subject: applicantSubject,
+        html: applicantHtml,
+      })
+      console.log(`📧 Candidate confirmation email sent to applicant: ${data.applicantEmail}`)
+    } catch (candErr) {
+      console.warn('⚠️ Could not send candidate confirmation email:', candErr)
+    }
+  }
+
   return { sent: true, messageId: info.messageId }
 }
