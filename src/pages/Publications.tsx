@@ -46,7 +46,7 @@ export default function Publications() {
       .then(d => {
         if (Array.isArray(d)) setPubData(d)
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   // Enforce sorted order: recent papers at top (descending by year, then by id)

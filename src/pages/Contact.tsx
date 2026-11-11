@@ -1,4 +1,4 @@
-﻿import ContactSection from '../components/ContactSection'
+import ContactSection from '../components/ContactSection'
 import SectionReveal from '../components/ui/SectionReveal'
 
 export default function Contact() {

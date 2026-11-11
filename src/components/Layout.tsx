@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import Marquee from 'react-fast-marquee'
 import {
   Menu,
   X,
@@ -109,21 +108,41 @@ export default function Layout() {
       <aside aria-label="Announcement" className="w-full bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] text-xs font-medium py-2 px-4 sm:px-8 relative z-30 overflow-hidden">
         <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden min-w-0">
-            <Marquee speed={45} pauseOnHover gradient={false}>
-              <div className="flex items-center gap-8 pr-12 text-center sm:text-left">
-                <span className={`inline-flex items-center gap-1.5 font-semibold text-xs tracking-tight ${isClosed ? 'text-rose-500' : 'text-[var(--accent-orange)]'}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isClosed ? 'bg-rose-500' : 'bg-[var(--accent-orange)] animate-pulse'}`} />
-                  {isClosed && vacancy.ribbonLabel.toLowerCase().includes('open') ? 'Applications Closed:' : vacancy.ribbonLabel}
-                </span>
-                <span className="text-[13px] text-[var(--text-muted)] font-normal">
-                  {isClosed ? vacancy.closedMessage : vacancy.ribbonText}
-                </span>
-                <span className="text-[var(--border-hairline)]">•</span>
-                <span className="text-[12.5px] text-[var(--text-muted)] font-normal">
-                  Artificial Intelligence Research Lab — Department of CSIT, NED University of Engineering & Technology
-                </span>
+            <div className="overflow-hidden whitespace-nowrap select-none">
+              <div className="animate-ribbon-scroll">
+                {/* Segment 1 */}
+                <div className="flex items-center gap-8 pr-8 shrink-0">
+                  <span className={`inline-flex items-center gap-1.5 font-semibold text-xs tracking-tight ${isClosed ? 'text-rose-500' : 'text-[var(--accent-orange)]'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isClosed ? 'bg-rose-500' : 'bg-[var(--accent-orange)] animate-pulse'}`} />
+                    {isClosed && vacancy.ribbonLabel.toLowerCase().includes('open') ? 'Applications Closed:' : vacancy.ribbonLabel}
+                  </span>
+                  <span className="text-[13px] text-[var(--text-muted)] font-normal">
+                    {isClosed ? vacancy.closedMessage : vacancy.ribbonText}
+                  </span>
+                  <span className="text-[var(--border-hairline)]">•</span>
+                  <span className="text-[12.5px] text-[var(--text-muted)] font-normal">
+                    Artificial Intelligence Research Lab — Department of CSIT, NED University of Engineering & Technology
+                  </span>
+                  <span className="text-[var(--border-hairline)]">•</span>
+                </div>
+
+                {/* Segment 2 (seamless infinite loop mirror) */}
+                <div className="flex items-center gap-8 pr-8 shrink-0" aria-hidden="true">
+                  <span className={`inline-flex items-center gap-1.5 font-semibold text-xs tracking-tight ${isClosed ? 'text-rose-500' : 'text-[var(--accent-orange)]'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isClosed ? 'bg-rose-500' : 'bg-[var(--accent-orange)] animate-pulse'}`} />
+                    {isClosed && vacancy.ribbonLabel.toLowerCase().includes('open') ? 'Applications Closed:' : vacancy.ribbonLabel}
+                  </span>
+                  <span className="text-[13px] text-[var(--text-muted)] font-normal">
+                    {isClosed ? vacancy.closedMessage : vacancy.ribbonText}
+                  </span>
+                  <span className="text-[var(--border-hairline)]">•</span>
+                  <span className="text-[12.5px] text-[var(--text-muted)] font-normal">
+                    Artificial Intelligence Research Lab — Department of CSIT, NED University of Engineering & Technology
+                  </span>
+                  <span className="text-[var(--border-hairline)]">•</span>
+                </div>
               </div>
-            </Marquee>
+            </div>
           </div>
 
           <div className="hidden md:flex items-center gap-4 shrink-0">
