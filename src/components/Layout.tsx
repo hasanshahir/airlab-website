@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import Marquee from 'react-fast-marquee'
 import {
   Menu,
   X,
@@ -15,11 +16,11 @@ import {
   GraduationCap,
   Building,
   Image as GalleryIcon,
+  ArrowRight,
 } from 'lucide-react'
 import AirLabLogo from './AirLabLogo'
 import ParticleField from './ParticleField'
 import StudentApplicationModal from './StudentApplicationModal'
-import ThemeToggle from './ThemeToggle'
 import { useVacancySettings } from '../lib/vacancy'
 
 export default function Layout() {
@@ -104,20 +105,28 @@ export default function Layout() {
         Skip to main content
       </a>
 
-      {/* ── 1. Restyled Top Vacancy Ribbon ── */}
-      <aside aria-label="Announcement" className="w-full bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] text-xs font-medium py-2.5 px-4 sm:px-8 relative z-30">
-        <div className="max-w-[1240px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-            <span className={`inline-flex items-center gap-1.5 font-semibold text-xs tracking-tight ${isClosed ? 'text-rose-500' : 'text-[var(--accent-orange)]'}`}>
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isClosed ? 'bg-rose-500' : 'bg-[var(--accent-orange)] animate-pulse'}`} />
-              {isClosed && vacancy.ribbonLabel.toLowerCase().includes('open') ? 'Applications Closed:' : vacancy.ribbonLabel}
-            </span>
-            <span className="text-[13px] text-[var(--text-muted)] font-normal">
-              {isClosed ? vacancy.closedMessage : vacancy.ribbonText}
-            </span>
+      {/* ── 1. Dynamic Horizontally Scrolling Vacancy Ribbon ── */}
+      <aside aria-label="Announcement" className="w-full bg-[var(--bg-surface)] border-b border-[var(--border-hairline)] text-xs font-medium py-2 px-4 sm:px-8 relative z-30 overflow-hidden">
+        <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-4">
+          <div className="flex-1 overflow-hidden min-w-0">
+            <Marquee speed={45} pauseOnHover gradient={false}>
+              <div className="flex items-center gap-8 pr-12 text-center sm:text-left">
+                <span className={`inline-flex items-center gap-1.5 font-semibold text-xs tracking-tight ${isClosed ? 'text-rose-500' : 'text-[var(--accent-orange)]'}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isClosed ? 'bg-rose-500' : 'bg-[var(--accent-orange)] animate-pulse'}`} />
+                  {isClosed && vacancy.ribbonLabel.toLowerCase().includes('open') ? 'Applications Closed:' : vacancy.ribbonLabel}
+                </span>
+                <span className="text-[13px] text-[var(--text-muted)] font-normal">
+                  {isClosed ? vacancy.closedMessage : vacancy.ribbonText}
+                </span>
+                <span className="text-[var(--border-hairline)]">•</span>
+                <span className="text-[12.5px] text-[var(--text-muted)] font-normal">
+                  Artificial Intelligence Research Lab — Department of CSIT, NED University of Engineering & Technology
+                </span>
+              </div>
+            </Marquee>
           </div>
 
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="hidden md:flex items-center gap-4 shrink-0">
             <a
               href="mailto:contact@airlab.neduet.edu.pk"
               className="inline-flex items-center gap-1.5 text-[12px] font-sans text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
@@ -482,18 +491,8 @@ export default function Layout() {
             </NavLink>
           </nav>
 
-          {/* Right Action CTA: Theme Toggle & Apply Now */}
+          {/* Right Action CTA: Inquiries & Apply Now */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            {/* Desktop Theme Switcher (3 Color Themes) */}
-            <div className="hidden md:block">
-              <ThemeToggle />
-            </div>
-
-            {/* Mobile/Compact Theme Toggle Button */}
-            <div className="md:hidden">
-              <ThemeToggle compact />
-            </div>
-
             <Link
               to="/contact"
               className="hidden xl:inline-flex text-[13.5px] font-medium text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors items-center gap-1.5 px-3 py-1.5 rounded-full"
@@ -504,12 +503,9 @@ export default function Layout() {
 
             <button
               onClick={() => setApplyModalOpen(true)}
-              className="group inline-flex items-center justify-center gap-2 h-10 px-4 sm:px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-medium tracking-tight transition-all duration-150 cursor-pointer shadow-sm active:translate-y-[1px]"
+              className="inline-flex items-center justify-center h-10 px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-semibold tracking-tight transition-all duration-150 cursor-pointer shadow-sm active:translate-y-[1px]"
             >
               <span>Apply Now</span>
-              <span className="text-[12px] leading-none transition-transform duration-150 group-hover:translate-x-0.5">
-                ↳
-              </span>
             </button>
 
             {/* Mobile Menu Button */}
@@ -533,13 +529,6 @@ export default function Layout() {
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="lg:hidden absolute top-[72px] left-0 right-0 bg-[var(--bg-surface-elevated)] border-b border-[var(--border-hairline)] px-6 py-6 shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto"
             >
-              <div className="flex items-center justify-between p-3 mb-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)]">
-                <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
-                  Theme
-                </span>
-                <ThemeToggle />
-              </div>
-
               <div className="space-y-2 mb-6">
                 <Link
                   to="/"
@@ -652,9 +641,9 @@ export default function Layout() {
                     setMobileMenuOpen(false)
                     setApplyModalOpen(true)
                   }}
-                  className="w-full sm:w-auto h-10 px-6 rounded-full bg-[var(--accent-orange)] text-white text-xs font-semibold"
+                  className="w-full sm:w-auto h-10 px-6 rounded-full bg-[var(--accent-orange)] text-white text-xs font-semibold cursor-pointer"
                 >
-                  Apply Now ↳
+                  Apply Now
                 </button>
               </div>
             </motion.div>
@@ -735,6 +724,12 @@ export default function Layout() {
                 NED CSIT & Inquiries
               </h5>
               <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
+                <li>
+                  <Link to="/contact" className="text-white hover:text-[var(--accent-orange)] transition-colors font-semibold inline-flex items-center gap-1.5">
+                    <span>Contact Us</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                  </Link>
+                </li>
                 <li>
                   <a
                     href="https://cct.neduet.edu.pk/AIR"

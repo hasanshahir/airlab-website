@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Copy, Check, Award, FileText, Download, ExternalLink, Search, Clock, ArrowRight } from 'lucide-react'
+import { Copy, Check, Award, FileText, Download, ExternalLink, Search, Clock, ArrowRight } from 'lucide-react'
 import { getPublications } from '../lib/data'
-import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
 
 const labBlogs = [
@@ -80,14 +79,6 @@ export default function Publications() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<BookOpen className="w-3.5 h-3.5 text-white" />}>
-              PEER-REVIEWED SCIENTIFIC OUTPUT
-            </Badge>
-          </div>
-        </SectionReveal>
-
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
             Research Papers & Publications
@@ -271,10 +262,6 @@ export default function Publications() {
       {/* ── 2. BLOGS SECTION (Underneath Publications) ── */}
       <section id="blogs" className="mt-24 pt-16 border-t border-[var(--border-hairline)] text-left">
         <div className="mb-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--accent-orange)] text-xs font-bold uppercase tracking-wider mb-3 border border-[var(--border-hairline)]">
-            <FileText className="w-3.5 h-3.5" />
-            <span>Articles & Technical Notes</span>
-          </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
             Research Blogs & Dispatches
           </h2>

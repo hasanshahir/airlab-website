@@ -3,12 +3,9 @@ import { Link } from 'react-router-dom'
 import {
   Brain,
   Bot,
-  Database,
-  Zap,
   Code,
   LineChart,
   Layers,
-  Users,
   Award,
   ArrowRight,
   Calendar,
@@ -16,13 +13,14 @@ import {
   ChevronRight,
   Cpu,
   GraduationCap,
+  ShieldAlert,
+  ShieldCheck,
+  Terminal,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import airLabMark from '../assets/air-lab-mark.png'
 import StudentApplicationModal from '../components/StudentApplicationModal'
-import QuickDrawer from '../components/QuickDrawer'
 import SponsorsGrid from '../components/SponsorsGrid'
-import ContactSection from '../components/ContactSection'
 import HeroBackgroundSlideshow from '../components/HeroBackgroundSlideshow'
 
 const recentUpdates = [
@@ -32,8 +30,7 @@ const recentUpdates = [
     date: 'Recent Release',
     title: 'Urdu Multilingual LLM Pretraining Milestone',
     desc: 'Pretraining byte-level tokenizers and parameter-efficient LoRA fine-tuning pipelines tailored for low-resource regional dialects.',
-    badge: 'Benchmark',
-    link: '/projects',
+    link: '/projects#PRJ-1',
     actionText: 'Explore Project',
     icon: Brain,
   },
@@ -43,7 +40,6 @@ const recentUpdates = [
     date: 'Admissions Open',
     title: 'Fall 2026 Student Research Fellowships Open',
     desc: 'Funded fellowship positions open for graduate and undergraduate scholars in edge AI, vision odometry, and TinyML acceleration.',
-    badge: 'Vacancies',
     actionType: 'apply',
     actionText: 'Apply for Vacancy',
     icon: GraduationCap,
@@ -54,8 +50,7 @@ const recentUpdates = [
     date: 'Lab Benchmark',
     title: 'Autonomous UAV Edge Perception Trial Completed',
     desc: 'Field testing real-time visual odometry and edge neural inference algorithms on embedded Jetson computing hardware.',
-    badge: 'Robotics',
-    link: '/projects',
+    link: '/projects#PRJ-6',
     actionText: 'View Benchmark',
     icon: Bot,
   },
@@ -65,7 +60,6 @@ const recentUpdates = [
     date: 'Monthly Honors',
     title: 'Performer of the Month Research Spotlight',
     desc: 'Honoring student researchers and lab fellows for groundbreaking contributions to multi-modal clinical diagnostic models.',
-    badge: 'Honors',
     link: '/performers',
     actionText: 'Meet Performers',
     icon: Award,
@@ -76,8 +70,7 @@ const recentUpdates = [
     date: 'Active Grants',
     title: 'National Infrastructure & Smart Grid Funding',
     desc: 'Secured competitive collaborative funding for power grid surge forecasting and renewable dispatch transformer models.',
-    badge: 'Grants',
-    link: '/grants',
+    link: '/grants#grant-meta-pytorch',
     actionText: 'View Grants',
     icon: Cpu,
   },
@@ -88,51 +81,37 @@ const coreResearchAreas = [
     icon: Brain,
     title: 'Foundational Models & NLP',
     desc: 'Pretraining multilingual LLMs tailored for low-resource regional dialects with advanced byte-level tokenizers and parameter-efficient fine-tuning.',
-    tag: 'Urdu & Multilingual NLP',
   },
   {
-    icon: Bot,
-    title: 'Autonomous Robotics & Edge AI',
-    desc: 'Real-time perception algorithms, spatial visual odometry, and edge TensorRT neural inference pipelines for robotic vehicles and aerial UAVs.',
-    tag: 'Robotics & Embedded Vision',
+    icon: ShieldAlert,
+    title: 'Adversarial AI',
+    desc: 'Investigating neural network vulnerabilities, model jailbreaking, prompt injection mitigation, and robust defense benchmarks for high-stakes AI systems.',
   },
   {
-    icon: Database,
-    title: 'Clinical Diagnostics & Healthcare',
-    desc: 'Deep multi-modal medical imaging classification, diagnostic explainability, and chest radiograph analysis deployed across partner clinics.',
-    tag: 'Medical AI Systems',
+    icon: ShieldCheck,
+    title: 'Cyber',
+    desc: 'Autonomous cyber defense, encrypted traffic analysis, zero-trust infrastructure, and automated vulnerability intelligence to safeguard digital ecosystems.',
   },
   {
-    icon: Zap,
-    title: 'Smart Energy & Infrastructure',
-    desc: 'Forecasting power grid surge anomalies, localized microgrid load shedding schedules, and renewable power dispatch with transformer models.',
-    tag: 'Grid Intelligence',
+    icon: Terminal,
+    title: 'Development',
+    desc: 'High-performance AI engineering, production-grade microservices, scalable distributed inference pipelines, and intelligent software systems.',
   },
   {
     icon: Code,
     title: 'Efficient Computing & TinyML',
     desc: 'Hardware-aware neural architecture search (NAS), INT8 quantization, and ultra-low-latency deployment on FPGAs and embedded SoCs.',
-    tag: 'TinyML & Edge Acceleration',
   },
   {
     icon: LineChart,
     title: 'AI Safety & Alignment',
     desc: 'Ensuring robust, unbiased, and safe deployment of intelligent systems in critical healthcare, power grids, and national infrastructure.',
-    tag: 'AI Safety',
   },
 ]
 
 export default function Home() {
   const [applyModalOpen, setApplyModalOpen] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [drawerTab, setDrawerTab] = useState<'projects' | 'members'>('projects')
   const updatesScrollRef = useRef<HTMLDivElement>(null)
-
-  // Side panel opens on click only (no hover trigger)
-  const openDrawer = (tab: 'projects' | 'members') => {
-    setDrawerTab(tab)
-    setDrawerOpen(true)
-  }
 
   const scrollUpdates = (direction: 'left' | 'right') => {
     if (updatesScrollRef.current) {
@@ -162,71 +141,50 @@ export default function Home() {
             {/* Subtle vertical separator on desktop */}
             <div className="hidden md:block w-px h-24 bg-white/30 shrink-0" />
 
-            {/* TEXT ON THE RIGHT: Clean punchy slogan + concise narrative */}
+            {/* TEXT ON THE RIGHT: Clean punchy slogan */}
             <div className="text-center md:text-left flex flex-col items-center md:items-start max-w-2xl">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-head text-white tracking-tight leading-[1.08] drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] select-none">
                 Where Intelligence Meets Engineering.
               </h1>
-              <p className="text-sm sm:text-base md:text-lg text-white/95 font-sans mt-3.5 leading-relaxed font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                The Artificial Intelligence Research Lab at NED University is pioneering foundational regional AI models, edge perception, and autonomous robotics benchmarks for national impact.
-              </p>
 
               {/* Action Buttons directly on the photography */}
               <div className="mt-7 flex flex-wrap items-center justify-center md:justify-start gap-3.5">
-                <button
-                  type="button"
-                  onClick={() => openDrawer('projects')}
+                <Link
+                  to="/projects"
                   className="h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
                 >
                   <Layers className="w-4 h-4 shrink-0" />
                   <span>Explore Projects</span>
                   <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => openDrawer('members')}
-                  className="h-12 px-7 bg-white/90 hover:bg-white text-[var(--ink-dark)] backdrop-blur-md text-sm font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
-                >
-                  <Users className="w-4 h-4 text-[var(--ink-dark)]/70 shrink-0" />
-                  <span>Lab Members</span>
-                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-                </button>
+                </Link>
               </div>
             </div>
           </div>
         </HeroBackgroundSlideshow>
 
         {/* ── MINIMAL CLEAN QUICK LINKS STRIP ── */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-5 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
-          <div className="flex items-center gap-2 font-semibold text-[var(--text-primary)]">
-            <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
-            <span>Direct Research Portals:</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <Link
-              to="/projects"
-              className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
-            >
-              All Projects &rarr;
-            </Link>
-            <span className="text-[var(--border-hairline)]">•</span>
-            <Link
-              to="/grants"
-              className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
-            >
-              <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-              Active Grants &rarr;
-            </Link>
-            <span className="text-[var(--border-hairline)]">•</span>
-            <Link
-              to="/team"
-              className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
-            >
-              All Team Members &rarr;
-            </Link>
-          </div>
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
+          <Link
+            to="/projects"
+            className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
+          >
+            All Projects &rarr;
+          </Link>
+          <span className="text-[var(--border-hairline)]">•</span>
+          <Link
+            to="/grants"
+            className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
+          >
+            <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+            Active Grants &rarr;
+          </Link>
+          <span className="text-[var(--border-hairline)]">•</span>
+          <Link
+            to="/team"
+            className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
+          >
+            All Team Members &rarr;
+          </Link>
         </div>
       </section>
 
@@ -276,8 +234,8 @@ export default function Home() {
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold uppercase tracking-wider bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
-                      {item.badge}
+                    <span className="text-[11.5px] font-semibold text-[var(--accent-orange)] font-sans">
+                      {item.category}
                     </span>
                     <div className="flex items-center gap-1 text-[11px] text-[var(--text-subtle)] font-medium">
                       <Calendar className="w-3 h-3" />
@@ -332,11 +290,6 @@ export default function Home() {
       <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-20 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
         <div className="max-w-[1240px] mx-auto">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-semibold uppercase tracking-wider mb-6">
-              <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)]" />
-              <span>About AIR Lab • NED University</span>
-            </div>
-
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-white leading-tight font-head">
               Empowering Regional AI Innovation at NED University
             </h2>
@@ -375,10 +328,7 @@ export default function Home() {
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-[var(--border-hairline)] pb-6 gap-4">
           <div>
-            <span className="text-xs font-sans uppercase font-bold text-[var(--accent-orange)] tracking-wider">
-              LAB INITIATIVES
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head mt-1.5">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
               Core Research Areas
             </h2>
           </div>
@@ -400,9 +350,6 @@ export default function Home() {
                     <div className="w-11 h-11 rounded-2xl bg-white border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all shadow-xs">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-sans text-[var(--text-muted)] uppercase px-3 py-1 bg-white rounded-full border border-[var(--border-hairline)]">
-                      {area.tag}
-                    </span>
                   </div>
 
                   <h3 className="font-head font-semibold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors mb-2.5">
@@ -429,9 +376,6 @@ export default function Home() {
       {/* ── 5. RESEARCH PARTNERS & SPONSORS ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
         <div className="text-center max-w-xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--text-subtle)] text-xs font-bold uppercase tracking-wider mb-3">
-            <span>Collaboration</span>
-          </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-head">
             Funded by National & Global Partners
           </h2>
@@ -439,20 +383,10 @@ export default function Home() {
         <SponsorsGrid />
       </section>
 
-      {/* ── 6. CONTACT & INQUIRIES ── */}
-      <ContactSection />
-
       {/* Student Application Modal */}
       <StudentApplicationModal
         isOpen={applyModalOpen}
         onClose={() => setApplyModalOpen(false)}
-      />
-
-      {/* Interactive Quick Explorer Drawer */}
-      <QuickDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        initialTab={drawerTab}
       />
     </div>
   )

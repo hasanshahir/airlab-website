@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Sparkles, Check, GraduationCap, FileText, User, Mail, BookOpen, Phone, Loader2, ArrowRight } from 'lucide-react'
+import { X, Sparkles, Check, GraduationCap, FileText, User, Mail, BookOpen, Phone, Loader2, ArrowRight, Briefcase } from 'lucide-react'
 import { useVacancySettings } from '../lib/vacancy'
 
 interface StudentApplicationModalProps {
@@ -22,6 +22,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
     email: '',
     phone: '',
     rollNo: '',
+    designation: 'Research Intern (Undergraduate)',
     department: 'Computer Science & IT',
     program: 'Undergraduate BS (3rd/4th Year)',
     track: 'Foundational LLMs & Urdu NLP',
@@ -70,9 +71,11 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
       data.append('name', formData.name)
       data.append('email', formData.email)
       data.append('phone', formData.phone || formData.rollNo)
+      data.append('designation', formData.designation)
+      data.append('positionTitle', formData.designation)
       data.append('university', 'NED University of Engineering & Technology')
-      data.append('degreeYear', `${formData.program} (${formData.department}) - Roll: ${formData.rollNo}`)
-      data.append('coverNote', `[Track: ${formData.track}] ${formData.statement}`)
+      data.append('degreeYear', `${formData.designation} — ${formData.program} (${formData.department}) - Roll: ${formData.rollNo}`)
+      data.append('coverNote', `[Designation: ${formData.designation} | Track: ${formData.track}] ${formData.statement}`)
       data.append('github', formData.resumeUrl)
       data.append('resumeUrl', formData.resumeUrl)
       // Structured copies of the fields so Google Sheets gets clean, separate columns
@@ -89,20 +92,43 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
         data.append('cv', cvFile)
       }
 
-      const res = await fetch('/api/applications', {
-        method: 'POST',
-        body: data,
-      })
+      let res: Response | null = null
+      try {
+        res = await fetch('/api/applications', {
+          method: 'POST',
+          body: data,
+        })
+      } catch (fetchErr) {
+        console.warn('Relative /api/applications unreachable, falling back to live endpoint...', fetchErr)
+        res = await fetch('https://airlab-website-peach.vercel.app/api/applications', {
+          method: 'POST',
+          body: data,
+        })
+      }
 
-      if (!res.ok) {
-        const text = await res.text()
+      if (!res || !res.ok) {
+        if (typeof window !== 'undefined' && !window.location.origin.includes('airlab-website-peach.vercel.app')) {
+          try {
+            const fallbackRes = await fetch('https://airlab-website-peach.vercel.app/api/applications', {
+              method: 'POST',
+              body: data,
+            })
+            if (fallbackRes.ok) {
+              setSubmitted(true)
+              return
+            }
+          } catch {
+            // retain original error
+          }
+        }
+        const text = (await res?.text()) || ''
         let errJson: any
         try {
           errJson = JSON.parse(text)
         } catch {
           // fallback
         }
-        throw new Error(errJson?.error || text || `Server error (${res.status})`)
+        throw new Error(errJson?.error || text || `Server error (${res?.status || 500})`)
       }
 
       setSubmitted(true)
@@ -131,289 +157,332 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
           aria-modal="true"
           aria-labelledby="vacancy-modal-title"
         >
-          {/* Backdrop with subtle ink tint and click-to-close */}
+          {/* Backdrop with dark tint and blur */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity"
           />
 
-          {/* Modal Container: responsive, max-height constrained with internal smooth scroll */}
+          {/* Modal Container: 100% solid, fully opaque elevated card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 14 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 14 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-2xl max-h-[92vh] sm:max-h-[88vh] flex flex-col bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-2xl sm:rounded-3xl shadow-2xl z-10 overflow-hidden font-sans my-auto text-left"
+            className="relative w-full max-w-2xl max-h-[92vh] sm:max-h-[88vh] flex flex-col bg-white border border-neutral-200 rounded-2xl sm:rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] z-10 overflow-hidden font-sans my-auto text-left"
+            style={{ backgroundColor: '#ffffff', opacity: 1 }}
             onClick={e => e.stopPropagation()}
           >
             {submitted ? (
               /* Success Screen */
-              <div className="flex flex-col flex-1 overflow-hidden">
-                <div className="p-5 sm:p-6 border-b border-[var(--border-hairline)] flex items-center justify-between shrink-0">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Application Received</span>
+              <div className="flex flex-col flex-1 overflow-hidden bg-white">
+                <div className="p-5 sm:p-6 border-b border-neutral-200 bg-white flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-3">
+                    <span className="brand-wordmark !text-neutral-950" style={{ fontSize: '17px' }}>
+                      AIR LAB
+                      <small className="!text-neutral-500 !text-[8px] !tracking-[0.14em]">NED UNIVERSITY · CSIT</small>
+                    </span>
+                    <span className="h-4 w-px bg-neutral-300" aria-hidden="true" />
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Application Received</span>
+                    </div>
                   </div>
                   <button
                     onClick={handleReset}
-                    className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                    className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 flex items-center justify-center text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer"
                     aria-label="Close modal"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 sm:p-8 text-center overscroll-contain">
-                  <div className="w-14 h-14 rounded-2xl bg-[var(--accent-orange)] text-white mx-auto flex items-center justify-center mb-5 shadow-md">
+                <div className="flex-1 overflow-y-auto p-6 sm:p-8 text-center overscroll-contain bg-white">
+                  <div className="w-14 h-14 rounded-2xl bg-[#ff5500] text-white mx-auto flex items-center justify-center mb-5 shadow-md">
                     <Check className="w-7 h-7" />
                   </div>
-                  <h3 id="vacancy-modal-title" className="text-2xl font-bold font-head text-[var(--text-primary)] mb-2.5">
+                  <h3 id="vacancy-modal-title" className="text-2xl font-bold font-head text-neutral-950 mb-2.5">
                     Application Submitted!
                   </h3>
-                  <p className="text-[14px] text-[var(--text-muted)] max-w-md mx-auto mb-6 leading-relaxed">
-                    Thank you for applying to the Artificial Intelligence Research Lab at NED University. Your application has been stored in the database. Dr. Murk Marvi and the faculty review committee will review your record and contact you at <strong className="text-[var(--text-primary)]">{formData.email}</strong>.
+                  <p className="text-[14px] text-neutral-600 max-w-md mx-auto mb-6 leading-relaxed">
+                    Thank you for applying to the Artificial Intelligence Research Lab at NED University. Your application has been stored in the database. Dr. Murk Marvi and the faculty review committee will review your record and contact you at <strong className="text-neutral-950">{formData.email}</strong>.
                   </p>
-                  <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)] text-left mb-6 max-w-md mx-auto space-y-2">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-neutral-50 border border-neutral-200 text-xs font-sans text-neutral-700 text-left mb-6 max-w-md mx-auto space-y-2">
                     <div><strong>Applicant:</strong> {formData.name} ({formData.rollNo})</div>
+                    <div><strong>Position:</strong> {formData.designation}</div>
                     <div><strong>Department:</strong> {formData.department}</div>
                     <div><strong>Research Track:</strong> {formData.track}</div>
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-5 border-t border-[var(--border-hairline)] bg-[var(--bg-surface)] flex justify-end shrink-0">
+                <div className="p-4 sm:p-5 border-t border-neutral-200 bg-neutral-50 flex justify-end shrink-0">
                   <button
                     onClick={handleReset}
-                    className="h-11 px-8 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-bold shadow-sm cursor-pointer transition-colors"
+                    className="h-11 px-8 rounded-full bg-[#ff5500] hover:bg-[#e04b00] text-white text-xs font-bold shadow-sm cursor-pointer transition-colors"
                   >
                     Done
                   </button>
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
-                {/* ── 1. Fixed Header (Always visible, never cropped) ── */}
-                <div className="p-5 sm:px-8 sm:py-5 border-b border-[var(--border-hairline)] bg-[var(--bg-surface-elevated)] flex items-start justify-between gap-4 shrink-0">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden bg-white">
+                {/* ── 1. Fixed Header with AIR Lab Logo & Badge ── */}
+                <div className="p-5 sm:px-8 sm:py-5 border-b border-neutral-200 bg-white flex items-start justify-between gap-4 shrink-0">
                   <div className="min-w-0 pr-2">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-[11px] font-sans font-semibold mb-2">
-                      <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">{vacancy.badge}</span>
+                    <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-2.5">
+                      <span className="brand-wordmark !text-neutral-950" style={{ fontSize: '17px' }}>
+                        AIR LAB
+                        <small className="!text-neutral-500 !text-[8px] !tracking-[0.14em]">NED UNIVERSITY · CSIT</small>
+                      </span>
+                      <span className="h-4 w-px bg-neutral-300" aria-hidden="true" />
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-50 text-[#ff5500] border border-[#ff5500]/30 text-[10.5px] font-sans font-semibold">
+                        <Sparkles className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{vacancy.badge}</span>
+                      </div>
                     </div>
-                    <h2 id="vacancy-modal-title" className="text-xl sm:text-2xl font-bold tracking-tight font-head text-[var(--text-primary)]">
+                    <h2 id="vacancy-modal-title" className="text-xl sm:text-2xl font-bold tracking-tight font-head text-neutral-950">
                       {vacancy.title}
                     </h2>
-                    <p className="text-xs sm:text-[13.5px] text-[var(--text-muted)] mt-1 font-sans leading-relaxed line-clamp-3 whitespace-pre-line">
-                      {vacancy.description}
+                    <p className="text-xs sm:text-[13.5px] text-neutral-600 mt-1 font-sans leading-relaxed line-clamp-2">
+                      {isClosed ? vacancy.closedMessage : vacancy.description}
                     </p>
                   </div>
 
                   <button
                     type="button"
                     onClick={onClose}
-                    className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--accent-orange)] transition-colors cursor-pointer shrink-0 mt-0.5"
+                    className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:border-[#ff5500] transition-colors cursor-pointer shrink-0 mt-0.5"
                     aria-label="Close modal"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* ── 2. Scrollable Body (Smooth scrolling, 100% visible fields) ── */}
-                <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-6 overscroll-contain space-y-4">
+                {/* ── 2. Scrollable Body (100% solid white background, high-contrast inputs) ── */}
+                <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-6 overscroll-contain space-y-4 bg-white">
                   {error && (
-                    <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 text-xs font-medium">
+                    <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium">
                       {error}
                     </div>
                   )}
 
                   {isClosed && (
-                    <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-[13px] text-[var(--text-muted)] leading-relaxed">
+                    <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 text-[13px] text-neutral-600 leading-relaxed">
                       {vacancy.closedMessage}
                     </div>
                   )}
 
                   <fieldset disabled={isClosed} className={`space-y-4 ${isClosed ? 'opacity-50' : ''}`}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
-                    {/* Full Name */}
+                    {/* Position / Designation Dropdown */}
                     <div>
-                      <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        Full Name *
+                      <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                        Position / Designation Applied For *
                       </label>
                       <div className="relative">
-                        <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
+                        <Briefcase className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+                        <select
+                          value={formData.designation}
+                          onChange={e => setFormData({ ...formData, designation: e.target.value })}
+                          className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans cursor-pointer font-medium"
+                        >
+                          <option value="Research Intern (Undergraduate)">Research Intern (Undergraduate)</option>
+                          <option value="Graduate Research Assistant (MS / PhD)">Graduate Research Assistant (MS / PhD)</option>
+                          <option value="NLP & Large Language Models Fellow">NLP &amp; Large Language Models Fellow</option>
+                          <option value="Computer Vision & Edge AI Researcher">Computer Vision &amp; Edge AI Researcher</option>
+                          <option value="Autonomous Robotics & SLAM Engineer">Autonomous Robotics &amp; SLAM Engineer</option>
+                          <option value="AI Systems Full-Stack Developer">AI Systems Full-Stack Developer</option>
+                          <option value="Clinical AI & Healthcare Data Fellow">Clinical AI &amp; Healthcare Data Fellow</option>
+                          <option value="Visiting Research Fellow">Visiting Research Fellow</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                      {/* Full Name */}
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                          Full Name *
+                        </label>
+                        <div className="relative">
+                          <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                          <input
+                            type="text"
+                            required
+                            value={formData.name}
+                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                            placeholder="e.g. Muhammad Ali"
+                            className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Student Email */}
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                          Email Address *
+                        </label>
+                        <div className="relative">
+                          <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                          <input
+                            type="email"
+                            required
+                            value={formData.email}
+                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                            placeholder="yourname@cloud.neduet.edu.pk"
+                            className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                      {/* Roll Number */}
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                          Roll / Reg Number *
+                        </label>
+                        <div className="relative">
+                          <GraduationCap className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                          <input
+                            type="text"
+                            required
+                            value={formData.rollNo}
+                            onChange={e => setFormData({ ...formData, rollNo: e.target.value })}
+                            placeholder="e.g. CS-2022045"
+                            className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Phone Number */}
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                          Phone / WhatsApp *
+                        </label>
+                        <div className="relative">
+                          <Phone className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                          <input
+                            type="text"
+                            required
+                            value={formData.phone}
+                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                            placeholder="e.g. 03001234567"
+                            className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Program / Level & Department */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                          Academic Program
+                        </label>
+                        <select
+                          value={formData.program}
+                          onChange={e => setFormData({ ...formData, program: e.target.value })}
+                          className="w-full px-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans cursor-pointer"
+                        >
+                          <option value="Undergraduate BS (3rd/4th Year)">Undergraduate BS (3rd / 4th Year)</option>
+                          <option value="Undergraduate BS (1st/2nd Year)">Undergraduate BS (1st / 2nd Year)</option>
+                          <option value="Postgraduate MS Candidate">Postgraduate MS Candidate</option>
+                          <option value="Doctoral PhD Scholar">Doctoral PhD Scholar</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                          Department
+                        </label>
                         <input
                           type="text"
-                          required
-                          value={formData.name}
-                          onChange={e => setFormData({ ...formData, name: e.target.value })}
-                          placeholder="e.g. Muhammad Ali"
-                          className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all font-sans"
+                          value={formData.department}
+                          onChange={e => setFormData({ ...formData, department: e.target.value })}
+                          placeholder="e.g. Computer Science & IT"
+                          className="w-full px-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans"
                         />
                       </div>
                     </div>
 
-                    {/* Student Email */}
+                    {/* Research Track of Interest */}
                     <div>
-                      <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        Email Address *
+                      <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                        Primary Research Track of Interest *
                       </label>
                       <div className="relative">
-                        <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-                        <input
-                          type="email"
-                          required
-                          value={formData.email}
-                          onChange={e => setFormData({ ...formData, email: e.target.value })}
-                          placeholder="yourname@cloud.neduet.edu.pk"
-                          className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all font-sans"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
-                    {/* Roll Number */}
-                    <div>
-                      <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        Roll / Reg Number *
-                      </label>
-                      <div className="relative">
-                        <GraduationCap className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-                        <input
-                          type="text"
-                          required
-                          value={formData.rollNo}
-                          onChange={e => setFormData({ ...formData, rollNo: e.target.value })}
-                          placeholder="e.g. CS-2022045"
-                          className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all font-sans"
-                        />
+                        <BookOpen className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+                        <select
+                          value={formData.track}
+                          onChange={e => setFormData({ ...formData, track: e.target.value })}
+                          className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans cursor-pointer"
+                        >
+                          <option value="Foundational LLMs & Urdu NLP">Foundational LLMs &amp; Urdu NLP</option>
+                          <option value="Adversarial AI & Robustness">Adversarial AI &amp; Robustness</option>
+                          <option value="Cyber & Security Intelligence">Cyber &amp; Security Intelligence</option>
+                          <option value="Full-Stack AI Development & Systems">Full-Stack AI Development &amp; Systems</option>
+                          <option value="Edge AI & Low-Power Embedded Vision">Edge AI &amp; Low-Power Embedded Vision</option>
+                          <option value="Autonomous Robotics & Aerial SLAM">Autonomous Robotics &amp; Aerial SLAM</option>
+                          <option value="AI Safety, Interpretability & Alignment">AI Safety, Interpretability &amp; Alignment</option>
+                          <option value="Healthcare & Clinical Multimodal AI">Healthcare &amp; Clinical Multimodal AI</option>
+                        </select>
                       </div>
                     </div>
 
-                    {/* Phone Number */}
-                    <div>
-                      <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        Phone / WhatsApp *
-                      </label>
-                      <div className="relative">
-                        <Phone className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
+                    {/* Attach Resume PDF & Portfolio */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                          Upload Resume (PDF) <span className="text-neutral-500 font-normal">(Max 4MB)</span>
+                        </label>
                         <input
-                          type="text"
-                          required
-                          value={formData.phone}
-                          onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="e.g. 03001234567"
-                          className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all font-sans"
+                          type="file"
+                          accept="application/pdf"
+                          onChange={e => setCvFile(e.target.files?.[0] || null)}
+                          className="w-full px-3.5 py-2 sm:py-2.5 rounded-xl border border-neutral-300 bg-neutral-50 text-[12px] text-neutral-900 file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-[#ff5500] file:text-white cursor-pointer font-sans"
                         />
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Program / Level */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        Academic Program
-                      </label>
-                      <select
-                        value={formData.program}
-                        onChange={e => setFormData({ ...formData, program: e.target.value })}
-                        className="w-full px-3.5 h-10 sm:h-11 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all font-sans cursor-pointer"
-                      >
-                        <option value="Undergraduate BS (3rd/4th Year)">Undergraduate BS (3rd / 4th Year)</option>
-                        <option value="Undergraduate BS (1st/2nd Year)">Undergraduate BS (1st / 2nd Year)</option>
-                        <option value="Postgraduate MS Candidate">Postgraduate MS Candidate</option>
-                        <option value="Doctoral PhD Scholar">Doctoral PhD Scholar</option>
-                      </select>
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                          GitHub / Portfolio Link
+                        </label>
+                        <div className="relative">
+                          <FileText className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                          <input
+                            type="url"
+                            value={formData.resumeUrl}
+                            onChange={e => setFormData({ ...formData, resumeUrl: e.target.value })}
+                            placeholder="https://github.com/..."
+                            className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans"
+                          />
+                        </div>
+                      </div>
                     </div>
 
+                    {/* Brief Statement */}
                     <div>
-                      <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        Department
+                      <label className="block text-xs font-semibold text-neutral-900 mb-1.5">
+                        Brief Statement of Interest / Past Projects
                       </label>
-                      <input
-                        type="text"
-                        value={formData.department}
-                        onChange={e => setFormData({ ...formData, department: e.target.value })}
-                        placeholder="e.g. Computer Science & IT"
-                        className="w-full px-3.5 h-10 sm:h-11 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all font-sans"
+                      <textarea
+                        rows={3}
+                        value={formData.statement}
+                        onChange={e => setFormData({ ...formData, statement: e.target.value })}
+                        placeholder="Highlight relevant technical skills, PyTorch/TensorFlow experience, projects, or research interest..."
+                        className="w-full p-3.5 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all resize-none font-sans"
                       />
                     </div>
-                  </div>
-
-                  {/* Research Track of Interest */}
-                  <div>
-                    <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                      Primary Research Track of Interest *
-                    </label>
-                    <div className="relative">
-                      <BookOpen className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-subtle)] pointer-events-none" />
-                      <select
-                        value={formData.track}
-                        onChange={e => setFormData({ ...formData, track: e.target.value })}
-                        className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all font-sans cursor-pointer"
-                      >
-                        <option value="Foundational LLMs & Urdu NLP">Foundational LLMs &amp; Urdu NLP</option>
-                        <option value="Edge AI & Low-Power Embedded Vision">Edge AI &amp; Low-Power Embedded Vision</option>
-                        <option value="Autonomous Robotics & Aerial SLAM">Autonomous Robotics &amp; Aerial SLAM</option>
-                        <option value="AI Safety, Interpretability & Alignment">AI Safety, Interpretability &amp; Alignment</option>
-                        <option value="Healthcare & Clinical Multimodal AI">Healthcare &amp; Clinical Multimodal AI</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Attach Resume PDF & Portfolio */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        Upload Resume (PDF) <span className="text-[var(--text-subtle)] font-normal">(Max 4MB)</span>
-                      </label>
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        onChange={e => setCvFile(e.target.files?.[0] || null)}
-                        className="w-full px-3.5 py-2 sm:py-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[12px] text-[var(--text-primary)] file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-[var(--accent-orange)] file:text-white cursor-pointer font-sans"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                        GitHub / Portfolio Link
-                      </label>
-                      <div className="relative">
-                        <FileText className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-                        <input
-                          type="url"
-                          value={formData.resumeUrl}
-                          onChange={e => setFormData({ ...formData, resumeUrl: e.target.value })}
-                          placeholder="https://github.com/..."
-                          className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all font-sans"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Brief Statement */}
-                  <div>
-                    <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                      Brief Statement of Interest / Past Projects
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={formData.statement}
-                      onChange={e => setFormData({ ...formData, statement: e.target.value })}
-                      placeholder="Highlight relevant technical skills, PyTorch/TensorFlow experience, projects, or research interest..."
-                      className="w-full p-3.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[13.5px] text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/20 transition-all resize-none font-sans"
-                    />
-                  </div>
                   </fieldset>
                 </div>
 
-                {/* ── 3. Fixed Footer with Submit Action (Always visible & accessible) ── */}
-                <div className="p-4 sm:px-8 sm:py-4 border-t border-[var(--border-hairline)] bg-[var(--bg-surface)] flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
-                  <div className="text-[11.5px] text-[var(--text-subtle)] flex items-center gap-1.5 self-start sm:self-auto">
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${isClosed ? 'bg-[var(--text-subtle)]' : 'bg-emerald-500'}`} />
+                {/* ── 3. Fixed Footer with Submit Action (Always visible & solid) ── */}
+                <div className="p-4 sm:px-8 sm:py-4 border-t border-neutral-200 bg-neutral-50 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
+                  <div className="text-[11.5px] text-neutral-600 flex items-center gap-1.5 self-start sm:self-auto">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${isClosed ? 'bg-neutral-400' : 'bg-emerald-500'}`} />
                     <span>{isClosed ? 'Applications Closed' : 'Applications Open \u2022 Reviewed Rolling'}</span>
                   </div>
 
@@ -421,14 +490,14 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                     <button
                       type="button"
                       onClick={onClose}
-                      className="h-10 sm:h-11 px-5 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface-elevated)] hover:bg-[var(--surface-alt)] text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xs font-semibold transition-colors cursor-pointer"
+                      className="h-10 sm:h-11 px-5 rounded-full border border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 text-xs font-semibold transition-colors cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={loading || isClosed}
-                      className="flex-1 sm:flex-initial h-10 sm:h-11 px-7 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer active:translate-y-[1px] disabled:opacity-50"
+                      className="flex-1 sm:flex-initial h-10 sm:h-11 px-7 rounded-full bg-[#ff5500] hover:bg-[#e04b00] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer active:translate-y-[1px] disabled:opacity-50"
                     >
                       {loading ? (
                         <>

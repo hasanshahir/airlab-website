@@ -1,5 +1,4 @@
-import { Brain, Handshake, Target, Globe, ShieldCheck } from 'lucide-react'
-import Badge from '../components/ui/Badge'
+import { Brain, Handshake, Globe, ShieldCheck } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 
 export default function About() {
@@ -34,14 +33,6 @@ export default function About() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-6 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-16 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<Brain className="w-3.5 h-3.5 text-white" />}>
-              NED UNIVERSITY · CSIT
-            </Badge>
-          </div>
-        </SectionReveal>
-
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
             About AIR Lab
@@ -61,12 +52,6 @@ export default function About() {
         <SectionReveal delay={0.05}>
           <div className="p-8 sm:p-12 relative overflow-hidden group bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200">
             <div className="max-w-4xl relative z-10">
-              <div className="mb-4">
-                <Badge variant="orange" icon={<Target className="w-3.5 h-3.5 text-white" />}>
-                  Vision & Foundation
-                </Badge>
-              </div>
-
               <h2 className="text-[22px] sm:text-[28px] font-semibold font-head text-[var(--text-primary)] mb-4 leading-tight">
                 Advancing Cutting-Edge AI & Translating Innovation
               </h2>
@@ -82,12 +67,6 @@ export default function About() {
         <SectionReveal delay={0.1}>
           <div className="p-8 sm:p-12 relative overflow-hidden group bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200">
             <div className="max-w-4xl relative z-10">
-              <div className="mb-4">
-                <Badge variant="purple" icon={<Handshake className="w-3.5 h-3.5 text-white" />}>
-                  Academia & Industry Bridging
-                </Badge>
-              </div>
-
               <h2 className="text-[22px] sm:text-[28px] font-semibold font-head text-[var(--text-primary)] mb-4 leading-tight">
                 Practical Solutions, Knowledge Transfer & Capacity Building
               </h2>
@@ -103,12 +82,6 @@ export default function About() {
         <SectionReveal delay={0.15}>
           <div className="p-8 sm:p-12 relative overflow-hidden group bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200">
             <div className="max-w-4xl relative z-10">
-              <div className="mb-4">
-                <Badge variant="orange" icon={<Globe className="w-3.5 h-3.5 text-white" />}>
-                  Global Impact & National Leadership
-                </Badge>
-              </div>
-
               <h2 className="text-[22px] sm:text-[28px] font-semibold font-head text-[var(--text-primary)] mb-4 leading-tight">
                 Shaping the Future of AI in Pakistan
               </h2>

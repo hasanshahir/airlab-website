@@ -24,7 +24,10 @@ export function createApp() {
   app.use(helmet())
   app.use(
     cors({
-      origin: env.CORS_ORIGINS,
+      origin: (_origin, callback) => {
+        // Allow all origins (localhost, all Vercel previews, custom domains)
+        callback(null, true)
+      },
       credentials: true, // admin auth will use httpOnly cookies
     }),
   )

@@ -9,7 +9,6 @@ import {
   Users,
   ExternalLink,
   ArrowRight,
-  Layers,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { getProjects, getTeamMembers } from '../lib/data'
@@ -57,7 +56,33 @@ export default function Projects() {
     return () => { active = false }
   }, [])
 
-  const categories = ['All', 'Funded', 'R&D', 'Undergraduate', 'Postgraduate']
+  const categories = ['All', 'Funded', 'Undergraduate', 'Postgraduate']
+
+  // Handle direct deep-linking from home cards (e.g. /projects#PRJ-1 or #PRJ-6)
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.replace('#', '')
+      if (!hash) return
+      const matched = projectsData.find(
+        p =>
+          String(p.id).toLowerCase() === hash.toLowerCase() ||
+          String(p.id).replace(/[^a-zA-Z0-9]/g, '').toLowerCase() === hash.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
+      )
+      if (matched) {
+        setActiveCategory('All')
+        setSelectedProject(matched)
+        setTimeout(() => {
+          const el = document.getElementById(String(matched.id))
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }
+        }, 150)
+      }
+    }
+    handleHash()
+    window.addEventListener('hashchange', handleHash)
+    return () => window.removeEventListener('hashchange', handleHash)
+  }, [projectsData])
 
   // Prevent background layout shift & lock scroll safely when modal is open
   useEffect(() => {
@@ -123,13 +148,6 @@ export default function Projects() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* ── Section Header ── */}
       <div className="mb-14 text-left max-w-3xl">
-        <div className="mb-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 text-xs font-sans font-semibold">
-            <Layers className="w-3.5 h-3.5" />
-            <span>FEATURED WORK & BENCHMARKS</span>
-          </div>
-        </div>
-
         <h1 className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] mb-4 font-head">
           Applied AI Systems & Projects
         </h1>
@@ -186,6 +204,7 @@ export default function Projects() {
             return (
               <div
                 key={proj.id}
+                id={String(proj.id)}
                 onClick={() => {
                   setSelectedProject(proj)
                   setActiveGalleryIndex(0)

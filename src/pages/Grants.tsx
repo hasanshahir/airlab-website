@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Award, ExternalLink, Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
+import { ExternalLink, Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
 import type { Grant } from '../types/data'
-import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
 import PlaceholderBadge from '../components/ui/PlaceholderBadge'
 
@@ -42,14 +41,6 @@ export default function Grants() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<Award className="w-3.5 h-3.5 text-white" />}>
-              RESEARCH FUNDING & GRANTS
-            </Badge>
-          </div>
-        </SectionReveal>
-
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
             Research Funding & Sponsored Grants

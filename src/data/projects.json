@@ -100,6 +100,32 @@
     ]
   },
   {
+    "id": "PRJ-NED-SAC",
+    "title": "NED-SAC: Intelligent Satellite Telemetry & Autonomous Space Perception",
+    "category": "Funded",
+    "status": "Ongoing",
+    "description": "Funded research initiative in collaboration with NED Space Applications Center (NED-SAC) focused on autonomous satellite telemetry anomaly detection, on-orbit sensor calibration, and edge perception models for space payload analytics.",
+    "funding": "Funded Research Initiative — NED Space Applications Center (NED-SAC)",
+    "grantSupplier": "NED Space Applications Center (NED-SAC)",
+    "grantAmount": "Competitive R&D Award",
+    "pi": "Faculty Research Board & Dr. Murk Marvi",
+    "funderUrl": "https://cct.neduet.edu.pk/AIR",
+    "timeTaken": "2025 — Present",
+    "startDate": "Jan 2025",
+    "coverImage": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80"
+    ],
+    "tags": [
+      "NED-SAC",
+      "Satellite Telemetry",
+      "Space AI",
+      "Autonomous Systems",
+      "Edge Perception",
+      "Funded R&D"
+    ]
+  },
+  {
     "id": "PRJ-1",
     "title": "Connected Identity Intelligence Platform for Digital Investigation",
     "category": "Funded",

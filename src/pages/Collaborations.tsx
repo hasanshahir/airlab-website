@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Handshake, ExternalLink, ShieldCheck, CheckCircle2 } from 'lucide-react'
+import { ExternalLink, ShieldCheck, CheckCircle2 } from 'lucide-react'
 import rawCollaborations from '../data/collaborations.json'
 import type { CollaborationItem } from '../types/data'
 
 const collaborationsData = rawCollaborations as unknown as CollaborationItem[]
-import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
 
 const partnersList = [
@@ -36,14 +35,6 @@ export default function Collaborations() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<Handshake className="w-3.5 h-3.5 text-white" />}>
-              ACADEMIC & INDUSTRY ALLIANCES
-            </Badge>
-          </div>
-        </SectionReveal>
-
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
             Research Alliances & Partners

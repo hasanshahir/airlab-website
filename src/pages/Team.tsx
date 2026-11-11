@@ -1,12 +1,11 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, ExternalLink, GraduationCap, Users, Calendar, Search, Sparkles, FileText } from 'lucide-react'
+import { Mail, ExternalLink, GraduationCap, Calendar, Search, Sparkles, FileText } from 'lucide-react'
 import { getTeamMembers, getPreviousInterns } from '../lib/data'
 import type { TeamMemberData } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
-import Badge from '../components/ui/Badge'
 import SectionReveal from '../components/ui/SectionReveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 
@@ -115,14 +114,6 @@ export default function Team() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-6 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0}>
-          <div className="mb-4">
-            <Badge variant="purple" icon={<Users className="w-3.5 h-3.5 text-white" />}>
-              RESEARCH FACULTY & SCHOLARS
-            </Badge>
-          </div>
-        </SectionReveal>
-
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
             Our Research Team
