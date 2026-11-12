@@ -10,7 +10,7 @@ import {
   ExternalLink,
   ArrowRight,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { getProjects, getTeamMembers } from '../lib/data'
 import type { ProjectItem, TeamMemberData } from '../types/data'
 import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
@@ -35,6 +35,7 @@ function parseDateScore(dateStr?: string): number {
 }
 
 export default function Projects() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [activeCategory, setActiveCategory] = useState<string>('All')
   const [query, setQuery] = useState('')
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
@@ -50,23 +51,80 @@ export default function Projects() {
       fetch('/api/content/team').then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([projs, team]) => {
       if (!active) return
-      if (Array.isArray(projs)) setProjectsData(projs)
-      if (Array.isArray(team)) setAllMembers(team)
+      if (Array.isArray(projs) && projs.length > 0) setProjectsData(projs)
+      if (Array.isArray(team) && team.length > 0) setAllMembers(team)
     })
     return () => { active = false }
   }, [])
 
-  const categories = ['All', 'Funded', 'Undergraduate', 'Postgraduate']
+  const categories = [
+    'All',
+    'Foundational Models & NLP',
+    'Adversarial AI',
+    'Cyber',
+    'Development',
+    'Efficient Computing & TinyML',
+    'AI Safety & Alignment',
+    'Funded',
+  ]
+
+  // Synchronize activeCategory with URL query parameter (?area=... or ?category=...)
+  useEffect(() => {
+    const getParamFromUrl = () => {
+      const fromParams = searchParams.get('area') || searchParams.get('category')
+      if (fromParams) return fromParams
+
+      // Fallback check in hash if present (e.g. #/projects?area=Cyber)
+      if (typeof window !== 'undefined' && window.location.hash.includes('?')) {
+        const hashQuery = window.location.hash.split('?')[1]
+        const params = new URLSearchParams(hashQuery)
+        const p = params.get('area') || params.get('category')
+        if (p) return p
+      }
+
+      // Fallback check in search if present (e.g. ?area=Cyber#/projects)
+      if (typeof window !== 'undefined' && window.location.search) {
+        const params = new URLSearchParams(window.location.search)
+        const p = params.get('area') || params.get('category')
+        if (p) return p
+      }
+
+      return null
+    }
+
+    const detected = getParamFromUrl()
+    if (detected) {
+      const match = categories.find(c => c.toLowerCase() === detected.toLowerCase())
+      if (match) {
+        setActiveCategory(match)
+      }
+    }
+  }, [searchParams])
+
+  const handleCategoryChange = (cat: string) => {
+    setActiveCategory(cat)
+    const next = new URLSearchParams(searchParams)
+    if (cat === 'All') {
+      next.delete('area')
+      next.delete('category')
+    } else {
+      next.set('area', cat)
+      next.delete('category')
+    }
+    setSearchParams(next)
+  }
 
   // Handle direct deep-linking from home cards (e.g. /projects#PRJ-1 or #PRJ-6)
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '')
       if (!hash) return
+      const cleanHash = hash.split('?')[0].replace('/projects', '').replace(/^\/+/, '')
+      if (!cleanHash) return
       const matched = projectsData.find(
         p =>
-          String(p.id).toLowerCase() === hash.toLowerCase() ||
-          String(p.id).replace(/[^a-zA-Z0-9]/g, '').toLowerCase() === hash.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
+          String(p.id).toLowerCase() === cleanHash.toLowerCase() ||
+          String(p.id).replace(/[^a-zA-Z0-9]/g, '').toLowerCase() === cleanHash.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
       )
       if (matched) {
         setActiveCategory('All')
@@ -112,12 +170,20 @@ export default function Projects() {
 
   const filtered = useMemo(() => {
     const list = projectsData.filter(p => {
-      const matchesCat = activeCategory === 'All' || p.category === activeCategory
+      const matchesCat =
+        activeCategory === 'All' ||
+        p.category?.toLowerCase() === activeCategory.toLowerCase() ||
+        p.areas?.some(a => a.toLowerCase() === activeCategory.toLowerCase()) ||
+        p.tags?.some(t => t.toLowerCase() === activeCategory.toLowerCase())
+
       const matchesSearch =
         query === '' ||
         p.title.toLowerCase().includes(query.toLowerCase()) ||
         p.description.toLowerCase().includes(query.toLowerCase()) ||
-        p.funding.toLowerCase().includes(query.toLowerCase())
+        p.funding.toLowerCase().includes(query.toLowerCase()) ||
+        p.tags?.some(t => t.toLowerCase().includes(query.toLowerCase())) ||
+        p.areas?.some(a => a.toLowerCase().includes(query.toLowerCase()))
+
       return matchesCat && matchesSearch
     })
 
@@ -164,7 +230,7 @@ export default function Projects() {
           {categories.map(cat => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => handleCategoryChange(cat)}
               className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${
                 activeCategory === cat
                   ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
@@ -246,9 +312,31 @@ export default function Projects() {
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2.5 font-head line-clamp-2">
+                  <h3 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2 font-head line-clamp-2">
                     {proj.title}
                   </h3>
+
+                  {/* Research Areas Badges */}
+                  {proj.areas && proj.areas.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {proj.areas.map(area => (
+                        <span
+                          key={area}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleCategoryChange(area)
+                          }}
+                          className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-sans font-medium transition-colors cursor-pointer ${
+                            activeCategory === area
+                              ? 'bg-[var(--accent-orange)] text-white'
+                              : 'bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed mb-5 line-clamp-3 font-normal">
                     {proj.description}
@@ -282,7 +370,7 @@ export default function Projects() {
                 {/* Bottom Action Footer */}
                 <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans">
                   <span className="text-[var(--text-subtle)] uppercase tracking-wider text-[11px] font-medium">
-                    {proj.category}
+                    {proj.areas?.[0] || proj.category}
                   </span>
                   <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1.5 group-hover:underline">
                     <span>View Details</span>
@@ -384,6 +472,27 @@ export default function Projects() {
 
                     {/* Specs Table */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs font-sans mb-8">
+                      {selectedProject.areas && selectedProject.areas.length > 0 && (
+                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl col-span-1 sm:col-span-2">
+                          <span className="text-[var(--text-subtle)] block mb-2 font-semibold">CORE RESEARCH AREAS</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedProject.areas.map(area => (
+                              <button
+                                key={area}
+                                type="button"
+                                onClick={() => {
+                                  handleCategoryChange(area)
+                                  setSelectedProject(null)
+                                }}
+                                className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--text-primary)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors cursor-pointer inline-flex items-center gap-1"
+                              >
+                                <span>{area}</span>
+                                <span>&rarr;</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">PROJECT TIMELINE</span>
                         <span className="font-semibold text-[var(--text-primary)]">

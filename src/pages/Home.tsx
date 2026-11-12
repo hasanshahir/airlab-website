@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Brain,
   Bot,
@@ -110,6 +110,7 @@ const coreResearchAreas = [
 ]
 
 export default function Home() {
+  const navigate = useNavigate()
   const [applyModalOpen, setApplyModalOpen] = useState(false)
   const updatesScrollRef = useRef<HTMLDivElement>(null)
 
@@ -326,23 +327,20 @@ export default function Home() {
 
       {/* ── 4. CORE RESEARCH AREAS (High-Contrast Clean Cards) ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-[var(--border-hairline)] pb-6 gap-4">
-          <div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
-              Core Research Areas
-            </h2>
-          </div>
-          <p className="text-sm sm:text-base text-[var(--text-muted)] max-w-md font-normal leading-relaxed">
-            Multi-disciplinary inquiry spanning regional foundational models, low-power edge vision, clinical diagnostics, and resilient national infrastructure.
-          </p>
+        <div className="mb-12 border-b border-[var(--border-hairline)] pb-6 text-left">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
+            Core Research Areas
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {coreResearchAreas.map((area, idx) => {
             const Icon = area.icon
+            const targetUrl = `/projects?area=${encodeURIComponent(area.title)}`
             return (
               <div
                 key={idx}
+                onClick={() => navigate(targetUrl)}
                 className="p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group cursor-pointer"
               >
                 <div>
@@ -362,7 +360,11 @@ export default function Home() {
                 </div>
 
                 <div className="pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans font-medium text-[var(--accent-orange)]">
-                  <Link to="/projects" className="inline-flex items-center gap-1.5 hover:underline font-semibold">
+                  <Link
+                    to={targetUrl}
+                    onClick={e => e.stopPropagation()}
+                    className="inline-flex items-center gap-1.5 hover:underline font-semibold"
+                  >
                     <span>View Projects</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
