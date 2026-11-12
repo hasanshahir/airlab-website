@@ -354,10 +354,10 @@ export default function Home() {
                   <img
                     src={area.image}
                     alt=""
-                    className="w-full h-full object-cover opacity-[0.08] dark:opacity-[0.14] group-hover:opacity-[0.15] dark:group-hover:opacity-[0.20] group-hover:scale-105 transition-all duration-500 ease-out"
+                    className="w-full h-full object-cover opacity-[0.18] dark:opacity-[0.24] group-hover:opacity-[0.26] dark:group-hover:opacity-[0.32] group-hover:scale-105 transition-all duration-500 ease-out"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-[var(--bg-surface)]/70 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-[var(--bg-surface)]/60 to-[var(--bg-surface)]/10 pointer-events-none" />
                 </div>
 
                 <div className="relative z-10">
