@@ -16,7 +16,7 @@ export default function Gallery() {
     fetch('/api/content/gallery')
       .then(r => r.ok ? r.json() : [])
       .then(d => {
-        if (Array.isArray(d)) setGalleryItems(d)
+        if (Array.isArray(d) && d.length > 0) setGalleryItems(d)
       })
       .catch(() => {})
   }, [])

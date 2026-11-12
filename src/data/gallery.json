@@ -1,1 +1,47 @@
-[]
+[
+  {
+    "id": "gal-1",
+    "title": "Research & Prototyping Laboratory",
+    "desc": "High-throughput deep learning compute cluster and prototyping workstations at AIR Lab.",
+    "cat": "Laboratory Facility",
+    "date": "2025",
+    "url": "/carousel-images/6530466a-3815-4434-a181-85e97c3ae385.jpg",
+    "span": "sm:col-span-2"
+  },
+  {
+    "id": "gal-2",
+    "title": "Deep Learning GPU Compute Rig",
+    "desc": "TensorRT and edge-accelerated compute hardware powering real-time inference pipelines.",
+    "cat": "Compute Rig",
+    "date": "2025",
+    "url": "/carousel-images/6a392586-ef4f-41db-9be7-cee1a0018f1f.jpg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-3",
+    "title": "Student ML Collaboration",
+    "desc": "Interdisciplinary student research groups prototyping regional foundation models and computer vision.",
+    "cat": "Student Research",
+    "date": "2025",
+    "url": "/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-4",
+    "title": "Research Fellows Workstations",
+    "desc": "Fellows stations dedicated to multilingual Urdu NLP, adversarial defense, and edge AI.",
+    "cat": "Fellows Workstations",
+    "date": "2025",
+    "url": "/carousel-images/adc711cf-26d5-4a13-ac9f-4e29f0cf13d7.jpg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-5",
+    "title": "Academic Excellence & Lab Entrance",
+    "desc": "Department of CSIT and Artificial Intelligence Research Lab entrance at NED University.",
+    "cat": "Campus",
+    "date": "2025",
+    "url": "/carousel-images/cb2f092f-f6df-418b-b84c-04085f274522.jpg",
+    "span": "sm:col-span-2"
+  }
+]

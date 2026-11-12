@@ -80,31 +80,37 @@ const coreResearchAreas = [
   {
     icon: Brain,
     title: 'Foundational Models & NLP',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800&auto=format&fit=crop&q=80',
     desc: 'Pretraining multilingual LLMs tailored for low-resource regional dialects with advanced byte-level tokenizers and parameter-efficient fine-tuning.',
   },
   {
     icon: ShieldAlert,
     title: 'Adversarial AI',
+    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
     desc: 'Investigating neural network vulnerabilities, model jailbreaking, prompt injection mitigation, and robust defense benchmarks for high-stakes AI systems.',
   },
   {
     icon: ShieldCheck,
     title: 'Cyber',
+    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=80',
     desc: 'Autonomous cyber defense, encrypted traffic analysis, zero-trust infrastructure, and automated vulnerability intelligence to safeguard digital ecosystems.',
   },
   {
     icon: Terminal,
     title: 'Development',
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80',
     desc: 'High-performance AI engineering, production-grade microservices, scalable distributed inference pipelines, and intelligent software systems.',
   },
   {
     icon: Code,
     title: 'Efficient Computing & TinyML',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
     desc: 'Hardware-aware neural architecture search (NAS), INT8 quantization, and ultra-low-latency deployment on FPGAs and embedded SoCs.',
   },
   {
     icon: LineChart,
     title: 'AI Safety & Alignment',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80',
     desc: 'Ensuring robust, unbiased, and safe deployment of intelligent systems in critical healthcare, power grids, and national infrastructure.',
   },
 ]
@@ -341,9 +347,20 @@ export default function Home() {
               <div
                 key={idx}
                 onClick={() => navigate(targetUrl)}
-                className="p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group cursor-pointer"
+                className="relative overflow-hidden p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group cursor-pointer"
               >
-                <div>
+                {/* Subtle low-opacity background image texture ensuring all text remains crisp and visible */}
+                <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+                  <img
+                    src={area.image}
+                    alt=""
+                    className="w-full h-full object-cover opacity-[0.08] dark:opacity-[0.14] group-hover:opacity-[0.15] dark:group-hover:opacity-[0.20] group-hover:scale-105 transition-all duration-500 ease-out"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-[var(--bg-surface)]/70 to-transparent pointer-events-none" />
+                </div>
+
+                <div className="relative z-10">
                   <div className="flex items-center justify-between mb-5">
                     <div className="w-11 h-11 rounded-2xl bg-white border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all shadow-xs">
                       <Icon className="w-5 h-5" />
@@ -359,7 +376,7 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans font-medium text-[var(--accent-orange)]">
+                <div className="relative z-10 pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans font-medium text-[var(--accent-orange)]">
                   <Link
                     to={targetUrl}
                     onClick={e => e.stopPropagation()}
