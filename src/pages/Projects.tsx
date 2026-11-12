@@ -34,14 +34,144 @@ function parseDateScore(dateStr?: string): number {
   return year * 100 + month
 }
 
+// Canonical research area mappings for all projects ensuring 100% reliable categorization
+const CANONICAL_PROJECT_AREAS: Record<string, string[]> = {
+  'PRJ-7': [
+    'Cyber',
+    'Adversarial AI',
+    'Efficient Computing & TinyML',
+    'AI Safety & Alignment',
+  ],
+  'PRJ-8': [
+    'Foundational Models & NLP',
+    'Efficient Computing & TinyML',
+    'Cyber',
+    'Development',
+  ],
+  'PRJ-9': [
+    'Adversarial AI',
+    'Cyber',
+    'AI Safety & Alignment',
+    'Foundational Models & NLP',
+  ],
+  'PRJ-10': [
+    'Foundational Models & NLP',
+    'Development',
+    'Efficient Computing & TinyML',
+  ],
+  'PRJ-NED-SAC': [
+    'Cyber',
+    'Efficient Computing & TinyML',
+    'Development',
+    'AI Safety & Alignment',
+  ],
+  'PRJ-1': [
+    'Foundational Models & NLP',
+    'Cyber',
+    'AI Safety & Alignment',
+    'Development',
+  ],
+  'PRJ-2': [
+    'Cyber',
+    'Development',
+    'Foundational Models & NLP',
+    'Adversarial AI',
+  ],
+  'PRJ-3': [
+    'Development',
+    'Cyber',
+    'Adversarial AI',
+    'Foundational Models & NLP',
+  ],
+  'PRJ-4': [
+    'Foundational Models & NLP',
+    'Efficient Computing & TinyML',
+    'Development',
+    'AI Safety & Alignment',
+  ],
+  'PRJ-5': [
+    'Development',
+    'Cyber',
+    'Foundational Models & NLP',
+  ],
+  'PRJ-6': [
+    'Foundational Models & NLP',
+    'Development',
+    'AI Safety & Alignment',
+  ],
+}
+
+function getProjectAreas(project: ProjectItem): string[] {
+  if (Array.isArray(project.areas) && project.areas.length > 0) {
+    return project.areas
+  }
+  const idStr = String(project.id)
+  if (CANONICAL_PROJECT_AREAS[idStr]) {
+    return CANONICAL_PROJECT_AREAS[idStr]
+  }
+  const cleanId = idStr.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+  for (const [key, areas] of Object.entries(CANONICAL_PROJECT_AREAS)) {
+    if (key.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === cleanId) {
+      return areas
+    }
+  }
+  return []
+}
+
+function projectMatchesResearchArea(project: ProjectItem, targetArea: string): boolean {
+  const normTarget = targetArea.trim().toLowerCase()
+  const areas = getProjectAreas(project).map(a => a.toLowerCase())
+  if (areas.some(a => a === normTarget || a.includes(normTarget) || normTarget.includes(a))) {
+    return true
+  }
+
+  // Check tags
+  const tags = (project.tags || []).map(t => t.toLowerCase())
+  if (tags.some(t => t.includes(normTarget) || normTarget.includes(t))) {
+    return true
+  }
+
+  // Keyword match fallback based on the 6 core research areas
+  const text = `${project.title} ${project.description}`.toLowerCase()
+  if (normTarget.includes('foundational') || normTarget.includes('nlp')) {
+    return text.includes('nlp') || text.includes('llm') || text.includes('slm') || text.includes('language model') || text.includes('tokenizer')
+  }
+  if (normTarget.includes('adversarial')) {
+    return text.includes('adversarial') || text.includes('poisoning') || text.includes('jailbreak') || text.includes('attack') || text.includes('vulnerabilit')
+  }
+  if (normTarget.includes('cyber')) {
+    return text.includes('cyber') || text.includes('security') || text.includes('investigation') || text.includes('forensics') || text.includes('defense') || text.includes('telemetry')
+  }
+  if (normTarget.includes('development')) {
+    return text.includes('development') || text.includes('platform') || text.includes('system') || text.includes('agent') || text.includes('software') || text.includes('microservices')
+  }
+  if (normTarget.includes('efficient') || normTarget.includes('tinyml')) {
+    return text.includes('tinyml') || text.includes('edge') || text.includes('quantization') || text.includes('offline') || text.includes('hardware') || text.includes('fpga') || text.includes('embedded')
+  }
+  if (normTarget.includes('safety') || normTarget.includes('alignment')) {
+    return text.includes('safety') || text.includes('alignment') || text.includes('privacy') || text.includes('unbiased') || text.includes('fairness') || text.includes('robust')
+  }
+  return false
+}
+
 export default function Projects() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [activeCategory, setActiveCategory] = useState<string>('All')
+  const [activeArea, setActiveArea] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null)
   const [activeGalleryIndex, setActiveGalleryIndex] = useState<number>(0)
 
-  const [projectsData, setProjectsData] = useState<ProjectItem[]>(() => getProjects())
+  // Old visible categories that the user sees in the filter pills row
+  const visibleCategories = ['All', 'Funded', 'Undergraduate', 'Postgraduate']
+
+  const [projectsData, setProjectsData] = useState<ProjectItem[]>(() => {
+    const list = getProjects()
+    return list.map(p => ({
+      ...p,
+      areas: getProjectAreas(p),
+    }))
+  })
   const [allMembers, setAllMembers] = useState<TeamMemberData[]>(() => getTeamMembers())
 
   useEffect(() => {
@@ -51,65 +181,74 @@ export default function Projects() {
       fetch('/api/content/team').then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([projs, team]) => {
       if (!active) return
-      if (Array.isArray(projs) && projs.length > 0) setProjectsData(projs)
+      if (Array.isArray(projs) && projs.length > 0) {
+        const localList = getProjects()
+        const merged = projs.map(p => {
+          const local = localList.find(lp => String(lp.id) === String(p.id))
+          const areas = (Array.isArray(p.areas) && p.areas.length > 0)
+            ? p.areas
+            : (local?.areas || getProjectAreas(p))
+          return {
+            ...local,
+            ...p,
+            areas,
+          }
+        })
+        setProjectsData(merged)
+      }
       if (Array.isArray(team) && team.length > 0) setAllMembers(team)
     })
     return () => { active = false }
   }, [])
 
-  const categories = [
-    'All',
-    'Foundational Models & NLP',
-    'Adversarial AI',
-    'Cyber',
-    'Development',
-    'Efficient Computing & TinyML',
-    'AI Safety & Alignment',
-    'Funded',
-  ]
-
-  // Synchronize activeCategory with URL query parameter (?area=... or ?category=...)
+  // Synchronize activeArea with URL query parameter (?area=...) when directed from Home cards
   useEffect(() => {
-    const getParamFromUrl = () => {
-      const fromParams = searchParams.get('area') || searchParams.get('category')
+    const getParam = (name: string): string | null => {
+      const fromParams = searchParams.get(name)
       if (fromParams) return fromParams
 
       // Fallback check in hash if present (e.g. #/projects?area=Cyber)
       if (typeof window !== 'undefined' && window.location.hash.includes('?')) {
         const hashQuery = window.location.hash.split('?')[1]
         const params = new URLSearchParams(hashQuery)
-        const p = params.get('area') || params.get('category')
+        const p = params.get(name)
         if (p) return p
       }
 
       // Fallback check in search if present (e.g. ?area=Cyber#/projects)
       if (typeof window !== 'undefined' && window.location.search) {
         const params = new URLSearchParams(window.location.search)
-        const p = params.get('area') || params.get('category')
+        const p = params.get(name)
         if (p) return p
       }
 
       return null
     }
 
-    const detected = getParamFromUrl()
-    if (detected) {
-      const match = categories.find(c => c.toLowerCase() === detected.toLowerCase())
-      if (match) {
-        setActiveCategory(match)
-      }
+    const areaParam = getParam('area')
+    const catParam = getParam('category')
+
+    if (areaParam) {
+      setActiveArea(decodeURIComponent(areaParam))
+      setActiveCategory('All')
+    } else if (catParam) {
+      const match = visibleCategories.find(c => c.toLowerCase() === decodeURIComponent(catParam).toLowerCase())
+      setActiveCategory(match || 'All')
+      setActiveArea(null)
+    } else {
+      setActiveArea(null)
     }
   }, [searchParams])
 
   const handleCategoryChange = (cat: string) => {
+    setActiveArea(null)
     setActiveCategory(cat)
     const next = new URLSearchParams(searchParams)
+    next.delete('area')
     if (cat === 'All') {
-      next.delete('area')
       next.delete('category')
     } else {
-      next.set('area', cat)
-      next.delete('category')
+      next.set('category', cat)
     }
     setSearchParams(next)
   }
@@ -127,6 +266,7 @@ export default function Projects() {
           String(p.id).replace(/[^a-zA-Z0-9]/g, '').toLowerCase() === cleanHash.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
       )
       if (matched) {
+        setActiveArea(null)
         setActiveCategory('All')
         setSelectedProject(matched)
         setTimeout(() => {
@@ -170,21 +310,34 @@ export default function Projects() {
 
   const filtered = useMemo(() => {
     const list = projectsData.filter(p => {
-      const matchesCat =
-        activeCategory === 'All' ||
-        p.category?.toLowerCase() === activeCategory.toLowerCase() ||
-        p.areas?.some(a => a.toLowerCase() === activeCategory.toLowerCase()) ||
-        p.tags?.some(t => t.toLowerCase() === activeCategory.toLowerCase())
+      // 1. Invisible Research Area filter (active only when user clicked a card's "View Projects" link)
+      if (activeArea) {
+        if (!projectMatchesResearchArea(p, activeArea)) {
+          return false
+        }
+      }
 
-      const matchesSearch =
-        query === '' ||
-        p.title.toLowerCase().includes(query.toLowerCase()) ||
-        p.description.toLowerCase().includes(query.toLowerCase()) ||
-        p.funding.toLowerCase().includes(query.toLowerCase()) ||
-        p.tags?.some(t => t.toLowerCase().includes(query.toLowerCase())) ||
-        p.areas?.some(a => a.toLowerCase().includes(query.toLowerCase()))
+      // 2. Visible category filter ('All', 'Funded', 'Undergraduate', 'Postgraduate')
+      if (!activeArea && activeCategory !== 'All') {
+        const cat = p.category?.toLowerCase() || ''
+        if (cat !== activeCategory.toLowerCase()) {
+          return false
+        }
+      }
 
-      return matchesCat && matchesSearch
+      // 3. Search query filter
+      if (query.trim() !== '') {
+        const q = query.toLowerCase()
+        const matchesSearch =
+          p.title.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          Boolean(p.funding && p.funding.toLowerCase().includes(q)) ||
+          Boolean(p.tags?.some(t => t.toLowerCase().includes(q))) ||
+          getProjectAreas(p).some(a => a.toLowerCase().includes(q))
+        if (!matchesSearch) return false
+      }
+
+      return true
     })
 
     // Sort: Ongoing projects at the top, Finished / older projects at the bottom; within groups, most recent first
@@ -200,7 +353,7 @@ export default function Projects() {
 
       return scoreB - scoreA
     })
-  }, [projectsData, activeCategory, query])
+  }, [projectsData, activeArea, activeCategory, query])
 
   // Resolve team members associated with selected project
   const projectMembers = useMemo(() => {
@@ -224,15 +377,15 @@ export default function Projects() {
       </div>
 
       {/* ── Category Filter Pills & Search ── */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 mb-10 pb-6 border-b border-[var(--border-hairline)]">
-        {/* Category Pills */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 mb-8 pb-6 border-b border-[var(--border-hairline)]">
+        {/* Category Pills (Old visible filters restored: All, Funded, Undergraduate, Postgraduate) */}
         <div className="flex flex-wrap items-center gap-2">
-          {categories.map(cat => (
+          {visibleCategories.map(cat => (
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
               className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${
-                activeCategory === cat
+                activeCategory === cat && !activeArea
                   ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
                   : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)] hover:border-[var(--accent-orange)]/40'
               }`}
@@ -254,6 +407,25 @@ export default function Projects() {
           />
         </div>
       </div>
+
+      {/* Active Core Research Area Banner (Only visible when directed from Home card's View Projects link) */}
+      {activeArea && (
+        <div className="mb-8 p-3.5 sm:p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--accent-orange)]/40 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-sans">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-[var(--accent-orange)] animate-pulse" />
+            <span className="text-[var(--text-muted)]">Categorized by Core Research Area:</span>
+            <span className="font-semibold text-[var(--accent-orange)] text-sm">{activeArea}</span>
+            <span className="text-[var(--text-subtle)] text-[11px]">({filtered.length} projects)</span>
+          </div>
+          <button
+            onClick={() => handleCategoryChange('All')}
+            className="text-[11px] font-semibold text-[var(--accent-orange)] hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            <span>Show all projects</span>
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* ── Project Cards Grid (Generous 28px Rounded Stone Cards) ── */}
       <AnimatePresence mode="wait">
@@ -312,31 +484,9 @@ export default function Projects() {
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2 font-head line-clamp-2">
+                  <h3 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2.5 font-head line-clamp-2">
                     {proj.title}
                   </h3>
-
-                  {/* Research Areas Badges */}
-                  {proj.areas && proj.areas.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {proj.areas.map(area => (
-                        <span
-                          key={area}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleCategoryChange(area)
-                          }}
-                          className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-sans font-medium transition-colors cursor-pointer ${
-                            activeCategory === area
-                              ? 'bg-[var(--accent-orange)] text-white'
-                              : 'bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:text-[var(--text-primary)]'
-                          }`}
-                        >
-                          {area}
-                        </span>
-                      ))}
-                    </div>
-                  )}
 
                   <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed mb-5 line-clamp-3 font-normal">
                     {proj.description}
@@ -370,7 +520,7 @@ export default function Projects() {
                 {/* Bottom Action Footer */}
                 <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans">
                   <span className="text-[var(--text-subtle)] uppercase tracking-wider text-[11px] font-medium">
-                    {proj.areas?.[0] || proj.category}
+                    {proj.category}
                   </span>
                   <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1.5 group-hover:underline">
                     <span>View Details</span>
@@ -477,18 +627,12 @@ export default function Projects() {
                           <span className="text-[var(--text-subtle)] block mb-2 font-semibold">CORE RESEARCH AREAS</span>
                           <div className="flex flex-wrap gap-1.5">
                             {selectedProject.areas.map(area => (
-                              <button
+                              <span
                                 key={area}
-                                type="button"
-                                onClick={() => {
-                                  handleCategoryChange(area)
-                                  setSelectedProject(null)
-                                }}
-                                className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--text-primary)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors cursor-pointer inline-flex items-center gap-1"
+                                className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--text-primary)] border border-[var(--border-hairline)]"
                               >
-                                <span>{area}</span>
-                                <span>&rarr;</span>
-                              </button>
+                                {area}
+                              </span>
                             ))}
                           </div>
                         </div>

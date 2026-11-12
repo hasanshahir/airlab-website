@@ -136,6 +136,7 @@ export const collections = [
       coverImage: { type: 'image' },
       images: { type: 'stringList' },
       tags: { type: 'stringList' },
+      areas: { type: 'stringList' },
       memberIds: { type: 'stringList', label: 'Team member IDs' },
       teamMembers: { type: 'stringList' },
     },
