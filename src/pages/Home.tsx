@@ -16,12 +16,17 @@ import {
   ShieldAlert,
   ShieldCheck,
   Terminal,
+  Images,
+  Box,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import airLabMark from '../assets/air-lab-mark.png'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
-import HeroBackgroundSlideshow from '../components/HeroBackgroundSlideshow'
+import HeroBackgroundSlideshow, { LAB_SLIDES } from '../components/HeroBackgroundSlideshow'
+import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
+
+const HERO_CAROUSEL_IMAGES = LAB_SLIDES.map(({ src, alt }) => ({ src, alt }))
 
 const recentUpdates = [
   {
@@ -118,7 +123,21 @@ const coreResearchAreas = [
 export default function Home() {
   const navigate = useNavigate()
   const [applyModalOpen, setApplyModalOpen] = useState(false)
+  const [heroMode, setHeroMode] = useState<'carousel' | 'slideshow'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem('airlab_hero_mode')
+      if (saved === 'slideshow' || saved === 'carousel') return saved
+    }
+    return 'carousel'
+  })
   const updatesScrollRef = useRef<HTMLDivElement>(null)
+
+  const handleHeroModeChange = (mode: 'carousel' | 'slideshow') => {
+    setHeroMode(mode)
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('airlab_hero_mode', mode)
+    }
+  }
 
   const scrollUpdates = (direction: 'left' | 'right') => {
     if (updatesScrollRef.current) {
@@ -132,33 +151,45 @@ export default function Home() {
 
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
-      {/* ── 1. FULL-WIDTH HERO SHOWCASE (Pans 100% of the screen horizontally, no padded rectangles) ── */}
+      {/* ── 1. FULL-WIDTH HERO SHOWCASE (Toggleable between 3D Curved Carousel & Classic Slideshow) ── */}
       <section className="relative w-full z-10">
-        <HeroBackgroundSlideshow autoPlayInterval={5000}>
-          <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-6">
-            {/* LOGO ON THE LEFT: Clean, iconic, white on imagery */}
-            <div className="shrink-0 flex items-center justify-center">
-              <img
-                src={airLabMark}
-                alt="AIR Lab Mark"
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain brightness-0 invert drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
+        {heroMode === 'carousel' ? (
+          <TiltedGridHero
+            images={HERO_CAROUSEL_IMAGES}
+            tileHeight={48}
+            speed={6}
+            axis={50}
+            gap={4}
+            curve={72}
+            className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+          >
+            <div className="relative z-10 flex h-full w-full max-w-4xl mx-auto flex-col items-center justify-center px-6 text-center">
+              {/* Soft, edge-less shadow behind the text only (carousel photos remain 100% full brightness) */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-2xl h-64 -z-10"
+                style={{
+                  background:
+                    'radial-gradient(closest-side, rgba(10, 0, 28, 0.58) 0%, rgba(10, 0, 28, 0.26) 55%, transparent 100%)',
+                }}
               />
-            </div>
 
-            {/* Subtle vertical separator on desktop */}
-            <div className="hidden md:block w-px h-24 bg-white/30 shrink-0" />
-
-            {/* TEXT ON THE RIGHT: Clean punchy slogan */}
-            <div className="text-center md:text-left flex flex-col items-center md:items-start max-w-2xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-head text-white tracking-tight leading-[1.08] drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] select-none">
+              {/* Clean centered 3D extruded slogan */}
+              <h1
+                className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl"
+                style={{
+                  textShadow:
+                    '0 1px 0 rgba(16, 0, 43, 0.95), 0 2px 0 rgba(16, 0, 43, 0.9), 0 3px 0 rgba(16, 0, 43, 0.85), 0 4px 0 rgba(16, 0, 43, 0.75), 0 8px 20px rgba(0, 0, 0, 0.95), 0 18px 42px rgba(0, 0, 0, 0.8)',
+                }}
+              >
                 Where Intelligence Meets Engineering.
               </h1>
 
-              {/* Action Buttons directly on the photography */}
-              <div className="mt-7 flex flex-wrap items-center justify-center md:justify-start gap-3.5">
+              {/* Tactile 3D Action Button centered directly below the text */}
+              <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center gap-3.5">
                 <Link
                   to="/projects"
-                  className="h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
+                  className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/25 shadow-[0_4px_0_rgba(16,0,43,0.55),0_12px_28px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_0_rgba(16,0,43,0.55),0_16px_34px_rgba(0,0,0,0.65)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_2px_0_rgba(16,0,43,0.55),0_6px_14px_rgba(0,0,0,0.5)] transition-all duration-200 flex items-center gap-2 cursor-pointer group"
                 >
                   <Layers className="w-4 h-4 shrink-0" />
                   <span>Explore Projects</span>
@@ -166,32 +197,103 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-          </div>
-        </HeroBackgroundSlideshow>
+          </TiltedGridHero>
+        ) : (
+          <HeroBackgroundSlideshow autoPlayInterval={5000}>
+            <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-6">
+              {/* LOGO ON THE LEFT: Clean, iconic, white on imagery */}
+              <div className="shrink-0 flex items-center justify-center">
+                <img
+                  src={airLabMark}
+                  alt="AIR Lab Mark"
+                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain brightness-0 invert drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
+                />
+              </div>
 
-        {/* ── MINIMAL CLEAN QUICK LINKS STRIP ── */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
-          <Link
-            to="/projects"
-            className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
+              {/* Subtle vertical separator on desktop */}
+              <div className="hidden md:block w-px h-24 bg-white/30 shrink-0" />
+
+              {/* TEXT ON THE RIGHT: Clean punchy slogan */}
+              <div className="text-center md:text-left flex flex-col items-center md:items-start max-w-2xl">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-head text-white tracking-tight leading-[1.08] drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] select-none">
+                  Where Intelligence Meets Engineering.
+                </h1>
+
+                {/* Action Buttons directly on the photography */}
+                <div className="mt-7 flex flex-wrap items-center justify-center md:justify-start gap-3.5">
+                  <Link
+                    to="/projects"
+                    className="h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
+                  >
+                    <Layers className="w-4 h-4 shrink-0" />
+                    <span>Explore Projects</span>
+                    <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </HeroBackgroundSlideshow>
+        )}
+
+        {/* ── MINIMAL CLEAN QUICK LINKS STRIP + HERO VIEW TOGGLE ── */}
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6">
+            <Link
+              to="/projects"
+              className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
+            >
+              All Projects &rarr;
+            </Link>
+            <span className="text-[var(--border-hairline)]">•</span>
+            <Link
+              to="/grants"
+              className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
+            >
+              <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+              Active Grants &rarr;
+            </Link>
+            <span className="text-[var(--border-hairline)]">•</span>
+            <Link
+              to="/team"
+              className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
+            >
+              All Team Members &rarr;
+            </Link>
+          </div>
+
+          {/* Hero View Mode Toggle */}
+          <div
+            role="group"
+            aria-label="Hero display mode"
+            className="inline-flex items-center p-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-xs mx-auto sm:mx-0"
           >
-            All Projects &rarr;
-          </Link>
-          <span className="text-[var(--border-hairline)]">•</span>
-          <Link
-            to="/grants"
-            className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
-          >
-            <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-            Active Grants &rarr;
-          </Link>
-          <span className="text-[var(--border-hairline)]">•</span>
-          <Link
-            to="/team"
-            className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
-          >
-            All Team Members &rarr;
-          </Link>
+            <button
+              type="button"
+              onClick={() => handleHeroModeChange('slideshow')}
+              aria-pressed={heroMode === 'slideshow'}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                heroMode === 'slideshow'
+                  ? 'bg-[var(--accent-orange)] text-white shadow-xs'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <Images className="w-3.5 h-3.5" />
+              <span>Slideshow</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleHeroModeChange('carousel')}
+              aria-pressed={heroMode === 'carousel'}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                heroMode === 'carousel'
+                  ? 'bg-[var(--accent-orange)] text-white shadow-xs'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <Box className="w-3.5 h-3.5" />
+              <span>3D Carousel</span>
+            </button>
+          </div>
         </div>
       </section>
 
