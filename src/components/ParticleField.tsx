@@ -100,15 +100,15 @@ export const ParticleField: React.FC = () => {
         if (p.y < 0) p.y = height
         if (p.y > height) p.y = 0
 
-        // Gentle mouse interaction (flee / drift)
+        // Subtle mouse interaction (gentle gravitational pull toward cursor)
         if (mouse) {
           const dx = p.x - mouse.x
           const dy = p.y - mouse.y
           const dist = Math.hypot(dx, dy)
-          if (dist < 130 && dist > 0) {
-            const force = (130 - dist) / 130
-            p.x += (dx / dist) * force * 1.6
-            p.y += (dy / dist) * force * 1.6
+          if (dist < 170 && dist > 18) {
+            const force = (170 - dist) / 170
+            p.x -= (dx / dist) * force * 0.4
+            p.y -= (dy / dist) * force * 0.4
           }
         }
 
