@@ -63,11 +63,6 @@ export default function Performers() {
             {/* Top Banner Ribbon & Cycle Selector */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-[var(--border-hairline)] mb-8">
               <div className="flex flex-wrap items-center gap-2.5">
-                <span className="px-4 py-1.5 rounded-full text-xs font-sans font-semibold bg-[var(--accent-orange)] text-white flex items-center gap-1.5 shadow-xs">
-                  <Medal className="w-4 h-4 text-white" />
-                  Spotlight Award
-                </span>
-                
                 {/* Cycle Switcher Tabs */}
                 {performersList.map((p, idx) => (
                   <button
