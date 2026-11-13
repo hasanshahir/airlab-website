@@ -29,6 +29,11 @@ function syncCarouselImagesPlugin() {
 
 export default defineConfig({
   base: '/',
+  resolve: {
+    alias: {
+      '@': path.resolve(import.meta.dirname, 'src'),
+    },
+  },
   plugins: [syncCarouselImagesPlugin(), tailwindcss(), react()],
   server: {
     // Forward API + uploaded files to the Express server during development.
