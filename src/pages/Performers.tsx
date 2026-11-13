@@ -11,18 +11,21 @@ const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
 )
 
 export default function Performers() {
-  const [featuredPerformer, setFeaturedPerformer] = useState<any>(null)
+  const [performersList, setPerformersList] = useState<any[]>([])
+  const [activeCycleIndex, setActiveCycleIndex] = useState(0)
 
   useEffect(() => {
     fetch('/api/content/performers')
       .then(r => r.ok ? r.json() : [])
       .then(d => {
-        if (Array.isArray(d) && d.length > 0) setFeaturedPerformer(d[0])
+        if (Array.isArray(d) && d.length > 0) setPerformersList(d)
       })
       .catch(() => {})
   }, [])
 
-  const teamRedirectUrl = featuredPerformer
+  const featuredPerformer = performersList[activeCycleIndex] || performersList[0] || null
+
+  const teamRedirectUrl = featuredPerformer?.id
     ? `/team?tab=${featuredPerformer.categoryTab || 'interns'}&member=${featuredPerformer.id}`
     : '/team'
 
@@ -57,18 +60,29 @@ export default function Performers() {
       ) : (
         <SectionReveal delay={0.2}>
           <div className="p-8 sm:p-12 relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-4xl mx-auto transition-all duration-300 hover:border-[var(--accent-orange)]/40 text-left">
-            {/* Top Banner Ribbon */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-8 border-b border-[var(--border-hairline)] mb-8">
-              <div className="flex items-center gap-2.5">
+            {/* Top Banner Ribbon & Cycle Selector */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-[var(--border-hairline)] mb-8">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <span className="px-4 py-1.5 rounded-full text-xs font-sans font-semibold bg-[var(--accent-orange)] text-white flex items-center gap-1.5 shadow-xs">
                   <Medal className="w-4 h-4 text-white" />
                   Spotlight Award
                 </span>
-                {featuredPerformer.month && (
-                  <span className="px-3.5 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--ink-dark)] border border-[var(--border-hairline)]">
-                    {featuredPerformer.month}
-                  </span>
-                )}
+                
+                {/* Cycle Switcher Tabs */}
+                {performersList.map((p, idx) => (
+                  <button
+                    key={p.id || idx}
+                    type="button"
+                    onClick={() => setActiveCycleIndex(idx)}
+                    className={`px-3.5 py-1 rounded-full text-xs font-sans font-medium border transition-colors cursor-pointer ${
+                      activeCycleIndex === idx
+                        ? 'bg-[var(--ink-dark)] text-white border-[var(--ink-dark)] shadow-xs'
+                        : 'bg-[var(--bg-page)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-orange)]'
+                    }`}
+                  >
+                    {p.month}
+                  </button>
+                ))}
               </div>
 
               <span className="text-xs font-sans text-[var(--text-subtle)]">
@@ -141,6 +155,29 @@ export default function Performers() {
                 </p>
               )}
             </div>
+
+            {/* Ceremony & Award Photos Grid */}
+            {Array.isArray(featuredPerformer.photos) && featuredPerformer.photos.length > 0 && (
+              <div className="mb-8 p-6 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)]">
+                <span className="text-xs font-sans font-semibold text-[var(--ink-dark)] uppercase tracking-wider block mb-3">
+                  Award Ceremony & Recognition Photos ({featuredPerformer.month}):
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {featuredPerformer.photos.map((photoUrl: string, pIdx: number) => (
+                    <div
+                      key={pIdx}
+                      className="relative aspect-4/3 rounded-xl overflow-hidden border border-[var(--border-hairline)] shadow-xs group bg-[var(--bg-surface)]"
+                    >
+                      <img
+                        src={photoUrl}
+                        alt={`Ceremony photo ${pIdx + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Bottom Actions Bar */}
             <div className="pt-6 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-4">

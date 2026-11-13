@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "id": "pom-sep-oct-2026",
+    "name": "Spotlight Awardee",
+    "role": "Research Scholar",
+    "department": "Department of CSIT · NED University",
+    "month": "September – October 2026",
+    "rank": 1,
+    "title": "Outstanding Research & Scientific Excellence",
+    "achievement": "Recognized by AIR Lab faculty for exemplary milestone execution, landmark AI model evaluations, and research contributions during the September – October 2026 research cycle.",
+    "tags": [
+      "Deep Learning",
+      "Computer Vision",
+      "AIR Lab Fellow",
+      "Research Award"
+    ],
+    "image": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
+    "categoryTab": "interns",
+    "photos": [
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg"
+    ]
+  },
+  {
+    "id": "pom-jul-aug-2026",
+    "name": "Spotlight Awardee",
+    "role": "Research Scholar",
+    "department": "Department of CSIT · NED University",
+    "month": "July – August 2026",
+    "rank": 2,
+    "title": "Distinguished Research Delivery & Innovation",
+    "achievement": "Commended by principal investigators for pioneering applied machine learning benchmarks and dedicated laboratory engineering leadership during July – August 2026.",
+    "tags": [
+      "Machine Learning",
+      "Applied AI",
+      "AIR Lab Fellow",
+      "Research Award"
+    ],
+    "image": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.30.jpeg",
+    "categoryTab": "interns",
+    "photos": [
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.28.jpeg",
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.30.jpeg",
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.32.jpeg",
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg"
+    ]
+  }
+]
