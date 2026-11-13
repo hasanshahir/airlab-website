@@ -1,47 +1,191 @@
 [
   {
-    "id": "gal-1",
+    "id": "gal-lab-1",
     "title": "Research & Prototyping Laboratory",
     "desc": "High-throughput deep learning compute cluster and prototyping workstations at AIR Lab.",
     "cat": "Laboratory Facility",
     "date": "2025",
-    "url": "/carousel-images/6530466a-3815-4434-a181-85e97c3ae385.jpg",
+    "url": "/gallery/carousel-6530466a-3815-4434-a181-85e97c3ae385.jpg",
     "span": "sm:col-span-2"
   },
   {
-    "id": "gal-2",
+    "id": "gal-lab-2",
     "title": "Deep Learning GPU Compute Rig",
     "desc": "TensorRT and edge-accelerated compute hardware powering real-time inference pipelines.",
-    "cat": "Compute Rig",
+    "cat": "Compute Infrastructure",
     "date": "2025",
-    "url": "/carousel-images/6a392586-ef4f-41db-9be7-cee1a0018f1f.jpg",
+    "url": "/gallery/carousel-6a392586-ef4f-41db-9be7-cee1a0018f1f.jpg",
     "span": "sm:col-span-1"
   },
   {
-    "id": "gal-3",
-    "title": "Student ML Collaboration",
+    "id": "gal-lab-3",
+    "title": "Student ML Collaboration Workspace",
     "desc": "Interdisciplinary student research groups prototyping regional foundation models and computer vision.",
     "cat": "Student Research",
     "date": "2025",
-    "url": "/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg",
+    "url": "/gallery/carousel-a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg",
     "span": "sm:col-span-1"
   },
   {
-    "id": "gal-4",
+    "id": "gal-lab-4",
     "title": "Research Fellows Workstations",
     "desc": "Fellows stations dedicated to multilingual Urdu NLP, adversarial defense, and edge AI.",
     "cat": "Fellows Workstations",
     "date": "2025",
-    "url": "/carousel-images/adc711cf-26d5-4a13-ac9f-4e29f0cf13d7.jpg",
+    "url": "/gallery/carousel-adc711cf-26d5-4a13-ac9f-4e29f0cf13d7.jpg",
     "span": "sm:col-span-1"
   },
   {
-    "id": "gal-5",
-    "title": "Academic Excellence & Lab Entrance",
+    "id": "gal-lab-5",
+    "title": "Department of CSIT & AIR Lab Entrance",
     "desc": "Department of CSIT and Artificial Intelligence Research Lab entrance at NED University.",
     "cat": "Campus",
     "date": "2025",
-    "url": "/carousel-images/cb2f092f-f6df-418b-b84c-04085f274522.jpg",
+    "url": "/gallery/carousel-cb2f092f-f6df-418b-b84c-04085f274522.jpg",
+    "span": "sm:col-span-2"
+  },
+  {
+    "id": "gal-new-1",
+    "title": "Advanced Neural Systems Prototyping",
+    "desc": "Scholars evaluating deep neural architecture performance in the dedicated AIR Lab testing bay.",
+    "cat": "Laboratory Facility",
+    "date": "2026",
+    "url": "/gallery/060415af-6c88-4507-be6f-72c298e9f831.jpg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-new-2",
+    "title": "Collaborative AI Model Review",
+    "desc": "Research leads and fellows reviewing model loss curves and edge deployment benchmarks.",
+    "cat": "Student Research",
+    "date": "2026",
+    "url": "/gallery/2fd3d390-40da-430f-bb33-6fae568577b3.jpg",
+    "span": "sm:col-span-2"
+  },
+  {
+    "id": "gal-new-3",
+    "title": "Computer Vision Benchmarking Rig",
+    "desc": "Hardware-accelerated edge testing bed for low-latency autonomous visual perception.",
+    "cat": "Compute Infrastructure",
+    "date": "2026",
+    "url": "/gallery/42f9f036-70b1-4f69-a512-5b3e0ff3e26e.jpg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-new-4",
+    "title": "Interdisciplinary Research Sprint",
+    "desc": "AIR Lab fellows in an active sprint across computer vision and multimodal NLP testbeds.",
+    "cat": "Student Research",
+    "date": "2026",
+    "url": "/gallery/9649e8d0-f077-452c-a10c-38b6a724406f.jpg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-new-5",
+    "title": "Faculty & Scholar Technical Sync",
+    "desc": "Technical coordination session at AIR Lab on sovereign AI architecture and datasets.",
+    "cat": "Academic Excellence",
+    "date": "2026",
+    "url": "/gallery/c8bd297e-86be-456a-afe8-7fdf2d828bc5.jpg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-new-6",
+    "title": "Hardware & Sensor Testbed Calibration",
+    "desc": "Calibration of embedded GPU clusters and autonomous robotics sensor telemetry.",
+    "cat": "Laboratory Facility",
+    "date": "2026",
+    "url": "/gallery/dd603a52-1a8a-4b79-b130-1a9c5d384e69.jpg",
+    "span": "sm:col-span-2"
+  },
+  {
+    "id": "gal-new-7",
+    "title": "Student Team Experimentation",
+    "desc": "Fellows verifying inference pipeline performance on specialized edge accelerators.",
+    "cat": "Student Research",
+    "date": "2026",
+    "url": "/gallery/e9e86d80-6dd9-4f04-9a26-47608f53e97c.jpg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-new-8",
+    "title": "Research Lab Central Bay",
+    "desc": "Panoramic view of the active research workstations and collaborative testbeds at NED CSIT.",
+    "cat": "Laboratory Facility",
+    "date": "2026",
+    "url": "/gallery/f0e8d434-1022-4e98-bc46-9992c8d5ae41.jpg",
+    "span": "sm:col-span-2"
+  },
+  {
+    "id": "gal-pom-1",
+    "title": "Performer of the Month Ceremony (July – August)",
+    "desc": "Faculty award presentation and certificate commendation honoring outstanding research contributions.",
+    "cat": "Performer of the Month",
+    "date": "July – August 2026",
+    "url": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.28.jpeg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-pom-2",
+    "title": "Research Recognition & Certificate Award (July – August)",
+    "desc": "AIR Lab leadership honoring research fellows for exceptional milestone delivery and scientific rigor.",
+    "cat": "Performer of the Month",
+    "date": "July – August 2026",
+    "url": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.30.jpeg",
+    "span": "sm:col-span-2"
+  },
+  {
+    "id": "gal-pom-3",
+    "title": "Award Presentation by Faculty Leads (July – August)",
+    "desc": "Principal Investigators presenting the Spotlight Award certificate at the Department of CSIT.",
+    "cat": "Performer of the Month",
+    "date": "July – August 2026",
+    "url": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.32.jpeg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-pom-4",
+    "title": "AIR Lab Fellowship Honor (July – August)",
+    "desc": "Official recognition honoring excellence in applied machine learning research and engineering.",
+    "cat": "Performer of the Month",
+    "date": "July – August 2026",
+    "url": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-pom-5",
+    "title": "Performer of the Month Spotlight (September – October)",
+    "desc": "Spotlight commendation ceremony recognizing breakthrough research and high-impact project execution.",
+    "cat": "Performer of the Month",
+    "date": "September – October 2026",
+    "url": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
+    "span": "sm:col-span-2"
+  },
+  {
+    "id": "gal-pom-6",
+    "title": "Certificate Commendation (September – October)",
+    "desc": "Award presentation by faculty supervisors for distinguished academic achievements and teamwork.",
+    "cat": "Performer of the Month",
+    "date": "September – October 2026",
+    "url": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-pom-7",
+    "title": "Spotlight Award Presentation (September – October)",
+    "desc": "Faculty coordinators recognizing top research fellows during the monthly performance review.",
+    "cat": "Performer of the Month",
+    "date": "September – October 2026",
+    "url": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg",
+    "span": "sm:col-span-1"
+  },
+  {
+    "id": "gal-pom-8",
+    "title": "Faculty & Awardee Group Celebration (September – October)",
+    "desc": "Group recognition commemorating scientific achievements and model benchmarks delivered by fellows.",
+    "cat": "Performer of the Month",
+    "date": "September – October 2026",
+    "url": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg",
     "span": "sm:col-span-2"
   }
 ]
