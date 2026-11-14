@@ -123,3 +123,23 @@ export interface InternItem {
   paper?: string
   image?: string
 }
+
+export interface PerformerItem {
+  id: string
+  name: string
+  role: string
+  department?: string
+  month: string
+  rank?: number
+  title?: string
+  achievement?: string
+  researchFocus?: string
+  email?: string
+  linkedin?: string
+  cvUrl?: string
+  avatar?: string
+  tags?: string[]
+  image: string
+  categoryTab?: string
+  photos?: string[]
+}
