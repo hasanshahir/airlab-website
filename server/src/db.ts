@@ -5,6 +5,10 @@ mongoose.set('strictQuery', true)
 
 /** Opens the MongoDB connection. Works identically for Atlas and a self-hosted mongod. */
 export async function connectDB(): Promise<typeof mongoose> {
+  if (!env.MONGO_URI || !/^mongodb(\+srv)?:\/\//.test(env.MONGO_URI)) {
+    console.warn('⚠️  MONGO_URI not configured; running with local JSON seed fallback.')
+    return mongoose
+  }
   mongoose.connection.on('disconnected', () => console.warn('⚠️  MongoDB disconnected'))
   mongoose.connection.on('reconnected', () => console.log('🔁 MongoDB reconnected'))
 

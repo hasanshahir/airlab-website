@@ -274,7 +274,7 @@ export default function Publications() {
             Research Blogs & Dispatches
           </h2>
           <p className="text-sm sm:text-base text-[var(--text-muted)] mt-2 leading-relaxed font-normal">
-            In-depth architectural breakdowns, engineering postmortems, and field deployment dispatches authored by AIR Lab scientists and fellows.
+            In-depth architectural breakdowns, engineering postmortems, and field deployment dispatches authored by AIR Lab scientists and researchers.
           </p>
         </div>
 
