@@ -659,8 +659,14 @@ export default function Projects() {
                       </div>
                       {selectedProject.pi && (
                         <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                          <span className="text-[var(--text-subtle)] block mb-1">PRINCIPAL INVESTIGATOR</span>
+                          <span className="text-[var(--text-subtle)] block mb-1">FACULTY SUPERVISOR / PI</span>
                           <span className="font-semibold text-[var(--text-primary)]">{selectedProject.pi}</span>
+                        </div>
+                      )}
+                      {selectedProject.industryAdvisor && selectedProject.industryAdvisor !== 'N/A' && (
+                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
+                          <span className="text-[var(--text-subtle)] block mb-1">INDUSTRY ADVISOR</span>
+                          <span className="font-semibold text-[var(--text-primary)]">{selectedProject.industryAdvisor}</span>
                         </div>
                       )}
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
