@@ -22,6 +22,25 @@ export const DEFAULT_VACANCY_SETTINGS: VacancySettings = {
     'Applications are currently closed. Please check back soon or follow our updates for the next intake.',
 }
 
+function sanitizeVacancyCopy(data: Partial<VacancySettings> | null | undefined): VacancySettings {
+  if (!data || typeof data !== 'object') return DEFAULT_VACANCY_SETTINGS
+  const isLegacyText = (val?: string) =>
+    !val || /internship|fellowship|vacanc/i.test(val)
+
+  return {
+    status: data.status === 'Closed' ? 'Closed' : 'Open',
+    badge: isLegacyText(data.badge) ? DEFAULT_VACANCY_SETTINGS.badge : data.badge!,
+    title: isLegacyText(data.title) ? DEFAULT_VACANCY_SETTINGS.title : data.title!,
+    description: isLegacyText(data.description) ? DEFAULT_VACANCY_SETTINGS.description : data.description!,
+    ribbonLabel:
+      !data.ribbonLabel || /open|internship|fellowship|vacanc/i.test(data.ribbonLabel)
+        ? DEFAULT_VACANCY_SETTINGS.ribbonLabel
+        : data.ribbonLabel,
+    ribbonText: isLegacyText(data.ribbonText) ? DEFAULT_VACANCY_SETTINGS.ribbonText : data.ribbonText!,
+    closedMessage: data.closedMessage || DEFAULT_VACANCY_SETTINGS.closedMessage,
+  }
+}
+
 // One shared request per page load, reused by every component that needs it.
 let cache: VacancySettings | null = null
 let inflight: Promise<VacancySettings> | null = null
@@ -32,10 +51,7 @@ function loadVacancySettings(): Promise<VacancySettings> {
     const req: Promise<VacancySettings> = fetch('/api/settings/vacancy')
       .then(r => (r.ok ? r.json() : null))
       .then((data): VacancySettings => {
-        const resolved: VacancySettings = {
-          ...DEFAULT_VACANCY_SETTINGS,
-          ...(data && typeof data === 'object' ? data : {}),
-        }
+        const resolved = sanitizeVacancyCopy(data)
         cache = resolved
         return resolved
       })
@@ -64,4 +80,3 @@ export function useVacancySettings(): VacancySettings {
 
   return settings
 }
-
