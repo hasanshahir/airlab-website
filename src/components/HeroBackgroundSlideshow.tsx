@@ -185,7 +185,7 @@ export const HeroBackgroundSlideshow: React.FC<HeroBackgroundSlideshowProps> = (
       </div>
 
       {/* ── FOREGROUND CONTENT (Full horizontal span, middle aligned, directly on photography) ── */}
-      <div className="relative z-20 w-full min-h-[500px] sm:min-h-[560px] md:min-h-[620px] flex items-center justify-center px-4 sm:px-8 md:px-12 py-16">
+      <div className="relative z-20 w-full min-h-[540px] sm:min-h-[640px] md:min-h-[720px] flex items-center justify-center px-4 sm:px-8 md:px-12 py-16">
         {children}
       </div>
 

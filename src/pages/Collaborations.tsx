@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ExternalLink, ShieldCheck, CheckCircle2 } from 'lucide-react'
+import { ShieldCheck, CheckCircle2 } from 'lucide-react'
 import rawCollaborations from '../data/collaborations.json'
 import type { CollaborationItem } from '../types/data'
 
@@ -26,7 +26,7 @@ export default function Collaborations() {
     fetch('/api/content/collaborations')
       .then(r => r.ok ? r.json() : [])
       .then(d => {
-        if (Array.isArray(d)) setCollaborations(d)
+        if (Array.isArray(d) && d.length > 0) setCollaborations(d)
       })
       .catch(() => {})
   }, [])
@@ -159,9 +159,8 @@ export default function Collaborations() {
                     <span className="text-[var(--text-subtle)]">
                       Alliance Status: <strong className="text-[var(--accent-orange)] font-semibold">Active</strong>
                     </span>
-                    <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1 transition-colors">
                       <span>Partnership Details</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
                     </span>
                   </div>
                 </div>

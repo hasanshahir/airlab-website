@@ -15,7 +15,7 @@ export default function Interns() {
     fetch('/api/content/interns')
       .then(r => r.ok ? r.json() : [])
       .then(d => {
-        if (Array.isArray(d)) setInterns(d)
+        if (Array.isArray(d) && d.length > 0) setInterns(d)
       })
       .catch(() => {})
   }, [])

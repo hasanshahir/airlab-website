@@ -1,5 +1,5 @@
 import React from 'react'
-import { ExternalLink, Handshake } from 'lucide-react'
+import { Handshake } from 'lucide-react'
 import { getSponsors } from '../lib/data'
 
 export const SponsorsGrid: React.FC = () => {
@@ -63,7 +63,6 @@ export const SponsorsGrid: React.FC = () => {
 
             <div className="pt-4 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans text-[var(--accent-orange)] font-semibold">
               <span className="group-hover:underline">Visit Sponsor Site</span>
-              <ExternalLink className="w-3.5 h-3.5" />
             </div>
           </a>
         ))}

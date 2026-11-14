@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Sparkles, Check, GraduationCap, FileText, User, Mail, BookOpen, Phone, Loader2, ArrowRight, Briefcase } from 'lucide-react'
+import { X, Check, GraduationCap, FileText, User, Mail, BookOpen, Phone, Loader2, Briefcase } from 'lucide-react'
 import { useVacancySettings } from '../lib/vacancy'
 
 interface StudentApplicationModalProps {
@@ -22,7 +22,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
     email: '',
     phone: '',
     rollNo: '',
-    designation: 'Research Intern (Undergraduate)',
+    designation: 'Undergraduate Researcher',
     department: 'Computer Science & IT',
     program: 'Undergraduate BS (3rd/4th Year)',
     track: 'Foundational LLMs & Urdu NLP',
@@ -229,32 +229,23 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden bg-white">
-                {/* ── 1. Fixed Header with AIR Lab Logo & Badge ── */}
-                <div className="p-5 sm:px-8 sm:py-5 border-b border-neutral-200 bg-white flex items-start justify-between gap-4 shrink-0">
-                  <div className="min-w-0 pr-2">
-                    <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-2.5">
-                      <span className="brand-wordmark !text-neutral-950" style={{ fontSize: '17px' }}>
-                        AIR LAB
-                        <small className="!text-neutral-500 !text-[8px] !tracking-[0.14em]">NED UNIVERSITY · CSIT</small>
-                      </span>
-                      <span className="h-4 w-px bg-neutral-300" aria-hidden="true" />
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-50 text-[#ff5500] border border-[#ff5500]/30 text-[10.5px] font-sans font-semibold">
-                        <Sparkles className="w-3 h-3 shrink-0" />
-                        <span className="truncate">{vacancy.badge}</span>
-                      </div>
-                    </div>
-                    <h2 id="vacancy-modal-title" className="text-xl sm:text-2xl font-bold tracking-tight font-head text-neutral-950">
-                      {vacancy.title}
+                {/* ── 1. Fixed Header with AIR Lab Logo ── */}
+                <div className="p-5 sm:px-8 sm:py-5 border-b border-neutral-200 bg-white flex items-center justify-between gap-4 shrink-0">
+                  <div className="min-w-0 pr-2 flex items-center gap-3">
+                    <span className="brand-wordmark !text-neutral-950" style={{ fontSize: '17px' }}>
+                      AIR LAB
+                      <small className="!text-neutral-500 !text-[8px] !tracking-[0.14em]">NED UNIVERSITY · CSIT</small>
+                    </span>
+                    <span className="h-4 w-px bg-neutral-300" aria-hidden="true" />
+                    <h2 id="vacancy-modal-title" className="text-lg sm:text-xl font-bold tracking-tight font-head text-neutral-950">
+                      Application Form
                     </h2>
-                    <p className="text-xs sm:text-[13.5px] text-neutral-600 mt-1 font-sans leading-relaxed line-clamp-2">
-                      {isClosed ? vacancy.closedMessage : vacancy.description}
-                    </p>
                   </div>
 
                   <button
                     type="button"
                     onClick={onClose}
-                    className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:border-[#ff5500] transition-colors cursor-pointer shrink-0 mt-0.5"
+                    className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 flex items-center justify-center text-neutral-600 hover:text-neutral-900 hover:border-[#ff5500] transition-colors cursor-pointer shrink-0"
                     aria-label="Close modal"
                   >
                     <X className="w-4 h-4" />
@@ -288,14 +279,14 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                           onChange={e => setFormData({ ...formData, designation: e.target.value })}
                           className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans cursor-pointer font-medium"
                         >
-                          <option value="Research Intern (Undergraduate)">Research Intern (Undergraduate)</option>
+                          <option value="Undergraduate Researcher">Undergraduate Researcher</option>
                           <option value="Graduate Research Assistant (MS / PhD)">Graduate Research Assistant (MS / PhD)</option>
-                          <option value="NLP & Large Language Models Fellow">NLP &amp; Large Language Models Fellow</option>
+                          <option value="NLP & Large Language Models Researcher">NLP &amp; Large Language Models Researcher</option>
                           <option value="Computer Vision & Edge AI Researcher">Computer Vision &amp; Edge AI Researcher</option>
                           <option value="Autonomous Robotics & SLAM Engineer">Autonomous Robotics &amp; SLAM Engineer</option>
-                          <option value="AI Systems Full-Stack Developer">AI Systems Full-Stack Developer</option>
-                          <option value="Clinical AI & Healthcare Data Fellow">Clinical AI &amp; Healthcare Data Fellow</option>
-                          <option value="Visiting Research Fellow">Visiting Research Fellow</option>
+                          <option value="Software Development & AI Systems Engineer">Software Development &amp; AI Systems Engineer</option>
+                          <option value="Clinical AI & Healthcare Data Researcher">Clinical AI &amp; Healthcare Data Researcher</option>
+                          <option value="Visiting Researcher">Visiting Researcher</option>
                         </select>
                       </div>
                     </div>
@@ -423,7 +414,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                           <option value="Foundational LLMs & Urdu NLP">Foundational LLMs &amp; Urdu NLP</option>
                           <option value="Adversarial AI & Robustness">Adversarial AI &amp; Robustness</option>
                           <option value="Cyber & Security Intelligence">Cyber &amp; Security Intelligence</option>
-                          <option value="Full-Stack AI Development & Systems">Full-Stack AI Development &amp; Systems</option>
+                          <option value="Software Development & AI Systems">Software Development &amp; AI Systems</option>
                           <option value="Edge AI & Low-Power Embedded Vision">Edge AI &amp; Low-Power Embedded Vision</option>
                           <option value="Autonomous Robotics & Aerial SLAM">Autonomous Robotics &amp; Aerial SLAM</option>
                           <option value="AI Safety, Interpretability & Alignment">AI Safety, Interpretability &amp; Alignment</option>
@@ -505,10 +496,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                           <span>Submitting...</span>
                         </>
                       ) : (
-                        <>
-                          <span>Submit Application</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </>
+                        <span>Submit Application</span>
                       )}
                     </button>
                   </div>
