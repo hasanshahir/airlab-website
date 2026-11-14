@@ -131,6 +131,7 @@ export default function Home() {
     return 'carousel'
   })
   const updatesScrollRef = useRef<HTMLDivElement>(null)
+  const areasScrollRef = useRef<HTMLDivElement>(null)
 
   const handleHeroModeChange = (mode: 'carousel' | 'slideshow') => {
     setHeroMode(mode)
@@ -143,6 +144,16 @@ export default function Home() {
     if (updatesScrollRef.current) {
       const scrollAmount = 340
       updatesScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      })
+    }
+  }
+
+  const scrollAreas = (direction: 'left' | 'right') => {
+    if (areasScrollRef.current) {
+      const scrollAmount = 380
+      areasScrollRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
       })
@@ -433,15 +444,42 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 4. CORE RESEARCH AREAS (High-Contrast Clean Cards) ── */}
+      {/* ── 4. CORE RESEARCH AREAS (Single-Row Horizontal Slider with Navigation Arrows) ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
-        <div className="mb-12 border-b border-[var(--border-hairline)] pb-6 text-left">
+        <div className="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--border-hairline)] text-left">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
             Core Research Areas
           </h2>
+
+          {/* Horizontal Slider Controls (< and >) */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => scrollAreas('left')}
+              className="w-10 h-10 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              aria-label="Previous research areas"
+              title="Scroll left"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollAreas('right')}
+              className="w-10 h-10 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              aria-label="Next research areas"
+              title="Scroll right"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Single-Row Horizontal Scrollable Track */}
+        <div
+          ref={areasScrollRef}
+          className="flex gap-6 overflow-x-auto pb-6 pt-1 scrollbar-none snap-x snap-mandatory scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {coreResearchAreas.map((area, idx) => {
             const Icon = area.icon
             const targetUrl = `/projects?area=${encodeURIComponent(area.title)}`
@@ -449,7 +487,7 @@ export default function Home() {
               <div
                 key={idx}
                 onClick={() => navigate(targetUrl)}
-                className="relative overflow-hidden p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group cursor-pointer"
+                className="min-w-[310px] sm:min-w-[360px] max-w-[380px] shrink-0 snap-start relative overflow-hidden p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
               >
                 {/* Subtle low-opacity background image texture ensuring all text remains crisp and visible */}
                 <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
