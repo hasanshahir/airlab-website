@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Medal, Mail } from 'lucide-react'
+import { Medal, Mail, FileText } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
+import { getPerformers } from '../lib/data'
+import type { PerformerItem } from '../types/data'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -11,7 +13,7 @@ const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
 )
 
 export default function Performers() {
-  const [performersList, setPerformersList] = useState<any[]>([])
+  const [performersList, setPerformersList] = useState<PerformerItem[]>(() => getPerformers())
   const [activeCycleIndex, setActiveCycleIndex] = useState(0)
 
   useEffect(() => {
@@ -59,9 +61,9 @@ export default function Performers() {
         </div>
       ) : (
         <SectionReveal delay={0.2}>
-          <div className="p-8 sm:p-12 relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-4xl mx-auto transition-all duration-300 hover:border-[var(--accent-orange)]/40 text-left">
+          <div className="p-6 sm:p-10 lg:p-12 relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-5xl mx-auto transition-all duration-300 hover:border-[var(--accent-orange)]/40 text-left">
             {/* Top Banner Ribbon & Cycle Selector */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-[var(--border-hairline)] mb-8">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-[var(--border-hairline)] mb-8">
               <div className="flex flex-wrap items-center gap-2.5">
                 {/* Cycle Switcher Tabs */}
                 {performersList.map((p, idx) => (
@@ -69,7 +71,7 @@ export default function Performers() {
                     key={p.id || idx}
                     type="button"
                     onClick={() => setActiveCycleIndex(idx)}
-                    className={`px-3.5 py-1 rounded-full text-xs font-sans font-medium border transition-colors cursor-pointer ${
+                    className={`px-4 py-1.5 rounded-full text-xs font-sans font-medium border transition-colors cursor-pointer ${
                       activeCycleIndex === idx
                         ? 'bg-[var(--ink-dark)] text-white border-[var(--ink-dark)] shadow-xs'
                         : 'bg-[var(--bg-page)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-orange)]'
@@ -85,32 +87,51 @@ export default function Performers() {
               </span>
             </div>
 
-            {/* Member Profile Showcase */}
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-8">
-              {/* Clickable Portrait Image */}
-              <Link
-                to={teamRedirectUrl}
-                title={`Click to view ${featuredPerformer.name} on Team page`}
-                className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden shrink-0 border border-[var(--border-hairline)] shadow-sm group cursor-pointer bg-[var(--bg-page)] transition-transform duration-300 hover:scale-102"
-              >
-                <img
-                  src={getMemberAvatar(featuredPerformer.image)}
-                  alt={featuredPerformer.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_AVATAR
-                  }}
-                />
-              </Link>
+            {/* Member Profile Showcase with Significantly Enlarged Main Ceremony Photo */}
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 sm:gap-10 mb-8">
+              {/* Clickable Large Main Image */}
+              <div className="w-full lg:w-[460px] shrink-0">
+                <Link
+                  to={teamRedirectUrl}
+                  title={`Click to view ${featuredPerformer.name} on Team page`}
+                  className="relative block w-full aspect-[4/3] sm:h-80 lg:h-[320px] rounded-2xl sm:rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-md group cursor-pointer bg-[var(--bg-page)] transition-transform duration-300 hover:scale-[1.01]"
+                >
+                  <img
+                    src={getMemberAvatar(featuredPerformer.image)}
+                    alt={featuredPerformer.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_AVATAR
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                  <div className="absolute bottom-3.5 left-4 right-4 flex items-center justify-between text-white text-xs font-sans">
+                    <span className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full font-medium">
+                      {featuredPerformer.month}
+                    </span>
+                    <span className="bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px]">
+                      AIR Lab Awardee
+                    </span>
+                  </div>
+                </Link>
+              </div>
 
-              <div className="flex-1 space-y-3 text-center md:text-left">
+              {/* Performer Details: Name, Department, Short Description, Quick Links */}
+              <div className="flex-1 w-full space-y-4 text-left">
                 <div>
-                  <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white inline-block mb-2">
-                    {featuredPerformer.role || 'Research Scholar'}
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl font-bold font-head text-[var(--text-primary)]">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white inline-block">
+                      {featuredPerformer.role || 'Research Intern'}
+                    </span>
+                    <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--accent-orange)]/10 text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 inline-block">
+                      Spotlight Awardee
+                    </span>
+                  </div>
+
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-head text-[var(--text-primary)] tracking-tight">
                     {featuredPerformer.name}
                   </h2>
+
                   {featuredPerformer.department && (
                     <p className="text-xs sm:text-sm text-[var(--text-muted)] font-sans mt-1">
                       {featuredPerformer.department}
@@ -118,9 +139,21 @@ export default function Performers() {
                   )}
                 </div>
 
+                {/* Short Description / Research Focus */}
+                {featuredPerformer.researchFocus && (
+                  <div className="p-4 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-sm text-[var(--text-muted)] font-sans">
+                    <div className="text-xs uppercase font-semibold text-[var(--text-primary)] mb-1">
+                      Research Focus & Specialization
+                    </div>
+                    <p className="leading-relaxed font-normal">
+                      {featuredPerformer.researchFocus}
+                    </p>
+                  </div>
+                )}
+
                 {/* Research Tags */}
                 {featuredPerformer.tags && (
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 pt-1">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
                     {featuredPerformer.tags.map((tag: string, idx: number) => (
                       <span
                         key={idx}
@@ -131,6 +164,41 @@ export default function Performers() {
                     ))}
                   </div>
                 )}
+
+                {/* Action Links (LinkedIn, Resume, Email) */}
+                <div className="flex flex-wrap items-center gap-2.5 pt-2">
+                  {featuredPerformer.linkedin && (
+                    <a
+                      href={featuredPerformer.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                    >
+                      <Linkedin className="w-3.5 h-3.5" />
+                      <span>LinkedIn</span>
+                    </a>
+                  )}
+                  {(featuredPerformer.cvUrl || featuredPerformer.linkedin) && (
+                    <a
+                      href={featuredPerformer.cvUrl || featuredPerformer.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Resume</span>
+                    </a>
+                  )}
+                  {featuredPerformer.email && (
+                    <a
+                      href={`mailto:${featuredPerformer.email}`}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Email</span>
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -182,15 +250,28 @@ export default function Performers() {
                     href={featuredPerformer.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-[var(--text-primary)] hover:border-[var(--accent-orange)] transition-colors"
+                    className="p-2.5 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                    title="LinkedIn Profile"
                   >
                     <Linkedin className="w-4 h-4" />
+                  </a>
+                )}
+                {(featuredPerformer.cvUrl || featuredPerformer.linkedin) && (
+                  <a
+                    href={featuredPerformer.cvUrl || featuredPerformer.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                    title="View Resume / CV"
+                  >
+                    <FileText className="w-4 h-4" />
                   </a>
                 )}
                 {featuredPerformer.email && (
                   <a
                     href={`mailto:${featuredPerformer.email}`}
-                    className="p-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-[var(--text-primary)] hover:border-[var(--accent-orange)] transition-colors"
+                    className="p-2.5 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                    title="Send Email"
                   >
                     <Mail className="w-4 h-4" />
                   </a>
@@ -199,7 +280,7 @@ export default function Performers() {
 
               <Link
                 to={teamRedirectUrl}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white hover:bg-[var(--accent-orange)] hover:text-white transition-all inline-flex items-center justify-center gap-2 shadow-xs"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white hover:bg-[var(--accent-orange)] hover:text-white transition-all inline-flex items-center justify-center gap-2 shadow-xs cursor-pointer"
               >
                 <span>View Full Team Dossier</span>
               </Link>

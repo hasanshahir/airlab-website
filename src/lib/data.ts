@@ -4,7 +4,8 @@ import grantsData from '../data/grants.json'
 import sponsorsData from '../data/sponsors.json'
 import projectsData from '../data/projects.json'
 import publicationsData from '../data/publications.json'
-import type { Grant, Sponsor, ProjectItem, TeamMemberData, PublicationItem } from '../types/data'
+import performersData from '../data/performers.json'
+import type { Grant, Sponsor, ProjectItem, TeamMemberData, PublicationItem, PerformerItem } from '../types/data'
 
 export function getTeamMembers(): TeamMemberData[] {
   return teamData as TeamMemberData[]
@@ -40,5 +41,9 @@ export function getFinishedProjects(): ProjectItem[] {
 
 export function getPublications(): PublicationItem[] {
   return (publicationsData as PublicationItem[]).sort((a, b) => b.year - a.year)
+}
+
+export function getPerformers(): PerformerItem[] {
+  return performersData as PerformerItem[]
 }
 
