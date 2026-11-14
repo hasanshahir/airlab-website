@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" fill="none">
+    <rect width="40" height="40" x="4" y="4" rx="10" fill="#047857"/>
+    <path d="M24 14L33 22L24 30L15 22L24 14Z" fill="white"/>
+    <circle cx="24" cy="22" r="3" fill="#047857"/>
+    <text x="52" y="22" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="currentColor">HEC PAKISTAN</text>
+    <text x="52" y="35" font-family="system-ui, sans-serif" font-size="9" font-weight="500" fill="currentColor" opacity="0.7">Higher Education Comm.</text>
+  </svg>

@@ -406,39 +406,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 3. ABOUT AIR LAB SECTION (Full Bleed Deep Ink Band) ── */}
+      {/* ── 3. ABOUT AIR LAB SECTION (Two Columns: Punch Line & Lab Photo) ── */}
       <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-20 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
         <div className="max-w-[1240px] mx-auto">
-          <div className="max-w-3xl">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-white leading-tight font-head">
-              Empowering Regional AI Innovation at NED University
-            </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+            {/* Left: Punch line and about text */}
+            <div className="text-left space-y-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-head">
+                Advancing Cutting-Edge AI & Translating Innovation
+              </h2>
 
-            <p className="text-base sm:text-lg text-white/85 leading-relaxed mb-6 font-normal">
-              The Artificial Intelligence Research Lab (AIR Lab) at NED University is dedicated to pushing the boundaries of machine learning, natural language processing, and computer vision.
-            </p>
+              <p className="text-base sm:text-lg text-white/85 leading-relaxed font-normal">
+                The Artificial Intelligence Research Lab (AIR Lab) at NED University is established to advance cutting-edge artificial intelligence and translate theoretical exploration into real-world impact.
+              </p>
 
-            <p className="text-base sm:text-lg text-white/80 leading-relaxed mb-10 font-normal">
-              Our mission is to develop foundational models optimized for the region&apos;s unique linguistic and infrastructural challenges, ensuring AI benefits all segments of society.
-            </p>
+              <p className="text-base sm:text-lg text-white/80 leading-relaxed font-normal">
+                Bridging academia and industry, we develop intelligent systems that are robust, ethical, explainable, and scalable—shaping the future of AI in Pakistan.
+              </p>
 
-            <div className="pt-6 border-t border-white/15 flex flex-wrap gap-4 items-center">
-              <Button
-                to="/team"
-                variant="secondary"
-                size="md"
-                className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold"
-              >
-                Meet the Team
-              </Button>
-              <button
-                type="button"
-                onClick={() => setApplyModalOpen(true)}
-                className="h-10 px-5 rounded-full text-[13.5px] font-medium text-white hover:text-white/80 flex items-center gap-1.5 transition-colors cursor-pointer group"
-              >
-                <span>Apply for Internship</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
+              <div className="pt-4 border-t border-white/15 flex flex-wrap gap-4 items-center">
+                <Button
+                  to="/about"
+                  variant="secondary"
+                  size="md"
+                  className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
+                >
+                  <span>About AIR Lab</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Right: AIR Lab Photo */}
+            <div className="relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl aspect-[4/3] bg-white/5 group">
+              <img
+                src="/carousel-images/6530466a-3815-4434-a181-85e97c3ae385.jpg"
+                alt="AIR Lab NED University"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-4 left-4 right-4 text-white text-xs font-sans font-medium bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl inline-flex items-center justify-between border border-white/10">
+                <span>Artificial Intelligence Research Lab</span>
+                <span className="text-[var(--accent-orange)]">NED University</span>
+              </div>
             </div>
           </div>
         </div>
@@ -532,13 +543,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 5. RESEARCH PARTNERS & SPONSORS ── */}
+      {/* ── 5. TEAM SHOWCASE (Guided by faculty, driven by students, built for Pakistan) ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-head">
-            Funded by National & Global Partners
-          </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+          {/* Left Column: Team punchline & text */}
+          <div className="text-left space-y-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--text-primary)] font-head leading-tight">
+              Guided by faculty, driven by students, built for Pakistan.
+            </h2>
+
+            <p className="text-base sm:text-lg text-[var(--text-muted)] leading-relaxed font-normal">
+              Behind every system is a team that cares about Pakistan. Our interdisciplinary team brings together faculty principal investigators, research interns, and student scholars solving real problems at the forefront of artificial intelligence.
+            </p>
+
+            <div className="pt-2">
+              <Button
+                to="/team"
+                size="md"
+                className="inline-flex items-center gap-2 font-semibold"
+              >
+                <span>Meet the Team</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Right Column: Team group photo */}
+          <div className="relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-xl aspect-[4/3] bg-[var(--bg-surface)] group">
+            <img
+              src="/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg"
+              alt="AIR Lab Research Team"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute bottom-4 left-4 right-4 text-white text-xs font-sans font-medium bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl inline-flex items-center justify-between border border-white/10">
+              <span>AIR Lab Faculty & Research Cohort</span>
+              <span className="text-[var(--accent-orange)]">Department of CSIT</span>
+            </div>
+          </div>
         </div>
+      </section>
+
+      {/* ── 6. COLLABORATORS & SPONSORS ── */}
+      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
         <SponsorsGrid />
       </section>
 

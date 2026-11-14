@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" fill="none">
+    <rect width="40" height="40" x="4" y="4" rx="10" fill="#111827"/>
+    <path d="M16 24C16 19 20 15 24 15C28 15 32 19 32 24C32 27 30 31 24 31C20 31 18 28 18 28" stroke="#76B900" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="24" cy="24" r="3" fill="#76B900"/>
+    <text x="52" y="22" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="currentColor">NVIDIA</text>
+    <text x="52" y="35" font-family="system-ui, sans-serif" font-size="9" font-weight="500" fill="currentColor" opacity="0.7">Applied Research</text>
+  </svg>

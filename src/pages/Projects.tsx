@@ -372,7 +372,7 @@ export default function Projects() {
         </h1>
 
         <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-          Portfolio of foundation architectures, edge robotics pipelines, and clinical diagnostic benchmarks developed at AIR Lab.
+          From funded research to student-built systems, every project at AIR Lab is designed to solve a real problem for the people of Pakistan.
         </p>
       </div>
 

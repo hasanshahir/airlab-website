@@ -122,7 +122,7 @@ export default function Team() {
 
         <SectionReveal delay={0.16}>
           <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Faculty leads, research interns, and scholars driving foundational regional AI, computer vision, and autonomous robotics at NED University.
+            Guided by faculty, driven by students, built for Pakistan. Behind every system is a team that cares about Pakistan
           </p>
         </SectionReveal>
       </div>
@@ -251,7 +251,7 @@ export default function Team() {
                                 key={idx}
                                 className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
                               >
-                                #{t}
+                                {t.replace(/^#/, '')}
                               </span>
                             ))}
                           </div>
