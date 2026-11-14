@@ -1,1 +1,66 @@
-[]
+[
+  {
+    "id": "sindh-hec",
+    "name": "Sindh HEC",
+    "tier": "Government Grant",
+    "type": "Govt. of Sindh Higher Education Commission",
+    "url": "https://sindhhec.gov.pk/",
+    "logo": "/partners/sindh-hec.svg"
+  },
+  {
+    "id": "ned-sac",
+    "name": "NED-SAC",
+    "tier": "Research Partner",
+    "type": "NED Space Applications Center & Satellite Telemetry",
+    "url": "https://www.neduet.edu.pk/",
+    "logo": "/partners/ned-sac.svg"
+  },
+  {
+    "id": "siehs",
+    "name": "SIEHS 1122",
+    "tier": "Public Health",
+    "type": "Sindh Integrated Emergency & Health Services",
+    "url": "https://siehs.org/",
+    "logo": "/partners/siehs.svg"
+  },
+  {
+    "id": "nedaasc",
+    "name": "NEDAASC",
+    "tier": "Alumni Endowment",
+    "type": "NED Alumni Association of Southern California",
+    "url": "https://nedaasc.org/",
+    "logo": "/partners/nedaasc.svg"
+  },
+  {
+    "id": "neduet-csit",
+    "name": "NEDUET CSIT",
+    "tier": "Host Department",
+    "type": "Department of Computer Science & Information Technology",
+    "url": "https://cct.neduet.edu.pk/",
+    "logo": "/partners/neduet.svg"
+  },
+  {
+    "id": "hec-pakistan",
+    "name": "HEC Pakistan",
+    "tier": "National Council",
+    "type": "Higher Education Commission of Pakistan",
+    "url": "https://www.hec.gov.pk/",
+    "logo": "/partners/hec-pakistan.svg"
+  },
+  {
+    "id": "nvidia",
+    "name": "NVIDIA",
+    "tier": "Compute Alliances",
+    "type": "Accelerated AI Compute & Deep Learning Architectures",
+    "url": "https://www.nvidia.com/en-us/research/",
+    "logo": "/partners/nvidia.svg"
+  },
+  {
+    "id": "pytorch",
+    "name": "PyTorch",
+    "tier": "Open Ecosystem",
+    "type": "Open-Source Foundation & Deep Learning Ecosystem",
+    "url": "https://pytorch.org/",
+    "logo": "/partners/meta.svg"
+  }
+]

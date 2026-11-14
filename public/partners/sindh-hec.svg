@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" fill="none">
+    <rect width="40" height="40" x="4" y="4" rx="10" fill="#0D5C3A"/>
+    <path d="M24 12L31 24H17L24 12Z" fill="#FFD700"/>
+    <circle cx="24" cy="28" r="4" fill="white"/>
+    <text x="52" y="22" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="currentColor">SINDH HEC</text>
+    <text x="52" y="35" font-family="system-ui, sans-serif" font-size="9" font-weight="500" fill="currentColor" opacity="0.7">Govt. of Sindh</text>
+  </svg>
