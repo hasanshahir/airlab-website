@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Medal, Mail, ArrowRight } from 'lucide-react'
+import { Medal, Mail } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 
@@ -126,7 +126,7 @@ export default function Performers() {
                         key={idx}
                         className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
                       >
-                        #{tag}
+                        {String(tag).replace(/^#/, '')}
                       </span>
                     ))}
                   </div>
@@ -202,7 +202,6 @@ export default function Performers() {
                 className="w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white hover:bg-[var(--accent-orange)] hover:text-white transition-all inline-flex items-center justify-center gap-2 shadow-xs"
               >
                 <span>View Full Team Dossier</span>
-                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>

@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Menu,
   X,
-  ExternalLink,
   Mail,
   ChevronDown,
   Layers,
@@ -15,7 +14,6 @@ import {
   GraduationCap,
   Building,
   Image as GalleryIcon,
-  ArrowRight,
 } from 'lucide-react'
 import AirLabLogo from './AirLabLogo'
 import ParticleField from './ParticleField'
@@ -161,7 +159,6 @@ export default function Layout() {
               className="inline-flex items-center gap-1 text-[12px] font-sans text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors"
             >
               <span>NED University</span>
-              <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
@@ -380,19 +377,6 @@ export default function Layout() {
                       </div>
                       <div className="space-y-1">
                         <Link
-                          to="/interns"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <GraduationCap className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Fellowship Program</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Internship trajectories and application tracks
-                          </p>
-                        </Link>
-
-                        <Link
                           to="/performers"
                           className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
                         >
@@ -604,9 +588,6 @@ export default function Layout() {
                       <Link to="/team?tab=previous" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Past Interns
                       </Link>
-                      <Link to="/interns" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Fellowship Program
-                      </Link>
                       <Link to="/performers" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Performer of the Month
                       </Link>
@@ -746,7 +727,6 @@ export default function Layout() {
                 <li>
                   <Link to="/contact" className="text-white hover:text-[var(--accent-orange)] transition-colors font-semibold inline-flex items-center gap-1.5">
                     <span>Contact Us</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
                   </Link>
                 </li>
                 <li>
@@ -756,7 +736,7 @@ export default function Layout() {
                     rel="noopener noreferrer"
                     className="hover:text-white transition-colors inline-flex items-center gap-1"
                   >
-                    Department Website <ExternalLink className="w-3 h-3 text-white/40" />
+                    Department Website
                   </a>
                 </li>
                 <li>
@@ -766,16 +746,8 @@ export default function Layout() {
                     rel="noopener noreferrer"
                     className="hover:text-white transition-colors inline-flex items-center gap-1"
                   >
-                    NED University <ExternalLink className="w-3 h-3 text-white/40" />
+                    NED University
                   </a>
-                </li>
-                <li>
-                  <button
-                    onClick={() => setApplyModalOpen(true)}
-                    className="hover:text-[var(--accent-orange)] transition-colors cursor-pointer text-left text-white/90"
-                  >
-                    Apply for Internship
-                  </button>
                 </li>
                 <li>
                   <a

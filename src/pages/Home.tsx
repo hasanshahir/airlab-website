@@ -7,12 +7,10 @@ import {
   LineChart,
   Layers,
   Award,
-  ArrowRight,
   Calendar,
   ChevronLeft,
   ChevronRight,
   Cpu,
-  GraduationCap,
   ShieldAlert,
   ShieldCheck,
   Terminal,
@@ -41,13 +39,13 @@ const recentUpdates = [
   },
   {
     id: 'update-2',
-    category: 'Fellowships',
-    date: 'Admissions Open',
-    title: 'Fall 2026 Student Research Fellowships Open',
-    desc: 'Funded fellowship positions open for graduate and undergraduate scholars in edge AI, vision odometry, and TinyML acceleration.',
-    actionType: 'apply',
-    actionText: 'Apply for Vacancy',
-    icon: GraduationCap,
+    category: 'Space & Cyber AI',
+    date: 'Funded Initiative',
+    title: 'NED-SAC Satellite Telemetry & Autonomous Perception',
+    desc: 'Developing onboard edge intelligence and automated anomaly detection for satellite telemetry streams with NED-SAC.',
+    link: '/projects#PRJ-NED-SAC',
+    actionText: 'Explore Project',
+    icon: ShieldCheck,
   },
   {
     id: 'update-3',
@@ -102,7 +100,7 @@ const coreResearchAreas = [
   },
   {
     icon: Terminal,
-    title: 'Development',
+    title: 'Software Development',
     image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80',
     desc: 'High-performance AI engineering, production-grade microservices, scalable distributed inference pipelines, and intelligent software systems.',
   },
@@ -167,12 +165,12 @@ export default function Home() {
         {heroMode === 'carousel' ? (
           <TiltedGridHero
             images={HERO_CAROUSEL_IMAGES}
-            tileHeight={48}
+            tileHeight={56}
             speed={6}
             axis={50}
             gap={4}
             curve={72}
-            className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+            className="h-[520px] sm:h-[640px] md:h-[720px] w-full bg-transparent"
           >
             <div className="relative z-10 flex h-full w-full max-w-4xl mx-auto flex-col items-center justify-center px-6 text-center">
               {/* Soft, edge-less shadow behind the text only (carousel photos remain 100% full brightness) */}
@@ -204,7 +202,6 @@ export default function Home() {
                 >
                   <Layers className="w-4 h-4 shrink-0" />
                   <span>Explore Projects</span>
-                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
                 </Link>
               </div>
             </div>
@@ -238,7 +235,6 @@ export default function Home() {
                   >
                     <Layers className="w-4 h-4 shrink-0" />
                     <span>Explore Projects</span>
-                    <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
                   </Link>
                 </div>
               </div>
@@ -253,7 +249,7 @@ export default function Home() {
               to="/projects"
               className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
             >
-              All Projects &rarr;
+              All Projects
             </Link>
             <span className="text-[var(--border-hairline)]">•</span>
             <Link
@@ -261,14 +257,14 @@ export default function Home() {
               className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
             >
               <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-              Active Grants &rarr;
+              Active Grants
             </Link>
             <span className="text-[var(--border-hairline)]">•</span>
             <Link
               to="/team"
               className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
             >
-              All Team Members &rarr;
+              All Team Members
             </Link>
           </div>
 
@@ -381,24 +377,12 @@ export default function Home() {
                   <span className="text-[11px] text-[var(--text-subtle)] font-medium">
                     {item.category}
                   </span>
-                  {item.actionType === 'apply' ? (
-                    <button
-                      type="button"
-                      onClick={() => setApplyModalOpen(true)}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                    >
-                      <span>{item.actionText}</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  ) : (
-                    <Link
-                      to={item.link!}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline group-hover:translate-x-0.5 transition-transform"
-                    >
-                      <span>{item.actionText}</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  )}
+                  <Link
+                    to={item.link!}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline transition-colors"
+                  >
+                    <span>{item.actionText}</span>
+                  </Link>
                 </div>
               </article>
             )
@@ -406,12 +390,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 3. ABOUT AIR LAB SECTION (Two Columns: Punch Line & Lab Photo) ── */}
-      <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-20 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
-        <div className="max-w-[1240px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+      {/* ── 3. ABOUT AIR LAB SECTION (Two Columns: Punch Line & Bigger Lab Photo) ── */}
+      <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-24 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
+        <div className="max-w-[1320px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             {/* Left: Punch line and about text */}
-            <div className="text-left space-y-6">
+            <div className="lg:col-span-5 text-left space-y-6">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-head">
                 Advancing Cutting-Edge AI & Translating Innovation
               </h2>
@@ -432,17 +416,16 @@ export default function Home() {
                   className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
                 >
                   <span>About AIR Lab</span>
-                  <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
 
-            {/* Right: AIR Lab Photo */}
-            <div className="relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl aspect-[4/3] bg-white/5 group">
+            {/* Right: Bigger AIR Lab Photo */}
+            <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group">
               <img
                 src="/carousel-images/6530466a-3815-4434-a181-85e97c3ae385.jpg"
                 alt="AIR Lab NED University"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
@@ -455,7 +438,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 4. CORE RESEARCH AREAS (Single-Row Horizontal Slider with Navigation Arrows) ── */}
+      {/* ── 4. CORE RESEARCH AREAS (Single-Row Horizontal Slider with Single "See Projects" Button) ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
         <div className="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--border-hairline)] text-left">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
@@ -526,28 +509,28 @@ export default function Home() {
                     {area.desc}
                   </p>
                 </div>
-
-                <div className="relative z-10 pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans font-medium text-[var(--accent-orange)]">
-                  <Link
-                    to={targetUrl}
-                    onClick={e => e.stopPropagation()}
-                    className="inline-flex items-center gap-1.5 hover:underline font-semibold"
-                  >
-                    <span>View Projects</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
               </div>
             )
           })}
         </div>
+
+        {/* Single "See Projects" Button */}
+        <div className="mt-8 flex justify-center sm:justify-start">
+          <Button
+            to="/projects"
+            size="md"
+            className="inline-flex items-center gap-2 font-semibold px-7"
+          >
+            <span>See Projects</span>
+          </Button>
+        </div>
       </section>
 
       {/* ── 5. TEAM SHOWCASE (Guided by faculty, driven by students, built for Pakistan) ── */}
-      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+      <section className="py-16 sm:py-24 px-6 sm:px-10 max-w-[1320px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Column: Team punchline & text */}
-          <div className="text-left space-y-6">
+          <div className="lg:col-span-5 text-left space-y-6">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--text-primary)] font-head leading-tight">
               Guided by faculty, driven by students, built for Pakistan.
             </h2>
@@ -563,17 +546,16 @@ export default function Home() {
                 className="inline-flex items-center gap-2 font-semibold"
               >
                 <span>Meet the Team</span>
-                <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
-          {/* Right Column: Team group photo */}
-          <div className="relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-xl aspect-[4/3] bg-[var(--bg-surface)] group">
+          {/* Right Column: Bigger Team group photo */}
+          <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-[var(--bg-surface)] group">
             <img
               src="/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg"
               alt="AIR Lab Research Team"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent pointer-events-none" />

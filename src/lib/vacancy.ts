@@ -13,12 +13,11 @@ export interface VacancySettings {
 
 export const DEFAULT_VACANCY_SETTINGS: VacancySettings = {
   status: 'Open',
-  badge: 'FELLOWSHIP & INTERNSHIP ADMISSIONS',
-  title: 'Apply for Research Vacancy',
-  description:
-    'Department of CSIT · NED University. Work directly with faculty on LLMs, edge perception, and robotics testbeds.',
-  ribbonLabel: 'Applications Open:',
-  ribbonText: 'Student Research Internship & Fellowship Vacancies Open for Fall 2026 — NEDUET CSIT',
+  badge: 'AIR LAB APPLICATIONS',
+  title: 'Application Form',
+  description: '',
+  ribbonLabel: 'AIR Lab NED:',
+  ribbonText: 'Advancing Sovereign AI, Foundational Models, Cyber Defense, and Edge Systems for Pakistan — Department of CSIT, NED University',
   closedMessage:
     'Applications are currently closed. Please check back soon or follow our updates for the next intake.',
 }

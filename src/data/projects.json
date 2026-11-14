@@ -39,7 +39,7 @@
       "Foundational Models & NLP",
       "Efficient Computing & TinyML",
       "Cyber",
-      "Development"
+      "Software Development"
     ],
     "description": "This project proposes a locally hosted, web-based research assistant for NED UET that uses small language models to summarize papers, compare them thematically and methodologically, and help draft new papers with LaTeX support. Because everything runs on campus hardware, unpublished research never leaves the institution, which avoids the privacy and IP risks of cloud LLMs while still delivering competitive quality.",
     "funding": "Departmental / Self-Funded",
@@ -99,7 +99,7 @@
     "status": "Ongoing",
     "areas": [
       "Foundational Models & NLP",
-      "Development",
+      "Software Development",
       "Efficient Computing & TinyML"
     ],
     "description": "Naqshkaar is an AI interior design platform for Pakistan that generates 3D room designs from a real catalogue of purchasable local products, scaled to true room dimensions and checked against space and budget limits. Unlike tools such as Planner 5D or RoomGPT, it uses PKR prices, accounts for local needs like ceiling-fan clearance, AC and UPS placement, and prayer space, and lets users pick each item from AI-shortlisted options. The result is a design they can visualize and buy, with an itemised cost estimate and direct purchase links.",
@@ -130,7 +130,7 @@
     "areas": [
       "Cyber",
       "Efficient Computing & TinyML",
-      "Development",
+      "Software Development",
       "AI Safety & Alignment"
     ],
     "description": "Funded research initiative in collaboration with NED Space Applications Center (NED-SAC) focused on autonomous satellite telemetry anomaly detection, on-orbit sensor calibration, and edge perception models for space payload analytics.",
@@ -163,7 +163,7 @@
       "Foundational Models & NLP",
       "Cyber",
       "AI Safety & Alignment",
-      "Development"
+      "Software Development"
     ],
     "description": "This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.",
     "funding": "GOVERNMENT OF SINDH SINDH HIGHER EDUCATION COMMISSION",
@@ -192,7 +192,7 @@
     "status": "Ongoing",
     "areas": [
       "Cyber",
-      "Development",
+      "Software Development",
       "Foundational Models & NLP",
       "Adversarial AI"
     ],
@@ -222,7 +222,7 @@
     "category": "Undergraduate",
     "status": "Finished",
     "areas": [
-      "Development",
+      "Software Development",
       "Cyber",
       "Adversarial AI",
       "Foundational Models & NLP"
@@ -254,7 +254,7 @@
     "areas": [
       "Foundational Models & NLP",
       "Efficient Computing & TinyML",
-      "Development",
+      "Software Development",
       "AI Safety & Alignment"
     ],
     "description": "This project builds a fully offline, locally run voice agent that automates post-ambulance feedback calls for emergency medical services (SIEHS). Manual feedback collection is costly and ties up call agents who should be available for emergencies, and keeping everything local protects patient privacy.",
@@ -283,7 +283,7 @@
     "category": "Undergraduate",
     "status": "Finished",
     "areas": [
-      "Development",
+      "Software Development",
       "Cyber",
       "Foundational Models & NLP"
     ],
@@ -313,7 +313,7 @@
     "status": "Finished",
     "areas": [
       "Foundational Models & NLP",
-      "Development",
+      "Software Development",
       "AI Safety & Alignment"
     ],
     "description": "The Intelligent Travel Agent is an AI platform from NED University of Engineering and Technology (NEDUET) that automates family holiday planning in Pakistan. Planning a trip today means manually comparing many separate sources for tickets, hotels, activities, weather and road conditions. That is stressful, slow and risky, and families often miss better budget options or end up paying for traditional tour guides.",

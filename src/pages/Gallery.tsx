@@ -1,25 +1,61 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Maximize2 } from 'lucide-react'
 import rawGallery from '../data/gallery.json'
 import type { GalleryItem } from '../types/data'
+import SectionReveal from '../components/ui/SectionReveal'
 
 const galleryData = rawGallery as unknown as GalleryItem[]
-import SectionReveal from '../components/ui/SectionReveal'
+
+const GALLERY_FILTERS = ['All', 'Visit', 'Session', 'Mentoring', 'Laboratory'] as const
+type GalleryFilter = (typeof GALLERY_FILTERS)[number]
+
+function normalizeGalleryCategory(cat?: string, title?: string): Exclude<GalleryFilter, 'All'> {
+  const c = (cat || '').trim().toLowerCase()
+  const t = (title || '').trim().toLowerCase()
+  if (c === 'visit' || c.includes('visit') || c.includes('campus') || c.includes('ceremony') || c.includes('performer')) {
+    return 'Visit'
+  }
+  if (c === 'session' || c.includes('session') || c.includes('sprint') || c.includes('student')) {
+    return 'Session'
+  }
+  if (c === 'mentoring' || c.includes('mentor') || c.includes('academic') || c.includes('review') || c.includes('sync') || t.includes('mentor') || t.includes('review') || t.includes('sync')) {
+    return 'Mentoring'
+  }
+  if (c === 'laboratory' || c.includes('lab') || c.includes('compute') || c.includes('hardware')) {
+    return 'Laboratory'
+  }
+  return 'Laboratory'
+}
 
 export default function Gallery() {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => galleryData)
+  const [activeFilter, setActiveFilter] = useState<GalleryFilter>('All')
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null)
 
   useEffect(() => {
     fetch('/api/content/gallery')
       .then(r => r.ok ? r.json() : [])
       .then(d => {
-        if (Array.isArray(d) && d.length > 0) setGalleryItems(d)
+        if (Array.isArray(d) && d.length > 0) {
+          setGalleryItems(
+            d.map((item: GalleryItem) => ({
+              ...item,
+              cat: normalizeGalleryCategory(item.cat, item.title),
+            }))
+          )
+        }
       })
       .catch(() => {})
   }, [])
+
+  const filteredItems = useMemo(() => {
+    if (activeFilter === 'All') return galleryItems
+    return galleryItems.filter(
+      item => normalizeGalleryCategory(item.cat, item.title) === activeFilter
+    )
+  }, [galleryItems, activeFilter])
 
   // Safe scroll lock for lightbox modal
   useEffect(() => {
@@ -42,7 +78,7 @@ export default function Gallery() {
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
-      <div className="mb-14 text-left max-w-3xl">
+      <div className="mb-10 text-left max-w-3xl">
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
             Laboratory Gallery & Media
@@ -51,50 +87,82 @@ export default function Gallery() {
 
         <SectionReveal delay={0.16}>
           <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Visual documentation of supercomputer commissioning, outdoor drone flight trials, hardware prototyping, and hackathons.
+            Visual documentation of laboratory infrastructure, mentoring sessions, technical sprints, and campus visits.
           </p>
         </SectionReveal>
       </div>
 
+      {/* Category Filter Pills */}
+      <div className="mb-10 flex flex-wrap items-center gap-2.5 text-left">
+        {GALLERY_FILTERS.map(filter => {
+          const isActive = activeFilter === filter
+          return (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => setActiveFilter(filter)}
+              className={`h-10 px-5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer border ${
+                isActive
+                  ? 'bg-[var(--accent-orange)] text-white border-[var(--accent-orange)] shadow-sm'
+                  : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {filter}
+            </button>
+          )
+        })}
+      </div>
+
       {/* Image Grid with 24px Rounded Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 auto-rows-[300px] gap-6 text-left">
-        {galleryItems.length === 0 ? (
+        {filteredItems.length === 0 ? (
           <div className="col-span-full text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-            <p className="text-sm font-sans text-[var(--text-muted)]">No media or gallery items published yet.</p>
+            <p className="text-sm font-sans text-[var(--text-muted)]">No media items found in this category.</p>
           </div>
-        ) : galleryItems.map((item, i) => (
-          <div
-            key={item.id}
-            className={`${item.span || ''} h-full`}
-          >
-            <div
-              onClick={() => setSelectedImage(item)}
-              className="h-full relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer group shadow-sm hover:border-[var(--accent-orange)]/50 hover:shadow-lg transition-all duration-300"
-              style={{ transitionDelay: `${i * 30}ms` }}
-            >
-              <img
-                src={item.url}
-                alt={item.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+        ) : (
+          filteredItems.map((item, i) => {
+            const categoryBadge = normalizeGalleryCategory(item.cat, item.title)
+            return (
+              <div
+                key={item.id}
+                className={`${activeFilter === 'All' ? item.span || '' : 'sm:col-span-1'} h-full`}
+              >
+                <div
+                  onClick={() => setSelectedImage(item)}
+                  className="h-full relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer group shadow-sm hover:border-[var(--accent-orange)]/50 hover:shadow-lg transition-all duration-300"
+                  style={{ transitionDelay: `${i * 30}ms` }}
+                >
+                  <img
+                    src={item.url}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
 
-              <div className="absolute top-4 right-4 pointer-events-none">
-                <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center shadow-xs">
-                  <Maximize2 className="w-3.5 h-3.5" />
-                </span>
-              </div>
+                  <div className="absolute top-4 left-4 pointer-events-none">
+                    <span className="px-3 py-1 rounded-full bg-black/55 text-white text-[11px] font-semibold backdrop-blur-sm border border-white/15">
+                      {categoryBadge}
+                    </span>
+                  </div>
 
-              <div className="absolute bottom-5 left-5 right-5 pointer-events-none">
-                <h3 className="text-base sm:text-lg font-semibold font-head text-white leading-tight mb-1">
-                  {item.title}
-                </h3>
-                <p className="text-xs text-white/80 line-clamp-1">{item.desc}</p>
+                  <div className="absolute top-4 right-4 pointer-events-none">
+                    <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center shadow-xs">
+                      <Maximize2 className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-5 left-5 right-5 pointer-events-none">
+                    <h3 className="text-base sm:text-lg font-semibold font-head text-white leading-tight mb-1">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-white/80 line-clamp-1">{item.desc}</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            )
+          })
+        )}
       </div>
 
       {/* Lightbox Modal rendered via Portal */}

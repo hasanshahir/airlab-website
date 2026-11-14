@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Copy, Check, Award, FileText, Download, ExternalLink, Search, Clock, ArrowRight } from 'lucide-react'
+import { Copy, Check, Award, FileText, Download, Search, Clock } from 'lucide-react'
 import { getPublications } from '../lib/data'
 import SectionReveal from '../components/ui/SectionReveal'
 
@@ -36,7 +36,7 @@ const labBlogs = [
 
 export default function Publications() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [copiedId, setCopiedId] = useState<number | null>(null)
+  const [copiedId, setCopiedId] = useState<string | number | null>(null)
 
   const [pubData, setPubData] = useState<any[]>(() => getPublications())
 
@@ -44,7 +44,7 @@ export default function Publications() {
     fetch('/api/content/publications')
       .then(r => r.ok ? r.json() : [])
       .then(d => {
-        if (Array.isArray(d)) setPubData(d)
+        if (Array.isArray(d) && d.length > 0) setPubData(d)
       })
       .catch(() => { })
   }, [])
@@ -52,20 +52,29 @@ export default function Publications() {
   // Enforce sorted order: recent papers at top (descending by year, then by id)
   const sortedPublications = useMemo(() => {
     return [...pubData].sort((a, b) => {
-      if (b.year !== a.year) return b.year - a.year
-      return b.id - a.id
+      const yearA = Number(a.year) || 0
+      const yearB = Number(b.year) || 0
+      if (yearB !== yearA) return yearB - yearA
+      return String(b.id || '').localeCompare(String(a.id || ''))
     })
   }, [pubData])
 
   const filtered = useMemo(() => {
     if (!searchQuery.trim()) return sortedPublications
     const q = searchQuery.toLowerCase()
-    return sortedPublications.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      p.authors.toLowerCase().includes(q) ||
-      p.venue.toLowerCase().includes(q) ||
-      (p.tags && p.tags.some((t: string) => t.toLowerCase().includes(q)))
-    )
+    return sortedPublications.filter(p => {
+      const tagsList = Array.isArray(p.tags)
+        ? p.tags
+        : typeof p.tags === 'string'
+        ? p.tags.split(',').map((s: string) => s.trim()).filter(Boolean)
+        : []
+      return (
+        (p.title || '').toLowerCase().includes(q) ||
+        (p.authors || '').toLowerCase().includes(q) ||
+        (p.venue || '').toLowerCase().includes(q) ||
+        tagsList.some((t: string) => t.toLowerCase().includes(q))
+      )
+    })
   }, [sortedPublications, searchQuery])
 
   const copyBibtex = (p: typeof pubData[0]) => {
@@ -193,7 +202,7 @@ export default function Publications() {
                             key={idx}
                             className="px-3 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
                           >
-                            #{tag}
+                            {String(tag).replace(/^#/, '')}
                           </span>
                         ))}
                       </div>
@@ -210,7 +219,6 @@ export default function Publications() {
                         className="h-9 px-4 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                       >
                         <span>Read Paper</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     )}
 
@@ -299,7 +307,7 @@ export default function Publications() {
                       key={tag}
                       className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] font-medium"
                     >
-                      #{tag}
+                      {tag.replace(/^#/, '')}
                     </span>
                   ))}
                 </div>
@@ -309,9 +317,8 @@ export default function Publications() {
                 <span className="text-xs font-semibold text-[var(--text-primary)]">
                   {blog.author}
                 </span>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:translate-x-1 transition-transform">
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] transition-colors">
                   <span>Read Notes</span>
-                  <ArrowRight className="w-3 h-3" />
                 </span>
               </div>
             </article>
