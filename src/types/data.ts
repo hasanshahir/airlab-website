@@ -34,6 +34,7 @@ export interface ProjectItem {
   grantSupplier?: string
   grantAmount?: string
   pi?: string
+  industryAdvisor?: string
   funderUrl?: string
   teamMembers?: string[]
   timeTaken?: string

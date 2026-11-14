@@ -129,6 +129,7 @@ export const collections = [
       grantSupplier: { type: 'string' },
       grantAmount: { type: 'string' },
       pi: { type: 'string', label: 'Principal Investigator' },
+      industryAdvisor: { type: 'string', label: 'Industry Advisor' },
       funderUrl: { type: 'url' },
       timeTaken: { type: 'string' },
       startDate: { type: 'date' },

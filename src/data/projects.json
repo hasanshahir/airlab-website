@@ -1,7 +1,7 @@
 [
   {
     "id": "PRJ-7",
-    "title": "Familiar: Quality-Aware Face Recognition System for Pakistani Subjects",
+    "title": "Familiar: A Quality-Aware Face Recognition System for Pakistani Subjects",
     "category": "Undergraduate",
     "status": "Ongoing",
     "areas": [
@@ -10,24 +10,32 @@
       "Efficient Computing & TinyML",
       "AI Safety & Alignment"
     ],
-    "description": "This project builds a quality-aware face retrieval system for Pakistani subjects, using face embeddings and a two-stage search: fast vector indexing to shortlist candidates, then AI-based refinement of the Top-K matches. It aims to stay accurate under challenging conditions like blur, low resolution, pose, lighting, glasses and facial hair, while remaining efficient on large databases. The prototype is intended for authorized uses such as searching campus camera footage, with humans making the final decision.",
+    "description": "An indigenous quality-aware face retrieval framework designed specifically for Pakistani subjects to mitigate demographic bias and surveillance-induced quality degradation. The system investigates pre-trained and domain-adapted deep feature embeddings (AdaFace, MagFace, and ArcFace baseline) across unconstrained camera conditions including severe motion blur, low resolution, varying illumination, facial hair, and glasses. Scalable sub-linear retrieval is achieved through Hierarchical Navigable Small World (HNSW) vector indexing, augmented by a secondary AI-driven attribute conditioning stage with human-in-the-loop candidate verification.",
     "funding": "Departmental / Self-Funded",
     "grantSupplier": "",
     "grantAmount": "",
-    "pi": "",
+    "pi": "Dr. Murk Marvi",
     "funderUrl": "",
-    "timeTaken": "Aug 2026",
+    "timeTaken": "AUG 2026 – MAY 2027",
     "startDate": "Aug 2026",
-    "coverImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80",
+    "endDate": "May 2027",
+    "coverImage": "/projects/familiar.jpg",
     "images": [
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
+      "/projects/familiar.jpg"
+    ],
+    "teamMembers": [
+      "Muhammad Obaid",
+      "Akhyar Ahmed Turk",
+      "Muhammad Rehan",
+      "Qazi Asim Kamal"
     ],
     "tags": [
       "Biometrics",
       "Face Recognition",
       "Pakistani Demographics",
       "Vector Indexing",
-      "Computer Vision"
+      "Domain-Adaptive Deep Learning",
+      "HNSW"
     ]
   },
   {
@@ -102,24 +110,98 @@
       "Software Development",
       "Efficient Computing & TinyML"
     ],
-    "description": "Naqshkaar is an AI interior design platform for Pakistan that generates 3D room designs from a real catalogue of purchasable local products, scaled to true room dimensions and checked against space and budget limits. Unlike tools such as Planner 5D or RoomGPT, it uses PKR prices, accounts for local needs like ceiling-fan clearance, AC and UPS placement, and prayer space, and lets users pick each item from AI-shortlisted options. The result is a design they can visualize and buy, with an itemised cost estimate and direct purchase links.",
+    "description": "An AI-assisted system that transforms room dimensions, style preferences and budgets into interactive 3D interior designs. It combines Pakistani product catalogues, true-scale furniture placement and spatial constraint checks with itemised PKR cost estimates and direct product links.",
     "funding": "Departmental / Self-Funded",
     "grantSupplier": "",
     "grantAmount": "",
-    "pi": "",
+    "pi": "Dr. Murk Marvi",
+    "industryAdvisor": "Muzammil Jethwa (Senior Solutions Engineer, Mazik Global)",
     "funderUrl": "",
-    "timeTaken": "Aug 2026",
-    "startDate": "Aug 2026",
-    "coverImage": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
+    "timeTaken": "SEPT-2026 to JUN-2027",
+    "startDate": "Sept 2026",
+    "endDate": "Jun 2027",
+    "coverImage": "/projects/naqshkaar.jpg",
     "images": [
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80"
+      "/projects/naqshkaar.jpg"
+    ],
+    "teamMembers": [
+      "Mureed Hussain",
+      "Muhammad Sameed",
+      "Faiq Ahmed",
+      "Muhammad Sami"
     ],
     "tags": [
       "3D Interior Design",
       "Generative AI",
       "Multimodal AI",
       "PKR Catalogue",
-      "Spatial Constraints"
+      "Spatial Constraints",
+      "Mazik Global"
+    ]
+  },
+  {
+    "id": "PRJ-11",
+    "title": "CORTEX — Cognitive Retrieval with Tiered Expansion",
+    "category": "Undergraduate",
+    "status": "Ongoing",
+    "areas": [
+      "Foundational Models & NLP",
+      "Software Development",
+      "Efficient Computing & TinyML",
+      "Cyber"
+    ],
+    "description": "CORTEX is a modular, tiered memory architecture for large language models (LLMs) designed to improve retrieval efficiency and optimize long-term memory storage. It organizes information across multiple memory tiers, enabling relevant information to be retrieved, updated, consolidated, and forgotten intelligently.",
+    "funding": "Departmental / Self-Funded",
+    "grantSupplier": "",
+    "grantAmount": "",
+    "pi": "Dr. Murk Marvi",
+    "industryAdvisor": "N/A",
+    "funderUrl": "",
+    "timeTaken": "2026 — 2027",
+    "startDate": "Aug 2026",
+    "coverImage": "/projects/cortex.jpg",
+    "images": [
+      "/projects/cortex.jpg"
+    ],
+    "tags": [
+      "LLMs",
+      "Memory Architecture",
+      "Cognitive Retrieval",
+      "Tiered Memory",
+      "Memory Manager",
+      "Vector Search"
+    ]
+  },
+  {
+    "id": "PRJ-12",
+    "title": "Taleem-e-Aam (Model-Craft)",
+    "category": "Undergraduate",
+    "status": "Ongoing",
+    "areas": [
+      "Foundational Models & NLP",
+      "Software Development",
+      "AI Safety & Alignment"
+    ],
+    "description": "Taleem-e-Aam is an AI-powered educational project that adapts a small, open-source language model to improve Urdu understanding and address the linguistic and cultural needs of Pakistani students. Using efficient fine-tuning techniques such as LoRA/QLoRA and reinforcement learning, the project aims to develop an educational application that provides accessible, accurate, and contextually relevant Urdu-based learning support.",
+    "funding": "Departmental / Self-Funded",
+    "grantSupplier": "",
+    "grantAmount": "",
+    "pi": "Dr. Murk Marvi",
+    "industryAdvisor": "N/A",
+    "funderUrl": "",
+    "timeTaken": "2026 — 2027",
+    "startDate": "Aug 2026",
+    "coverImage": "/projects/taleem-e-aam.jpg",
+    "images": [
+      "/projects/taleem-e-aam.jpg"
+    ],
+    "tags": [
+      "Urdu NLP",
+      "Educational AI",
+      "LoRA / QLoRA",
+      "SLM",
+      "Reinforcement Learning",
+      "Model-Craft"
     ]
   },
   {
