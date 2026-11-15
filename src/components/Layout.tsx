@@ -486,16 +486,8 @@ export default function Layout() {
             </NavLink>
           </nav>
 
-          {/* Right Action CTA: Inquiries & Apply Now */}
+          {/* Right Action CTA: Apply Now */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            <Link
-              to="/contact"
-              className="hidden xl:inline-flex text-[13.5px] font-medium text-[var(--text-muted)] hover:text-[var(--accent-orange)] transition-colors items-center gap-1.5 px-3 py-1.5 rounded-full"
-            >
-              <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-              <span>Inquiries</span>
-            </Link>
-
             <button
               onClick={() => setApplyModalOpen(true)}
               className="inline-flex items-center justify-center h-10 px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-semibold tracking-tight transition-all duration-150 cursor-pointer shadow-sm active:translate-y-[1px]"
