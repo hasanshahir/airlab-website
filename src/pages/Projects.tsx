@@ -476,9 +476,6 @@ export default function Projects() {
                       <span className="px-3 py-1 rounded-full bg-[var(--accent-orange)] text-white text-[11px] font-sans font-semibold">
                         {selectedProject.status}
                       </span>
-                      <span className="text-xs font-sans text-[var(--text-muted)]">
-                        airlab.neduet.edu.pk/projects/{selectedProject.id}
-                      </span>
                     </div>
 
                     <button
@@ -492,36 +489,34 @@ export default function Projects() {
 
                   <div className="p-6 sm:p-8 overflow-y-auto flex-1">
                     {/* Image Gallery Viewer */}
-                    {selectedProject.images && selectedProject.images.length > 0 && (
-                      <div className="mb-6">
-                        <div className="h-64 sm:h-80 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] border border-[var(--border-hairline)] mb-3">
-                          <img
-                            src={getProjectCover(selectedProject.images[activeGalleryIndex] || selectedProject.coverImage)}
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_PROJECT_COVER
-                            }}
-                            alt={`${selectedProject.title} preview ${activeGalleryIndex + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        {selectedProject.images.length > 1 && (
-                          <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
-                            {selectedProject.images.map((img, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => setActiveGalleryIndex(idx)}
-                                className={`w-20 h-14 rounded-xl overflow-hidden border shrink-0 transition-all cursor-pointer ${activeGalleryIndex === idx
-                                    ? 'border-[var(--accent-orange)] ring-2 ring-[var(--accent-orange)]'
-                                    : 'border-[var(--border-hairline)] opacity-60 hover:opacity-100'
-                                  }`}
-                              >
-                                <img src={img} alt="thumb" className="w-full h-full object-cover" />
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                    <div className="mb-6">
+                      <div className="h-64 sm:h-80 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] border border-[var(--border-hairline)] mb-3">
+                        <img
+                          src={getProjectCover(selectedProject.images?.[activeGalleryIndex] || selectedProject.coverImage)}
+                          onError={(e) => {
+                            e.currentTarget.src = DEFAULT_PROJECT_COVER
+                          }}
+                          alt={`${selectedProject.title} preview ${activeGalleryIndex + 1}`}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    )}
+                      {selectedProject.images && selectedProject.images.length > 1 && (
+                        <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
+                          {selectedProject.images.map((img, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setActiveGalleryIndex(idx)}
+                              className={`w-20 h-14 rounded-xl overflow-hidden border shrink-0 transition-all cursor-pointer ${activeGalleryIndex === idx
+                                  ? 'border-[var(--accent-orange)] ring-2 ring-[var(--accent-orange)]'
+                                  : 'border-[var(--border-hairline)] opacity-60 hover:opacity-100'
+                                }`}
+                            >
+                              <img src={img} alt="thumb" className="w-full h-full object-cover" />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
                     <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-3 font-head">
                       {selectedProject.title}
@@ -552,25 +547,12 @@ export default function Projects() {
                       </div>
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">STATUS</span>
-                        <span className="font-semibold text-[var(--accent-orange)]">{selectedProject.status} Review</span>
+                        <span className="font-semibold text-[var(--accent-orange)]">{selectedProject.status}</span>
                       </div>
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">PROJECT CATEGORY</span>
                         <span className="font-semibold text-[var(--text-primary)]">{selectedProject.category}</span>
                       </div>
-                      {selectedProject.funderUrl && (
-                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                          <span className="text-[var(--text-subtle)] block mb-1">SPONSOR WEBSITE</span>
-                          <a
-                            href={selectedProject.funderUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[var(--ink-dark)] hover:underline font-semibold flex items-center gap-1"
-                          >
-                            <span>Visit Website</span>
-                          </a>
-                        </div>
-                      )}
                     </div>
 
                     {/* ── Group Members Section ── */}
