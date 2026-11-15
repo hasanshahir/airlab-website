@@ -9,6 +9,16 @@ import TitleReveal from '../components/ui/TitleReveal'
 const GALLERY_FILTERS = ['All', 'Visit', 'Session', 'Mentoring', 'Lab'] as const
 type GalleryFilter = (typeof GALLERY_FILTERS)[number]
 
+const BENTO_SPANS = [
+  'sm:col-span-2',
+  'sm:col-span-1',
+  'sm:col-span-1',
+  'sm:col-span-2',
+  'sm:col-span-1',
+  'sm:col-span-1',
+  'sm:col-span-1',
+] as const
+
 interface GalleryPhotoCard {
   key: string
   title: string
@@ -185,7 +195,7 @@ export default function Gallery() {
       </div>
 
       {/* Image Grid with 24px Rounded Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 auto-rows-[300px] gap-6 text-left">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 grid-flow-dense auto-rows-[300px] gap-6 text-left">
         {loading ? (
           Array.from({ length: 6 }).map((_, idx) => (
             <div
@@ -205,7 +215,7 @@ export default function Gallery() {
           filteredCards.map((card, i) => (
             <div
               key={card.key}
-              className={`${activeFilter === 'All' ? card.span || '' : 'sm:col-span-1'} h-full`}
+              className={`${card.span || BENTO_SPANS[i % BENTO_SPANS.length]} h-full`}
             >
               <div
                 onClick={() => setSelectedIndex(i)}
