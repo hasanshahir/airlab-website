@@ -18,8 +18,8 @@ export const SponsorsGrid: React.FC = () => {
         </div>
       </div>
 
-      {/* Logos-only circular cards with responsive centered layout */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 justify-items-center items-center">
+      {/* Logos-only circular cards centered with tighter spacing */}
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 md:gap-6 max-w-3xl mx-auto">
         {sponsors.map(sponsor => (
           <a
             key={sponsor.id}
@@ -28,13 +28,13 @@ export const SponsorsGrid: React.FC = () => {
             rel="noopener noreferrer"
             title={sponsor.name}
             aria-label={sponsor.name}
-            className="group relative w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/60 hover:shadow-xl transition-all duration-300 flex items-center justify-center cursor-pointer hover:-translate-y-1.5 hover:scale-105 p-6 shadow-xs overflow-hidden"
+            className="group relative w-28 h-28 sm:w-34 sm:h-34 md:w-36 md:h-36 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/60 hover:shadow-xl transition-all duration-300 flex items-center justify-center cursor-pointer hover:-translate-y-1.5 hover:scale-105 p-5 sm:p-6 shadow-xs overflow-hidden shrink-0"
           >
             {sponsor.logo ? (
               <img
                 src={sponsor.logo}
                 alt={`${sponsor.name} logo`}
-                className="max-h-16 sm:max-h-20 max-w-[78%] w-auto object-contain filter grayscale opacity-85 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-108 transition-all duration-300"
+                className="max-h-14 sm:max-h-18 max-w-[78%] w-auto object-contain transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
               />
             ) : (
