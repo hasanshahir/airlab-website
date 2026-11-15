@@ -46,15 +46,20 @@ contentRouter.get('/:slug', async (req, res) => {
   }
 
   // If database collection is currently empty or unavailable, serve fallback seed data from src/data/*.json
-  // (projects and previous-interns are served strictly from the database / admin panel)
-  if (req.params.slug !== 'projects' && req.params.slug !== 'previous-interns' && (!items || items.length === 0)) {
+  // (projects, previous-interns, and gallery are served strictly from the database / admin panel)
+  if (
+    req.params.slug !== 'projects' &&
+    req.params.slug !== 'previous-interns' &&
+    req.params.slug !== 'gallery' &&
+    (!items || items.length === 0)
+  ) {
     try {
       const seedPath = path.join(DATA_DIR, def.seedFile)
       let raw = await readFile(seedPath, 'utf8')
       if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1)
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed) && parsed.length > 0) {
-        res.set('Cache-Control', 'no-cache')
+        res.set('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400')
         return res.json(parsed)
       }
     } catch {
@@ -62,10 +67,9 @@ contentRouter.get('/:slug', async (req, res) => {
     }
   }
 
-  const dbReady = mongoose.connection.readyState === 1
   res.set(
     'Cache-Control',
-    dbReady ? 'public, s-maxage=30, stale-while-revalidate=120' : 'no-store'
+    'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400'
   )
   res.json(items)
 })
@@ -78,5 +82,6 @@ contentRouter.get('/:slug/:id', async (req, res) => {
   if (/^\d+$/.test(raw)) candidates.push(Number(raw))
   const item = await model.findOne({ id: { $in: candidates }, published: true }).lean()
   if (!item) throw new HttpError(404, 'Item not found')
+  res.set('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400')
   res.json(item)
 })

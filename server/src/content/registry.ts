@@ -17,6 +17,7 @@ export type FieldType =
   | 'boolean'
   | 'url'
   | 'image' // stored as a URL/path string; admin UI shows an uploader
+  | 'imageList' // array of { url, caption? } objects or URL strings
   | 'file' // e.g. CV PDF; stored as URL/path string
   | 'date' // kept as free-form string (existing data uses "2024", "Jan 2025", …)
   | 'enum'
@@ -224,10 +225,16 @@ export const collections = [
     titleField: 'title',
     fields: {
       title: { type: 'string', required: true, listed: true },
-      cat: { type: 'string', label: 'Category', listed: true },
+      cat: {
+        type: 'enum',
+        label: 'Category',
+        required: true,
+        listed: true,
+        options: ['Lab', 'Visit', 'Session', 'Mentoring'],
+      },
       date: { type: 'date', listed: true },
       desc: { type: 'text', label: 'Description' },
-      url: { type: 'image', label: 'Image', required: true },
+      images: { type: 'imageList', label: 'Photos' },
       span: { type: 'string', label: 'Grid span' },
     },
   },

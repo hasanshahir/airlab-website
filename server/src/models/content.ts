@@ -10,6 +10,8 @@ function toSchemaType(field: FieldDef): SchemaDefinition[string] {
       return { ...base, type: Boolean, default: false }
     case 'stringList':
       return { type: [String], default: [] }
+    case 'imageList':
+      return { type: [Schema.Types.Mixed], default: [] }
     case 'enum':
       return { ...base, type: String, enum: field.options }
     default:

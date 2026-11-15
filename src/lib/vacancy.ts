@@ -48,7 +48,7 @@ export function invalidateVacancyCache(nextSettings?: VacancySettings) {
 function loadVacancySettings(): Promise<VacancySettings> {
   if (cache) return Promise.resolve(cache)
   if (!inflight) {
-    const req: Promise<VacancySettings> = fetch('/api/settings/vacancy', { cache: 'no-store' })
+    const req: Promise<VacancySettings> = fetch('/api/settings/vacancy')
       .then(r => (r.ok ? r.json() : null))
       .then((data): VacancySettings => {
         const resolved = normalizeVacancyCopy(data)

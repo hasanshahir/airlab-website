@@ -24,6 +24,9 @@ import {
   AlertCircle,
   KeyRound,
   ClipboardList,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from 'lucide-react'
 import {
   DEFAULT_VACANCY_SETTINGS,
@@ -38,6 +41,7 @@ type FieldType =
   | 'boolean'
   | 'url'
   | 'image'
+  | 'imageList'
   | 'file'
   | 'date'
   | 'enum'
@@ -214,17 +218,21 @@ const COLLECTION_SCHEMAS: Record<string, Record<string, FieldDef>> = {
     published: { type: 'boolean', label: 'Published on Website' },
   },
   gallery: {
-    title: { type: 'string', label: 'Photo Title', required: true },
+    title: {
+      type: 'string',
+      label: 'Event / Album Title',
+      required: true,
+      placeholder: 'e.g. PyTorch Bootcamp or HEC Campus Visit',
+    },
     cat: {
       type: 'enum',
       label: 'Category',
       required: true,
-      options: ['Laboratory', 'Visit', 'Session', 'Mentoring'],
+      options: ['Lab', 'Visit', 'Session', 'Mentoring'],
     },
-    date: { type: 'date', label: 'Date', placeholder: 'e.g. Oct 2025' },
-    desc: { type: 'text', label: 'Caption / Description' },
-    url: { type: 'image', label: 'Photograph', required: true },
-    span: { type: 'string', label: 'Grid Span (optional)' },
+    date: { type: 'date', label: 'Date', placeholder: 'e.g. Oct 2026' },
+    desc: { type: 'text', label: 'Event Description (default caption)' },
+    images: { type: 'imageList', label: 'Photos (1 or more)', required: true },
     order: { type: 'number', label: 'Display Order' },
     published: { type: 'boolean', label: 'Published on Website' },
   },
@@ -271,7 +279,7 @@ function buildDefaultItem(slug: string, nextOrder: number): Record<string, any> 
       item[key] = false
     } else if (def.type === 'number') {
       item[key] = key === 'year' ? new Date().getFullYear() : 0
-    } else if (def.type === 'stringList') {
+    } else if (def.type === 'stringList' || def.type === 'imageList') {
       item[key] = []
     } else if (def.type === 'enum' && def.options?.length) {
       item[key] = def.options[0]
@@ -282,6 +290,73 @@ function buildDefaultItem(slug: string, nextOrder: number): Record<string, any> 
   if (item.published === undefined) item.published = true
   if (item.order === undefined) item.order = nextOrder
   return item
+}
+
+interface GalleryPhotoEntry {
+  url: string
+  caption?: string
+}
+
+function normalizeGalleryImages(raw: unknown, fallbackUrl?: string): GalleryPhotoEntry[] {
+  const list: GalleryPhotoEntry[] = []
+  if (Array.isArray(raw)) {
+    for (const entry of raw) {
+      if (typeof entry === 'string' && entry.trim()) {
+        list.push({ url: entry.trim(), caption: '' })
+      } else if (entry && typeof entry === 'object' && typeof (entry as any).url === 'string' && (entry as any).url.trim()) {
+        list.push({
+          url: (entry as any).url.trim(),
+          caption: typeof (entry as any).caption === 'string' ? (entry as any).caption : '',
+        })
+      }
+    }
+  }
+  if (list.length === 0 && typeof fallbackUrl === 'string' && fallbackUrl.trim()) {
+    list.push({ url: fallbackUrl.trim(), caption: '' })
+  }
+  return list
+}
+
+function compressImageFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (file.size > 5 * 1024 * 1024) {
+      reject(new Error(`"${file.name}" exceeds the 5MB limit. Please upload a smaller image.`))
+      return
+    }
+    const reader = new FileReader()
+    reader.onerror = () => reject(new Error(`Failed to read "${file.name}".`))
+    reader.onload = ev => {
+      const dataUrl = ev.target?.result as string
+      if (file.type === 'image/svg+xml') {
+        resolve(dataUrl)
+        return
+      }
+      const img = new Image()
+      img.onload = () => {
+        const maxDim = 800
+        let { width, height } = img
+        if (width > maxDim || height > maxDim) {
+          const scale = Math.min(maxDim / width, maxDim / height)
+          width = Math.round(width * scale)
+          height = Math.round(height * scale)
+        }
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          resolve(dataUrl)
+          return
+        }
+        ctx.drawImage(img, 0, 0, width, height)
+        const compressed = canvas.toDataURL('image/webp', 0.75)
+        resolve(compressed.length < dataUrl.length ? compressed : dataUrl)
+      }
+      img.onerror = () => resolve(dataUrl)
+      img.src = dataUrl
+    }
+    reader.readAsDataURL(file)
+  })
 }
 
 export default function AdminDashboard() {
@@ -301,6 +376,8 @@ export default function AdminDashboard() {
   const [editingItem, setEditingItem] = useState<any | null>(null)
   const [isNew, setIsNew] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [modalError, setModalError] = useState<string | null>(null)
+  const [newImageUrl, setNewImageUrl] = useState('')
   const [bannerNotice, setBannerNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // Vacancy & Site Settings state
@@ -322,7 +399,7 @@ export default function AdminDashboard() {
     setEditingItem(null)
     setEmail('')
     setPassword('')
-    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
+    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => { })
   }
 
   // Strictly verify authentication token against the backend DB before rendering the dashboard
@@ -474,12 +551,26 @@ export default function AdminDashboard() {
     if (!editingItem || !token || !adminUser) return
     setSaving(true)
     setBannerNotice(null)
+    setModalError(null)
 
     try {
       const isCreate = isNew
       const recordId = editingItem._id
       if (!isCreate && !recordId) {
         throw new Error('Record is missing a database _id and cannot be updated.')
+      }
+
+      const payload = { ...editingItem }
+      if (activeTab === 'gallery') {
+        const cleanedImages = normalizeGalleryImages(payload.images).map(img => ({
+          url: img.url,
+          caption: (img.caption || '').trim(),
+        }))
+        if (cleanedImages.length === 0) {
+          throw new Error('Please upload or add at least 1 photo for this gallery entry.')
+        }
+        payload.images = cleanedImages
+        delete payload.url
       }
 
       const url = isCreate ? `/api/admin/${activeTab}` : `/api/admin/${activeTab}/${recordId}`
@@ -492,7 +583,7 @@ export default function AdminDashboard() {
           Authorization: `Bearer ${token}`,
         },
         credentials: 'include',
-        body: JSON.stringify(editingItem),
+        body: JSON.stringify(payload),
       })
 
       if (res.status === 401) {
@@ -513,12 +604,15 @@ export default function AdminDashboard() {
 
       setEditingItem(null)
       setIsNew(false)
+      setNewImageUrl('')
       setBannerNotice({
         type: 'success',
         text: isCreate ? 'New record created and published to database.' : 'Record updated in database.',
       })
     } catch (err: any) {
-      setBannerNotice({ type: 'error', text: err.message || 'Failed to save record' })
+      const msg = err.message || 'Failed to save record'
+      setModalError(msg)
+      setBannerNotice({ type: 'error', text: msg })
     } finally {
       setSaving(false)
     }
@@ -823,11 +917,10 @@ export default function AdminDashboard() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center justify-between px-3 py-2 rounded-[4px] text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                    isActive
+                  className={`flex items-center justify-between px-3 py-2 rounded-[4px] text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 ${isActive
                       ? 'bg-[var(--accent-orange)]/10 text-[var(--accent-orange)] font-semibold'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)]'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <Icon className="w-4 h-4 shrink-0" />
@@ -869,6 +962,8 @@ export default function AdminDashboard() {
           {!['applications', 'vacancy-settings', 'security'].includes(activeTab) && (
             <button
               onClick={() => {
+                setModalError(null)
+                setNewImageUrl('')
                 setEditingItem(buildDefaultItem(activeTab, items.length))
                 setIsNew(true)
               }}
@@ -882,11 +977,10 @@ export default function AdminDashboard() {
 
         {bannerNotice && (
           <div
-            className={`mb-6 p-3.5 rounded-[4px] border text-xs flex items-center justify-between gap-3 ${
-              bannerNotice.type === 'success'
+            className={`mb-6 p-3.5 rounded-[4px] border text-xs flex items-center justify-between gap-3 ${bannerNotice.type === 'success'
                 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700'
                 : 'bg-red-500/10 border-red-500/20 text-red-600'
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2">
               {bannerNotice.type === 'success' ? (
@@ -1072,11 +1166,10 @@ export default function AdminDashboard() {
                   <button
                     key={st}
                     onClick={() => setAppStatusFilter(st)}
-                    className={`px-3 py-1.5 rounded text-xs font-medium cursor-pointer border transition-colors ${
-                      appStatusFilter === st
+                    className={`px-3 py-1.5 rounded text-xs font-medium cursor-pointer border transition-colors ${appStatusFilter === st
                         ? 'bg-[var(--accent-orange)] text-white border-[var(--accent-orange)]'
                         : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:text-[var(--text-primary)]'
-                    }`}
+                      }`}
                   >
                     {st}
                   </button>
@@ -1119,15 +1212,14 @@ export default function AdminDashboard() {
                         </span>
                       )}
                       <span
-                        className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                          app.status === 'Accepted'
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${app.status === 'Accepted'
                             ? 'bg-green-500/10 text-green-600'
                             : app.status === 'Shortlisted'
-                            ? 'bg-blue-500/10 text-blue-600'
-                            : app.status === 'Rejected'
-                            ? 'bg-red-500/10 text-red-600'
-                            : 'bg-yellow-500/10 text-yellow-600'
-                        }`}
+                              ? 'bg-blue-500/10 text-blue-600'
+                              : app.status === 'Rejected'
+                                ? 'bg-red-500/10 text-red-600'
+                                : 'bg-yellow-500/10 text-yellow-600'
+                          }`}
                       >
                         {app.status || 'New'}
                       </span>
@@ -1237,30 +1329,34 @@ export default function AdminDashboard() {
                           {item.name || item.title || item.partner || `ID: ${item.id || item._id}`}
                         </td>
                         <td className="py-3 px-4 text-[var(--text-muted)]">
-                          {item.tenure && item.department
-                            ? `${item.tenure} • ${item.department}`
-                            : item.authors ||
-                              item.author ||
-                              item.role ||
-                              item.category ||
-                              item.type ||
-                              item.term ||
-                              item.month ||
-                              item.funder ||
-                              item.venue ||
-                              item.cat ||
-                              item.tenure ||
-                              item.department ||
-                              item.date ||
-                              '—'}
+                          {activeTab === 'gallery'
+                            ? (() => {
+                                const count = normalizeGalleryImages(item.images, item.url).length
+                                return `${item.cat || 'Lab'} • ${count} photo${count === 1 ? '' : 's'}`
+                              })()
+                            : item.tenure && item.department
+                              ? `${item.tenure} • ${item.department}`
+                              : item.authors ||
+                                item.author ||
+                                item.role ||
+                                item.category ||
+                                item.type ||
+                                item.term ||
+                                item.month ||
+                                item.funder ||
+                                item.venue ||
+                                item.cat ||
+                                item.tenure ||
+                                item.department ||
+                                item.date ||
+                                '—'}
                         </td>
                         <td className="py-3 px-4">
                           <span
-                            className={`inline-block px-2 py-0.5 rounded text-[10px] ${
-                              item.published !== false
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] ${item.published !== false
                                 ? 'bg-green-500/10 text-green-600'
                                 : 'bg-gray-500/10 text-gray-500'
-                            }`}
+                              }`}
                           >
                             {item.published !== false ? 'Published' : 'Hidden'}
                           </span>
@@ -1268,8 +1364,14 @@ export default function AdminDashboard() {
                         <td className="py-3 px-4 text-right space-x-2 whitespace-nowrap">
                           <button
                             onClick={() => {
+                              setModalError(null)
+                              setNewImageUrl('')
                               const defaults = buildDefaultItem(activeTab, item.order ?? 0)
-                              setEditingItem({ ...defaults, ...item })
+                              const next = { ...defaults, ...item }
+                              if (activeTab === 'gallery') {
+                                next.images = normalizeGalleryImages(item.images, item.url)
+                              }
+                              setEditingItem(next)
                               setIsNew(false)
                             }}
                             className="px-2.5 py-1 rounded bg-[var(--bg-page)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)] text-xs cursor-pointer"
@@ -1309,6 +1411,12 @@ export default function AdminDashboard() {
                   </div>
 
                   <form onSubmit={handleSaveItem} className="space-y-4">
+                    {modalError && (
+                      <div className="p-3 rounded-[4px] border border-red-500/30 bg-red-500/10 text-red-600 text-xs flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>{modalError}</span>
+                      </div>
+                    )}
                     {editableFields.map(field => {
                       const def: FieldDef | undefined = currentSchema[field]
                       const label = def?.label || field
@@ -1317,14 +1425,14 @@ export default function AdminDashboard() {
                         (typeof editingItem[field] === 'boolean'
                           ? 'boolean'
                           : typeof editingItem[field] === 'number'
-                          ? 'number'
-                          : Array.isArray(editingItem[field])
-                          ? 'stringList'
-                          : /image|photo|avatar|thumbnail|cover|logo/i.test(field)
-                          ? 'image'
-                          : /description|abstract|quote|achievement|excerpt/i.test(field)
-                          ? 'text'
-                          : 'string')
+                            ? 'number'
+                            : Array.isArray(editingItem[field])
+                              ? 'stringList'
+                              : /image|photo|avatar|thumbnail|cover|logo/i.test(field)
+                                ? 'image'
+                                : /description|abstract|quote|achievement|excerpt/i.test(field)
+                                  ? 'text'
+                                  : 'string')
 
                       return (
                         <div key={field}>
@@ -1403,6 +1511,159 @@ export default function AdminDashboard() {
                               placeholder="Comma-separated values"
                               className="w-full px-3 py-2 text-xs rounded border border-[var(--border-hairline)] bg-[var(--bg-page)]"
                             />
+                          ) : fieldType === 'imageList' ? (
+                            (() => {
+                              const photos: GalleryPhotoEntry[] = Array.isArray(editingItem[field])
+                                ? editingItem[field]
+                                : []
+                              const updatePhotos = (next: GalleryPhotoEntry[]) =>
+                                setEditingItem((prev: any) => ({ ...prev, [field]: next }))
+
+                              const movePhoto = (idx: number, dir: -1 | 1) => {
+                                const target = idx + dir
+                                if (target < 0 || target >= photos.length) return
+                                const copy = [...photos]
+                                ;[copy[idx], copy[target]] = [copy[target], copy[idx]]
+                                updatePhotos(copy)
+                              }
+
+                              const addUrlPhoto = () => {
+                                const trimmed = newImageUrl.trim()
+                                if (!trimmed) return
+                                updatePhotos([...photos, { url: trimmed, caption: '' }])
+                                setNewImageUrl('')
+                              }
+
+                              return (
+                                <div className="space-y-3">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] bg-[var(--accent-orange)]/10 hover:bg-[var(--accent-orange)]/20 text-[var(--accent-orange)] text-xs font-medium cursor-pointer transition-colors border border-[var(--accent-orange)]/30">
+                                      <Upload className="w-3.5 h-3.5" />
+                                      <span>Upload Photos</span>
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        className="hidden"
+                                        onChange={async e => {
+                                          const files = Array.from(e.target.files || [])
+                                          e.target.value = ''
+                                          if (!files.length) return
+                                          setModalError(null)
+                                          try {
+                                            const compressed = await Promise.all(files.map(compressImageFile))
+                                            setEditingItem((prev: any) => {
+                                              const current = Array.isArray(prev?.[field]) ? prev[field] : []
+                                              return {
+                                                ...prev,
+                                                [field]: [
+                                                  ...current,
+                                                  ...compressed.map(url => ({ url, caption: '' })),
+                                                ],
+                                              }
+                                            })
+                                          } catch (err: any) {
+                                            setModalError(err.message || 'Failed to process uploaded image(s).')
+                                          }
+                                        }}
+                                      />
+                                    </label>
+                                    <span className="text-[11px] text-[var(--text-subtle)]">
+                                      Select 1 or multiple images ({photos.length} added)
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center gap-2">
+                                    <input
+                                      type="text"
+                                      value={newImageUrl}
+                                      onChange={e => setNewImageUrl(e.target.value)}
+                                      onKeyDown={e => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault()
+                                          addUrlPhoto()
+                                        }
+                                      }}
+                                      placeholder="Or paste an image URL / path and click Add"
+                                      className="flex-1 px-3 py-1.5 text-xs rounded border border-[var(--border-hairline)] bg-[var(--bg-page)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-orange)]"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={addUrlPhoto}
+                                      className="px-3 py-1.5 rounded text-xs border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:border-[var(--accent-orange)] cursor-pointer"
+                                    >
+                                      Add URL
+                                    </button>
+                                  </div>
+
+                                  {photos.length === 0 ? (
+                                    <div className="p-6 rounded border border-dashed border-[var(--border-hairline)] bg-[var(--bg-page)] text-center text-[11px] text-[var(--text-subtle)]">
+                                      No photos added yet. Upload 1–10 photos above; each photo will appear as its own card on the Gallery page.
+                                    </div>
+                                  ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                      {photos.map((photo, idx) => (
+                                        <div
+                                          key={`${idx}-${photo.url.slice(0, 24)}`}
+                                          className="rounded border border-[var(--border-hairline)] bg-[var(--bg-page)] p-2.5 space-y-2"
+                                        >
+                                          <div className="relative aspect-[16/10] rounded overflow-hidden bg-black/5 border border-[var(--border-hairline)]">
+                                            <img
+                                              src={photo.url}
+                                              alt={photo.caption || `Photo ${idx + 1}`}
+                                              className="w-full h-full object-cover"
+                                            />
+                                            <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/65 text-white text-[10px] font-medium">
+                                              #{idx + 1}
+                                            </span>
+                                            <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
+                                              <button
+                                                type="button"
+                                                disabled={idx === 0}
+                                                onClick={() => movePhoto(idx, -1)}
+                                                title="Move earlier"
+                                                className="w-6 h-6 rounded bg-black/65 text-white flex items-center justify-center disabled:opacity-35 hover:bg-black cursor-pointer"
+                                              >
+                                                <ChevronLeft className="w-3.5 h-3.5" />
+                                              </button>
+                                              <button
+                                                type="button"
+                                                disabled={idx === photos.length - 1}
+                                                onClick={() => movePhoto(idx, 1)}
+                                                title="Move later"
+                                                className="w-6 h-6 rounded bg-black/65 text-white flex items-center justify-center disabled:opacity-35 hover:bg-black cursor-pointer"
+                                              >
+                                                <ChevronRight className="w-3.5 h-3.5" />
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => updatePhotos(photos.filter((_, i) => i !== idx))}
+                                                title="Remove photo"
+                                                className="w-6 h-6 rounded bg-red-600/90 text-white flex items-center justify-center hover:bg-red-700 cursor-pointer"
+                                              >
+                                                <X className="w-3.5 h-3.5" />
+                                              </button>
+                                            </div>
+                                          </div>
+                                          <input
+                                            type="text"
+                                            value={photo.caption ?? ''}
+                                            onChange={e => {
+                                              const next = photos.map((p, i) =>
+                                                i === idx ? { ...p, caption: e.target.value } : p
+                                              )
+                                              updatePhotos(next)
+                                            }}
+                                            placeholder="Optional caption for this photo..."
+                                            className="w-full px-2.5 py-1.5 text-[11px] rounded border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-orange)]"
+                                          />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })()
                           ) : fieldType === 'image' ? (
                             <div className="space-y-2">
                               <div className="flex items-center gap-3">
@@ -1412,7 +1673,7 @@ export default function AdminDashboard() {
                                     alt="Preview"
                                     className="w-12 h-12 object-cover rounded border border-[var(--border-hairline)] bg-[var(--bg-surface)] shrink-0"
                                     onError={e => {
-                                      ;(e.target as HTMLElement).style.display = 'none'
+                                      ; (e.target as HTMLElement).style.display = 'none'
                                     }}
                                   />
                                 ) : (
@@ -1430,51 +1691,16 @@ export default function AdminDashboard() {
                                         type="file"
                                         accept="image/*"
                                         className="hidden"
-                                        onChange={e => {
+                                        onChange={async e => {
                                           const file = e.target.files?.[0]
+                                          e.target.value = ''
                                           if (!file) return
-                                          if (file.size > 5 * 1024 * 1024) {
-                                            alert('Image size exceeds 5MB limit. Please upload a smaller image.')
-                                            return
+                                          try {
+                                            const result = await compressImageFile(file)
+                                            setEditingItem((prev: any) => ({ ...prev, [field]: result }))
+                                          } catch (err: any) {
+                                            alert(err.message || 'Failed to upload image.')
                                           }
-                                          const reader = new FileReader()
-                                          reader.onload = ev => {
-                                            const dataUrl = ev.target?.result as string
-                                            // Keep SVGs or already-small images untouched; compress large raster uploads
-                                            if (file.type === 'image/svg+xml' || dataUrl.length < 90_000) {
-                                              setEditingItem({ ...editingItem, [field]: dataUrl })
-                                              return
-                                            }
-                                            const img = new Image()
-                                            img.onload = () => {
-                                              const maxDim = 1200
-                                              let { width, height } = img
-                                              if (width > maxDim || height > maxDim) {
-                                                const scale = Math.min(maxDim / width, maxDim / height)
-                                                width = Math.round(width * scale)
-                                                height = Math.round(height * scale)
-                                              }
-                                              const canvas = document.createElement('canvas')
-                                              canvas.width = width
-                                              canvas.height = height
-                                              const ctx = canvas.getContext('2d')
-                                              if (!ctx) {
-                                                setEditingItem({ ...editingItem, [field]: dataUrl })
-                                                return
-                                              }
-                                              ctx.drawImage(img, 0, 0, width, height)
-                                              const compressed = canvas.toDataURL('image/webp', 0.82)
-                                              setEditingItem({
-                                                ...editingItem,
-                                                [field]: compressed.length < dataUrl.length ? compressed : dataUrl,
-                                              })
-                                            }
-                                            img.onerror = () => {
-                                              setEditingItem({ ...editingItem, [field]: dataUrl })
-                                            }
-                                            img.src = dataUrl
-                                          }
-                                          reader.readAsDataURL(file)
                                         }}
                                       />
                                     </label>

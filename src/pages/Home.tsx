@@ -10,7 +10,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-   ShieldAlert,
+  ShieldAlert,
   ShieldCheck,
   Terminal,
 } from 'lucide-react'
@@ -19,7 +19,7 @@ import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
 import { CoverflowCarousel } from '@/components/ui/coverflow-carousel'
-import { getGrants } from '../lib/data'
+import { getGrants, getProjects } from '../lib/data'
 import { useVacancySettings } from '../lib/vacancy'
 import type { ProjectItem, Grant } from '../types/data'
 
@@ -50,37 +50,37 @@ const coreResearchAreas = [
   {
     icon: Brain,
     title: 'Foundational Models & NLP',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=50',
     desc: 'Pretraining multilingual LLMs tailored for low-resource regional dialects with advanced byte-level tokenizers and parameter-efficient fine-tuning.',
   },
   {
     icon: ShieldAlert,
     title: 'Adversarial AI',
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=50',
     desc: 'Investigating neural network vulnerabilities, model jailbreaking, prompt injection mitigation, and robust defense benchmarks for high-stakes AI systems.',
   },
   {
     icon: ShieldCheck,
     title: 'Cyber',
-    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&auto=format&fit=crop&q=50',
     desc: 'Autonomous cyber defense, encrypted traffic analysis, zero-trust infrastructure, and automated vulnerability intelligence to safeguard digital ecosystems.',
   },
   {
     icon: Terminal,
     title: 'Software Development',
-    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&auto=format&fit=crop&q=50',
     desc: 'High-performance AI engineering, production-grade microservices, scalable distributed inference pipelines, and intelligent software systems.',
   },
   {
     icon: Code,
     title: 'Efficient Computing & TinyML',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=50',
     desc: 'Hardware-aware neural architecture search (NAS), INT8 quantization, and ultra-low-latency deployment on FPGAs and embedded SoCs.',
   },
   {
     icon: LineChart,
     title: 'AI Safety & Alignment',
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop&q=50',
     desc: 'Ensuring robust, unbiased, and safe deployment of intelligent systems in critical healthcare, power grids, and national infrastructure.',
   },
 ]
@@ -95,7 +95,13 @@ export default function Home() {
   const updatesTargetVelocityRef = useRef(55)
   const updatesManualBoostRef = useRef(0)
   const vacancy = useVacancySettings()
-  const [projects, setProjects] = useState<ProjectItem[]>([])
+  const [projects, setProjects] = useState<ProjectItem[]>(() => {
+    try {
+      return getProjects()
+    } catch {
+      return []
+    }
+  })
   const [grants, setGrants] = useState<Grant[]>(() => getGrants())
   const areasTrackRef = useRef<HTMLDivElement>(null)
   const areasOffsetRef = useRef(0)
@@ -114,7 +120,7 @@ export default function Home() {
           setProjects(data)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
 
     fetch(`${apiBase}/api/content/grants`)
       .then((res) => (res.ok ? res.json() : null))
@@ -123,7 +129,7 @@ export default function Home() {
           setGrants(data)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
 
     return () => {
       active = false
@@ -411,11 +417,10 @@ export default function Home() {
                   role="radio"
                   aria-checked={isActive}
                   onClick={() => setCarouselVersion(option.id)}
-                  className={`relative px-3.5 py-1 rounded-full text-xs font-semibold transition-colors duration-180 cursor-pointer select-none ${
-                    isActive
+                  className={`relative px-3.5 py-1 rounded-full text-xs font-semibold transition-colors duration-180 cursor-pointer select-none ${isActive
                       ? 'text-white'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                  }`}
+                    }`}
                 >
                   {isActive && (
                     <motion.span
@@ -649,6 +654,7 @@ export default function Home() {
                       alt=""
                       className="w-full h-full object-cover opacity-[0.18] dark:opacity-[0.24] group-hover:opacity-[0.26] dark:group-hover:opacity-[0.32] group-hover:scale-105 transition-all duration-500 ease-out"
                       loading="lazy"
+                      decoding="async"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-[var(--bg-surface)]/60 to-[var(--bg-surface)]/10 pointer-events-none" />
                   </div>

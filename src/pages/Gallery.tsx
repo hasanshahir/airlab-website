@@ -1,15 +1,22 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Maximize2 } from 'lucide-react'
-import rawGallery from '../data/gallery.json'
+import { X, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { GalleryItem } from '../types/data'
 import SectionReveal from '../components/ui/SectionReveal'
 
-const galleryData = rawGallery as unknown as GalleryItem[]
-
-const GALLERY_FILTERS = ['All', 'Visit', 'Session', 'Mentoring', 'Laboratory'] as const
+const GALLERY_FILTERS = ['All', 'Visit', 'Session', 'Mentoring', 'Lab'] as const
 type GalleryFilter = (typeof GALLERY_FILTERS)[number]
+
+interface GalleryPhotoCard {
+  key: string
+  title: string
+  cat: Exclude<GalleryFilter, 'All'>
+  date?: string
+  caption: string
+  url: string
+  span?: string
+}
 
 function normalizeGalleryCategory(cat?: string, title?: string): Exclude<GalleryFilter, 'All'> {
   const c = (cat || '').trim().toLowerCase()
@@ -24,56 +31,114 @@ function normalizeGalleryCategory(cat?: string, title?: string): Exclude<Gallery
     return 'Mentoring'
   }
   if (c === 'laboratory' || c.includes('lab') || c.includes('compute') || c.includes('hardware')) {
-    return 'Laboratory'
+    return 'Lab'
   }
-  return 'Laboratory'
+  return 'Lab'
+}
+
+function expandGalleryItems(items: GalleryItem[]): GalleryPhotoCard[] {
+  const cards: GalleryPhotoCard[] = []
+  for (const item of items) {
+    const cat = normalizeGalleryCategory(item.cat, item.title)
+    const rawPhotos = Array.isArray(item.images) && item.images.length > 0
+      ? item.images
+      : item.url
+        ? [item.url]
+        : []
+
+    const normalized = rawPhotos
+      .map(entry => {
+        if (typeof entry === 'string') {
+          return { url: entry.trim(), caption: '' }
+        }
+        if (entry && typeof entry === 'object' && typeof entry.url === 'string') {
+          return { url: entry.url.trim(), caption: (entry.caption || '').trim() }
+        }
+        return null
+      })
+      .filter((p): p is { url: string; caption: string } => Boolean(p && p.url))
+
+    normalized.forEach((photo, idx) => {
+      cards.push({
+        key: `${item._id || item.id}-${idx}`,
+        title: item.title,
+        cat,
+        date: item.date,
+        caption: photo.caption || item.desc || '',
+        url: photo.url,
+        span: normalized.length === 1 ? item.span : undefined,
+      })
+    })
+  }
+  return cards
 }
 
 export default function Gallery() {
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => galleryData)
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState<GalleryFilter>('All')
-  const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   useEffect(() => {
+    let active = true
     fetch('/api/content/gallery')
-      .then(r => r.ok ? r.json() : [])
+      .then(r => (r.ok ? r.json() : []))
       .then(d => {
-        if (Array.isArray(d) && d.length > 0) {
-          setGalleryItems(
-            d.map((item: GalleryItem) => ({
-              ...item,
-              cat: normalizeGalleryCategory(item.cat, item.title),
-            }))
-          )
+        if (!active) return
+        if (Array.isArray(d)) {
+          setGalleryItems(d)
         }
       })
       .catch(() => {})
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
   }, [])
 
-  const filteredItems = useMemo(() => {
-    if (activeFilter === 'All') return galleryItems
-    return galleryItems.filter(
-      item => normalizeGalleryCategory(item.cat, item.title) === activeFilter
-    )
-  }, [galleryItems, activeFilter])
+  const allCards = useMemo(() => expandGalleryItems(galleryItems), [galleryItems])
 
-  // Safe scroll lock for lightbox modal
+  const filteredCards = useMemo(() => {
+    if (activeFilter === 'All') return allCards
+    return allCards.filter(card => card.cat === activeFilter)
+  }, [allCards, activeFilter])
+
+  const selectedCard = selectedIndex !== null ? filteredCards[selectedIndex] ?? null : null
+
+  const goPrev = useCallback(() => {
+    setSelectedIndex(prev => {
+      if (prev === null || filteredCards.length <= 1) return prev
+      return (prev - 1 + filteredCards.length) % filteredCards.length
+    })
+  }, [filteredCards.length])
+
+  const goNext = useCallback(() => {
+    setSelectedIndex(prev => {
+      if (prev === null || filteredCards.length <= 1) return prev
+      return (prev + 1) % filteredCards.length
+    })
+  }, [filteredCards.length])
+
+  // Safe scroll lock & keyboard navigation for lightbox modal
   useEffect(() => {
-    if (selectedImage) {
-      const originalOverflow = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
+    if (selectedIndex === null) return
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
 
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setSelectedImage(null)
-      }
-      window.addEventListener('keydown', handleKeyDown)
-
-      return () => {
-        document.body.style.overflow = originalOverflow
-        window.removeEventListener('keydown', handleKeyDown)
-      }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedIndex(null)
+      else if (e.key === 'ArrowLeft') goPrev()
+      else if (e.key === 'ArrowRight') goNext()
     }
-  }, [selectedImage])
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [selectedIndex, goPrev, goNext])
 
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
@@ -100,7 +165,10 @@ export default function Gallery() {
             <button
               key={filter}
               type="button"
-              onClick={() => setActiveFilter(filter)}
+              onClick={() => {
+                setActiveFilter(filter)
+                setSelectedIndex(null)
+              }}
               className={`h-10 px-5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer border ${
                 isActive
                   ? 'bg-[var(--accent-orange)] text-white border-[var(--accent-orange)] shadow-sm'
@@ -115,53 +183,63 @@ export default function Gallery() {
 
       {/* Image Grid with 24px Rounded Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 auto-rows-[300px] gap-6 text-left">
-        {filteredItems.length === 0 ? (
+        {loading ? (
+          Array.from({ length: 6 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="h-full rounded-3xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] animate-pulse"
+            />
+          ))
+        ) : filteredCards.length === 0 ? (
           <div className="col-span-full text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-            <p className="text-sm font-sans text-[var(--text-muted)]">No media items found in this category.</p>
+            <p className="text-sm font-sans text-[var(--text-muted)]">
+              {allCards.length === 0
+                ? 'No gallery photos published yet.'
+                : 'No media items found in this category.'}
+            </p>
           </div>
         ) : (
-          filteredItems.map((item, i) => {
-            const categoryBadge = normalizeGalleryCategory(item.cat, item.title)
-            return (
+          filteredCards.map((card, i) => (
+            <div
+              key={card.key}
+              className={`${activeFilter === 'All' ? card.span || '' : 'sm:col-span-1'} h-full`}
+            >
               <div
-                key={item.id}
-                className={`${activeFilter === 'All' ? item.span || '' : 'sm:col-span-1'} h-full`}
+                onClick={() => setSelectedIndex(i)}
+                className="h-full relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer group shadow-sm hover:border-[var(--accent-orange)]/50 hover:shadow-lg transition-all duration-300"
+                style={{ transitionDelay: `${i * 30}ms` }}
               >
-                <div
-                  onClick={() => setSelectedImage(item)}
-                  className="h-full relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer group shadow-sm hover:border-[var(--accent-orange)]/50 hover:shadow-lg transition-all duration-300"
-                  style={{ transitionDelay: `${i * 30}ms` }}
-                >
-                  <img
-                    src={item.url}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                <img
+                  src={card.url}
+                  alt={card.caption || card.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
 
-                  <div className="absolute top-4 left-4 pointer-events-none">
-                    <span className="px-3 py-1 rounded-full bg-black/55 text-white text-[11px] font-semibold backdrop-blur-sm border border-white/15">
-                      {categoryBadge}
-                    </span>
-                  </div>
+                <div className="absolute top-4 left-4 pointer-events-none">
+                  <span className="px-3 py-1 rounded-full bg-black/55 text-white text-[11px] font-semibold backdrop-blur-sm border border-white/15">
+                    {card.cat}
+                  </span>
+                </div>
 
-                  <div className="absolute top-4 right-4 pointer-events-none">
-                    <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center shadow-xs">
-                      <Maximize2 className="w-3.5 h-3.5" />
-                    </span>
-                  </div>
+                <div className="absolute top-4 right-4 pointer-events-none">
+                  <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center shadow-xs">
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </span>
+                </div>
 
-                  <div className="absolute bottom-5 left-5 right-5 pointer-events-none">
-                    <h3 className="text-base sm:text-lg font-semibold font-head text-white leading-tight mb-1">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-white/80 line-clamp-1">{item.desc}</p>
-                  </div>
+                <div className="absolute bottom-5 left-5 right-5 pointer-events-none">
+                  <h3 className="text-base sm:text-lg font-semibold font-head text-white leading-tight mb-1">
+                    {card.title}
+                  </h3>
+                  {card.caption && (
+                    <p className="text-xs text-white/80 line-clamp-1">{card.caption}</p>
+                  )}
                 </div>
               </div>
-            )
-          })
+            </div>
+          ))
         )}
       </div>
 
@@ -169,13 +247,13 @@ export default function Gallery() {
       {typeof document !== 'undefined' &&
         createPortal(
           <AnimatePresence>
-            {selectedImage && (
+            {selectedCard && selectedIndex !== null && (
               <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8">
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  onClick={() => setSelectedImage(null)}
+                  onClick={() => setSelectedIndex(null)}
                   className="absolute inset-0 bg-black/75 backdrop-blur-md"
                 />
 
@@ -187,26 +265,65 @@ export default function Gallery() {
                   className="relative max-w-4xl w-full bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl overflow-hidden shadow-2xl z-10 text-left"
                 >
                   <button
-                    onClick={() => setSelectedImage(null)}
+                    type="button"
+                    onClick={() => setSelectedIndex(null)}
                     className="absolute top-5 right-5 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black transition-colors z-20 cursor-pointer shadow-md"
                     aria-label="Close image modal"
                   >
                     <X className="w-4 h-4" />
                   </button>
 
-                  <div className="max-h-[65vh] w-full bg-black overflow-hidden flex items-center justify-center">
+                  <div className="relative max-h-[65vh] w-full bg-black overflow-hidden flex items-center justify-center">
                     <img
-                      src={selectedImage.url}
-                      alt={selectedImage.title}
+                      src={selectedCard.url}
+                      alt={selectedCard.caption || selectedCard.title}
                       className="w-full h-full object-contain max-h-[65vh]"
                     />
+
+                    {filteredCards.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={goPrev}
+                          aria-label="Previous photo"
+                          className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={goNext}
+                          aria-label="Next photo"
+                          className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
                   </div>
 
                   <div className="p-6 sm:p-8">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-[var(--accent-orange)]/15 text-[var(--accent-orange)] text-[11px] font-semibold">
+                          {selectedCard.cat}
+                        </span>
+                        {selectedCard.date && (
+                          <span className="text-xs text-[var(--text-muted)]">{selectedCard.date}</span>
+                        )}
+                      </div>
+                      {filteredCards.length > 1 && (
+                        <span className="text-xs text-[var(--text-muted)]">
+                          {selectedIndex + 1} / {filteredCards.length}
+                        </span>
+                      )}
+                    </div>
                     <h3 className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)] mb-2">
-                      {selectedImage.title}
+                      {selectedCard.title}
                     </h3>
-                    <p className="text-sm text-[var(--text-muted)] leading-relaxed">{selectedImage.desc}</p>
+                    {selectedCard.caption && (
+                      <p className="text-sm text-[var(--text-muted)] leading-relaxed">{selectedCard.caption}</p>
+                    )}
                   </div>
                 </motion.div>
               </div>

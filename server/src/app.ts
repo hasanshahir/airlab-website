@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import compression from 'compression'
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import mongoose from 'mongoose'
@@ -21,6 +22,7 @@ export function createApp() {
   app.disable('x-powered-by')
 
   app.use(helmet())
+  app.use(compression())
   app.use(
     cors({
       origin: (_origin, callback) => {

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, GraduationCap, Calendar, Search, Sparkles, FileText } from 'lucide-react'
-import { getTeamMembers } from '../lib/data'
+import { getTeamMembers, getPreviousInterns } from '../lib/data'
 import type { TeamMemberData } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
@@ -44,14 +44,14 @@ export default function Team() {
   }, [searchParams])
 
   const [allMembersRaw, setAllMembersRaw] = useState<TeamMemberData[]>(() => getTeamMembers())
-  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>([])
+  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>(() => getPreviousInterns())
 
   useEffect(() => {
     let active = true
     const apiBase = import.meta.env.VITE_API_URL || ''
     Promise.all([
-      fetch(`${apiBase}/api/content/team`, { cache: 'no-store' }).then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch(`${apiBase}/api/content/previous-interns`, { cache: 'no-store' }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(`${apiBase}/api/content/team`).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(`${apiBase}/api/content/previous-interns`).then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([team, prev]) => {
       if (!active) return
       if (Array.isArray(team) && team.length > 0) {

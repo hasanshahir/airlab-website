@@ -352,9 +352,8 @@ export function CoverflowCarousel({
   const active = slides[selected];
   const mask =
     edgeFade > 0
-      ? `linear-gradient(90deg, transparent, #000 ${edgeFade}%, #000 ${
-          100 - edgeFade
-        }%, transparent)`
+      ? `linear-gradient(90deg, transparent, #000 ${edgeFade}%, #000 ${100 - edgeFade
+      }%, transparent)`
       : undefined;
 
   return (
@@ -424,6 +423,7 @@ export function CoverflowCarousel({
                   src={slide.src}
                   alt={slide.alt}
                   draggable={false}
+                  decoding="async"
                   className="h-full w-full select-none object-cover"
                 />
               </div>

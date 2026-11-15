@@ -7,7 +7,7 @@ export const SponsorsGrid: React.FC = () => {
 
   useEffect(() => {
     let active = true
-    fetch('/api/content/sponsors', { cache: 'no-store' })
+    fetch('/api/content/sponsors')
       .then(r => (r.ok ? r.json() : null))
       .then(data => {
         if (active && Array.isArray(data) && data.length > 0) {

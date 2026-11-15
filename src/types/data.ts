@@ -106,13 +106,20 @@ export interface CollaborationItem {
   image?: string
 }
 
+export interface GalleryPhoto {
+  url: string
+  caption?: string
+}
+
 export interface GalleryItem {
   id: string
+  _id?: string
   title: string
   cat?: string
   date?: string
   desc?: string
-  url: string
+  url?: string
+  images?: Array<GalleryPhoto | string>
   span?: string
 }
 

@@ -50,7 +50,9 @@ async function main() {
     }))
 
     if (force) await model.deleteMany({})
-    await model.insertMany(docs, { ordered: true })
+    if (docs.length > 0) {
+      await model.insertMany(docs, { ordered: true })
+    }
     total += docs.length
     console.log(`✅ ${def.slug.padEnd(18)} ${docs.length} docs imported from ${def.seedFile}`)
   }

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getFacultyPriority } from '../lib/utils'
+import { getProjects } from '../lib/data'
 import type { ProjectItem } from '../types/data'
 import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
 
@@ -90,8 +91,15 @@ export default function Projects() {
   // Old visible categories that the user sees in the filter pills row
   const visibleCategories = ['All', 'Funded', 'Undergraduate', 'Postgraduate']
 
-  const [projectsData, setProjectsData] = useState<ProjectItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [projectsData, setProjectsData] = useState<ProjectItem[]>(() => {
+    try {
+      const seed = getProjects()
+      return Array.isArray(seed) ? seed.map(p => ({ ...p, areas: getProjectAreas(p) })) : []
+    } catch {
+      return []
+    }
+  })
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -290,11 +298,10 @@ export default function Projects() {
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${
-                activeCategory === cat && !activeArea
+              className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${activeCategory === cat && !activeArea
                   ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
                   : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)] hover:border-[var(--accent-orange)]/40'
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -377,11 +384,10 @@ export default function Projects() {
                       </span>
 
                       <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-sans font-semibold flex items-center gap-1.5 ${
-                          isOngoing
+                        className={`px-3 py-1 rounded-full text-[10px] font-sans font-semibold flex items-center gap-1.5 ${isOngoing
                             ? 'bg-emerald-600 text-white'
                             : 'bg-[var(--ink-dark)] text-white'
-                        }`}
+                          }`}
                       >
                         {isOngoing ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
                         {proj.status}
@@ -499,11 +505,10 @@ export default function Projects() {
                               <button
                                 key={idx}
                                 onClick={() => setActiveGalleryIndex(idx)}
-                                className={`w-20 h-14 rounded-xl overflow-hidden border shrink-0 transition-all cursor-pointer ${
-                                  activeGalleryIndex === idx
+                                className={`w-20 h-14 rounded-xl overflow-hidden border shrink-0 transition-all cursor-pointer ${activeGalleryIndex === idx
                                     ? 'border-[var(--accent-orange)] ring-2 ring-[var(--accent-orange)]'
                                     : 'border-[var(--border-hairline)] opacity-60 hover:opacity-100'
-                                }`}
+                                  }`}
                               >
                                 <img src={img} alt="thumb" className="w-full h-full object-cover" />
                               </button>
