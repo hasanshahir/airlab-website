@@ -224,7 +224,7 @@ export default function Grants() {
                         {grant.amount && (
                           <div className="px-5 py-3.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-left md:text-right shrink-0 shadow-xs">
                             <div className="text-[11px] font-sans font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                              PI
+                              Granted Amount
                             </div>
                             <AnimatedGrantAmount amount={grant.amount} />
                           </div>
