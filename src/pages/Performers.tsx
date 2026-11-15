@@ -5,6 +5,7 @@ import { Medal, Mail, FileText, ChevronLeft, ChevronRight, ArrowUpRight, Loader2
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 import { TextReveal } from '../components/ui/cascade-text'
+import BlurReveal from '../components/ui/blur-reveal'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { extractPerformerPhotos, normalizeDbPerformers } from '../lib/performers'
 import type { PerformerItem, CoAwardeeInfo } from '../types/data'
@@ -124,11 +125,14 @@ export default function Performers() {
           Performer of the Month
         </TitleReveal>
 
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Monthly spotlight honoring the researchers who demonstrated exceptional scientific rigor, landmark publications, and engineering leadership at AIR Lab.
-          </p>
-        </SectionReveal>
+        <BlurReveal
+          as="p"
+          waitForPreloader
+          delay={0.16}
+          className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal"
+        >
+          Monthly spotlight honoring the researchers who demonstrated exceptional scientific rigor, landmark publications, and engineering leadership at AIR Lab.
+        </BlurReveal>
       </div>
 
       {/* ── Performer Card or Placeholder ── */}
@@ -150,7 +154,7 @@ export default function Performers() {
           </p>
         </div>
       ) : (
-        <SectionReveal delay={0.2}>
+        <SectionReveal delay={0.2} blur={false}>
           <div className="p-6 sm:p-10 lg:p-12 relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-5xl mx-auto transition-all duration-300 hover:border-[var(--accent-orange)]/40 text-left">
             {/* Top Month Selector (July to October) */}
             <div className="flex flex-wrap items-center gap-2.5 pb-6 sm:pb-8 border-b border-[var(--border-hairline)] mb-8">
@@ -321,7 +325,7 @@ export default function Performers() {
                             title={`View ${person.name} on Research Interns`}
                             className="inline-flex items-baseline gap-1 hover:text-[var(--accent-orange)] transition-colors underline decoration-[var(--border-hairline-dark)] underline-offset-4 hover:decoration-[var(--accent-orange)]"
                           >
-                            <TextReveal as="span" text={person.name} staggerDelay={16} duration={250} />
+                            <TextReveal as="span" text={person.name} blurOnReveal staggerDelay={16} duration={250} />
                           </Link>
                         </span>
                       ))}
@@ -333,7 +337,7 @@ export default function Performers() {
                         title={`View ${featuredPerformer.name} on Research Interns`}
                         className="hover:text-[var(--accent-orange)] transition-colors underline decoration-[var(--border-hairline-dark)] underline-offset-4 hover:decoration-[var(--accent-orange)]"
                       >
-                        <TextReveal as="span" text={featuredPerformer.name} staggerDelay={16} duration={250} />
+                        <TextReveal as="span" text={featuredPerformer.name} blurOnReveal staggerDelay={16} duration={250} />
                       </Link>
                     </h2>
                   )}
@@ -425,14 +429,24 @@ export default function Performers() {
                 Faculty Commendation & Impact:
               </span>
               {featuredPerformer.title && (
-                <h4 className="text-base font-bold font-head text-[var(--text-primary)] mb-2">
+                <BlurReveal
+                  key={`${featuredPerformer.id}-title`}
+                  as="h4"
+                  mode="char"
+                  className="text-base font-bold font-head text-[var(--text-primary)] mb-2"
+                >
                   {featuredPerformer.title}
-                </h4>
+                </BlurReveal>
               )}
               {featuredPerformer.achievement && (
-                <p className="text-sm font-sans text-[var(--text-muted)] leading-relaxed font-normal">
+                <BlurReveal
+                  key={`${featuredPerformer.id}-ach`}
+                  as="p"
+                  delay={0.08}
+                  className="text-sm font-sans text-[var(--text-muted)] leading-relaxed font-normal"
+                >
                   {featuredPerformer.achievement}
-                </p>
+                </BlurReveal>
               )}
             </div>
 

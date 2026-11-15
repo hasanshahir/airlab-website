@@ -1,6 +1,7 @@
 import { Eye, Target } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
+import BlurReveal from '../components/ui/blur-reveal'
 import AboutRibbon from '../components/AboutRibbon'
 
 export default function About() {
@@ -41,16 +42,14 @@ export default function About() {
             Research-grade minds. Production-ready systems. Built for Pakistan.
           </TitleReveal>
 
-          <SectionReveal delay={0.22}>
-            <div className="space-y-4 text-[16px] sm:text-[18px] text-[var(--text-muted)] leading-relaxed font-normal max-w-3xl">
-              <p>
-                AIR Lab, the artificial intelligence research lab at NED University, turns cutting-edge research into production-ready systems. We build models, fine-tune and optimize open-source ones to run on local hardware, and gather the data to teach them Pakistan’s languages and realities.
-              </p>
-              <p>
-                Our work spans cybersecurity and adversarial AI, small language models, computer vision, natural language processing, speech-based agents, and agentic AI. We don’t stop at papers and prototypes. We engineer, test, and deploy systems that people and institutions can use. Every project begins with one question: what do the people of Pakistan need?
-              </p>
-            </div>
-          </SectionReveal>
+          <div className="space-y-4 text-[16px] sm:text-[18px] text-[var(--text-muted)] leading-relaxed font-normal max-w-3xl">
+            <BlurReveal as="p" waitForPreloader delay={0.22}>
+              AIR Lab, the artificial intelligence research lab at NED University, turns cutting-edge research into production-ready systems. We build models, fine-tune and optimize open-source ones to run on local hardware, and gather the data to teach them Pakistan’s languages and realities.
+            </BlurReveal>
+            <BlurReveal as="p" waitForPreloader delay={0.34}>
+              Our work spans cybersecurity and adversarial AI, small language models, computer vision, natural language processing, speech-based agents, and agentic AI. We don’t stop at papers and prototypes. We engineer, test, and deploy systems that people and institutions can use. Every project begins with one question: what do the people of Pakistan need?
+            </BlurReveal>
+          </div>
         </div>
       </div>
 
@@ -61,7 +60,7 @@ export default function About() {
       <div className="pt-16 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto">
         {/* Vision & Mission */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
-          <SectionReveal delay={0.15}>
+          <SectionReveal delay={0.15} blur={false}>
             <div className="h-full p-8 sm:p-10 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-start">
               <div className="w-12 h-12 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--accent-orange)] mb-6 shadow-sm">
                 <Eye className="w-6 h-6" />
@@ -72,13 +71,17 @@ export default function About() {
               >
                 Vision
               </TitleReveal>
-              <p className="text-[15px] sm:text-[16px] text-[var(--text-muted)] leading-relaxed font-normal">
+              <BlurReveal
+                as="p"
+                delay={0.12}
+                className="text-[15px] sm:text-[16px] text-[var(--text-muted)] leading-relaxed font-normal"
+              >
                 To make Pakistan a builder of AI, not just a consumer of it, with solutions designed around our people, our languages, and our values.
-              </p>
+              </BlurReveal>
             </div>
           </SectionReveal>
 
-          <SectionReveal delay={0.2}>
+          <SectionReveal delay={0.2} blur={false}>
             <div className="h-full p-8 sm:p-10 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-start">
               <div className="w-12 h-12 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center justify-center text-[var(--accent-orange)] mb-6 shadow-sm">
                 <Target className="w-6 h-6" />
@@ -89,9 +92,13 @@ export default function About() {
               >
                 Mission
               </TitleReveal>
-              <p className="text-[15px] sm:text-[16px] text-[var(--text-muted)] leading-relaxed font-normal">
+              <BlurReveal
+                as="p"
+                delay={0.12}
+                className="text-[15px] sm:text-[16px] text-[var(--text-muted)] leading-relaxed font-normal"
+              >
                 To conduct cutting-edge AI research and turn it into secure, production-ready systems built around the languages, data, and needs of the people of Pakistan, while training the next generation of AI researchers and engineers.
-              </p>
+              </BlurReveal>
             </div>
           </SectionReveal>
         </div>
@@ -109,14 +116,18 @@ export default function About() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {aims.map((aim, i) => (
-              <SectionReveal key={i} staggerIndex={i}>
+              <SectionReveal key={i} staggerIndex={i} blur={false}>
                 <div className="h-full p-7 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-md transition-all duration-200 flex flex-col">
                   <span className="text-[12px] font-mono font-semibold text-[var(--accent-orange)] mb-4 px-2.5 py-1 bg-[var(--bg-page)] border border-[var(--border-hairline)] rounded-full w-fit">
                     0{i + 1}
                   </span>
-                  <p className="text-[15px] text-[var(--text-muted)] leading-relaxed font-normal">
+                  <BlurReveal
+                    as="p"
+                    delay={i * 0.06}
+                    className="text-[15px] text-[var(--text-muted)] leading-relaxed font-normal"
+                  >
                     {aim}
-                  </p>
+                  </BlurReveal>
                 </div>
               </SectionReveal>
             ))}
@@ -136,14 +147,18 @@ export default function About() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {objectives.map((obj, i) => (
-              <SectionReveal key={i} staggerIndex={i}>
+              <SectionReveal key={i} staggerIndex={i} blur={false}>
                 <div className="h-full p-7 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-md transition-all duration-200 flex flex-col">
                   <span className="text-[12px] font-mono font-semibold text-[var(--accent-orange)] mb-4 px-2.5 py-1 bg-[var(--bg-page)] border border-[var(--border-hairline)] rounded-full w-fit">
                     0{i + 1}
                   </span>
-                  <p className="text-[14.5px] text-[var(--text-muted)] leading-relaxed font-normal">
+                  <BlurReveal
+                    as="p"
+                    delay={i * 0.05}
+                    className="text-[14.5px] text-[var(--text-muted)] leading-relaxed font-normal"
+                  >
                     {obj}
-                  </p>
+                  </BlurReveal>
                 </div>
               </SectionReveal>
             ))}

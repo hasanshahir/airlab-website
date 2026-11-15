@@ -1,6 +1,6 @@
 import ContactSection from '../components/ContactSection'
-import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
+import BlurReveal from '../components/ui/blur-reveal'
 
 export default function Contact() {
   return (
@@ -14,11 +14,14 @@ export default function Contact() {
           Contact AIR Lab
         </TitleReveal>
 
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Department of Computer Science & Information Technology (CSIT), NED University of Engineering & Technology.
-          </p>
-        </SectionReveal>
+        <BlurReveal
+          as="p"
+          waitForPreloader
+          delay={0.16}
+          className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal"
+        >
+          Department of Computer Science & Information Technology (CSIT), NED University of Engineering & Technology.
+        </BlurReveal>
       </div>
 
       <ContactSection />

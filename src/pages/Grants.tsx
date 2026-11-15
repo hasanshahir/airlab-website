@@ -4,6 +4,7 @@ import { getGrants } from '../lib/data'
 import { getFacultyPriority } from '../lib/utils'
 import type { Grant } from '../types/data'
 import TitleReveal from '../components/ui/TitleReveal'
+import BlurReveal from '../components/ui/blur-reveal'
 import PlaceholderBadge from '../components/ui/PlaceholderBadge'
 
 function parseGrantDateScore(durationStr?: string): number {
@@ -246,9 +247,13 @@ export default function Grants() {
                       </div>
 
                       {grant.description && (
-                        <p className="text-[15.5px] sm:text-[16.5px] text-[var(--text-primary)]/90 leading-[1.78] font-normal max-w-3xl">
+                        <BlurReveal
+                          as="p"
+                          delay={0.1}
+                          className="text-[15.5px] sm:text-[16.5px] text-[var(--text-primary)]/90 leading-[1.78] font-normal max-w-3xl"
+                        >
                           {grant.description}
-                        </p>
+                        </BlurReveal>
                       )}
                     </div>
 

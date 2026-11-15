@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import TitleReveal from '../components/ui/TitleReveal'
+import BlurReveal from '../components/ui/blur-reveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
@@ -580,13 +581,20 @@ export default function Home() {
                 Advancing Cutting-Edge AI & Translating Innovation
               </TitleReveal>
 
-              <p className="text-base sm:text-lg text-white/85 leading-relaxed font-normal">
+              <BlurReveal
+                as="p"
+                className="text-base sm:text-lg text-white/85 leading-relaxed font-normal"
+              >
                 The Artificial Intelligence Research Lab (AIR Lab) at NED University is established to advance cutting-edge artificial intelligence and translate theoretical exploration into real-world impact.
-              </p>
+              </BlurReveal>
 
-              <p className="text-base sm:text-lg text-white/80 leading-relaxed font-normal">
+              <BlurReveal
+                as="p"
+                delay={0.12}
+                className="text-base sm:text-lg text-white/80 leading-relaxed font-normal"
+              >
                 Bridging academia and industry, we develop intelligent systems that are robust, ethical, explainable, and scalable—shaping the future of AI in Pakistan.
-              </p>
+              </BlurReveal>
 
               <div className="pt-4 border-t border-white/15 flex flex-wrap gap-4 items-center">
                 <Button
@@ -705,9 +713,12 @@ export default function Home() {
                 Guided by faculty, driven by students, built for Pakistan.
               </TitleReveal>
 
-              <p className="text-base sm:text-lg text-white/85 leading-relaxed font-normal">
+              <BlurReveal
+                as="p"
+                className="text-base sm:text-lg text-white/85 leading-relaxed font-normal"
+              >
                 Behind every system is a team that cares about Pakistan. Our interdisciplinary team brings together faculty principal investigators, research interns, and student scholars solving real problems at the forefront of artificial intelligence.
-              </p>
+              </BlurReveal>
 
               <div className="pt-4 border-t border-white/15 flex flex-wrap gap-4 items-center">
                 <Button

@@ -6,8 +6,8 @@ import type { TeamMemberData } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { normalizeLinkedInUrl } from '../lib/utils'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
-import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
+import BlurReveal from '../components/ui/blur-reveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
@@ -147,11 +147,14 @@ export default function Team() {
           Faculty Leads
         </TitleReveal>
 
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Guided by faculty, driven by students, built for Pakistan. Behind every system is a team that cares about Pakistan
-          </p>
-        </SectionReveal>
+        <BlurReveal
+          as="p"
+          waitForPreloader
+          delay={0.16}
+          className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal"
+        >
+          Guided by faculty, driven by students, built for Pakistan. Behind every system is a team that cares about Pakistan
+        </BlurReveal>
       </div>
 
       {/* Tabs Control (Pill-shaped selectors) */}

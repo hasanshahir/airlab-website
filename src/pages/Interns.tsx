@@ -6,6 +6,7 @@ import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import Button from '../components/ui/Button'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
+import BlurReveal from '../components/ui/blur-reveal'
 
 const internsData = rawInterns as unknown as InternItem[]
 
@@ -33,11 +34,14 @@ export default function Interns() {
           Research Interns & Alumni
         </TitleReveal>
 
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Where our former research fellows are now — from graduate studies to industry engineering positions.
-          </p>
-        </SectionReveal>
+        <BlurReveal
+          as="p"
+          waitForPreloader
+          delay={0.16}
+          className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal"
+        >
+          Where our former research fellows are now — from graduate studies to industry engineering positions.
+        </BlurReveal>
       </div>
 
       {/* Grid of Alumni */}
