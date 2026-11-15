@@ -1,7 +1,12 @@
 import sharp from 'sharp'
 import mongoose from 'mongoose'
 
-const uri = 'mongodb+srv://hkh034553_db_user:qEK9FSUGeyRSOTwN@cluster0.xbk6omj.mongodb.net/airlab?retryWrites=true&w=majority'
+// Usage: node --env-file=server/.env scripts/optimize-mongo-images.js
+const uri = process.env.MONGO_URI
+if (!uri) {
+  console.error('MONGO_URI is not set. Run with: node --env-file=server/.env scripts/optimize-mongo-images.js')
+  process.exit(1)
+}
 
 async function compressBase64(dataUri, maxDim = 800, quality = 75) {
   if (!dataUri || !dataUri.startsWith('data:image')) return dataUri
