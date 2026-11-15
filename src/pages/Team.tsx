@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, GraduationCap, Calendar, Search, Sparkles, FileText } from 'lucide-react'
-import { getTeamMembers, getPreviousInterns } from '../lib/data'
+import { Mail, GraduationCap, Calendar, Search, Sparkles, FileText, Loader2 } from 'lucide-react'
 import type { TeamMemberData } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { normalizeLinkedInUrl } from '../lib/utils'
@@ -45,41 +44,36 @@ export default function Team() {
     }
   }, [searchParams])
 
-  const [allMembersRaw, setAllMembersRaw] = useState<TeamMemberData[]>(() => getTeamMembers())
-  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>(() => getPreviousInterns())
+  const [allMembersRaw, setAllMembersRaw] = useState<TeamMemberData[]>([])
+  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
     const apiBase = import.meta.env.VITE_API_URL || ''
     Promise.all([
-      fetch(`${apiBase}/api/content/team`).then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch(`${apiBase}/api/content/previous-interns`).then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([team, prev]) => {
-      if (!active) return
-      if (Array.isArray(team) && team.length > 0) {
-        const localMembers = getTeamMembers()
-        const enriched = team.map((item: any) => {
-          const local = localMembers.find(
-            m =>
-              String(m.id) === String(item.id) ||
-              m.name.trim().toLowerCase() === String(item.name || '').trim().toLowerCase()
-          )
-          return local
-            ? {
-                ...local,
-                ...item,
-                image: item.image || local.image,
-                linkedin: normalizeLinkedInUrl(item.linkedin) || local.linkedin,
-              }
-            : item
-        })
-        setAllMembersRaw(enriched)
-      }
-      if (Array.isArray(prev)) {
-        setSortedPreviousInterns(prev)
-      }
-    })
-    return () => { active = false }
+      fetch(`${apiBase}/api/content/team`).then(r => (r.ok ? r.json() : [])).catch(() => []),
+      fetch(`${apiBase}/api/content/previous-interns`).then(r => (r.ok ? r.json() : [])).catch(() => []),
+    ])
+      .then(([team, prev]) => {
+        if (!active) return
+        if (Array.isArray(team)) {
+          const normalized = team.map((item: any) => ({
+            ...item,
+            linkedin: normalizeLinkedInUrl(item.linkedin) || item.linkedin,
+          }))
+          setAllMembersRaw(normalized)
+        }
+        if (Array.isArray(prev)) {
+          setSortedPreviousInterns(prev)
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
   }, [])
 
   const alumniList = useMemo(() => {
@@ -150,7 +144,7 @@ export default function Team() {
           waitForPreloader
           className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight"
         >
-          Our Research Team
+          Faculty Leads
         </TitleReveal>
 
         <SectionReveal delay={0.16}>
@@ -223,7 +217,14 @@ export default function Team() {
             <div className="max-w-4xl mx-auto space-y-6">
               {facultyMembers.length === 0 && (
                 <div className="text-center py-16 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-                  <p className="text-sm font-sans text-[var(--text-muted)]">No faculty members listed yet.</p>
+                  {loading ? (
+                    <div className="inline-flex items-center gap-2 text-sm font-sans text-[var(--text-muted)]">
+                      <Loader2 className="w-4 h-4 animate-spin text-[var(--accent-orange)]" />
+                      <span>Loading faculty leads...</span>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-sans text-[var(--text-muted)]">No faculty members listed yet.</p>
+                  )}
                 </div>
               )}
               {facultyMembers.map(f => {
@@ -275,20 +276,6 @@ export default function Team() {
                         <p className="text-sm font-medium text-[var(--text-muted)] mt-1 font-sans">
                           {f.designation} · {f.department}
                         </p>
-
-                        {/* Research Tags */}
-                        {raw?.tags && (
-                          <div className="flex flex-wrap gap-1.5 mt-3">
-                            {raw.tags.map((t, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
-                              >
-                                {t.replace(/^#/, '')}
-                              </span>
-                            ))}
-                          </div>
-                        )}
                       </div>
 
                       {/* Action buttons: LinkedIn, Email, Resume */}
@@ -363,9 +350,16 @@ export default function Team() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left">
               {filteredInterns.length === 0 && (
                 <div className="col-span-full text-center py-16 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-                  <p className="text-sm font-sans text-[var(--text-muted)]">
-                    {searchQuery ? `No interns match "${searchQuery}".` : 'No research interns listed yet.'}
-                  </p>
+                  {loading ? (
+                    <div className="inline-flex items-center gap-2 text-sm font-sans text-[var(--text-muted)]">
+                      <Loader2 className="w-4 h-4 animate-spin text-[var(--accent-orange)]" />
+                      <span>Loading research scholars...</span>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-sans text-[var(--text-muted)]">
+                      {searchQuery ? `No interns match "${searchQuery}".` : 'No research interns listed yet.'}
+                    </p>
+                  )}
                 </div>
               )}
               {filteredInterns.map(intern => {

@@ -5,7 +5,6 @@ import { X, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { GalleryItem, PerformerItem } from '../types/data'
 import { getPerformers } from '../lib/data'
 import { extractPerformerPhotos, mergePerformersWithLocal } from '../lib/performers'
-import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 
 const GALLERY_FILTERS = ['All', 'Events', 'Session', 'Mentoring', 'Lab'] as const
@@ -217,20 +216,14 @@ export default function Gallery() {
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
-      <div className="mb-10 text-left max-w-3xl">
+      <div className="mb-8 text-left max-w-3xl">
         <TitleReveal
           as="h1"
           waitForPreloader
-          className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight"
+          className="font-head font-semibold text-[var(--text-primary)] tracking-tight"
         >
           Lab Gallery
         </TitleReveal>
-
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Visual documentation of laboratory infrastructure, mentoring sessions, technical sprints, and campus visits.
-          </p>
-        </SectionReveal>
       </div>
 
       {/* Category Filter Pills */}
