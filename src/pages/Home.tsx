@@ -379,8 +379,9 @@ export default function Home() {
           <CoverflowCarousel
             slides={HERO_CAROUSEL_IMAGES}
             autoPlay
-            speed={4}
-            cardWidth="clamp(250px, 34vw, 400px)"
+            transitionDuration={680}
+            pauseDuration={1100}
+            cardWidth="clamp(275px, 36vw, 440px)"
             label="AIR Lab Hero Coverflow Carousel"
             className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
           >

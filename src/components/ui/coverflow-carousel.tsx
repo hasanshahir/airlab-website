@@ -33,9 +33,13 @@ export interface CoverflowCarouselProps {
   /** Space between cards, as a fraction of card width. */
   gap?: number;
   loop?: boolean;
-  /** Continuously spin from right to left like TiltedGridHero. */
+  /** Automatically animate right-to-left, pause on each centered card, and repeat. */
   autoPlay?: boolean;
-  /** Seconds to advance by one card when autoPlay is enabled. @default 4 */
+  /** Duration in ms of the quick slide transition between cards. @default 680 */
+  transitionDuration?: number;
+  /** Pause in ms after landing on the centered view before advancing. @default 1100 */
+  pauseDuration?: number;
+  /** Legacy prop alias (seconds) — if provided, scales transition/pause timing. */
   speed?: number;
   /** Width of the horizontal edge fade mask in percent (0 disables). @default 12 */
   edgeFade?: number;
@@ -57,11 +61,12 @@ export function CoverflowCarousel({
   perspective = 3,
   falloff = 0.56,
   fade = 0.1,
-  cardWidth = "clamp(250px, 34vw, 400px)",
+  cardWidth = "clamp(275px, 36vw, 440px)",
   gap = 0.05,
   loop = true,
   autoPlay = true,
-  speed = 4,
+  transitionDuration = 680,
+  pauseDuration = 1100,
   edgeFade = 12,
   showCaption = false,
   showPagination = false,
@@ -76,14 +81,12 @@ export function CoverflowCarousel({
   const frameRef = React.useRef<HTMLDivElement>(null);
   const cardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   /** Fractional card index at the centre. The single source of truth. */
-  const posRef = React.useRef(0);
-  /** Where the current settle is headed. Stepping off `pos` instead would
-      swallow a keypress that lands mid-flight, before the round-off moves. */
+  const posRef = React.useRef(autoPlay && loop && count > 1 ? -1 : 0);
+  /** Where the current settle is headed. */
   const targetRef = React.useRef(0);
   const widthRef = React.useRef(0);
   const rafRef = React.useRef<number | null>(null);
-  const autoRafRef = React.useRef<number | null>(null);
-  const lastFrameTimeRef = React.useRef<number | null>(null);
+  const pauseTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedRef = React.useRef(0);
   const dragRef = React.useRef<{
     id: number;
@@ -144,7 +147,6 @@ export function CoverflowCarousel({
       const distance = Math.abs(offset);
       // Both the tilt and the recession ease off as cards travel out —
       // doubling the distance adds only about half again as much of each.
-      // A linear ramp folds the second card shut; this keeps it readable.
       const ramp = Math.pow(distance, falloff);
       // Capped short of edge-on so a far card never turns its back.
       const tilt = Math.min(rotate * ramp, 82) * Math.sign(offset);
@@ -161,78 +163,103 @@ export function CoverflowCarousel({
     });
   }, [count, depth, fade, falloff, gap, loop, rotate]);
 
-  const stopAutoSpin = React.useCallback(() => {
-    if (autoRafRef.current !== null) {
-      cancelAnimationFrame(autoRafRef.current);
-      autoRafRef.current = null;
+  const clearPauseTimer = React.useCallback(() => {
+    if (pauseTimerRef.current !== null) {
+      clearTimeout(pauseTimerRef.current);
+      pauseTimerRef.current = null;
     }
-    lastFrameTimeRef.current = null;
   }, []);
 
-  const canAutoSpin =
-    autoPlay && loop && speed > 0 && count > 1 && !prefersReducedMotion;
-
-  const startAutoSpin = React.useCallback(() => {
-    stopAutoSpin();
-    if (!canAutoSpin) return;
-
-    const tick = (now: number) => {
-      if (dragRef.current !== null || rafRef.current !== null) {
-        autoRafRef.current = null;
-        lastFrameTimeRef.current = null;
-        return;
-      }
-      const prev = lastFrameTimeRef.current ?? now;
-      lastFrameTimeRef.current = now;
-      // Cap frame delta so tab switches don't jump cards forward.
-      const dt = Math.min((now - prev) / 1000, 0.1);
-      // Advancing positive `pos` decreases `offset = index - pos`,
-      // moving cards smoothly from right to left just like v1.
-      posRef.current += dt / speed;
-      targetRef.current = posRef.current;
-      syncSelected(posRef.current);
-      paint();
-      autoRafRef.current = requestAnimationFrame(tick);
-    };
-
-    autoRafRef.current = requestAnimationFrame(tick);
-  }, [canAutoSpin, paint, speed, stopAutoSpin, syncSelected]);
-
-  React.useEffect(() => {
-    startAutoSpin();
-    return stopAutoSpin;
-  }, [startAutoSpin, stopAutoSpin]);
-
-  const settle = React.useCallback(
-    (target: number) => {
-      stopAutoSpin();
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-      targetRef.current = target;
-      syncSelected(target);
-
-      const step = () => {
-        const remaining = target - posRef.current;
-        if (Math.abs(remaining) < 0.0004) {
-          posRef.current = target;
-          paint();
-          rafRef.current = null;
-          startAutoSpin();
-          return;
-        }
-        // Exponential ease-out settle.
-        posRef.current += remaining * 0.16;
-        paint();
-        rafRef.current = requestAnimationFrame(step);
-      };
-      rafRef.current = requestAnimationFrame(step);
-    },
-    [paint, startAutoSpin, stopAutoSpin, syncSelected],
-  );
+  const canAutoPlay =
+    autoPlay && loop && count > 1 && !prefersReducedMotion;
 
   const clamp = React.useCallback(
     (pos: number) => (loop ? pos : Math.max(0, Math.min(count - 1, pos))),
     [count, loop],
   );
+
+  // Smoothly animate `posRef` to `target` over `transitionDuration` ms,
+  // land on the centered view, pause for `pauseDuration` ms, and repeat.
+  const settle = React.useCallback(
+    function runSettle(target: number) {
+      clearPauseTimer();
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+
+      targetRef.current = target;
+      syncSelected(target);
+
+      const startPos = posRef.current;
+      const delta = target - startPos;
+
+      const scheduleNextStep = () => {
+        if (!canAutoPlay || dragRef.current !== null) return;
+        clearPauseTimer();
+        pauseTimerRef.current = setTimeout(() => {
+          pauseTimerRef.current = null;
+          if (dragRef.current !== null) return;
+          // Advance +1 so cards glide from right to left and land on the next centered view.
+          runSettle(clamp(Math.round(targetRef.current) + 1));
+        }, pauseDuration);
+      };
+
+      if (Math.abs(delta) < 0.0004 || prefersReducedMotion) {
+        posRef.current = target;
+        paint();
+        scheduleNextStep();
+        return;
+      }
+
+      const startTime = performance.now();
+      const duration = Math.max(180, transitionDuration);
+
+      const step = (now: number) => {
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        // Smooth cubic ease-out: quick initial motion, crisp gentle landing on center.
+        const eased = 1 - Math.pow(1 - t, 3);
+        posRef.current = startPos + delta * eased;
+        paint();
+
+        if (t < 1) {
+          rafRef.current = requestAnimationFrame(step);
+        } else {
+          posRef.current = target;
+          paint();
+          rafRef.current = null;
+          scheduleNextStep();
+        }
+      };
+
+      rafRef.current = requestAnimationFrame(step);
+    },
+    [
+      canAutoPlay,
+      clamp,
+      clearPauseTimer,
+      paint,
+      pauseDuration,
+      prefersReducedMotion,
+      syncSelected,
+      transitionDuration,
+    ],
+  );
+
+  // Kick off the initial quick entrance animation into the default view (0),
+  // then pause ~1s and repeat right-to-left.
+  React.useEffect(() => {
+    if (!canAutoPlay) return;
+    settle(Math.round(targetRef.current));
+    return () => {
+      clearPauseTimer();
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [canAutoPlay, clearPauseTimer, settle]);
 
   const goTo = React.useCallback(
     (index: number) => {
@@ -251,7 +278,7 @@ export function CoverflowCarousel({
   );
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    stopAutoSpin();
+    clearPauseTimer();
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
@@ -316,9 +343,9 @@ export function CoverflowCarousel({
   React.useEffect(
     () => () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-      stopAutoSpin();
+      clearPauseTimer();
     },
-    [stopAutoSpin],
+    [clearPauseTimer],
   );
 
   const active = slides[selected];
