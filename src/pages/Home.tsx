@@ -539,11 +539,6 @@ export default function Home() {
                 className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-4 left-4 right-4 text-white text-xs font-sans font-medium bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl inline-flex items-center justify-between border border-white/10">
-                <span>AIR Lab Faculty & Research Cohort</span>
-                <span className="text-[var(--accent-orange)]">Department of CSIT</span>
-              </div>
             </div>
           </div>
         </div>
