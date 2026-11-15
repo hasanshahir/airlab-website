@@ -82,7 +82,7 @@ export default function Gallery() {
 
   useEffect(() => {
     let active = true
-    fetch('/api/content/gallery')
+    fetch('/api/content/gallery', { cache: 'no-store' })
       .then(r => (r.ok ? r.json() : []))
       .then(d => {
         if (!active) return

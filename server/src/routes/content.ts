@@ -67,9 +67,12 @@ contentRouter.get('/:slug', async (req, res) => {
     }
   }
 
+  const dbReady = mongoose.connection.readyState === 1
   res.set(
     'Cache-Control',
-    'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400'
+    !dbReady || req.params.slug === 'gallery'
+      ? 'no-store'
+      : 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400'
   )
   res.json(items)
 })
