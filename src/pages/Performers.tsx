@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Medal, Mail, FileText, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
@@ -14,10 +15,25 @@ const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   </svg>
 )
 
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0.35,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? '-100%' : '100%',
+    opacity: 0.35,
+  }),
+}
+
 export default function Performers() {
   const [performersList, setPerformersList] = useState<PerformerItem[]>(() => getPerformers())
   const [activeCycleIndex, setActiveCycleIndex] = useState(0)
-  const [activeSlideIndex, setActiveSlideIndex] = useState(0)
+  const [slideState, setSlideState] = useState({ index: 0, direction: 1 })
   const [isPaused, setIsPaused] = useState(false)
 
   useEffect(() => {
@@ -27,7 +43,7 @@ export default function Performers() {
         if (!Array.isArray(d) || d.length === 0) return
         const merged = mergePerformersWithLocal(d, getPerformers())
         setPerformersList(merged)
-        setActiveSlideIndex(0)
+        setSlideState({ index: 0, direction: 1 })
       })
       .catch(() => {})
   }, [])
@@ -41,24 +57,41 @@ export default function Performers() {
     return unique.length > 0 ? unique : [DEFAULT_AVATAR]
   }, [featuredPerformer])
 
-  const safeSlideIndex = slides.length > 0 ? activeSlideIndex % slides.length : 0
+  const safeSlideIndex = slides.length > 0 ? slideState.index % slides.length : 0
 
   useEffect(() => {
     if (slides.length <= 1 || isPaused) return
     const timer = window.setInterval(() => {
-      setActiveSlideIndex(prev => (prev + 1) % slides.length)
+      setSlideState(prev => ({
+        index: (prev.index + 1) % slides.length,
+        direction: 1,
+      }))
     }, 4500)
     return () => window.clearInterval(timer)
   }, [slides.length, isPaused, activeCycleIndex])
 
   const goToPrevSlide = () => {
     if (slides.length <= 1) return
-    setActiveSlideIndex(prev => (prev - 1 + slides.length) % slides.length)
+    setSlideState(prev => ({
+      index: (prev.index - 1 + slides.length) % slides.length,
+      direction: -1,
+    }))
   }
 
   const goToNextSlide = () => {
     if (slides.length <= 1) return
-    setActiveSlideIndex(prev => (prev + 1) % slides.length)
+    setSlideState(prev => ({
+      index: (prev.index + 1) % slides.length,
+      direction: 1,
+    }))
+  }
+
+  const goToSlide = (targetIdx: number) => {
+    if (targetIdx === safeSlideIndex) return
+    setSlideState({
+      index: targetIdx,
+      direction: targetIdx > safeSlideIndex ? 1 : -1,
+    })
   }
 
   const coAwardees: CoAwardeeInfo[] = Array.isArray(featuredPerformer?.coAwardees)
@@ -111,7 +144,7 @@ export default function Performers() {
                   type="button"
                   onClick={() => {
                     setActiveCycleIndex(idx)
-                    setActiveSlideIndex(0)
+                    setSlideState({ index: 0, direction: 1 })
                   }}
                   className={`px-4 py-1.5 rounded-full text-xs font-sans font-medium border transition-colors cursor-pointer ${
                     activeCycleIndex === idx
@@ -143,18 +176,31 @@ export default function Performers() {
                   <Link
                     to={teamRedirectUrl}
                     title={`Click to view ${featuredPerformer.name} on Research Interns page`}
-                    className="block w-full h-full cursor-pointer"
+                    className="relative block w-full h-full cursor-pointer overflow-hidden"
                   >
-                    <img
-                      key={slides[safeSlideIndex]}
-                      src={slides[safeSlideIndex]}
-                      alt={`${featuredPerformer.name} — ${featuredPerformer.month} photo ${safeSlideIndex + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      onError={e => {
-                        e.currentTarget.src = DEFAULT_AVATAR
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                    <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
+                      <AnimatePresence initial={false} custom={slideState.direction} mode="popLayout">
+                        <motion.img
+                          key={`${activeCycleIndex}-${slides[safeSlideIndex]}`}
+                          src={slides[safeSlideIndex]}
+                          custom={slideState.direction}
+                          variants={slideVariants}
+                          initial="enter"
+                          animate="center"
+                          exit="exit"
+                          transition={{
+                            x: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+                            opacity: { duration: 0.3 },
+                          }}
+                          alt={`${featuredPerformer.name} — ${featuredPerformer.month} photo ${safeSlideIndex + 1}`}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          onError={e => {
+                            e.currentTarget.src = DEFAULT_AVATAR
+                          }}
+                        />
+                      </AnimatePresence>
+                    </div>
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
                   </Link>
 
                   {slides.length > 1 && (
@@ -201,7 +247,7 @@ export default function Performers() {
                         <button
                           key={slideUrl + sIdx}
                           type="button"
-                          onClick={() => setActiveSlideIndex(sIdx)}
+                          onClick={() => goToSlide(sIdx)}
                           aria-label={`View photo ${sIdx + 1}`}
                           className={`relative w-14 h-10 rounded-lg overflow-hidden border transition-all cursor-pointer ${
                             safeSlideIndex === sIdx
@@ -226,7 +272,7 @@ export default function Performers() {
                         <button
                           key={sIdx}
                           type="button"
-                          onClick={() => setActiveSlideIndex(sIdx)}
+                          onClick={() => goToSlide(sIdx)}
                           aria-label={`Go to slide ${sIdx + 1}`}
                           className={`h-2 rounded-full transition-all cursor-pointer ${
                             safeSlideIndex === sIdx
@@ -265,14 +311,13 @@ export default function Performers() {
                       ))}
                     </h2>
                   ) : (
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-head text-[var(--text-primary)] tracking-tight">
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-head text-[var(--text-primary)] tracking-tight leading-snug">
                       <Link
                         to={teamRedirectUrl}
                         title={`View ${featuredPerformer.name} on Research Interns`}
-                        className="inline-flex items-center gap-1.5 hover:text-[var(--accent-orange)] transition-colors underline decoration-[var(--border-hairline-dark)] underline-offset-4 hover:decoration-[var(--accent-orange)]"
+                        className="hover:text-[var(--accent-orange)] transition-colors underline decoration-[var(--border-hairline-dark)] underline-offset-4 hover:decoration-[var(--accent-orange)]"
                       >
-                        <span>{featuredPerformer.name}</span>
-                        <ArrowUpRight className="w-5 h-5 shrink-0 opacity-60" />
+                        {featuredPerformer.name}
                       </Link>
                     </h2>
                   )}
@@ -284,93 +329,77 @@ export default function Performers() {
                   )}
                 </div>
 
-                {/* Co-Awardees Contact Cards */}
-                {coAwardees.length > 0 && (
-                  <div className="space-y-2.5">
-                    {coAwardees.map(person => (
-                      <div
-                        key={person.id}
-                        className="p-3.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2"
-                      >
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Link
-                            to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
-                            title={`View ${person.name} on Research Interns`}
-                            className="inline-flex items-center gap-1 text-sm font-bold font-head text-[var(--text-primary)] hover:text-[var(--accent-orange)] transition-colors"
-                          >
-                            <span>{person.name}</span>
-                            <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />
-                          </Link>
-                          {person.note && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[var(--bg-surface)] text-[var(--text-subtle)] border border-[var(--border-hairline)]">
-                              {person.note}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-1.5">
-                          {person.linkedin && (
-                            <a
-                              href={person.linkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                            >
-                              <Linkedin className="w-3 h-3" />
-                              <span>LinkedIn</span>
-                            </a>
-                          )}
-                          {person.email && (
-                            <a
-                              href={`mailto:${person.email}`}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                            >
-                              <Mail className="w-3 h-3" />
-                              <span>Email</span>
-                            </a>
-                          )}
-                        </div>
+                {/* Awardee Detail Cards (unified for both co-awardees and single awardees) */}
+                <div className="space-y-2.5">
+                  {(coAwardees.length > 0
+                    ? coAwardees
+                    : [
+                        {
+                          id: featuredPerformer.id,
+                          name: featuredPerformer.name,
+                          categoryTab: featuredPerformer.categoryTab || 'interns',
+                          email: featuredPerformer.email,
+                          linkedin: featuredPerformer.linkedin,
+                          cvUrl: featuredPerformer.cvUrl,
+                        },
+                      ]
+                  ).map((person: CoAwardeeInfo & { cvUrl?: string }) => (
+                    <div
+                      key={person.id || person.name}
+                      className="p-3.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
+                          title={`View ${person.name} on Research Interns`}
+                          className="inline-flex items-center gap-1 text-sm font-bold font-head text-[var(--text-primary)] hover:text-[var(--accent-orange)] transition-colors"
+                        >
+                          <span>{person.name}</span>
+                          <ArrowUpRight className="w-3.5 h-3.5 shrink-0 opacity-60" />
+                        </Link>
+                        {person.note && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[var(--bg-surface)] text-[var(--text-subtle)] border border-[var(--border-hairline)]">
+                            {person.note}
+                          </span>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
 
-                {/* Action Links for Single Awardee (kept only once, no bottom duplicate) */}
-                {coAwardees.length === 0 && (
-                  <div className="flex flex-wrap items-center gap-2.5 pt-2">
-                    {featuredPerformer.linkedin && (
-                      <a
-                        href={featuredPerformer.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                      >
-                        <Linkedin className="w-3.5 h-3.5" />
-                        <span>LinkedIn</span>
-                      </a>
-                    )}
-                    {(featuredPerformer.cvUrl || featuredPerformer.linkedin) && (
-                      <a
-                        href={featuredPerformer.cvUrl || featuredPerformer.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>Resume</span>
-                      </a>
-                    )}
-                    {featuredPerformer.email && (
-                      <a
-                        href={`mailto:${featuredPerformer.email}`}
-                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                      >
-                        <Mail className="w-3.5 h-3.5" />
-                        <span>Email</span>
-                      </a>
-                    )}
-                  </div>
-                )}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {person.linkedin && (
+                          <a
+                            href={person.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                          >
+                            <Linkedin className="w-3 h-3" />
+                            <span>LinkedIn</span>
+                          </a>
+                        )}
+                        {person.cvUrl && (
+                          <a
+                            href={person.cvUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                          >
+                            <FileText className="w-3 h-3" />
+                            <span>Resume</span>
+                          </a>
+                        )}
+                        {person.email && (
+                          <a
+                            href={`mailto:${person.email}`}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                          >
+                            <Mail className="w-3 h-3" />
+                            <span>Email</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
