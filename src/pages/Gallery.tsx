@@ -169,7 +169,7 @@ export default function Gallery() {
           waitForPreloader
           className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight"
         >
-          Laboratory Gallery & Media
+          Lab Gallery
         </TitleReveal>
 
         <SectionReveal delay={0.16}>
