@@ -9,7 +9,6 @@ import {
   Users,
 } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { getProjects } from '../lib/data'
 import { getFacultyPriority } from '../lib/utils'
 import type { ProjectItem } from '../types/data'
 import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
@@ -33,67 +32,6 @@ function parseDateScore(dateStr?: string): number {
   return year * 100 + month
 }
 
-// Canonical research area mappings for all projects ensuring 100% reliable categorization
-const CANONICAL_PROJECT_AREAS: Record<string, string[]> = {
-  'PRJ-7': [
-    'Cyber',
-    'Adversarial AI',
-    'Efficient Computing & TinyML',
-    'AI Safety & Alignment',
-  ],
-  'PRJ-8': [
-    'Foundational Models & NLP',
-    'Efficient Computing & TinyML',
-    'Cyber',
-    'Software Development',
-  ],
-  'PRJ-9': [
-    'Adversarial AI',
-    'Cyber',
-    'AI Safety & Alignment',
-    'Foundational Models & NLP',
-  ],
-  'PRJ-10': [
-    'Foundational Models & NLP',
-    'Software Development',
-    'Efficient Computing & TinyML',
-  ],
-  'PRJ-1': [
-    'Foundational Models & NLP',
-    'Cyber',
-    'AI Safety & Alignment',
-    'Software Development',
-  ],
-  'PRJ-2': [
-    'Cyber',
-    'Software Development',
-    'Foundational Models & NLP',
-    'Adversarial AI',
-  ],
-  'PRJ-3': [
-    'Software Development',
-    'Cyber',
-    'Adversarial AI',
-    'Foundational Models & NLP',
-  ],
-  'PRJ-4': [
-    'Foundational Models & NLP',
-    'Efficient Computing & TinyML',
-    'Software Development',
-    'AI Safety & Alignment',
-  ],
-  'PRJ-5': [
-    'Software Development',
-    'Cyber',
-    'Foundational Models & NLP',
-  ],
-  'PRJ-6': [
-    'Foundational Models & NLP',
-    'Software Development',
-    'AI Safety & Alignment',
-  ],
-}
-
 function normalizeAreaName(area: string): string {
   return area.trim().toLowerCase() === 'development' ? 'Software Development' : area
 }
@@ -101,16 +39,6 @@ function normalizeAreaName(area: string): string {
 function getProjectAreas(project: ProjectItem): string[] {
   if (Array.isArray(project.areas) && project.areas.length > 0) {
     return project.areas.map(normalizeAreaName)
-  }
-  const idStr = String(project.id)
-  if (CANONICAL_PROJECT_AREAS[idStr]) {
-    return CANONICAL_PROJECT_AREAS[idStr]
-  }
-  const cleanId = idStr.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
-  for (const [key, areas] of Object.entries(CANONICAL_PROJECT_AREAS)) {
-    if (key.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === cleanId) {
-      return areas
-    }
   }
   return []
 }
@@ -151,16 +79,6 @@ function projectMatchesResearchArea(project: ProjectItem, targetArea: string): b
   return false
 }
 
-function getCanonicalProjectKey(title?: string): string {
-  if (!title) return ''
-  const clean = title.trim().toLowerCase()
-  const prefixMatch = clean.split(/\s*[:–—]\s*/)[0]?.trim()
-  if (prefixMatch && prefixMatch.length >= 4 && prefixMatch !== clean) {
-    return prefixMatch
-  }
-  return clean.replace(/[^a-z0-9]+/g, ' ').trim()
-}
-
 export default function Projects() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [activeCategory, setActiveCategory] = useState<string>('All')
@@ -172,88 +90,28 @@ export default function Projects() {
   // Old visible categories that the user sees in the filter pills row
   const visibleCategories = ['All', 'Funded', 'Undergraduate', 'Postgraduate']
 
-  const [projectsData, setProjectsData] = useState<ProjectItem[]>(() => {
-    const list = getProjects()
-    return list.map(p => ({
-      ...p,
-      areas: getProjectAreas(p),
-    }))
-  })
+  const [projectsData, setProjectsData] = useState<ProjectItem[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
-    fetch('/api/content/projects')
+    const apiBase = import.meta.env.VITE_API_URL || ''
+    fetch(`${apiBase}/api/content/projects`)
       .then(r => (r.ok ? r.json() : []))
       .catch(() => [])
       .then((projs: ProjectItem[]) => {
         if (!active) return
-        if (Array.isArray(projs) && projs.length > 0) {
-          const localList = getProjects()
-          const dedupedMap = new Map<string, ProjectItem>()
-          for (const p of projs) {
-            const key = getCanonicalProjectKey(p.title) || String(p.id)
-            const prev = dedupedMap.get(key)
-            if (!prev) {
-              dedupedMap.set(key, p)
-            } else {
-              const prevMembers = Array.isArray(prev.teamMembers) ? prev.teamMembers : []
-              const currMembers = Array.isArray(p.teamMembers) ? p.teamMembers : []
-              dedupedMap.set(key, {
-                ...prev,
-                ...p,
-                teamMembers: currMembers.length >= prevMembers.length ? currMembers : prevMembers,
-              })
-            }
-          }
-
-          const merged = Array.from(dedupedMap.values()).map(p => {
-            const pKey = getCanonicalProjectKey(p.title)
-            const local = localList.find(
-              lp =>
-                String(lp.id) === String(p.id) ||
-                lp.title.trim().toLowerCase() === String(p.title || '').trim().toLowerCase() ||
-                (pKey && getCanonicalProjectKey(lp.title) === pKey)
-            )
-            const rawAreas =
-              Array.isArray(p.areas) && p.areas.length > 0
-                ? p.areas
-                : local?.areas || getProjectAreas(local || p)
-            const areas = rawAreas.map(normalizeAreaName)
-            const useLocalCover =
-              local?.coverImage?.startsWith('/projects/') &&
-              (!p.coverImage ||
-                String(p.coverImage).includes('unsplash.com') ||
-                String(p.coverImage).includes('ibb.co'))
-            const apiMembers = Array.isArray(p.teamMembers) ? p.teamMembers.filter(Boolean) : []
-            const localMembers = Array.isArray(local?.teamMembers)
-              ? local!.teamMembers!.filter(Boolean)
-              : []
-            const teamMembers =
-              apiMembers.length > 1
-                ? apiMembers
-                : localMembers.length > apiMembers.length
-                  ? localMembers
-                  : apiMembers
-
-            return {
-              ...local,
+        if (Array.isArray(projs)) {
+          setProjectsData(
+            projs.map(p => ({
               ...p,
-              coverImage:
-                (useLocalCover
-                  ? local!.coverImage
-                  : p.coverImage || local?.coverImage) || '',
-              images:
-                (useLocalCover
-                  ? local!.images
-                  : p.images?.length
-                    ? p.images
-                    : local?.images) || [],
-              teamMembers,
-              areas,
-            } as ProjectItem
-          })
-          setProjectsData(merged)
+              areas: getProjectAreas(p),
+            }))
+          )
         }
+      })
+      .finally(() => {
+        if (active) setLoading(false)
       })
     return () => {
       active = false
@@ -572,14 +430,18 @@ export default function Projects() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Empty State */}
-      {filtered.length === 0 && (
+      {/* Loading / Empty State */}
+      {loading && filtered.length === 0 ? (
+        <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
+          <p className="text-sm font-sans text-[var(--text-muted)]">Loading projects...</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
           <p className="text-sm font-sans text-[var(--text-muted)]">
             {query ? `No projects match "${query}".` : 'No projects published yet.'}
           </p>
         </div>
-      )}
+      ) : null}
 
       {/* ── Project Gallery & Specs Modal ── */}
       {typeof document !== 'undefined' &&

@@ -786,7 +786,7 @@ export default function AdminDashboard() {
     { id: 'applications', label: 'Intern Applications', icon: ClipboardList },
     { id: 'vacancy-settings', label: 'Vacancy & Ribbon', icon: Settings },
     { id: 'team', label: 'Faculty & Team', icon: Users },
-    { id: 'previous-interns', label: 'Past Interns Archive', icon: GraduationCap },
+    { id: 'previous-interns', label: 'Past Interns', icon: GraduationCap },
     { id: 'interns', label: 'Intern Spotlights', icon: GraduationCap },
     { id: 'performers', label: 'Performer of Month', icon: Medal },
     { id: 'projects', label: 'Research Projects', icon: Briefcase },
@@ -1247,19 +1247,22 @@ export default function AdminDashboard() {
                           {item.name || item.title || item.partner || `ID: ${item.id || item._id}`}
                         </td>
                         <td className="py-3 px-4 text-[var(--text-muted)]">
-                          {item.authors ||
-                            item.author ||
-                            item.role ||
-                            item.category ||
-                            item.type ||
-                            item.term ||
-                            item.month ||
-                            item.funder ||
-                            item.venue ||
-                            item.cat ||
-                            item.tenure ||
-                            item.date ||
-                            '—'}
+                          {item.tenure && item.department
+                            ? `${item.tenure} • ${item.department}`
+                            : item.authors ||
+                              item.author ||
+                              item.role ||
+                              item.category ||
+                              item.type ||
+                              item.term ||
+                              item.month ||
+                              item.funder ||
+                              item.venue ||
+                              item.cat ||
+                              item.tenure ||
+                              item.department ||
+                              item.date ||
+                              '—'}
                         </td>
                         <td className="py-3 px-4">
                           <span

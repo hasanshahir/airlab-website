@@ -11,13 +11,11 @@ import {
   ArrowUpRight,
   ArrowRight,
 } from 'lucide-react'
-import rawProjects from '../data/projects.json'
 import rawTeam from '../data/team.json'
 import type { ProjectItem, TeamMemberData } from '../types/data'
 import { getMemberAvatar } from '../lib/placeholders'
 import { getFacultyPriority } from '../lib/utils'
 
-const initialProjectsData = rawProjects as unknown as ProjectItem[]
 const initialTeamData = rawTeam as unknown as TeamMemberData[]
 
 
@@ -39,17 +37,18 @@ export default function QuickDrawer({
   const [tab, setTab] = useState<'projects' | 'members'>(initialTab)
   const [searchQuery, setSearchQuery] = useState('')
   const [memberFilter, setMemberFilter] = useState<'All' | 'Faculty' | 'Research Interns'>('All')
-  const [projectsData, setProjectsData] = useState<ProjectItem[]>(initialProjectsData)
+  const [projectsData, setProjectsData] = useState<ProjectItem[]>([])
   const [teamData, setTeamData] = useState<TeamMemberData[]>(initialTeamData)
 
   useEffect(() => {
     let active = true
+    const apiBase = import.meta.env.VITE_API_URL || ''
     Promise.all([
-      fetch('/api/content/projects').then(r => (r.ok ? r.json() : [])).catch(() => []),
-      fetch('/api/content/team').then(r => (r.ok ? r.json() : [])).catch(() => []),
+      fetch(`${apiBase}/api/content/projects`).then(r => (r.ok ? r.json() : [])).catch(() => []),
+      fetch(`${apiBase}/api/content/team`).then(r => (r.ok ? r.json() : [])).catch(() => []),
     ]).then(([projs, team]) => {
       if (!active) return
-      if (Array.isArray(projs) && projs.length > 0) setProjectsData(projs)
+      if (Array.isArray(projs)) setProjectsData(projs)
       if (Array.isArray(team) && team.length > 0) setTeamData(team)
     })
     return () => {

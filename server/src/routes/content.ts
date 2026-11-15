@@ -46,7 +46,8 @@ contentRouter.get('/:slug', async (req, res) => {
   }
 
   // If database collection is currently empty or unavailable, serve fallback seed data from src/data/*.json
-  if (!items || items.length === 0) {
+  // (projects and previous-interns are served strictly from the database / admin panel)
+  if (req.params.slug !== 'projects' && req.params.slug !== 'previous-interns' && (!items || items.length === 0)) {
     try {
       const seedPath = path.join(DATA_DIR, def.seedFile)
       let raw = await readFile(seedPath, 'utf8')

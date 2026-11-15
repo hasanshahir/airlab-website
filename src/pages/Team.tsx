@@ -606,17 +606,19 @@ export default function Team() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border-hairline)]">
-                    {alumniList.map((p: any) => (
-                      <tr
-                        key={p.id}
-                        id={`member-${p.id}`}
-                        className={`hover:bg-[var(--bg-page)] transition-colors ${
-                          highlightedMemberId === p.id ? 'bg-[var(--accent-orange)]/15 ring-2 ring-[var(--accent-orange)]' : ''
-                        }`}
-                      >
-                        <td className="py-4 px-6 font-semibold text-[var(--text-primary)]">
-                          {p.name}
-                        </td>
+                    {alumniList.map((p: any) => {
+                      const memberKey = p.id || p._id
+                      return (
+                        <tr
+                          key={memberKey}
+                          id={`member-${memberKey}`}
+                          className={`hover:bg-[var(--bg-page)] transition-colors ${
+                            highlightedMemberId === memberKey || highlightedMemberId === p.id ? 'bg-[var(--accent-orange)]/15 ring-2 ring-[var(--accent-orange)]' : ''
+                          }`}
+                        >
+                          <td className="py-4 px-6 font-semibold text-[var(--text-primary)]">
+                            {p.name}
+                          </td>
                         <td className="py-4 px-6 text-[var(--text-muted)] font-sans text-xs">
                           {p.tenure || 'Former Research Intern'} • {p.department}
                         </td>
@@ -638,7 +640,7 @@ export default function Team() {
                           </a>
                         </td>
                       </tr>
-                    ))}
+                    )})}
                   </tbody>
                 </table>
               </div>

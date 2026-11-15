@@ -19,7 +19,7 @@ import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
 import { CoverflowCarousel } from '@/components/ui/coverflow-carousel'
-import { getProjects, getGrants } from '../lib/data'
+import { getGrants } from '../lib/data'
 import { useVacancySettings } from '../lib/vacancy'
 import type { ProjectItem, Grant } from '../types/data'
 
@@ -95,7 +95,7 @@ export default function Home() {
   const updatesTargetVelocityRef = useRef(55)
   const updatesManualBoostRef = useRef(0)
   const vacancy = useVacancySettings()
-  const [projects, setProjects] = useState<ProjectItem[]>(() => getProjects())
+  const [projects, setProjects] = useState<ProjectItem[]>([])
   const [grants, setGrants] = useState<Grant[]>(() => getGrants())
   const areasTrackRef = useRef<HTMLDivElement>(null)
   const areasOffsetRef = useRef(0)
@@ -110,7 +110,7 @@ export default function Home() {
     fetch(`${apiBase}/api/content/projects`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (active && Array.isArray(data) && data.length > 0) {
+        if (active && Array.isArray(data)) {
           setProjects(data)
         }
       })
