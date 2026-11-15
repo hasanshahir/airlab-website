@@ -3,7 +3,7 @@ import { Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
 import { getFacultyPriority } from '../lib/utils'
 import type { Grant } from '../types/data'
-import SectionReveal from '../components/ui/SectionReveal'
+import TitleReveal from '../components/ui/TitleReveal'
 import PlaceholderBadge from '../components/ui/PlaceholderBadge'
 
 function parseGrantDateScore(durationStr?: string): number {
@@ -159,11 +159,13 @@ export default function Grants() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1320px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0.08}>
-          <h1 className="font-head font-semibold text-[var(--text-primary)] tracking-tight">
-            Research Grants
-          </h1>
-        </SectionReveal>
+        <TitleReveal
+          as="h1"
+          waitForPreloader
+          className="font-head font-semibold text-[var(--text-primary)] tracking-tight"
+        >
+          Research Grants
+        </TitleReveal>
       </div>
 
       {/* Grants Cards (Generous 28px Rounded Stone Cards) */}

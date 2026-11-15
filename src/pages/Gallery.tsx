@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { GalleryItem } from '../types/data'
 import SectionReveal from '../components/ui/SectionReveal'
+import TitleReveal from '../components/ui/TitleReveal'
 
 const GALLERY_FILTERS = ['All', 'Visit', 'Session', 'Mentoring', 'Lab'] as const
 type GalleryFilter = (typeof GALLERY_FILTERS)[number]
@@ -144,11 +145,13 @@ export default function Gallery() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-10 text-left max-w-3xl">
-        <SectionReveal delay={0.08}>
-          <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Laboratory Gallery & Media
-          </h1>
-        </SectionReveal>
+        <TitleReveal
+          as="h1"
+          waitForPreloader
+          className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight"
+        >
+          Laboratory Gallery & Media
+        </TitleReveal>
 
         <SectionReveal delay={0.16}>
           <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">

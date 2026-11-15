@@ -13,6 +13,7 @@ import { getFacultyPriority } from '../lib/utils'
 import { getProjects } from '../lib/data'
 import type { ProjectItem } from '../types/data'
 import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
+import TitleReveal from '../components/ui/TitleReveal'
 
 function parseDateScore(dateStr?: string): number {
   if (!dateStr) return 0
@@ -285,9 +286,13 @@ export default function Projects() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* ── Section Header ── */}
       <div className="mb-14 text-left max-w-3xl">
-        <h1 className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] font-head">
+        <TitleReveal
+          as="h1"
+          waitForPreloader
+          className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] font-head"
+        >
           Project Catalog
-        </h1>
+        </TitleReveal>
       </div>
 
       {/* ── Category Filter Pills & Search ── */}

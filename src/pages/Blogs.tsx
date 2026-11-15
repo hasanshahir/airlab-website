@@ -9,7 +9,7 @@ import {
   ArrowRight,
   X,
 } from 'lucide-react'
-import SectionReveal from '../components/ui/SectionReveal'
+import TitleReveal from '../components/ui/TitleReveal'
 import rawBlogs from '../data/blogs.json'
 
 export interface BlogPost {
@@ -129,11 +129,13 @@ export default function Blogs() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* ── Section Header ── */}
       <div className="mb-10 text-left max-w-3xl">
-        <SectionReveal delay={0.08}>
-          <h1 className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] font-head">
-            Blogs
-          </h1>
-        </SectionReveal>
+        <TitleReveal
+          as="h1"
+          waitForPreloader
+          className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] font-head"
+        >
+          Blogs
+        </TitleReveal>
       </div>
 
       {/* ── Search & Filter Controls ── */}

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Medal, Mail, FileText, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
+import TitleReveal from '../components/ui/TitleReveal'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { getPerformers } from '../lib/data'
 import type { PerformerItem, CoAwardeeInfo } from '../types/data'
@@ -115,11 +116,13 @@ export default function Performers() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-14 text-left max-w-3xl">
-        <SectionReveal delay={0.08}>
-          <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Performer of the Month
-          </h1>
-        </SectionReveal>
+        <TitleReveal
+          as="h1"
+          waitForPreloader
+          className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight"
+        >
+          Performer of the Month
+        </TitleReveal>
 
         <SectionReveal delay={0.16}>
           <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">

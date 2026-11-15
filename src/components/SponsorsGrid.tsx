@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { getSponsors } from '../lib/data'
 import type { Sponsor } from '../types/data'
+import TitleReveal from './ui/TitleReveal'
 
 export const SponsorsGrid: React.FC = () => {
   const [sponsors, setSponsors] = useState<Sponsor[]>(() => getSponsors())
@@ -29,9 +30,12 @@ export const SponsorsGrid: React.FC = () => {
           <span className="text-xs font-sans uppercase font-bold text-[var(--accent-orange)] tracking-wider">
             COLLABORATIVE ALLIANCES
           </span>
-          <h2 className="text-2xl sm:text-3xl font-head font-semibold text-[var(--text-primary)] tracking-tight mt-1">
+          <TitleReveal
+            as="h2"
+            className="text-2xl sm:text-3xl font-head font-semibold text-[var(--text-primary)] tracking-tight mt-1"
+          >
             Sponsors & Institutional Partners
-          </h2>
+          </TitleReveal>
         </div>
       </div>
 

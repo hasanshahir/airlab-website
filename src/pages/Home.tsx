@@ -15,6 +15,7 @@ import {
   Terminal,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
+import TitleReveal from '../components/ui/TitleReveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
@@ -342,15 +343,17 @@ export default function Home() {
       />
 
       {/* Clean centered 3D extruded slogan */}
-      <h1
-        className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl"
+      <TitleReveal
+        as="h1"
+        waitForPreloader
+        className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl pointer-events-auto"
         style={{
           textShadow:
             '0 1px 0 rgba(16, 0, 43, 0.95), 0 2px 0 rgba(16, 0, 43, 0.9), 0 3px 0 rgba(16, 0, 43, 0.85), 0 4px 0 rgba(16, 0, 43, 0.75), 0 8px 20px rgba(0, 0, 0, 0.95), 0 18px 42px rgba(0, 0, 0, 0.8)',
         }}
       >
         Where Intelligence Meets Engineering.
-      </h1>
+      </TitleReveal>
 
       {/* Tactile 3D Action Button centered directly below the text */}
       <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center gap-3.5 pointer-events-auto">
@@ -466,9 +469,12 @@ export default function Home() {
       <section className="py-10 sm:py-12 px-4 sm:px-8 max-w-[1240px] mx-auto relative z-10">
         {/* Header Row with Prev/Next Controls */}
         <div className="flex items-center justify-between gap-4 mb-6 pb-3 border-b border-[var(--border-hairline)]">
-          <h2 className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)]">
+          <TitleReveal
+            as="h2"
+            className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)]"
+          >
             Recent Updates
-          </h2>
+          </TitleReveal>
 
           {/* Horizontal Navigation Arrow Buttons */}
           <div className="flex items-center gap-2">
@@ -561,9 +567,12 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             {/* Left: Punch line and about text */}
             <div className="lg:col-span-5 text-left space-y-6">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-head">
+              <TitleReveal
+                as="h2"
+                className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-head"
+              >
                 Advancing Cutting-Edge AI & Translating Innovation
-              </h2>
+              </TitleReveal>
 
               <p className="text-base sm:text-lg text-white/85 leading-relaxed font-normal">
                 The Artificial Intelligence Research Lab (AIR Lab) at NED University is established to advance cutting-edge artificial intelligence and translate theoretical exploration into real-world impact.
@@ -601,9 +610,12 @@ export default function Home() {
       {/* ── 4. CORE RESEARCH AREAS (Single-Row Horizontal Slider with Single "See Projects" Button) ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
         <div className="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--border-hairline)] text-left">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
+          <TitleReveal
+            as="h2"
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head"
+          >
             Core Research Areas
-          </h2>
+          </TitleReveal>
 
           {/* Horizontal Slider Controls (< and >) */}
           <div className="flex items-center gap-2">
@@ -698,9 +710,12 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             {/* Left Column: Team punchline & text */}
             <div className="lg:col-span-5 text-left space-y-6">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-head leading-tight">
+              <TitleReveal
+                as="h2"
+                className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-head leading-tight"
+              >
                 Guided by faculty, driven by students, built for Pakistan.
-              </h2>
+              </TitleReveal>
 
               <p className="text-base sm:text-lg text-white/85 leading-relaxed font-normal">
                 Behind every system is a team that cares about Pakistan. Our interdisciplinary team brings together faculty principal investigators, research interns, and student scholars solving real problems at the forefront of artificial intelligence.

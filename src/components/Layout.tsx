@@ -18,6 +18,8 @@ import {
 import AirLabLogo from './AirLabLogo'
 import airLabMark from '../assets/air-lab-mark.png'
 import ParticleField from './ParticleField'
+import Preloader from './Preloader'
+import ScrollIndicator from './ScrollIndicator'
 import StudentApplicationModal from './StudentApplicationModal'
 import { useVacancySettings } from '../lib/vacancy'
 
@@ -94,6 +96,8 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] font-sans antialiased flex flex-col selection:bg-[var(--accent-orange)] selection:text-white relative">
+      <Preloader />
+      <ScrollIndicator />
       <ParticleField />
       {/* ── 0. Accessibility Skip Link ── */}
       <a
