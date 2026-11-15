@@ -284,86 +284,53 @@ export default function Performers() {
                   )}
                 </div>
 
-                {/* Co-Awardees Breakdown OR Single Research Focus */}
-                {coAwardees.length > 0 ? (
+                {/* Co-Awardees Contact Cards */}
+                {coAwardees.length > 0 && (
                   <div className="space-y-2.5">
                     {coAwardees.map(person => (
                       <div
                         key={person.id}
-                        className="p-3.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-col gap-2"
+                        className="p-3.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2"
                       >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Link
-                              to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
-                              title={`View ${person.name} on Research Interns`}
-                              className="inline-flex items-center gap-1 text-sm font-bold font-head text-[var(--text-primary)] hover:text-[var(--accent-orange)] transition-colors"
-                            >
-                              <span>{person.name}</span>
-                              <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />
-                            </Link>
-                            {person.note && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[var(--bg-surface)] text-[var(--text-subtle)] border border-[var(--border-hairline)]">
-                                {person.note}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-1.5">
-                            {person.linkedin && (
-                              <a
-                                href={person.linkedin}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                              >
-                                <Linkedin className="w-3 h-3" />
-                                <span>LinkedIn</span>
-                              </a>
-                            )}
-                            {person.email && (
-                              <a
-                                href={`mailto:${person.email}`}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                              >
-                                <Mail className="w-3 h-3" />
-                                <span>Email</span>
-                              </a>
-                            )}
-                          </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Link
+                            to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
+                            title={`View ${person.name} on Research Interns`}
+                            className="inline-flex items-center gap-1 text-sm font-bold font-head text-[var(--text-primary)] hover:text-[var(--accent-orange)] transition-colors"
+                          >
+                            <span>{person.name}</span>
+                            <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />
+                          </Link>
+                          {person.note && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[var(--bg-surface)] text-[var(--text-subtle)] border border-[var(--border-hairline)]">
+                              {person.note}
+                            </span>
+                          )}
                         </div>
 
-                        {person.researchFocus && (
-                          <p className="text-xs text-[var(--text-muted)] font-sans leading-relaxed">
-                            {person.researchFocus}
-                          </p>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          {person.linkedin && (
+                            <a
+                              href={person.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                            >
+                              <Linkedin className="w-3 h-3" />
+                              <span>LinkedIn</span>
+                            </a>
+                          )}
+                          {person.email && (
+                            <a
+                              href={`mailto:${person.email}`}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                            >
+                              <Mail className="w-3 h-3" />
+                              <span>Email</span>
+                            </a>
+                          )}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  featuredPerformer.researchFocus && (
-                    <div className="p-4 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-sm text-[var(--text-muted)] font-sans">
-                      <div className="text-xs uppercase font-semibold text-[var(--text-primary)] mb-1">
-                        Research Focus & Specialization
-                      </div>
-                      <p className="leading-relaxed font-normal">
-                        {featuredPerformer.researchFocus}
-                      </p>
-                    </div>
-                  )
-                )}
-
-                {/* Research Tags */}
-                {featuredPerformer.tags && (
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    {featuredPerformer.tags.map((tag: string, idx: number) => (
-                      <span
-                        key={idx}
-                        className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]"
-                      >
-                        {String(tag).replace(/^#/, '')}
-                      </span>
                     ))}
                   </div>
                 )}
