@@ -73,6 +73,9 @@
   --ink-2: var(--text-muted);
   --ink-3: var(--text-subtle);
 
+  --demo-bg: #ffffff;
+  --demo-text: #1a1a1a;
+
   /* Precise Hairline Borders */
   --border-hairline: rgba(16, 0, 43, 0.10);
   --border-hairline-dark: rgba(16, 0, 43, 0.22);
@@ -143,6 +146,9 @@
   --ink: var(--text-primary);
   --ink-2: var(--text-muted);
   --ink-3: var(--text-subtle);
+
+  --demo-bg: #ffffff;
+  --demo-text: #1a1a1a;
 
   /* Precise Hairline Borders */
   --border-hairline: rgba(26, 11, 46, 0.10);

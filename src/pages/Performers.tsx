@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Medal, Mail, FileText, ChevronLeft, ChevronRight, ArrowUpRight, Loader2 } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
+import { TextReveal } from '../components/ui/cascade-text'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { extractPerformerPhotos, normalizeDbPerformers } from '../lib/performers'
 import type { PerformerItem, CoAwardeeInfo } from '../types/data'
@@ -320,7 +321,7 @@ export default function Performers() {
                             title={`View ${person.name} on Research Interns`}
                             className="inline-flex items-baseline gap-1 hover:text-[var(--accent-orange)] transition-colors underline decoration-[var(--border-hairline-dark)] underline-offset-4 hover:decoration-[var(--accent-orange)]"
                           >
-                            <span>{person.name}</span>
+                            <TextReveal as="span" text={person.name} staggerDelay={16} duration={250} />
                           </Link>
                         </span>
                       ))}
@@ -332,7 +333,7 @@ export default function Performers() {
                         title={`View ${featuredPerformer.name} on Research Interns`}
                         className="hover:text-[var(--accent-orange)] transition-colors underline decoration-[var(--border-hairline-dark)] underline-offset-4 hover:decoration-[var(--accent-orange)]"
                       >
-                        {featuredPerformer.name}
+                        <TextReveal as="span" text={featuredPerformer.name} staggerDelay={16} duration={250} />
                       </Link>
                     </h2>
                   )}

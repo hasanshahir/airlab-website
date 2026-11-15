@@ -350,6 +350,7 @@ export default function Home() {
       <TitleReveal
         as="h1"
         waitForPreloader
+        hoverColor="#C77DFF"
         className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl pointer-events-auto"
         style={{
           textShadow:
@@ -573,6 +574,7 @@ export default function Home() {
             <div className="lg:col-span-5 text-left space-y-6">
               <TitleReveal
                 as="h2"
+                hoverColor="#C77DFF"
                 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-head"
               >
                 Advancing Cutting-Edge AI & Translating Innovation
@@ -697,6 +699,7 @@ export default function Home() {
             <div className="lg:col-span-5 text-left space-y-6">
               <TitleReveal
                 as="h2"
+                hoverColor="#C77DFF"
                 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-head leading-tight"
               >
                 Guided by faculty, driven by students, built for Pakistan.

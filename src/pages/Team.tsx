@@ -270,9 +270,12 @@ export default function Team() {
                           </span>
                         </div>
 
-                        <h2 className="text-2xl sm:text-3xl font-semibold font-head text-[var(--text-primary)]">
+                        <TitleReveal
+                          as="h2"
+                          className="text-2xl sm:text-3xl font-semibold font-head text-[var(--text-primary)]"
+                        >
                           {f.name}
-                        </h2>
+                        </TitleReveal>
                         <p className="text-sm font-medium text-[var(--text-muted)] mt-1 font-sans">
                           {f.designation} · {f.department}
                         </p>

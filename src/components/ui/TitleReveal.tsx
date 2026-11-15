@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { TextReveal } from './cascade-text'
 
 interface TitleRevealProps {
   text?: string
@@ -9,22 +10,14 @@ interface TitleRevealProps {
   delay?: number
   stagger?: number
   waitForPreloader?: boolean
+  hoverColor?: string
+  direction?: 'up' | 'down'
 }
 
-const FALLOFF = [1, 0.7, 0.4, 0.15]
-const RADIUS = 3
-
 /**
- * Reverse-engineered Big Title Reveal Animation from microdose.studio
- * (about.html lines 518-575, index.html lines 912-1114).
- *
- * Features:
- * 1. Splits heading text into `.title-reveal-word` and `.title-reveal-char` spans.
- * 2. Animates container blur-fade-in (`blur(8px) -> blur(0px)`, `y: 16 -> 0`, `800ms`, `cubic-bezier(0.43, 0.98, 0.87, 1)`).
- * 3. Staggers every character from `{ opacity: 0, y: 8, filter: blur(6px) }` to `{ opacity: 1, y: 0, filter: blur(0px) }`
- *    with `duration: 450ms`, `stagger: 20ms` (`0.02s`), `ease: cubic-bezier(0.43, 0.98, 0.87, 1)`.
- * 4.Coordinates with the Preloader (`preloader-reveal` event) when visible during initial load.
- * 5. Includes Microdose's desktop hover proximity character weight wave (`FALLOFF = [1, 0.7, 0.4, 0.15]`).
+ * Combines initial scroll/preloader blur-fade entrance reveal with interactive
+ * character-cascade hover interaction (`cascade-text.tsx` `TextReveal`) across
+ * all page and section headings.
  */
 export default function TitleReveal({
   text,
@@ -33,11 +26,11 @@ export default function TitleReveal({
   className = '',
   style,
   delay = 0,
-  stagger = 0.018,
   waitForPreloader = false,
+  hoverColor = 'var(--accent-orange)',
+  direction = 'up',
 }: TitleRevealProps) {
   const rootRef = useRef<HTMLElement | null>(null)
-  const charRefs = useRef<(HTMLSpanElement | null)[]>([])
   const [inView, setInView] = useState(false)
   const [preloaderReady, setPreloaderReady] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
@@ -47,8 +40,10 @@ export default function TitleReveal({
     }
     return false
   })
-  const [isTouch, setIsTouch] = useState(false)
-  const [hoverIdx, setHoverIdx] = useState<number | null>(null)
+  const [isTouch] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  })
 
   const rawString =
     typeof text === 'string'
@@ -56,10 +51,6 @@ export default function TitleReveal({
       : typeof children === 'string'
       ? children
       : ''
-
-  useEffect(() => {
-    setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  }, [])
 
   useEffect(() => {
     const checkState = () => {
@@ -91,7 +82,7 @@ export default function TitleReveal({
     if (!el) return
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         if (entries[0]?.isIntersecting) {
           setInView(true)
           observer.disconnect()
@@ -106,51 +97,17 @@ export default function TitleReveal({
 
   const isRevealed = inView && preloaderReady
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isTouch || !isRevealed) return
-    const mouseX = e.clientX
-    const mouseY = e.clientY
-    let closest = -1
-    let minDist = Infinity
-
-    for (let i = 0; i < charRefs.current.length; i++) {
-      const ch = charRefs.current[i]
-      if (!ch) continue
-      const rect = ch.getBoundingClientRect()
-      const cx = rect.left + rect.width / 2
-      const cy = rect.top + rect.height / 2
-      const dist = Math.hypot(mouseX - cx, mouseY - cy)
-      if (dist < minDist) {
-        minDist = dist
-        closest = i
-      }
-    }
-    if (closest !== -1 && minDist < 120) {
-      setHoverIdx(closest)
-    } else {
-      setHoverIdx(null)
-    }
-  }
-
-  const handleMouseLeave = () => {
-    if (!isTouch) setHoverIdx(null)
-  }
-
   if (!rawString) {
-    return React.createElement(Tag, { className }, children)
+    return React.createElement(Tag, { className, style }, children)
   }
 
-  const words = rawString.split(' ')
-  let globalCharIndex = 0
+  const adaptiveStagger = Math.min(24, Math.max(10, Math.round(320 / Math.max(1, rawString.length))))
 
   return React.createElement(
     Tag,
     {
       ref: rootRef as React.Ref<HTMLHeadingElement>,
       className,
-      'aria-label': rawString,
-      onMouseMove: handleMouseMove,
-      onMouseLeave: handleMouseLeave,
       style: {
         ...style,
         opacity: isRevealed ? 1 : 0,
@@ -166,64 +123,14 @@ export default function TitleReveal({
         transitionDelay: `${Math.round(delay * 1000)}ms`,
       },
     },
-    words.map((word, wIdx) => {
-      const chars = Array.from(word)
-      return (
-        <React.Fragment key={wIdx}>
-          <span className="title-reveal-word" aria-hidden="true">
-            {chars.map((ch, cIdx) => {
-              const charIndex = globalCharIndex++
-              const charDelayMs = Math.round((delay + charIndex * stagger) * 1000)
-
-              let weightFactor = 0
-              if (hoverIdx !== null) {
-                const dist = Math.abs(charIndex - hoverIdx)
-                if (dist <= RADIUS) {
-                  weightFactor = FALLOFF[dist] ?? 0
-                }
-              }
-
-              return (
-                <span
-                  key={cIdx}
-                  ref={(el) => {
-                    charRefs.current[charIndex] = el
-                  }}
-                  className="title-reveal-char"
-                  style={{
-                    opacity: isRevealed ? 1 : 0,
-                    transform: isRevealed
-                      ? weightFactor > 0
-                        ? `translateY(${(-1.5 * weightFactor).toFixed(2)}px)`
-                        : 'translateY(0px)'
-                      : 'translateY(8px)',
-                    filter: isTouch
-                      ? 'none'
-                      : isRevealed
-                      ? 'blur(0px)'
-                      : 'blur(6px)',
-                    fontVariationSettings:
-                      weightFactor > 0
-                        ? `"wght" ${Math.round(600 + 150 * weightFactor)}`
-                        : undefined,
-                    transitionProperty: 'opacity, transform, filter, font-variation-settings',
-                    transitionDuration: hoverIdx !== null ? '220ms' : '450ms',
-                    transitionTimingFunction:
-                      hoverIdx !== null
-                        ? 'cubic-bezier(0.8, 0.1, 0.21, 0.72)'
-                        : 'cubic-bezier(0.43, 0.98, 0.87, 1)',
-                    transitionDelay:
-                      hoverIdx !== null ? '0ms' : `${charDelayMs}ms`,
-                  }}
-                >
-                  {ch}
-                </span>
-              )
-            })}
-          </span>
-          {wIdx < words.length - 1 ? ' ' : null}
-        </React.Fragment>
-      )
-    })
+    <TextReveal
+      as="span"
+      text={rawString}
+      staggerDelay={adaptiveStagger}
+      duration={260}
+      hoverColor={hoverColor}
+      direction={direction}
+      className="inline-block"
+    />
   )
 }

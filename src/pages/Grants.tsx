@@ -224,9 +224,12 @@ export default function Grants() {
                             {grant.placeholder && <PlaceholderBadge />}
                           </div>
 
-                          <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-head font-bold text-[var(--text-primary)] leading-[1.18] tracking-tight max-w-3xl">
+                          <TitleReveal
+                            as="h2"
+                            className="text-2xl sm:text-3xl lg:text-[34px] font-head font-bold text-[var(--text-primary)] leading-[1.18] tracking-tight max-w-3xl"
+                          >
                             {grant.title}
-                          </h2>
+                          </TitleReveal>
                           <div className="text-sm sm:text-[15px] font-semibold text-[var(--accent-orange)] font-sans mt-2">
                             Grant Supplier: {grant.funder}
                           </div>
