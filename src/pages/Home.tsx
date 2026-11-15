@@ -20,6 +20,13 @@ import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
 import { CoverflowCarousel } from '@/components/ui/coverflow-carousel'
+import {
+  HoverSlider,
+  HoverSliderImage,
+  HoverSliderImageWrap,
+  TextStaggerHover,
+  useHoverSliderContext,
+} from '@/components/ui/animated-slideshow'
 import { getGrants, getProjects } from '../lib/data'
 import { useVacancySettings } from '../lib/vacancy'
 import type { ProjectItem, Grant } from '../types/data'
@@ -51,40 +58,69 @@ const coreResearchAreas = [
   {
     icon: Brain,
     title: 'Foundational Models & NLP',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=50',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=1000&auto=format&fit=crop&q=80',
     desc: 'Pretraining multilingual LLMs tailored for low-resource regional dialects with advanced byte-level tokenizers and parameter-efficient fine-tuning.',
   },
   {
     icon: ShieldAlert,
     title: 'Adversarial AI',
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=50',
+    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1000&auto=format&fit=crop&q=80',
     desc: 'Investigating neural network vulnerabilities, model jailbreaking, prompt injection mitigation, and robust defense benchmarks for high-stakes AI systems.',
   },
   {
     icon: ShieldCheck,
     title: 'Cyber',
-    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&auto=format&fit=crop&q=50',
+    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1000&auto=format&fit=crop&q=80',
     desc: 'Autonomous cyber defense, encrypted traffic analysis, zero-trust infrastructure, and automated vulnerability intelligence to safeguard digital ecosystems.',
   },
   {
     icon: Terminal,
     title: 'Software Development',
-    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&auto=format&fit=crop&q=50',
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1000&auto=format&fit=crop&q=80',
     desc: 'High-performance AI engineering, production-grade microservices, scalable distributed inference pipelines, and intelligent software systems.',
   },
   {
     icon: Code,
     title: 'Efficient Computing & TinyML',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=50',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1000&auto=format&fit=crop&q=80',
     desc: 'Hardware-aware neural architecture search (NAS), INT8 quantization, and ultra-low-latency deployment on FPGAs and embedded SoCs.',
   },
   {
     icon: LineChart,
     title: 'AI Safety & Alignment',
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop&q=50',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1000&auto=format&fit=crop&q=80',
     desc: 'Ensuring robust, unbiased, and safe deployment of intelligent systems in critical healthcare, power grids, and national infrastructure.',
   },
 ]
+
+function ActiveResearchAreaCaption({
+  onSelectArea,
+}: {
+  onSelectArea: (title: string) => void
+}) {
+  const { activeSlide } = useHoverSliderContext()
+  const active = coreResearchAreas[activeSlide] ?? coreResearchAreas[0]
+  const Icon = active.icon
+
+  return (
+    <div
+      onClick={() => onSelectArea(active.title)}
+      className="mt-4 p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex items-start gap-4 cursor-pointer hover:border-[var(--accent-orange)]/40 transition-colors"
+    >
+      <div className="w-10 h-10 rounded-xl bg-white border border-[var(--border-hairline)] text-[var(--accent-orange)] flex items-center justify-center shrink-0 shadow-xs">
+        <Icon className="w-5 h-5" />
+      </div>
+      <div className="min-w-0 text-left">
+        <div className="font-head font-semibold text-base text-[var(--text-primary)] mb-1">
+          {active.title}
+        </div>
+        <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
+          {active.desc}
+        </p>
+      </div>
+    </div>
+  )
+}
 
 export default function Home() {
   const navigate = useNavigate()
@@ -104,11 +140,6 @@ export default function Home() {
     }
   })
   const [grants, setGrants] = useState<Grant[]>(() => getGrants())
-  const areasTrackRef = useRef<HTMLDivElement>(null)
-  const areasOffsetRef = useRef(0)
-  const areasVelocityRef = useRef(55) // px/sec default moving left
-  const areasTargetVelocityRef = useRef(55)
-  const areasManualBoostRef = useRef(0)
 
   useEffect(() => {
     let active = true
@@ -210,10 +241,6 @@ export default function Home() {
     return [...recentUpdates, ...recentUpdates, ...recentUpdates]
   }, [recentUpdates])
 
-  const loopedAreas = useMemo(() => {
-    return [...coreResearchAreas, ...coreResearchAreas, ...coreResearchAreas]
-  }, [])
-
   useEffect(() => {
     let rafId = 0
     let lastTime = performance.now()
@@ -267,16 +294,6 @@ export default function Home() {
         dt
       )
 
-      stepRibbon(
-        areasTrackRef.current,
-        coreResearchAreas.length,
-        areasOffsetRef,
-        areasVelocityRef,
-        areasTargetVelocityRef,
-        areasManualBoostRef,
-        dt
-      )
-
       rafId = requestAnimationFrame(tick)
     }
 
@@ -312,22 +329,9 @@ export default function Home() {
     updatesTargetVelocityRef.current = 55
   }
 
-  const handleAreasMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    updateRibbonHoverVelocity(e, areasTargetVelocityRef)
-  }
-
-  const handleAreasMouseLeave = () => {
-    areasTargetVelocityRef.current = 55
-  }
-
   const scrollUpdates = (direction: 'left' | 'right') => {
     const step = 360
     updatesManualBoostRef.current += direction === 'left' ? -step : step
-  }
-
-  const scrollAreas = (direction: 'left' | 'right') => {
-    const step = 380
-    areasManualBoostRef.current += direction === 'left' ? -step : step
   }
 
   const heroOverlay = (
@@ -607,7 +611,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 4. CORE RESEARCH AREAS (Single-Row Horizontal Slider with Single "See Projects" Button) ── */}
+      {/* ── 4. CORE RESEARCH AREAS (Animated Hover Slideshow) ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
         <div className="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--border-hairline)] text-left">
           <TitleReveal
@@ -617,91 +621,72 @@ export default function Home() {
             Core Research Areas
           </TitleReveal>
 
-          {/* Horizontal Slider Controls (< and >) */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => scrollAreas('left')}
-              className="w-10 h-10 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-              aria-label="Previous research areas"
-              title="Scroll left"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollAreas('right')}
-              className="w-10 h-10 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-              aria-label="Next research areas"
-              title="Scroll right"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Dynamic Looping Ribbon of Core Research Areas */}
-        <div
-          onMouseMove={handleAreasMouseMove}
-          onMouseLeave={handleAreasMouseLeave}
-          className="relative overflow-hidden py-2 -my-2 select-none"
-        >
-          <div
-            ref={areasTrackRef}
-            className="flex gap-6 w-max pb-6 pt-1 will-change-transform"
-          >
-            {loopedAreas.map((area, idx) => {
-              const Icon = area.icon
-              const targetUrl = `/projects?area=${encodeURIComponent(area.title)}`
-              return (
-                <div
-                  key={`${area.title}-${idx}`}
-                  onClick={() => navigate(targetUrl)}
-                  className="min-w-[310px] sm:min-w-[360px] max-w-[380px] shrink-0 relative overflow-hidden p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
-                >
-                  {/* Subtle low-opacity background image texture ensuring all text remains crisp and visible */}
-                  <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
-                    <img
-                      src={area.image}
-                      alt=""
-                      className="w-full h-full object-cover opacity-[0.18] dark:opacity-[0.24] group-hover:opacity-[0.26] dark:group-hover:opacity-[0.32] group-hover:scale-105 transition-all duration-500 ease-out"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-[var(--bg-surface)]/60 to-[var(--bg-surface)]/10 pointer-events-none" />
-                  </div>
-
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-5">
-                      <div className="w-11 h-11 rounded-2xl bg-white border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all shadow-xs">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                    </div>
-
-                    <h3 className="font-head font-semibold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors mb-2.5">
-                      {area.title}
-                    </h3>
-
-                    <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
-                      {area.desc}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Single "See Projects" Button */}
-        <div className="mt-8 flex justify-center sm:justify-start">
           <Button
             to="/projects"
-            size="md"
-            className="inline-flex items-center gap-2 font-semibold px-7"
+            size="sm"
+            className="inline-flex items-center gap-2 font-semibold px-5 shrink-0"
           >
             <span>See Projects</span>
           </Button>
         </div>
+
+        <HoverSlider className="rounded-3xl bg-[var(--bg-surface)]/80 border border-[var(--border-hairline)] p-6 sm:p-10 lg:p-12 shadow-sm">
+          <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-[var(--accent-orange)] font-sans text-left">
+            / research tracks
+          </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 lg:gap-12">
+            {/* Left Column: Staggered Hover Titles */}
+            <div className="lg:col-span-6 flex flex-col items-start space-y-3 sm:space-y-4 text-left">
+              {coreResearchAreas.map((area, index) => (
+                <button
+                  key={area.title}
+                  type="button"
+                  onClick={() =>
+                    navigate(`/projects?area=${encodeURIComponent(area.title)}`)
+                  }
+                  className="text-left cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
+                >
+                  <TextStaggerHover
+                    index={index}
+                    className="font-head text-2xl sm:text-3xl xl:text-[34px] font-bold uppercase tracking-tight leading-tight text-[var(--text-primary)]"
+                    text={area.title}
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Right Column: Clipped Animated Image + Active Area Description */}
+            <div className="lg:col-span-6 flex flex-col">
+              <HoverSliderImageWrap className="rounded-2xl overflow-hidden border border-[var(--border-hairline)] shadow-md aspect-[4/3] max-h-[380px] w-full bg-[var(--ink-dark)]">
+                {coreResearchAreas.map((area, index) => (
+                  <div
+                    key={area.title}
+                    onClick={() =>
+                      navigate(`/projects?area=${encodeURIComponent(area.title)}`)
+                    }
+                    className="cursor-pointer"
+                  >
+                    <HoverSliderImage
+                      index={index}
+                      imageUrl={area.image}
+                      src={area.image}
+                      alt={area.title}
+                      className="size-full object-cover"
+                      loading="eager"
+                      decoding="async"
+                    />
+                  </div>
+                ))}
+              </HoverSliderImageWrap>
+
+              <ActiveResearchAreaCaption
+                onSelectArea={(title) =>
+                  navigate(`/projects?area=${encodeURIComponent(title)}`)
+                }
+              />
+            </div>
+          </div>
+        </HoverSlider>
       </section>
 
       {/* ── 5. TEAM SHOWCASE (Guided by faculty, driven by students, built for Pakistan) ── */}

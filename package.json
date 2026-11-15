@@ -26,6 +26,7 @@
     "lucide-react": "^1.47.0",
     "mongoose": "^9.11.2",
     "morgan": "^1.12.1",
+    "motion": "^14.14.0",
     "multer": "^2.4.0",
     "nodemailer": "^10.1.7",
     "react": "^19.2.8",
