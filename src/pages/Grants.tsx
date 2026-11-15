@@ -152,7 +152,7 @@ export default function Grants() {
   }, [grants])
 
   return (
-    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
+    <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1320px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* Header */}
       <div className="mb-14 text-left max-w-3xl">
         <SectionReveal delay={0.08}>
@@ -163,86 +163,88 @@ export default function Grants() {
       </div>
 
       {/* Grants Cards (Generous 28px Rounded Stone Cards) */}
-      <div className="space-y-6">
-        <div className="space-y-6 text-left">
+      <div className="space-y-8">
+        <div className="space-y-8 text-left">
           {sortedGrants.map(grant => {
               const isActive = grant.status === 'Active'
               return (
                 <div
                   key={grant.id}
-                  className="relative overflow-hidden group p-8 sm:p-10 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200"
+                  className="relative overflow-hidden group p-9 sm:p-12 lg:p-14 min-h-[380px] sm:min-h-[420px] rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
                 >
-                  {/* Subtle low-opacity background image with gradient overlay */}
+                  {/* Visible background image with directional gradient overlay for text contrast */}
                   {grant.image && (
                     <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
                       <img
                         src={grant.image}
                         alt=""
-                        className="w-full h-full object-cover opacity-[0.18] dark:opacity-[0.24] group-hover:opacity-[0.24] dark:group-hover:opacity-[0.30] group-hover:scale-[1.02] transition-all duration-500 ease-out"
+                        className="w-full h-full object-cover opacity-[0.50] dark:opacity-[0.54] group-hover:opacity-[0.60] dark:group-hover:opacity-[0.64] group-hover:scale-[1.02] transition-all duration-500 ease-out"
                         loading="lazy"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-surface)]/95 via-[var(--bg-surface)]/80 to-[var(--bg-surface)]/45 pointer-events-none" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)]/90 via-[var(--bg-surface)]/30 to-[var(--bg-surface)]/15 pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-surface)]/92 via-[var(--bg-surface)]/76 to-[var(--bg-surface)]/20 pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)]/65 via-transparent to-transparent pointer-events-none" />
                     </div>
                   )}
 
-                  <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-5">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2 mb-3.5">
-                          <span
-                            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-sans font-semibold ${isActive
-                                ? 'bg-emerald-600 text-white'
-                                : 'bg-[var(--ink-dark)] text-white'
-                              }`}
-                          >
-                            {isActive ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
-                            {grant.status}
-                          </span>
-
-                          {grant.programTitle && (
-                            <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--ink-dark)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium">
-                              <Landmark className="w-3 h-3" />
-                              {grant.programTitle}
+                  <div className="relative z-10 flex-1 flex flex-col justify-between gap-8">
+                    <div>
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-6">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-4">
+                            <span
+                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-sans font-semibold ${isActive
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'bg-[var(--ink-dark)] text-white'
+                                }`}
+                            >
+                              {isActive ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
+                              {grant.status}
                             </span>
-                          )}
 
-                          {grant.duration && (
-                            <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)] inline-flex items-center gap-1.5 font-medium">
-                              <Calendar className="w-3 h-3" />
-                              {grant.duration}
-                            </span>
-                          )}
+                            {grant.programTitle && (
+                              <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--ink-dark)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium">
+                                <Landmark className="w-3 h-3" />
+                                {grant.programTitle}
+                              </span>
+                            )}
 
-                          {grant.placeholder && <PlaceholderBadge />}
+                            {grant.duration && (
+                              <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)] inline-flex items-center gap-1.5 font-medium">
+                                <Calendar className="w-3 h-3" />
+                                {grant.duration}
+                              </span>
+                            )}
+
+                            {grant.placeholder && <PlaceholderBadge />}
+                          </div>
+
+                          <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-head font-bold text-[var(--text-primary)] leading-[1.18] tracking-tight max-w-3xl">
+                            {grant.title}
+                          </h2>
+                          <div className="text-sm sm:text-[15px] font-semibold text-[var(--accent-orange)] font-sans mt-2">
+                            Grant Supplier: {grant.funder}
+                          </div>
                         </div>
 
-                        <h2 className="text-xl sm:text-2xl font-head font-semibold text-[var(--text-primary)] leading-snug max-w-3xl">
-                          {grant.title}
-                        </h2>
-                        <div className="text-sm font-semibold text-[var(--accent-orange)] font-sans mt-1.5">
-                          Grant Supplier: {grant.funder}
-                        </div>
+                        {grant.amount && (
+                          <div className="px-5 py-3.5 rounded-2xl bg-[var(--bg-page)]/95 backdrop-blur-xs border border-[var(--border-hairline)] text-left md:text-right shrink-0 shadow-xs">
+                            <div className="text-[11px] font-sans font-bold tracking-wider text-[var(--text-subtle)] uppercase">
+                              Granted Amount
+                            </div>
+                            <AnimatedGrantAmount amount={grant.amount} />
+                          </div>
+                        )}
                       </div>
 
-                      {grant.amount && (
-                        <div className="px-5 py-3.5 rounded-2xl bg-[var(--bg-page)]/95 backdrop-blur-xs border border-[var(--border-hairline)] text-left md:text-right shrink-0 shadow-xs">
-                          <div className="text-[11px] font-sans font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                            Granted Amount
-                          </div>
-                          <AnimatedGrantAmount amount={grant.amount} />
-                        </div>
+                      {grant.description && (
+                        <p className="text-[15.5px] sm:text-[16.5px] text-[var(--text-primary)]/90 leading-[1.78] font-normal max-w-3xl">
+                          {grant.description}
+                        </p>
                       )}
                     </div>
 
-                    {grant.description && (
-                      <p className="text-sm sm:text-[14.5px] text-[var(--text-muted)] leading-relaxed mb-6 font-normal max-w-4xl">
-                        {grant.description}
-                      </p>
-                    )}
-
                     {(grant.leadInvestigator || grant.url) && (
-                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-4 text-xs font-sans">
+                      <div className="pt-5 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-4 text-xs sm:text-[13px] font-sans">
                         {grant.leadInvestigator && (
                           <span className="flex items-center gap-1.5 text-[var(--text-subtle)]">
                             <User className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
