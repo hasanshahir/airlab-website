@@ -68,13 +68,10 @@ const COLLECTION_SCHEMAS: Record<string, Record<string, FieldDef>> = {
     designation: { type: 'string', label: 'Academic Designation', placeholder: 'e.g. Assistant Professor' },
     department: { type: 'string', label: 'Department', placeholder: 'e.g. Computer Science & IT' },
     email: { type: 'string', label: 'Email Address', placeholder: 'name@neduet.edu.pk' },
-    phone: { type: 'string', label: 'Phone Number' },
     linkedin: { type: 'url', label: 'LinkedIn URL', placeholder: 'https://linkedin.com/in/...' },
     cvUrl: { type: 'file', label: 'CV / Resume (PDF or URL)' },
     image: { type: 'image', label: 'Profile Photo' },
     researchFocus: { type: 'text', label: 'Research Focus / Specialty' },
-    tags: { type: 'stringList', label: 'Specialty Tags (comma-separated)' },
-    qualifications: { type: 'stringList', label: 'Qualifications (comma-separated)' },
     tenure: { type: 'string', label: 'Tenure / Cohort', placeholder: 'e.g. 2024 - Present' },
     isLead: { type: 'boolean', label: 'Faculty / Lab Lead' },
     order: { type: 'number', label: 'Display Order' },
@@ -89,24 +86,17 @@ const COLLECTION_SCHEMAS: Record<string, Record<string, FieldDef>> = {
     order: { type: 'number', label: 'Display Order' },
     published: { type: 'boolean', label: 'Published on Website' },
   },
-  interns: {
-    name: { type: 'string', label: 'Full Name', required: true },
-    term: { type: 'string', label: 'Cohort / Term', placeholder: 'e.g. Summer 2025' },
-    project: { type: 'string', label: 'Research Project' },
-    university: { type: 'string', label: 'University', placeholder: 'NED University' },
-    currentRole: { type: 'string', label: 'Current Role / Destination' },
-    paper: { type: 'string', label: 'Publication / Output' },
-    quote: { type: 'text', label: 'Testimonial / Quote' },
-    image: { type: 'image', label: 'Profile Photo' },
-    order: { type: 'number', label: 'Display Order' },
-    published: { type: 'boolean', label: 'Published on Website' },
-  },
   performers: {
     name: { type: 'string', label: 'Researcher Name', required: true },
-    month: { type: 'string', label: 'Recognition Month', required: true, placeholder: 'e.g. October 2025' },
-    role: { type: 'string', label: 'Role in Lab', placeholder: 'e.g. Undergraduate Research Fellow' },
+    month: { type: 'string', label: 'Recognition Month', required: true, placeholder: 'e.g. October 2026' },
+    role: { type: 'string', label: 'Role in Lab', placeholder: 'e.g. Research Intern' },
+    department: { type: 'string', label: 'Department', placeholder: 'e.g. Department of CSIT · NED University' },
     title: { type: 'string', label: 'Award / Spotlight Title' },
     achievement: { type: 'text', label: 'Achievement Summary' },
+    researchFocus: { type: 'string', label: 'Research Focus' },
+    email: { type: 'string', label: 'Email Address' },
+    linkedin: { type: 'url', label: 'LinkedIn URL' },
+    cvUrl: { type: 'url', label: 'Resume / CV URL' },
     rank: { type: 'number', label: 'Rank (1 = Top)' },
     tags: { type: 'stringList', label: 'Research Tags (comma-separated)' },
     image: { type: 'image', label: 'Ceremony / Profile Photo' },
@@ -298,6 +288,11 @@ function buildDefaultItem(slug: string, nextOrder: number): Record<string, any> 
   }
   if (item.published === undefined) item.published = true
   if (item.order === undefined) item.order = nextOrder
+  if (slug === 'team') {
+    delete item.phone
+    delete item.tags
+    delete item.qualifications
+  }
   return item
 }
 
@@ -589,6 +584,12 @@ export default function AdminDashboard() {
         if (!payload.image && cleanedPhotos.length > 0) {
           payload.image = cleanedPhotos[0].url
         }
+      }
+
+      if (activeTab === 'team') {
+        delete payload.phone
+        delete payload.tags
+        delete payload.qualifications
       }
 
       const url = isCreate ? `/api/admin/${activeTab}` : `/api/admin/${activeTab}/${recordId}`
@@ -889,7 +890,6 @@ export default function AdminDashboard() {
     { id: 'vacancy-settings', label: 'Vacancy & Ribbon', icon: Settings },
     { id: 'team', label: 'Faculty & Team', icon: Users },
     { id: 'previous-interns', label: 'Past Interns', icon: GraduationCap },
-    { id: 'interns', label: 'Intern Spotlights', icon: GraduationCap },
     { id: 'performers', label: 'Performer of Month', icon: Medal },
     { id: 'projects', label: 'Research Projects', icon: Briefcase },
     { id: 'grants', label: 'Grants & Funding', icon: Award },
@@ -902,10 +902,12 @@ export default function AdminDashboard() {
   ]
 
   const currentSchema = COLLECTION_SCHEMAS[activeTab] || {}
+  const BLOCKED_FIELDS = new Set(['_id', '__v', 'createdAt', 'updatedAt', 'id', 'phone', 'tags', 'qualifications'])
   const editableFields = editingItem
-    ? Object.keys(currentSchema).length > 0
-      ? Object.keys(currentSchema)
-      : Object.keys(editingItem).filter(k => !['_id', '__v', 'createdAt', 'updatedAt', 'id'].includes(k))
+    ? (Object.keys(currentSchema).length > 0
+        ? Object.keys(currentSchema)
+        : Object.keys(editingItem)
+      ).filter(k => !BLOCKED_FIELDS.has(k))
     : []
 
   return (
@@ -1390,6 +1392,10 @@ export default function AdminDashboard() {
                                 next.images = normalizeGalleryImages(item.images, item.url)
                               } else if (activeTab === 'performers') {
                                 next.photos = normalizeGalleryImages(item.photos)
+                              } else if (activeTab === 'team') {
+                                delete next.phone
+                                delete next.tags
+                                delete next.qualifications
                               }
                               setEditingItem(next)
                               setIsNew(false)

@@ -3,8 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { GalleryItem, PerformerItem } from '../types/data'
-import { getPerformers } from '../lib/data'
-import { extractPerformerPhotos, mergePerformersWithLocal } from '../lib/performers'
+import { extractPerformerPhotos, normalizeDbPerformers } from '../lib/performers'
 import TitleReveal from '../components/ui/TitleReveal'
 
 const GALLERY_FILTERS = ['All', 'Events', 'Session', 'Mentoring', 'Lab'] as const
@@ -134,7 +133,7 @@ function expandPerformerItems(performers: PerformerItem[]): GalleryPhotoCard[] {
 
 export default function Gallery() {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
-  const [performersList, setPerformersList] = useState<PerformerItem[]>(() => getPerformers())
+  const [performersList, setPerformersList] = useState<PerformerItem[]>([])
   const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState<GalleryFilter>('All')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -154,8 +153,8 @@ export default function Gallery() {
         if (Array.isArray(galleryRes)) {
           setGalleryItems(galleryRes)
         }
-        if (Array.isArray(performersRes) && performersRes.length > 0) {
-          setPerformersList(mergePerformersWithLocal(performersRes, getPerformers()))
+        if (Array.isArray(performersRes)) {
+          setPerformersList(normalizeDbPerformers(performersRes))
         }
       })
       .finally(() => {

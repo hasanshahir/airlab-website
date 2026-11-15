@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Medal, Mail, FileText, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react'
+import { Medal, Mail, FileText, ChevronLeft, ChevronRight, ArrowUpRight, Loader2 } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
-import { getPerformers } from '../lib/data'
-import { extractPerformerPhotos, mergePerformersWithLocal } from '../lib/performers'
+import { extractPerformerPhotos, normalizeDbPerformers } from '../lib/performers'
 import type { PerformerItem, CoAwardeeInfo } from '../types/data'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
@@ -31,21 +30,30 @@ const slideVariants = {
 }
 
 export default function Performers() {
-  const [performersList, setPerformersList] = useState<PerformerItem[]>(() => getPerformers())
+  const [performersList, setPerformersList] = useState<PerformerItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [activeCycleIndex, setActiveCycleIndex] = useState(0)
   const [slideState, setSlideState] = useState({ index: 0, direction: 1 })
   const [isPaused, setIsPaused] = useState(false)
 
   useEffect(() => {
+    let active = true
     fetch('/api/content/performers', { cache: 'no-store' })
       .then(r => (r.ok ? r.json() : []))
       .then((d: PerformerItem[]) => {
-        if (!Array.isArray(d) || d.length === 0) return
-        const merged = mergePerformersWithLocal(d, getPerformers())
-        setPerformersList(merged)
-        setSlideState({ index: 0, direction: 1 })
+        if (!active) return
+        if (Array.isArray(d)) {
+          setPerformersList(normalizeDbPerformers(d))
+          setSlideState({ index: 0, direction: 1 })
+        }
       })
       .catch(() => {})
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
   }, [])
 
   const featuredPerformer = performersList[activeCycleIndex] || performersList[0] || null
@@ -123,7 +131,14 @@ export default function Performers() {
       </div>
 
       {/* ── Performer Card or Placeholder ── */}
-      {!featuredPerformer ? (
+      {loading ? (
+        <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)] max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 text-sm font-sans text-[var(--text-muted)]">
+            <Loader2 className="w-4 h-4 animate-spin text-[var(--accent-orange)]" />
+            <span>Loading Performers of the Month...</span>
+          </div>
+        </div>
+      ) : !featuredPerformer ? (
         <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)] max-w-4xl mx-auto">
           <Medal className="w-12 h-12 text-[var(--accent-orange)] mx-auto mb-4 opacity-75" />
           <h3 className="text-xl font-bold font-head text-[var(--text-primary)] mb-2">

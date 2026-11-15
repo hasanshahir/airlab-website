@@ -3,9 +3,8 @@ import type { GalleryPhoto, PerformerItem } from '../types/data'
 const MONTH_ORDER = ['july', 'august', 'september', 'october']
 
 /**
- * Identifies the two legacy placeholder documents originally seeded in MongoDB
- * ("Spotlight Awardee" with date-range months) so they don't override the
- * month-wise local awardees unless explicitly replaced/created in Admin.
+ * Identifies the two legacy placeholder documents ("Spotlight Awardee" with date-range months)
+ * if any still exist in the database.
  */
 export function isLegacyDateRangeItem(item: Partial<PerformerItem>): boolean {
   const month = String(item.month || '')
@@ -47,7 +46,6 @@ export function extractPerformerPhotos(item: Partial<PerformerItem>): GalleryPho
   }
 
   if (item.image) {
-    // Prefer keeping primary image first if it wasn't already added in `photos`
     const trimmed = item.image.trim()
     if (trimmed && !seen.has(trimmed)) {
       seen.add(trimmed)
@@ -58,10 +56,6 @@ export function extractPerformerPhotos(item: Partial<PerformerItem>): GalleryPho
   return result
 }
 
-/**
- * Merges live API performers with local month-wise seed data, preserving any
- * Admin-edited overrides and appending newly created performers from Admin.
- */
 export function mergePerformersWithLocal(
   apiItems: PerformerItem[],
   localItems: PerformerItem[]
@@ -104,4 +98,19 @@ export function mergePerformersWithLocal(
   const combined = [...mergedLocal, ...addedFromAdmin]
   combined.sort((a, b) => getMonthSortIndex(a.month) - getMonthSortIndex(b.month))
   return combined
+}
+
+/**
+ * Filters out legacy placeholder records and sorts database performers by display order / month.
+ */
+export function normalizeDbPerformers(apiItems: PerformerItem[]): PerformerItem[] {
+  return apiItems
+    .filter(item => !isLegacyDateRangeItem(item))
+    .slice()
+    .sort((a, b) => {
+      const orderA = typeof (a as any).order === 'number' ? (a as any).order : getMonthSortIndex(a.month)
+      const orderB = typeof (b as any).order === 'number' ? (b as any).order : getMonthSortIndex(b.month)
+      if (orderA !== orderB) return orderA - orderB
+      return getMonthSortIndex(a.month) - getMonthSortIndex(b.month)
+    })
 }
