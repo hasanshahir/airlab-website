@@ -246,6 +246,12 @@ const COLLECTION_SCHEMAS: Record<string, Record<string, FieldDef>> = {
       required: true,
       placeholder: 'e.g. Building Low-Resource Multilingual LLMs at AIR Lab',
     },
+    author: {
+      type: 'string',
+      label: 'Author Name',
+      required: true,
+      placeholder: 'e.g. Dr. Murk Marvi / AIR Lab Editorial',
+    },
     link: {
       type: 'url',
       label: 'Link to Blog',

@@ -221,7 +221,7 @@ export default function Team() {
   const tabs: { id: TabType; label: string; count?: number }[] = [
     { id: 'faculty', label: 'Faculty', count: facultyMembers.length },
     { id: 'interns', label: 'Research Interns', count: internMembers.length },
-    { id: 'previous', label: 'Alumni Interns', count: alumniList.length },
+    { id: 'previous', label: 'Past Interns', count: alumniList.length },
   ]
 
   return (
@@ -584,14 +584,14 @@ export default function Team() {
               <div className="p-6 sm:p-8 border-b border-[var(--border-hairline)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-xl font-semibold font-head text-[var(--text-primary)]">
-                    Previous Research Interns & Alumni
+                    Past Research Interns
                   </h3>
                   <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1 font-normal">
                     Researchers and interns who completed their research terms at AIR Lab.
                   </p>
                 </div>
                 <span className="px-3.5 py-1.5 rounded-full text-xs font-sans font-medium bg-[var(--ink-dark)] text-white shrink-0">
-                  {alumniList.length} Alumni Recorded
+                  {alumniList.length} Past Interns Recorded
                 </span>
               </div>
 

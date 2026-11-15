@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import {
   Brain,
   Code,
@@ -17,6 +18,7 @@ import Button from '../components/ui/Button'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
+import { CoverflowCarousel } from '@/components/ui/coverflow-carousel'
 import { getProjects, getGrants } from '../lib/data'
 import { useVacancySettings } from '../lib/vacancy'
 import type { ProjectItem, Grant } from '../types/data'
@@ -86,6 +88,7 @@ const coreResearchAreas = [
 export default function Home() {
   const navigate = useNavigate()
   const [applyModalOpen, setApplyModalOpen] = useState(false)
+  const [carouselVersion, setCarouselVersion] = useState<'v1' | 'v2'>('v1')
   const updatesTrackRef = useRef<HTMLDivElement>(null)
   const updatesOffsetRef = useRef(0)
   const updatesVelocityRef = useRef(55) // px/sec default moving left
@@ -320,53 +323,111 @@ export default function Home() {
     areasManualBoostRef.current += direction === 'left' ? -step : step
   }
 
+  const heroOverlay = (
+    <div className="relative z-10 flex h-full w-full max-w-4xl mx-auto flex-col items-center justify-center px-6 text-center pointer-events-none">
+      {/* Soft, edge-less shadow behind the text only (carousel photos remain 100% full brightness) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-2xl h-64 -z-10"
+        style={{
+          background:
+            'radial-gradient(closest-side, rgba(10, 0, 28, 0.58) 0%, rgba(10, 0, 28, 0.26) 55%, transparent 100%)',
+        }}
+      />
+
+      {/* Clean centered 3D extruded slogan */}
+      <h1
+        className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl"
+        style={{
+          textShadow:
+            '0 1px 0 rgba(16, 0, 43, 0.95), 0 2px 0 rgba(16, 0, 43, 0.9), 0 3px 0 rgba(16, 0, 43, 0.85), 0 4px 0 rgba(16, 0, 43, 0.75), 0 8px 20px rgba(0, 0, 0, 0.95), 0 18px 42px rgba(0, 0, 0, 0.8)',
+        }}
+      >
+        Where Intelligence Meets Engineering.
+      </h1>
+
+      {/* Tactile 3D Action Button centered directly below the text */}
+      <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center gap-3.5 pointer-events-auto">
+        <Link
+          to="/projects"
+          className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/25 shadow-[0_4px_0_rgba(16,0,43,0.55),0_12px_28px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_0_rgba(16,0,43,0.55),0_16px_34px_rgba(0,0,0,0.65)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_2px_0_rgba(16,0,43,0.55),0_6px_14px_rgba(0,0,0,0.5)] transition-all duration-200 flex items-center gap-2 cursor-pointer group"
+        >
+          <Layers className="w-4 h-4 shrink-0" />
+          <span>Explore Projects</span>
+        </Link>
+      </div>
+    </div>
+  )
+
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
-      {/* ── 1. FULL-WIDTH HERO SHOWCASE (3D Curved Carousel) ── */}
+      {/* ── 1. FULL-WIDTH HERO SHOWCASE (V1 Curved / V2 Coverflow) ── */}
       <section className="relative w-full z-10">
-        <TiltedGridHero
-          images={HERO_CAROUSEL_IMAGES}
-          tileHeight={48}
-          speed={6}
-          axis={50}
-          gap={4}
-          curve={72}
-          className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
-        >
-          <div className="relative z-10 flex h-full w-full max-w-4xl mx-auto flex-col items-center justify-center px-6 text-center">
-            {/* Soft, edge-less shadow behind the text only (carousel photos remain 100% full brightness) */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-2xl h-64 -z-10"
-              style={{
-                background:
-                  'radial-gradient(closest-side, rgba(10, 0, 28, 0.58) 0%, rgba(10, 0, 28, 0.26) 55%, transparent 100%)',
-              }}
-            />
+        {carouselVersion === 'v1' ? (
+          <TiltedGridHero
+            images={HERO_CAROUSEL_IMAGES}
+            tileHeight={48}
+            speed={6}
+            axis={50}
+            gap={4}
+            curve={72}
+            className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+          >
+            {heroOverlay}
+          </TiltedGridHero>
+        ) : (
+          <CoverflowCarousel
+            slides={HERO_CAROUSEL_IMAGES}
+            autoPlay
+            speed={6}
+            cardWidth="clamp(220px, 30vw, 340px)"
+            label="AIR Lab Hero Coverflow Carousel"
+            className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+          >
+            {heroOverlay}
+          </CoverflowCarousel>
+        )}
 
-            {/* Clean centered 3D extruded slogan */}
-            <h1
-              className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl"
-              style={{
-                textShadow:
-                  '0 1px 0 rgba(16, 0, 43, 0.95), 0 2px 0 rgba(16, 0, 43, 0.9), 0 3px 0 rgba(16, 0, 43, 0.85), 0 4px 0 rgba(16, 0, 43, 0.75), 0 8px 20px rgba(0, 0, 0, 0.95), 0 18px 42px rgba(0, 0, 0, 0.8)',
-              }}
-            >
-              Where Intelligence Meets Engineering.
-            </h1>
-
-            {/* Tactile 3D Action Button centered directly below the text */}
-            <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center gap-3.5">
-              <Link
-                to="/projects"
-                className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/25 shadow-[0_4px_0_rgba(16,0,43,0.55),0_12px_28px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_0_rgba(16,0,43,0.55),0_16px_34px_rgba(0,0,0,0.65)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_2px_0_rgba(16,0,43,0.55),0_6px_14px_rgba(0,0,0,0.5)] transition-all duration-200 flex items-center gap-2 cursor-pointer group"
-              >
-                <Layers className="w-4 h-4 shrink-0" />
-                <span>Explore Projects</span>
-              </Link>
-            </div>
+        {/* ── CAROUSEL VERSION TOGGLE (V1 / V2) RIGHT BELOW THE CAROUSEL ── */}
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 pt-3 flex items-center justify-center">
+          <div
+            role="radiogroup"
+            aria-label="Hero Carousel Version"
+            className="inline-flex items-center p-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-xs"
+          >
+            {(
+              [
+                { id: 'v1', label: 'V1 · Curved' },
+                { id: 'v2', label: 'V2 · Coverflow' },
+              ] as const
+            ).map((option) => {
+              const isActive = carouselVersion === option.id
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={isActive}
+                  onClick={() => setCarouselVersion(option.id)}
+                  className={`relative px-3.5 py-1 rounded-full text-xs font-semibold transition-colors duration-180 cursor-pointer select-none ${
+                    isActive
+                      ? 'text-white'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeHeroCarouselVersionPill"
+                      className="absolute inset-0 rounded-full bg-[var(--accent-orange)] shadow-xs"
+                      transition={{ type: 'spring', stiffness: 500, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative z-10">{option.label}</span>
+                </button>
+              )
+            })}
           </div>
-        </TiltedGridHero>
+        </div>
 
         {/* ── MINIMAL CLEAN QUICK LINKS STRIP ── */}
         <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">

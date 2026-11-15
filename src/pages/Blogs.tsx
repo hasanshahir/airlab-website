@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Clock,
   Search,
   Sparkles,
   Calendar,
@@ -248,9 +247,9 @@ export default function Blogs() {
 
                   <div className="p-7 pb-0">
                     <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-4 font-medium">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                        <span>{blog.readTime || 'Research Dispatch'}</span>
+                      <div className="flex items-center gap-1.5 text-[var(--text-primary)] font-semibold">
+                        <User className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                        <span>{blog.author || 'AIR Lab'}</span>
                       </div>
                       {blog.date && (
                         <span className="inline-flex items-center gap-1">
@@ -286,11 +285,7 @@ export default function Blogs() {
                   </div>
                 </div>
 
-                <div className="mx-7 my-6 pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[var(--text-primary)] inline-flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-                    <span>{blog.author || 'AIR Lab'}</span>
-                  </span>
+                <div className="mx-7 my-6 pt-4 border-t border-[var(--border-hairline)] flex items-center justify-end">
                   {blog.link ? (
                     <a
                       href={blog.link}
@@ -343,8 +338,8 @@ export default function Blogs() {
 
               <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)] mb-4">
                 <span className="inline-flex items-center gap-1 text-[var(--accent-orange)] font-semibold">
-                  <Clock className="w-3.5 h-3.5" />
-                  {activePost.readTime || 'Research Dispatch'}
+                  <User className="w-3.5 h-3.5" />
+                  {activePost.author || 'AIR Lab'}
                 </span>
                 {activePost.date && (
                   <span className="inline-flex items-center gap-1">
@@ -352,10 +347,6 @@ export default function Blogs() {
                     {activePost.date}
                   </span>
                 )}
-                <span className="inline-flex items-center gap-1">
-                  <User className="w-3.5 h-3.5" />
-                  {activePost.author || 'AIR Lab'}
-                </span>
               </div>
 
               {activePost.image && (

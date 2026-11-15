@@ -256,9 +256,9 @@ export const collections = [
     fields: {
       image: { type: 'image' },
       title: { type: 'string', required: true, listed: true },
+      author: { type: 'string', listed: true },
       link: { type: 'url', required: true },
       date: { type: 'date', required: true, listed: true },
-      author: { type: 'string' },
       excerpt: { type: 'text' },
       tag: { type: 'string' },
     },
