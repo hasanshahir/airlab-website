@@ -17,97 +17,6 @@ const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
 
 type TabType = 'faculty' | 'interns' | 'previous'
 
-const HARDCODED_ALUMNI_INTERNS = [
-  {
-    id: 'pri1',
-    name: 'Muhammad Ahmed Raza',
-    email: 'raza4520222@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/muhammad-ahmed-raza-8130072bb',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri2',
-    name: 'Wania Manzoor',
-    email: 'manzoor4501868@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/wania-manzoor-',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri3',
-    name: 'Muhammad Zohaib Khan',
-    email: 'khan4504302@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/muhammad-zohaib-khan-3bab09203/',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri4',
-    name: 'Muhammad Taha',
-    email: 'taha4605051@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/muhammad-taha-5b9546285',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri5',
-    name: 'Abdul Rehman',
-    email: 'rehman4605578@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/abdul-rehman-21a7752a7',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri6',
-    name: 'Fatima Azeemi',
-    email: 'azeemi4502943@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/fatima-azeemi-466988266',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri7',
-    name: 'Muhammad Saim Asim',
-    email: 'asim4606091@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/muhammad-saim-asim-1695b72b8',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri8',
-    name: 'Faisal Shahid',
-    email: 'shahid4500192@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/faisalshahid03/',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri9',
-    name: 'Iqra Iqbal',
-    email: 'iqbal4503948@cloud.neduet.edu.pk',
-    linkedin: 'https://pk.linkedin.com/in/iqra-iqbal-a2234b271',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri10',
-    name: 'Faiq Ahmed',
-    email: 'ahmed4603833@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/faiq-ahmed1/',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  },
-  {
-    id: 'pri11',
-    name: 'Unaiza Asif',
-    email: 'asif4601743@cloud.neduet.edu.pk',
-    linkedin: 'https://www.linkedin.com/in/unaiza-asif',
-    tenure: 'Former Research Intern',
-    department: 'Computer Science & IT'
-  }
-]
-
 export default function Team() {
   const [searchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState<TabType>('faculty')
@@ -135,13 +44,14 @@ export default function Team() {
   }, [searchParams])
 
   const [allMembersRaw, setAllMembersRaw] = useState<TeamMemberData[]>(() => getTeamMembers())
-  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>(() => HARDCODED_ALUMNI_INTERNS)
+  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>([])
 
   useEffect(() => {
     let active = true
+    const apiBase = import.meta.env.VITE_API_URL || ''
     Promise.all([
-      fetch('/api/content/team', { cache: 'no-store' }).then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/content/previous-interns', { cache: 'no-store' }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(`${apiBase}/api/content/team`, { cache: 'no-store' }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(`${apiBase}/api/content/previous-interns`, { cache: 'no-store' }).then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([team, prev]) => {
       if (!active) return
       if (Array.isArray(team) && team.length > 0) {
@@ -156,19 +66,17 @@ export default function Team() {
         })
         setAllMembersRaw(enriched)
       }
-      if (Array.isArray(prev) && prev.length > 0) {
+      if (Array.isArray(prev)) {
         setSortedPreviousInterns(prev)
-      } else {
-        setSortedPreviousInterns(HARDCODED_ALUMNI_INTERNS)
       }
     })
     return () => { active = false }
   }, [])
 
   const alumniList = useMemo(() => {
-    const baseList = Array.isArray(sortedPreviousInterns) && sortedPreviousInterns.length > 0
+    const baseList = Array.isArray(sortedPreviousInterns)
       ? [...sortedPreviousInterns]
-      : [...HARDCODED_ALUMNI_INTERNS]
+      : []
     const candidates = allMembersRaw.filter(
       m => m.category === 'Alumni' || (m.category as string) === 'Previous Interns'
     )
@@ -596,53 +504,59 @@ export default function Team() {
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs sm:text-sm font-sans">
-                  <thead>
-                    <tr className="border-b border-[var(--border-hairline)] font-sans text-[11px] uppercase tracking-wider text-[var(--text-subtle)] bg-[var(--bg-page)]">
-                      <th className="py-4 px-6 font-semibold">Name</th>
-                      <th className="py-4 px-6 font-semibold">Period & Department</th>
-                      <th className="py-4 px-6 font-semibold">Email</th>
-                      <th className="py-4 px-6 text-right font-semibold">LinkedIn</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--border-hairline)]">
-                    {alumniList.map((p: any) => {
-                      const memberKey = p.id || p._id
-                      return (
-                        <tr
-                          key={memberKey}
-                          id={`member-${memberKey}`}
-                          className={`hover:bg-[var(--bg-page)] transition-colors ${
-                            highlightedMemberId === memberKey || highlightedMemberId === p.id ? 'bg-[var(--accent-orange)]/15 ring-2 ring-[var(--accent-orange)]' : ''
-                          }`}
-                        >
-                          <td className="py-4 px-6 font-semibold text-[var(--text-primary)]">
-                            {p.name}
-                          </td>
-                        <td className="py-4 px-6 text-[var(--text-muted)] font-sans text-xs">
-                          {p.tenure || 'Former Research Intern'} • {p.department}
-                        </td>
-                        <td className="py-4 px-6 font-sans text-xs text-[var(--text-muted)]">
-                          <a href={`mailto:${p.email}`} className="text-[var(--accent-orange)] hover:underline flex items-center gap-1 font-semibold">
-                            <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                            {p.email}
-                          </a>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <a
-                            href={p.linkedin}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--bg-page)] text-[var(--ink-dark)] hover:bg-[var(--ink-dark)] hover:text-white transition-all text-xs font-sans border border-[var(--border-hairline)] font-medium"
-                          >
-                            <Linkedin className="w-3.5 h-3.5" />
-                            <span>LinkedIn</span>
-                          </a>
-                        </td>
+                {alumniList.length === 0 ? (
+                  <div className="text-center py-16 text-xs text-[var(--text-muted)] font-sans">
+                    No past interns listed yet.
+                  </div>
+                ) : (
+                  <table className="w-full text-left border-collapse text-xs sm:text-sm font-sans">
+                    <thead>
+                      <tr className="border-b border-[var(--border-hairline)] font-sans text-[11px] uppercase tracking-wider text-[var(--text-subtle)] bg-[var(--bg-page)]">
+                        <th className="py-4 px-6 font-semibold">Name</th>
+                        <th className="py-4 px-6 font-semibold">Period & Department</th>
+                        <th className="py-4 px-6 font-semibold">Email</th>
+                        <th className="py-4 px-6 text-right font-semibold">LinkedIn</th>
                       </tr>
-                    )})}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--border-hairline)]">
+                      {alumniList.map((p: any) => {
+                        const memberKey = p.id || p._id
+                        return (
+                          <tr
+                            key={memberKey}
+                            id={`member-${memberKey}`}
+                            className={`hover:bg-[var(--bg-page)] transition-colors ${
+                              highlightedMemberId === memberKey || highlightedMemberId === p.id ? 'bg-[var(--accent-orange)]/15 ring-2 ring-[var(--accent-orange)]' : ''
+                            }`}
+                          >
+                            <td className="py-4 px-6 font-semibold text-[var(--text-primary)]">
+                              {p.name}
+                            </td>
+                          <td className="py-4 px-6 text-[var(--text-muted)] font-sans text-xs">
+                            {p.tenure || 'Former Research Intern'} • {p.department}
+                          </td>
+                          <td className="py-4 px-6 font-sans text-xs text-[var(--text-muted)]">
+                            <a href={`mailto:${p.email}`} className="text-[var(--accent-orange)] hover:underline flex items-center gap-1 font-semibold">
+                              <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                              {p.email}
+                            </a>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <a
+                              href={p.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--bg-page)] text-[var(--ink-dark)] hover:bg-[var(--ink-dark)] hover:text-white transition-all text-xs font-sans border border-[var(--border-hairline)] font-medium"
+                            >
+                              <Linkedin className="w-3.5 h-3.5" />
+                              <span>LinkedIn</span>
+                            </a>
+                          </td>
+                        </tr>
+                      )})}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           </motion.div>
