@@ -10,7 +10,6 @@ import Grants from './pages/Grants'
 import Contact from './pages/Contact'
 import Gallery from './pages/Gallery'
 import Performers from './pages/Performers'
-import Collaborations from './pages/Collaborations'
 import Interns from './pages/Interns'
 import AdminDashboard from './pages/Admin'
 
@@ -29,7 +28,6 @@ export default function App() {
             <Route path="contact" element={<Contact />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="performers" element={<Performers />} />
-            <Route path="collaborations" element={<Collaborations />} />
             <Route path="interns" element={<Interns />} />
             <Route path="admin" element={<AdminDashboard />} />
             <Route path="*" element={<Home />} />

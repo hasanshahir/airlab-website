@@ -405,7 +405,7 @@ export default function Layout() {
               <button
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'about' ? null : 'about')}
-                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'about' || location.pathname.includes('/about') || location.pathname.includes('/collaborations') || location.pathname.includes('/gallery')
+                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'about' || location.pathname.includes('/about') || location.pathname.includes('/gallery')
                     ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
                   }`}
@@ -439,19 +439,6 @@ export default function Layout() {
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
                             Mission, foundational pillars, and department leadership
-                          </p>
-                        </Link>
-
-                        <Link
-                          to="/collaborations"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
-                        >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Building className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
-                            <span>Collaborations</span>
-                          </div>
-                          <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
-                            Enterprise sponsors and academic research partners
                           </p>
                         </Link>
                       </div>
@@ -610,9 +597,6 @@ export default function Layout() {
                       <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         About AIR Lab
                       </Link>
-                      <Link to="/collaborations" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Collaborations
-                      </Link>
                       <Link to="/gallery" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Lab Gallery
                       </Link>
@@ -714,7 +698,6 @@ export default function Layout() {
               </h5>
               <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
                 <li><Link to="/team" className="hover:text-white transition-colors">Faculty & Scholars</Link></li>
-                <li><Link to="/collaborations" className="hover:text-white transition-colors">Collaborations & Industry</Link></li>
                 <li><Link to="/performers" className="hover:text-white transition-colors">Performers of the Month</Link></li>
                 <li><Link to="/interns" className="hover:text-white transition-colors">Research Interns</Link></li>
                 <li><Link to="/contact" className="hover:text-white transition-colors">Contact Coordination</Link></li>
