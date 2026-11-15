@@ -128,6 +128,17 @@ export interface InternItem {
   image?: string
 }
 
+export interface CoAwardeeInfo {
+  id: string
+  name: string
+  researchFocus?: string
+  email?: string
+  linkedin?: string
+  cvUrl?: string
+  categoryTab?: string
+  note?: string
+}
+
 export interface PerformerItem {
   id: string
   name: string
@@ -146,4 +157,5 @@ export interface PerformerItem {
   image: string
   categoryTab?: string
   photos?: string[]
+  coAwardees?: CoAwardeeInfo[]
 }

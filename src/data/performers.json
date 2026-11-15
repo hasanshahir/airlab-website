@@ -1,62 +1,147 @@
 [
   {
-    "id": "ri-muhammad-shaheer-khan",
-    "name": "Muhammad Shaheer Khan",
-    "role": "Research Intern",
+    "id": "ri-areeba-zehra-jafri",
+    "name": "Areeba Zehra Jafri & Muhammad Hammad Khan",
+    "role": "Research Interns",
     "department": "Department of CSIT · NED University",
-    "month": "September – October 2026",
+    "month": "July 2026",
     "rank": 1,
-    "title": "Lead Student Author — Multimodal RAG & Embedding Models",
-    "achievement": "Recognized by AIR Lab faculty for exemplary milestone execution, landmark AI model evaluations, and high-performance embedding pipeline benchmarks during the September – October 2026 research cycle.",
-    "researchFocus": "Computer Vision, RAG Systems, Embedding Models, AI Automation",
-    "email": "khan4731403@cloud.neduet.edu.pk",
-    "linkedin": "https://www.linkedin.com/in/muhammad-shaheer-86043359/",
-    "cvUrl": "https://www.linkedin.com/in/muhammad-shaheer-86043359/",
-    "avatar": "/pfp/shaheer.png",
+    "title": "Co-Performers of the Month — Cybersecurity, Adversarial ML & Agentic AI",
+    "achievement": "Recognized by AIR Lab faculty for outstanding research execution in cybersecurity, adversarial machine learning, RAG systems, and agentic AI engineering during July 2026. (Note: Muhammad Hammad Khan was unable to attend the ceremony photo session in person.)",
+    "researchFocus": "Cybersecurity, Adversarial ML, Machine Learning · Data Science, RAG Systems, Agentic AI, AI Engineering",
     "tags": [
+      "Cybersecurity",
+      "Adversarial ML",
+      "Data Science",
+      "RAG Systems",
+      "Agentic AI",
+      "AIR Lab Fellow"
+    ],
+    "image": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg",
+    "categoryTab": "interns",
+    "photos": [
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg",
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.28.jpeg"
+    ],
+    "coAwardees": [
+      {
+        "id": "ri-areeba-zehra-jafri",
+        "name": "Areeba Zehra Jafri",
+        "researchFocus": "Cybersecurity, Adversarial ML, Machine Learning",
+        "email": "jafrri4603155@cloud.neduet.edu.pk",
+        "linkedin": "https://www.linkedin.com/in/areeba-zehra-jafri",
+        "categoryTab": "interns"
+      },
+      {
+        "id": "ri-muhammad-hammad-khan",
+        "name": "Muhammad Hammad Khan",
+        "researchFocus": "Data Science, RAG Systems, Agentic AI, AI Engineering",
+        "email": "khan4600572@cloud.neduet.edu.pk",
+        "linkedin": "https://www.linkedin.com/in/hammad-khan-308395286/",
+        "categoryTab": "interns",
+        "note": "Absent during photo ceremony"
+      }
+    ]
+  },
+  {
+    "id": "ri-haseeb-yaqoob",
+    "name": "Haseeb Yaqoob & Muhammad Shaheer Khan",
+    "role": "Research Interns",
+    "department": "Department of CSIT · NED University",
+    "month": "August 2026",
+    "rank": 2,
+    "title": "Co-Performers of the Month — Multimodal RAG, NLP & Edge Computer Vision",
+    "achievement": "Commended by principal investigators for pioneering applied machine learning benchmarks, multimodal RAG embedding pipelines, and dedicated laboratory engineering leadership during August 2026.",
+    "researchFocus": "NLP & LLMs, Computer Vision · Computer Vision, RAG Systems, Embedding Models, AI Automation",
+    "tags": [
+      "NLP & LLMs",
       "Computer Vision",
       "RAG Systems",
       "Embedding Models",
       "AI Automation",
       "AIR Lab Fellow"
     ],
+    "image": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.32.jpeg",
+    "categoryTab": "interns",
+    "photos": [
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.32.jpeg",
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.30.jpeg"
+    ],
+    "coAwardees": [
+      {
+        "id": "ri-haseeb-yaqoob",
+        "name": "Haseeb Yaqoob",
+        "researchFocus": "NLP & LLMs, Computer Vision",
+        "email": "yaqoob4705143@cloud.neduet.edu.pk",
+        "linkedin": "https://www.linkedin.com/in/haseeb-yaqoob-864360287/",
+        "categoryTab": "interns"
+      },
+      {
+        "id": "ri-muhammad-shaheer-khan",
+        "name": "Muhammad Shaheer Khan",
+        "researchFocus": "Computer Vision, RAG Systems, Embedding Models, AI Automation",
+        "email": "khan4731403@cloud.neduet.edu.pk",
+        "linkedin": "https://www.linkedin.com/in/muhammad-shaheer-86043359/",
+        "categoryTab": "interns"
+      }
+    ]
+  },
+  {
+    "id": "ri-syed-muhammed-ahmed",
+    "name": "Syed Muhammed Ahmed",
+    "role": "Research Intern",
+    "department": "Department of CSIT · NED University",
+    "month": "September 2026",
+    "rank": 3,
+    "title": "Outstanding Research & Scientific Excellence — Generative AI & RAG Systems",
+    "achievement": "Recognized by AIR Lab faculty for exemplary milestone execution, landmark AI model evaluations, and applied data science and generative AI contributions during September 2026.",
+    "researchFocus": "Data Science, Machine Learning, RAG Systems, Generative AI",
+    "email": "ahmed4605214@cloud.neduet.edu.pk",
+    "linkedin": "https://www.linkedin.com/in/syedmuhammedahmed/",
+    "cvUrl": "https://www.linkedin.com/in/syedmuhammedahmed/",
+    "avatar": "/pfp/muhammed-ahmed.jpeg",
+    "tags": [
+      "Data Science",
+      "Machine Learning",
+      "RAG Systems",
+      "Generative AI",
+      "AIR Lab Fellow"
+    ],
+    "image": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
+    "categoryTab": "interns",
+    "photos": [
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg"
+    ]
+  },
+  {
+    "id": "ri-syed-muhammed-ahmed",
+    "name": "Syed Muhammed Ahmed",
+    "role": "Research Intern",
+    "department": "Department of CSIT · NED University",
+    "month": "October 2026",
+    "rank": 4,
+    "title": "Outstanding Research & Scientific Excellence — Generative AI & RAG Systems",
+    "achievement": "Recognized by AIR Lab faculty for exemplary milestone execution, landmark AI model evaluations, and applied data science and generative AI contributions during October 2026.",
+    "researchFocus": "Data Science, Machine Learning, RAG Systems, Generative AI",
+    "email": "ahmed4605214@cloud.neduet.edu.pk",
+    "linkedin": "https://www.linkedin.com/in/syedmuhammedahmed/",
+    "cvUrl": "https://www.linkedin.com/in/syedmuhammedahmed/",
+    "avatar": "/pfp/muhammed-ahmed.jpeg",
+    "tags": [
+      "Data Science",
+      "Machine Learning",
+      "RAG Systems",
+      "Generative AI",
+      "AIR Lab Fellow"
+    ],
     "image": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
     "categoryTab": "interns",
     "photos": [
       "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg",
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg"
-    ]
-  },
-  {
-    "id": "ri-haseeb-yaqoob",
-    "name": "Haseeb Yaqoob",
-    "role": "Research Intern",
-    "department": "Department of CSIT · NED University",
-    "month": "July – August 2026",
-    "rank": 2,
-    "title": "Distinguished Research Delivery & Edge Perception Benchmarks",
-    "achievement": "Commended by principal investigators for pioneering applied machine learning benchmarks and dedicated laboratory engineering leadership during July – August 2026.",
-    "researchFocus": "NLP & LLMs, Computer Vision, Autonomous Aerial SLAM",
-    "email": "yaqoob4705143@cloud.neduet.edu.pk",
-    "linkedin": "https://www.linkedin.com/in/haseeb-yaqoob-864360287/",
-    "cvUrl": "https://www.linkedin.com/in/haseeb-yaqoob-864360287/",
-    "avatar": "/pfp/haseeb.png",
-    "tags": [
-      "NLP & LLMs",
-      "Computer Vision",
-      "Aerial SLAM",
-      "Multi-Agent",
-      "AIR Lab Fellow"
-    ],
-    "image": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.30.jpeg",
-    "categoryTab": "interns",
-    "photos": [
-      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.28.jpeg",
-      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.30.jpeg",
-      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.32.jpeg",
-      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg"
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg"
     ]
   }
 ]

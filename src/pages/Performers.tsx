@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Medal, Mail, FileText } from 'lucide-react'
+import { Medal, Mail, FileText, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { getPerformers } from '../lib/data'
-import type { PerformerItem } from '../types/data'
+import type { PerformerItem, CoAwardeeInfo } from '../types/data'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -12,23 +12,103 @@ const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   </svg>
 )
 
+const MONTH_ORDER = ['july', 'august', 'september', 'october']
+
+function isLegacyDateRangeItem(item: PerformerItem): boolean {
+  const month = String(item.month || '')
+  const id = String(item.id || '')
+  if (id === 'pom-sep-oct-2026' || id === 'pom-jul-aug-2026') return true
+  return /[–-]/.test(month)
+}
+
+function getMonthSortIndex(month?: string): number {
+  const lower = String(month || '').toLowerCase()
+  const idx = MONTH_ORDER.findIndex(m => lower.includes(m))
+  return idx >= 0 ? idx : 99
+}
+
 export default function Performers() {
   const [performersList, setPerformersList] = useState<PerformerItem[]>(() => getPerformers())
   const [activeCycleIndex, setActiveCycleIndex] = useState(0)
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
 
   useEffect(() => {
     fetch('/api/content/performers')
-      .then(r => r.ok ? r.json() : [])
-      .then(d => {
-        if (Array.isArray(d) && d.length > 0) setPerformersList(d)
+      .then(r => (r.ok ? r.json() : []))
+      .then((d: PerformerItem[]) => {
+        if (!Array.isArray(d) || d.length === 0) return
+        const monthWiseApi = d.filter(item => !isLegacyDateRangeItem(item))
+        if (monthWiseApi.length === 0) return
+
+        const local = getPerformers()
+        const merged = local.map(localItem => {
+          const match = monthWiseApi.find(
+            apiItem =>
+              String(apiItem.id) === String(localItem.id) &&
+              String(apiItem.month || '').trim().toLowerCase() ===
+                String(localItem.month || '').trim().toLowerCase()
+          )
+          if (!match) return localItem
+          return {
+            ...localItem,
+            ...match,
+            photos:
+              Array.isArray(match.photos) && match.photos.length > 0
+                ? match.photos
+                : localItem.photos,
+            coAwardees:
+              Array.isArray(match.coAwardees) && match.coAwardees.length > 0
+                ? match.coAwardees
+                : localItem.coAwardees,
+          }
+        })
+        merged.sort((a, b) => getMonthSortIndex(a.month) - getMonthSortIndex(b.month))
+        setPerformersList(merged)
+        setActiveSlideIndex(0)
       })
       .catch(() => {})
   }, [])
 
   const featuredPerformer = performersList[activeCycleIndex] || performersList[0] || null
 
-  const teamRedirectUrl = featuredPerformer?.id
-    ? `/team?tab=${featuredPerformer.categoryTab || 'interns'}&member=${featuredPerformer.id}`
+  const slides = useMemo(() => {
+    if (!featuredPerformer) return []
+    const raw =
+      Array.isArray(featuredPerformer.photos) && featuredPerformer.photos.length > 0
+        ? featuredPerformer.photos
+        : [featuredPerformer.image]
+    const unique = Array.from(new Set(raw.filter(Boolean).map(url => getMemberAvatar(url))))
+    return unique.length > 0 ? unique : [DEFAULT_AVATAR]
+  }, [featuredPerformer])
+
+  const safeSlideIndex = slides.length > 0 ? activeSlideIndex % slides.length : 0
+
+  useEffect(() => {
+    if (slides.length <= 1 || isPaused) return
+    const timer = window.setInterval(() => {
+      setActiveSlideIndex(prev => (prev + 1) % slides.length)
+    }, 4500)
+    return () => window.clearInterval(timer)
+  }, [slides.length, isPaused, activeCycleIndex])
+
+  const goToPrevSlide = () => {
+    if (slides.length <= 1) return
+    setActiveSlideIndex(prev => (prev - 1 + slides.length) % slides.length)
+  }
+
+  const goToNextSlide = () => {
+    if (slides.length <= 1) return
+    setActiveSlideIndex(prev => (prev + 1) % slides.length)
+  }
+
+  const coAwardees: CoAwardeeInfo[] = Array.isArray(featuredPerformer?.coAwardees)
+    ? featuredPerformer.coAwardees
+    : []
+
+  const hasMemberProfile = Boolean(featuredPerformer?.id?.startsWith('ri-'))
+  const teamRedirectUrl = hasMemberProfile
+    ? `/team?tab=${featuredPerformer?.categoryTab || 'interns'}&member=${featuredPerformer?.id}`
     : '/team'
 
   return (
@@ -43,7 +123,7 @@ export default function Performers() {
 
         <SectionReveal delay={0.16}>
           <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Monthly spotlight honoring the researcher who demonstrated exceptional scientific rigor, landmark publications, and engineering leadership at AIR Lab.
+            Monthly spotlight honoring the researchers who demonstrated exceptional scientific rigor, landmark publications, and engineering leadership at AIR Lab.
           </p>
         </SectionReveal>
       </div>
@@ -62,15 +142,17 @@ export default function Performers() {
       ) : (
         <SectionReveal delay={0.2}>
           <div className="p-6 sm:p-10 lg:p-12 relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-5xl mx-auto transition-all duration-300 hover:border-[var(--accent-orange)]/40 text-left">
-            {/* Top Banner Ribbon & Cycle Selector */}
+            {/* Top Banner Ribbon & Month Selector (July to October) */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-[var(--border-hairline)] mb-8">
               <div className="flex flex-wrap items-center gap-2.5">
-                {/* Cycle Switcher Tabs */}
                 {performersList.map((p, idx) => (
                   <button
-                    key={p.id || idx}
+                    key={`${p.id || 'item'}-${p.month || idx}`}
                     type="button"
-                    onClick={() => setActiveCycleIndex(idx)}
+                    onClick={() => {
+                      setActiveCycleIndex(idx)
+                      setActiveSlideIndex(0)
+                    }}
                     className={`px-4 py-1.5 rounded-full text-xs font-sans font-medium border transition-colors cursor-pointer ${
                       activeCycleIndex === idx
                         ? 'bg-[var(--ink-dark)] text-white border-[var(--ink-dark)] shadow-xs'
@@ -87,25 +169,66 @@ export default function Performers() {
               </span>
             </div>
 
-            {/* Member Profile Showcase with Significantly Enlarged Main Ceremony Photo */}
+            {/* Member Profile Showcase with Interactive Photo Slideshow */}
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 sm:gap-10 mb-8">
-              {/* Clickable Large Main Image */}
-              <div className="w-full lg:w-[460px] shrink-0">
-                <Link
-                  to={teamRedirectUrl}
-                  title={`Click to view ${featuredPerformer.name} on Team page`}
-                  className="relative block w-full aspect-[4/3] sm:h-80 lg:h-[320px] rounded-2xl sm:rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-md group cursor-pointer bg-[var(--bg-page)] transition-transform duration-300 hover:scale-[1.01]"
-                >
-                  <img
-                    src={getMemberAvatar(featuredPerformer.image)}
-                    alt={featuredPerformer.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      e.currentTarget.src = DEFAULT_AVATAR
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
-                  <div className="absolute bottom-3.5 left-4 right-4 flex items-center justify-between text-white text-xs font-sans">
+              {/* Main Image Slideshow */}
+              <div
+                className="w-full lg:w-[460px] shrink-0"
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+                onFocus={() => setIsPaused(true)}
+                onBlur={() => setIsPaused(false)}
+                onKeyDown={e => {
+                  if (e.key === 'ArrowLeft') goToPrevSlide()
+                  if (e.key === 'ArrowRight') goToNextSlide()
+                }}
+                tabIndex={0}
+              >
+                <div className="relative w-full aspect-[4/3] sm:h-80 lg:h-[320px] rounded-2xl sm:rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-md group bg-[var(--bg-page)]">
+                  <Link
+                    to={teamRedirectUrl}
+                    title={`Click to view ${featuredPerformer.name} on Team page`}
+                    className="block w-full h-full cursor-pointer"
+                  >
+                    <img
+                      key={slides[safeSlideIndex]}
+                      src={slides[safeSlideIndex]}
+                      alt={`${featuredPerformer.name} — ${featuredPerformer.month} photo ${safeSlideIndex + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={e => {
+                        e.currentTarget.src = DEFAULT_AVATAR
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                  </Link>
+
+                  {slides.length > 1 && (
+                    <>
+                      <span className="absolute top-3.5 right-3.5 z-10 bg-black/60 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[11px] font-sans font-medium pointer-events-none">
+                        {safeSlideIndex + 1} / {slides.length}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={goToPrevSlide}
+                        aria-label="Previous photo"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/55 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-sm"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={goToNextSlide}
+                        aria-label="Next photo"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/55 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-sm"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+
+                  <div className="absolute bottom-3.5 left-4 right-4 flex items-center justify-between text-white text-xs font-sans pointer-events-none">
                     <span className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full font-medium">
                       {featuredPerformer.month}
                     </span>
@@ -113,18 +236,61 @@ export default function Performers() {
                       AIR Lab Awardee
                     </span>
                   </div>
-                </Link>
+                </div>
+
+                {/* Slideshow Dots & Thumbnails */}
+                {slides.length > 1 && (
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      {slides.map((slideUrl, sIdx) => (
+                        <button
+                          key={slideUrl + sIdx}
+                          type="button"
+                          onClick={() => setActiveSlideIndex(sIdx)}
+                          aria-label={`View photo ${sIdx + 1}`}
+                          className={`relative w-14 h-10 rounded-lg overflow-hidden border transition-all cursor-pointer ${
+                            safeSlideIndex === sIdx
+                              ? 'border-[var(--accent-orange)] ring-2 ring-[var(--accent-orange)]/30 opacity-100'
+                              : 'border-[var(--border-hairline)] opacity-60 hover:opacity-90'
+                          }`}
+                        >
+                          <img
+                            src={slideUrl}
+                            alt={`Thumbnail ${sIdx + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={e => {
+                              e.currentTarget.src = DEFAULT_AVATAR
+                            }}
+                          />
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      {slides.map((_, sIdx) => (
+                        <button
+                          key={sIdx}
+                          type="button"
+                          onClick={() => setActiveSlideIndex(sIdx)}
+                          aria-label={`Go to slide ${sIdx + 1}`}
+                          className={`h-2 rounded-full transition-all cursor-pointer ${
+                            safeSlideIndex === sIdx
+                              ? 'w-5 bg-[var(--ink-dark)]'
+                              : 'w-2 bg-[var(--border-hairline-dark)] hover:bg-[var(--accent-orange)]/60'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Performer Details: Name, Department, Short Description, Quick Links */}
+              {/* Performer Details: Name, Department, Research Focus, Quick Links */}
               <div className="flex-1 w-full space-y-4 text-left">
                 <div>
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white inline-block">
                       {featuredPerformer.role || 'Research Intern'}
-                    </span>
-                    <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--accent-orange)]/10 text-[var(--accent-orange)] border border-[var(--accent-orange)]/20 inline-block">
-                      Spotlight Awardee
                     </span>
                   </div>
 
@@ -139,16 +305,76 @@ export default function Performers() {
                   )}
                 </div>
 
-                {/* Short Description / Research Focus */}
-                {featuredPerformer.researchFocus && (
-                  <div className="p-4 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-sm text-[var(--text-muted)] font-sans">
-                    <div className="text-xs uppercase font-semibold text-[var(--text-primary)] mb-1">
-                      Research Focus & Specialization
-                    </div>
-                    <p className="leading-relaxed font-normal">
-                      {featuredPerformer.researchFocus}
-                    </p>
+                {/* Co-Awardees Breakdown OR Single Research Focus */}
+                {coAwardees.length > 0 ? (
+                  <div className="space-y-2.5">
+                    {coAwardees.map(person => (
+                      <div
+                        key={person.id}
+                        className="p-3.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-col gap-2"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm font-bold font-head text-[var(--text-primary)]">
+                              {person.name}
+                            </span>
+                            {person.note && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[var(--bg-surface)] text-[var(--text-subtle)] border border-[var(--border-hairline)]">
+                                {person.note}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            {person.linkedin && (
+                              <a
+                                href={person.linkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                              >
+                                <Linkedin className="w-3 h-3" />
+                                <span>LinkedIn</span>
+                              </a>
+                            )}
+                            {person.email && (
+                              <a
+                                href={`mailto:${person.email}`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                              >
+                                <Mail className="w-3 h-3" />
+                                <span>Email</span>
+                              </a>
+                            )}
+                            <Link
+                              to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                            >
+                              <span>Profile</span>
+                              <ArrowUpRight className="w-3 h-3" />
+                            </Link>
+                          </div>
+                        </div>
+
+                        {person.researchFocus && (
+                          <p className="text-xs text-[var(--text-muted)] font-sans leading-relaxed">
+                            {person.researchFocus}
+                          </p>
+                        )}
+                      </div>
+                    ))}
                   </div>
+                ) : (
+                  featuredPerformer.researchFocus && (
+                    <div className="p-4 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-sm text-[var(--text-muted)] font-sans">
+                      <div className="text-xs uppercase font-semibold text-[var(--text-primary)] mb-1">
+                        Research Focus & Specialization
+                      </div>
+                      <p className="leading-relaxed font-normal">
+                        {featuredPerformer.researchFocus}
+                      </p>
+                    </div>
+                  )
                 )}
 
                 {/* Research Tags */}
@@ -165,40 +391,42 @@ export default function Performers() {
                   </div>
                 )}
 
-                {/* Action Links (LinkedIn, Resume, Email) */}
-                <div className="flex flex-wrap items-center gap-2.5 pt-2">
-                  {featuredPerformer.linkedin && (
-                    <a
-                      href={featuredPerformer.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                    >
-                      <Linkedin className="w-3.5 h-3.5" />
-                      <span>LinkedIn</span>
-                    </a>
-                  )}
-                  {(featuredPerformer.cvUrl || featuredPerformer.linkedin) && (
-                    <a
-                      href={featuredPerformer.cvUrl || featuredPerformer.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Resume</span>
-                    </a>
-                  )}
-                  {featuredPerformer.email && (
-                    <a
-                      href={`mailto:${featuredPerformer.email}`}
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                      <span>Email</span>
-                    </a>
-                  )}
-                </div>
+                {/* Action Links for Single Awardee */}
+                {coAwardees.length === 0 && (
+                  <div className="flex flex-wrap items-center gap-2.5 pt-2">
+                    {featuredPerformer.linkedin && (
+                      <a
+                        href={featuredPerformer.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                      >
+                        <Linkedin className="w-3.5 h-3.5" />
+                        <span>LinkedIn</span>
+                      </a>
+                    )}
+                    {(featuredPerformer.cvUrl || featuredPerformer.linkedin) && (
+                      <a
+                        href={featuredPerformer.cvUrl || featuredPerformer.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>Resume</span>
+                      </a>
+                    )}
+                    {featuredPerformer.email && (
+                      <a
+                        href={`mailto:${featuredPerformer.email}`}
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] text-xs font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        <span>Email</span>
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -218,29 +446,6 @@ export default function Performers() {
                 </p>
               )}
             </div>
-
-            {/* Ceremony & Award Photos Grid */}
-            {Array.isArray(featuredPerformer.photos) && featuredPerformer.photos.length > 0 && (
-              <div className="mb-8 p-6 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)]">
-                <span className="text-xs font-sans font-semibold text-[var(--ink-dark)] uppercase tracking-wider block mb-3">
-                  Award Ceremony & Recognition Photos ({featuredPerformer.month}):
-                </span>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {featuredPerformer.photos.map((photoUrl: string, pIdx: number) => (
-                    <div
-                      key={pIdx}
-                      className="relative aspect-4/3 rounded-xl overflow-hidden border border-[var(--border-hairline)] shadow-xs group bg-[var(--bg-surface)]"
-                    >
-                      <img
-                        src={photoUrl}
-                        alt={`Ceremony photo ${pIdx + 1}`}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Bottom Actions Bar */}
             <div className="pt-6 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -279,7 +484,7 @@ export default function Performers() {
               </div>
 
               <Link
-                to={teamRedirectUrl}
+                to={coAwardees.length > 0 ? `/team?tab=${featuredPerformer.categoryTab || 'interns'}` : teamRedirectUrl}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white hover:bg-[var(--accent-orange)] hover:text-white transition-all inline-flex items-center justify-center gap-2 shadow-xs cursor-pointer"
               >
                 <span>View Full Team Dossier</span>
