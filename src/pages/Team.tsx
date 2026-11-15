@@ -5,6 +5,7 @@ import { Mail, GraduationCap, Calendar, Search, Sparkles, FileText } from 'lucid
 import { getTeamMembers, getPreviousInterns } from '../lib/data'
 import type { TeamMemberData } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
+import { normalizeLinkedInUrl } from '../lib/utils'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
@@ -63,7 +64,14 @@ export default function Team() {
               String(m.id) === String(item.id) ||
               m.name.trim().toLowerCase() === String(item.name || '').trim().toLowerCase()
           )
-          return local ? { ...local, ...item, image: item.image || local.image } : item
+          return local
+            ? {
+                ...local,
+                ...item,
+                image: item.image || local.image,
+                linkedin: normalizeLinkedInUrl(item.linkedin) || local.linkedin,
+              }
+            : item
         })
         setAllMembersRaw(enriched)
       }

@@ -1,5 +1,5 @@
 import { getMemberAvatar } from '../lib/placeholders'
-import { getFacultyPriority } from '../lib/utils'
+import { getFacultyPriority, normalizeLinkedInUrl } from '../lib/utils'
 
 export interface TeamMemberData {
   id: string
@@ -71,8 +71,9 @@ export class TeamMemberEntity {
    * Primary action link: returns LinkedIn URL if present, otherwise direct mailto fallback
    */
   public getPrimaryActionUrl(): string {
-    if (this.hasLinkedIn()) {
-      return this.linkedin!
+    const linkedInUrl = this.getLinkedInUrl()
+    if (linkedInUrl) {
+      return linkedInUrl
     }
     if (this.hasEmail()) {
       return `mailto:${this.email}`
@@ -84,25 +85,14 @@ export class TeamMemberEntity {
    * Checks whether the member has a valid external LinkedIn URL
    */
   public hasLinkedIn(): boolean {
-    return Boolean(
-      this.linkedin &&
-      this.linkedin.trim() !== '' &&
-      this.linkedin.trim() !== '#' &&
-      !this.linkedin.includes('placeholder')
-    )
+    return this.getLinkedInUrl() !== null
   }
 
   /**
    * Returns clean LinkedIn URL or null
    */
   public getLinkedInUrl(): string | null {
-    if (!this.hasLinkedIn()) return null
-    let url = this.linkedin!.trim()
-    // Fix common URL prefixes if malformed
-    if (url.startsWith('https://cct.neduet.edu.pk/www.linkedin.com')) {
-      url = url.replace('https://cct.neduet.edu.pk/www.linkedin.com', 'https://www.linkedin.com')
-    }
-    return url
+    return normalizeLinkedInUrl(this.linkedin)
   }
 
   /**
