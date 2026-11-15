@@ -35,7 +35,7 @@ export interface CoverflowCarouselProps {
   loop?: boolean;
   /** Continuously spin from right to left like TiltedGridHero. */
   autoPlay?: boolean;
-  /** Seconds to advance by one card when autoPlay is enabled. @default 6 */
+  /** Seconds to advance by one card when autoPlay is enabled. @default 4 */
   speed?: number;
   /** Width of the horizontal edge fade mask in percent (0 disables). @default 12 */
   edgeFade?: number;
@@ -57,11 +57,11 @@ export function CoverflowCarousel({
   perspective = 3,
   falloff = 0.56,
   fade = 0.1,
-  cardWidth = "clamp(220px, 30vw, 340px)",
+  cardWidth = "clamp(250px, 34vw, 400px)",
   gap = 0.05,
   loop = true,
   autoPlay = true,
-  speed = 6,
+  speed = 4,
   edgeFade = 12,
   showCaption = false,
   showPagination = false,
