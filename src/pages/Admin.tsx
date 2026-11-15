@@ -239,11 +239,25 @@ const COLLECTION_SCHEMAS: Record<string, Record<string, FieldDef>> = {
     published: { type: 'boolean', label: 'Published on Website' },
   },
   blogs: {
-    title: { type: 'string', label: 'Post Title', required: true },
-    author: { type: 'string', label: 'Author', placeholder: 'e.g. AIR Lab Editorial' },
-    date: { type: 'date', label: 'Publish Date', placeholder: 'e.g. Nov 15, 2025' },
-    tag: { type: 'string', label: 'Category Tag', placeholder: 'e.g. Technical Breakdown' },
-    excerpt: { type: 'text', label: 'Summary / Content Excerpt' },
+    image: { type: 'image', label: 'Blog Cover Image' },
+    title: {
+      type: 'string',
+      label: 'Title of Blog',
+      required: true,
+      placeholder: 'e.g. Building Low-Resource Multilingual LLMs at AIR Lab',
+    },
+    link: {
+      type: 'url',
+      label: 'Link to Blog',
+      required: true,
+      placeholder: 'https://medium.com/... or https://...',
+    },
+    date: {
+      type: 'date',
+      label: 'Date',
+      required: true,
+      placeholder: 'e.g. November 16, 2026 or 2026-11-16',
+    },
     order: { type: 'number', label: 'Display Order' },
     published: { type: 'boolean', label: 'Published on Website' },
   },
@@ -1238,6 +1252,7 @@ export default function AdminDashboard() {
                             item.venue ||
                             item.cat ||
                             item.tenure ||
+                            item.date ||
                             '—'}
                         </td>
                         <td className="py-3 px-4">

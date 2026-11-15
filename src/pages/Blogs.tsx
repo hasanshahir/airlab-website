@@ -14,8 +14,10 @@ import SectionReveal from '../components/ui/SectionReveal'
 import rawBlogs from '../data/blogs.json'
 
 export interface BlogPost {
-  id: string | number
+  _id?: string
+  id?: string | number
   title: string
+  link?: string
   author?: string
   date?: string
   excerpt?: string
@@ -64,14 +66,24 @@ export default function Blogs() {
     return ['All', ...Array.from(set)]
   }, [blogsData])
 
-  // Filtered blogs
+  // Filtered & sorted blogs (newest date first)
   const filtered = useMemo(() => {
-    return blogsData.filter(blog => {
+    const sorted = [...blogsData].sort((a, b) => {
+      const timeA = a.date ? Date.parse(a.date) : NaN
+      const timeB = b.date ? Date.parse(b.date) : NaN
+      if (!Number.isNaN(timeA) && !Number.isNaN(timeB) && timeB !== timeA) {
+        return timeB - timeA
+      }
+      return (a.order ?? 0) - (b.order ?? 0)
+    })
+
+    return sorted.filter(blog => {
       const q = searchQuery.toLowerCase().trim()
       const matchesSearch =
         !q ||
         blog.title?.toLowerCase().includes(q) ||
         blog.author?.toLowerCase().includes(q) ||
+        blog.date?.toLowerCase().includes(q) ||
         blog.excerpt?.toLowerCase().includes(q) ||
         blog.tag?.toLowerCase().includes(q) ||
         (Array.isArray(blog.tags) && blog.tags.some(t => t.toLowerCase().includes(q)))
@@ -158,61 +170,101 @@ export default function Blogs() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
-          {filtered.map(blog => {
+          {filtered.map((blog, idx) => {
             const tags = [
               blog.tag,
               ...(Array.isArray(blog.tags) ? blog.tags : []),
             ].filter(Boolean) as string[]
+            const itemKey = blog._id || blog.id || blog.title || idx
+
+            const handleCardClick = () => {
+              if (blog.link && !blog.content && !blog.excerpt) {
+                window.open(blog.link, '_blank', 'noopener,noreferrer')
+              } else {
+                setActivePost(blog)
+              }
+            }
 
             return (
               <article
-                key={blog.id}
-                onClick={() => setActivePost(blog)}
-                className="p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group cursor-pointer"
+                key={itemKey}
+                onClick={handleCardClick}
+                className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group cursor-pointer overflow-hidden"
               >
                 <div>
-                  <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-4 font-medium">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                      <span>{blog.readTime || 'Research Dispatch'}</span>
+                  {blog.image && (
+                    <div className="w-full h-48 overflow-hidden bg-[var(--bg-page)] border-b border-[var(--border-hairline)]">
+                      <img
+                        src={blog.image}
+                        alt={blog.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
                     </div>
-                    {blog.date && <span>{blog.date}</span>}
-                  </div>
-
-                  <h3 className="text-lg font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-3">
-                    {blog.title}
-                  </h3>
-
-                  {blog.excerpt && (
-                    <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed font-normal mb-5 line-clamp-3">
-                      {blog.excerpt}
-                    </p>
                   )}
 
-                  {tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-6">
-                      {tags.map(t => (
-                        <span
-                          key={t}
-                          className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] font-medium inline-flex items-center gap-1"
-                        >
-                          <Tag className="w-2.5 h-2.5 text-[var(--accent-orange)]" />
-                          <span>{t}</span>
+                  <div className="p-7 pb-0">
+                    <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-4 font-medium">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                        <span>{blog.readTime || 'Research Dispatch'}</span>
+                      </div>
+                      {blog.date && (
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>{blog.date}</span>
                         </span>
-                      ))}
+                      )}
                     </div>
-                  )}
+
+                    <h3 className="text-lg font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-3">
+                      {blog.title}
+                    </h3>
+
+                    {blog.excerpt && (
+                      <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed font-normal mb-5 line-clamp-3">
+                        {blog.excerpt}
+                      </p>
+                    )}
+
+                    {tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-6">
+                        {tags.map(t => (
+                          <span
+                            key={t}
+                            className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] font-medium inline-flex items-center gap-1"
+                          >
+                            <Tag className="w-2.5 h-2.5 text-[var(--accent-orange)]" />
+                            <span>{t}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
+                <div className="mx-7 my-6 pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
                   <span className="text-xs font-semibold text-[var(--text-primary)] inline-flex items-center gap-1">
                     <User className="w-3.5 h-3.5 text-[var(--text-muted)]" />
                     <span>{blog.author || 'AIR Lab'}</span>
                   </span>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:translate-x-0.5 transition-transform">
-                    <span>Read Article</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
+                  {blog.link ? (
+                    <a
+                      href={blog.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={e => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline group-hover:translate-x-0.5 transition-transform"
+                    >
+                      <span>Read Article</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:translate-x-0.5 transition-transform">
+                      <span>Read Article</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  )}
                 </div>
               </article>
             )
@@ -263,6 +315,16 @@ export default function Blogs() {
                 </span>
               </div>
 
+              {activePost.image && (
+                <div className="mb-6 rounded-2xl overflow-hidden border border-[var(--border-hairline)] max-h-64 bg-[var(--bg-page)]">
+                  <img
+                    src={activePost.image}
+                    alt={activePost.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+
               <h2 className="text-2xl sm:text-3xl font-bold font-head text-[var(--text-primary)] tracking-tight mb-4 leading-snug">
                 {activePost.title}
               </h2>
@@ -275,13 +337,26 @@ export default function Blogs() {
                 </div>
               )}
 
-              <div className="prose prose-sm text-[var(--text-primary)] leading-relaxed space-y-4 pt-4 border-t border-[var(--border-hairline)]">
-                <p className="text-base text-[var(--text-muted)] font-normal leading-relaxed">
-                  {activePost.content || activePost.excerpt}
-                </p>
-              </div>
+              {(activePost.content || activePost.excerpt) && (
+                <div className="prose prose-sm text-[var(--text-primary)] leading-relaxed space-y-4 pt-4 border-t border-[var(--border-hairline)]">
+                  <p className="text-base text-[var(--text-muted)] font-normal leading-relaxed">
+                    {activePost.content || activePost.excerpt}
+                  </p>
+                </div>
+              )}
 
-              <div className="mt-8 pt-6 border-t border-[var(--border-hairline)] flex justify-end">
+              <div className="mt-8 pt-6 border-t border-[var(--border-hairline)] flex items-center justify-end gap-3">
+                {activePost.link && (
+                  <a
+                    href={activePost.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <span>Read Full Article</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                )}
                 <button
                   onClick={() => setActivePost(null)}
                   className="px-5 py-2 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
