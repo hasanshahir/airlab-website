@@ -417,14 +417,33 @@ body.is-loading {
 .preloader-content {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
+<<<<<<< fix/projects-modal-and-sheet-data
+.preloader-logo {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  letter-spacing: -0.44px;
+  display: inline-block;
+}
+
+.pl-char {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+.preloader-logo-bold {
+  font-weight: 600;
+  color: #19171B;
+}
+
+.preloader-logo-light {
+  font-weight: 300;
+  color: #19171B;
+=======
 .preloader-fluid-mark-wrap {
-  width: clamp(76px, 10vw, 108px);
-  height: clamp(76px, 10vw, 108px);
+  width: clamp(84px, 11vw, 118px);
+  height: clamp(84px, 11vw, 118px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -436,33 +455,29 @@ body.is-loading {
   height: 100%;
   display: block;
   overflow: visible;
-  filter: drop-shadow(0 10px 28px rgba(16, 0, 68, 0.14));
+  filter: drop-shadow(0 12px 30px rgba(16, 0, 68, 0.12));
+>>>>>>> local
 }
 
-/* Right-Side Page Loading / Scroll Indicator */
+/* Right-Side Page Loading / Scroll Indicator (Minimalist Frameless Ruler) */
 .scroll-indicator {
   position: fixed;
-  right: 12px;
+<<<<<<< fix/projects-modal-and-sheet-data
+  right: 32px;
+=======
+  right: 16px;
+>>>>>>> local
   top: 50%;
   transform: translateY(-50%);
   z-index: 99;
   pointer-events: none;
-  width: 44px;
-  height: 292px;
-  padding: 10px 7px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(12, 21, 42, 0.08);
-  box-shadow: 0 4px 20px rgba(12, 21, 42, 0.08);
-  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.scroll-indicator.is-dark {
-  background: rgba(12, 21, 42, 0.72);
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
+<<<<<<< fix/projects-modal-and-sheet-data
+  width: 48px;
+  height: 272px;
+=======
+  width: 28px;
+  height: 210px;
+>>>>>>> local
 }
 
 .scroll-indicator-track {
@@ -475,22 +490,30 @@ body.is-loading {
 }
 
 .scroll-tick {
-  height: 1.5px;
-  background: rgba(12, 21, 42, 0.34);
-  width: 14px;
+  height: 1px;
+<<<<<<< fix/projects-modal-and-sheet-data
+  background: rgba(107, 108, 113, 0.18);
+  width: 24px;
+=======
+  background: rgba(12, 21, 42, 0.22);
+  width: 10px;
+>>>>>>> local
   margin-left: auto;
   flex-shrink: 0;
-  border-radius: 9999px;
   will-change: width, background-color;
 }
 
 .scroll-tick-major {
-  height: 1.5px;
-  background: rgba(12, 21, 42, 0.56);
-  width: 22px;
+  height: 1px;
+<<<<<<< fix/projects-modal-and-sheet-data
+  background: rgba(107, 108, 113, 0.28);
+  width: 40px;
+=======
+  background: rgba(12, 21, 42, 0.38);
+  width: 18px;
+>>>>>>> local
   margin-left: auto;
   flex-shrink: 0;
-  border-radius: 9999px;
   will-change: width, background-color;
 }
 
