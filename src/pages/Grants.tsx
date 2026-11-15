@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
-import { Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
+import { Calendar, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
 import type { Grant } from '../types/data'
 import SectionReveal from '../components/ui/SectionReveal'
@@ -206,9 +206,12 @@ export default function Grants() {
                               </span>
                             )}
 
-                            <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)]">
-                              {grant.duration}
-                            </span>
+                            {grant.duration && (
+                              <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)] inline-flex items-center gap-1.5 font-medium">
+                                <Calendar className="w-3 h-3" />
+                                {grant.duration}
+                              </span>
+                            )}
 
                             {grant.placeholder && <PlaceholderBadge />}
                           </div>
@@ -237,21 +240,8 @@ export default function Grants() {
                         </p>
                       )}
 
-                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-4 text-xs font-sans">
-                        <div className="flex flex-wrap items-center gap-4 text-[var(--text-subtle)]">
-                          {grant.leadInvestigator && (
-                            <span className="flex items-center gap-1.5">
-                              <User className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                              <span>Supervisor: <strong className="text-[var(--text-primary)]">{grant.leadInvestigator}</strong></span>
-                            </span>
-                          )}
-                          <span className="flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span>Timeline: {grant.duration}</span>
-                          </span>
-                        </div>
-
-                        {grant.url && (
+                      {grant.url && (
+                        <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-end text-xs font-sans">
                           <a
                             href={grant.url}
                             target="_blank"
@@ -260,8 +250,8 @@ export default function Grants() {
                           >
                             <span>Funder Website</span>
                           </a>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
