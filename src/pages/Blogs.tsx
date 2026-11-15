@@ -30,10 +30,24 @@ export interface BlogPost {
   image?: string
 }
 
+const BLOGS_CACHE_KEY = 'airlab_blogs_cache_v1'
+
+function readCachedBlogs(): BlogPost[] {
+  try {
+    const raw = sessionStorage.getItem(BLOGS_CACHE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    }
+  } catch {
+    // ignore storage errors
+  }
+  return Array.isArray(rawBlogs) ? (rawBlogs as BlogPost[]) : []
+}
+
 export default function Blogs() {
-  const [blogsData, setBlogsData] = useState<BlogPost[]>(() =>
-    Array.isArray(rawBlogs) ? (rawBlogs as BlogPost[]) : []
-  )
+  const [blogsData, setBlogsData] = useState<BlogPost[]>(() => readCachedBlogs())
+  const [loading, setLoading] = useState<boolean>(() => readCachedBlogs().length === 0)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState<string>('All')
   const [activePost, setActivePost] = useState<BlogPost | null>(null)
@@ -44,11 +58,23 @@ export default function Blogs() {
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
         if (!active) return
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setBlogsData(data)
+          try {
+            if (data.length > 0) {
+              sessionStorage.setItem(BLOGS_CACHE_KEY, JSON.stringify(data))
+            } else {
+              sessionStorage.removeItem(BLOGS_CACHE_KEY)
+            }
+          } catch {
+            // ignore storage quota errors
+          }
         }
       })
       .catch(() => {})
+      .finally(() => {
+        if (active) setLoading(false)
+      })
     return () => {
       active = false
     }
@@ -144,7 +170,34 @@ export default function Blogs() {
       </div>
 
       {/* ── Blogs Grid ── */}
-      {filtered.length === 0 ? (
+      {loading && filtered.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+          {[0, 1, 2].map(idx => (
+            <div
+              key={idx}
+              className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] overflow-hidden animate-pulse flex flex-col justify-between"
+            >
+              <div>
+                <div className="w-full h-48 bg-[var(--bg-page)] border-b border-[var(--border-hairline)]" />
+                <div className="p-7 pb-0 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="h-3 w-24 rounded-full bg-[var(--bg-page)]" />
+                    <div className="h-3 w-20 rounded-full bg-[var(--bg-page)]" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-5 w-11/12 rounded-md bg-[var(--bg-page)]" />
+                    <div className="h-5 w-3/4 rounded-md bg-[var(--bg-page)]" />
+                  </div>
+                </div>
+              </div>
+              <div className="mx-7 my-6 pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
+                <div className="h-3 w-20 rounded-full bg-[var(--bg-page)]" />
+                <div className="h-3 w-24 rounded-full bg-[var(--bg-page)]" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-24 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
           <Sparkles className="w-8 h-8 text-[var(--accent-orange)] mx-auto mb-3 opacity-60" />
           <p className="text-sm sm:text-base font-sans font-medium text-[var(--text-primary)]">

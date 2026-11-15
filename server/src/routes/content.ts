@@ -61,7 +61,11 @@ contentRouter.get('/:slug', async (req, res) => {
     }
   }
 
-  res.set('Cache-Control', 'no-cache')
+  const dbReady = mongoose.connection.readyState === 1
+  res.set(
+    'Cache-Control',
+    dbReady ? 'public, s-maxage=30, stale-while-revalidate=120' : 'no-store'
+  )
   res.json(items)
 })
 

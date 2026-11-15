@@ -1433,18 +1433,49 @@ export default function AdminDashboard() {
                                         className="hidden"
                                         onChange={e => {
                                           const file = e.target.files?.[0]
-                                          if (file) {
-                                            if (file.size > 2 * 1024 * 1024) {
-                                              alert('Image size exceeds 2MB limit. Please upload a smaller image.')
+                                          if (!file) return
+                                          if (file.size > 5 * 1024 * 1024) {
+                                            alert('Image size exceeds 5MB limit. Please upload a smaller image.')
+                                            return
+                                          }
+                                          const reader = new FileReader()
+                                          reader.onload = ev => {
+                                            const dataUrl = ev.target?.result as string
+                                            // Keep SVGs or already-small images untouched; compress large raster uploads
+                                            if (file.type === 'image/svg+xml' || dataUrl.length < 90_000) {
+                                              setEditingItem({ ...editingItem, [field]: dataUrl })
                                               return
                                             }
-                                            const reader = new FileReader()
-                                            reader.onload = ev => {
-                                              const base64 = ev.target?.result as string
-                                              setEditingItem({ ...editingItem, [field]: base64 })
+                                            const img = new Image()
+                                            img.onload = () => {
+                                              const maxDim = 1200
+                                              let { width, height } = img
+                                              if (width > maxDim || height > maxDim) {
+                                                const scale = Math.min(maxDim / width, maxDim / height)
+                                                width = Math.round(width * scale)
+                                                height = Math.round(height * scale)
+                                              }
+                                              const canvas = document.createElement('canvas')
+                                              canvas.width = width
+                                              canvas.height = height
+                                              const ctx = canvas.getContext('2d')
+                                              if (!ctx) {
+                                                setEditingItem({ ...editingItem, [field]: dataUrl })
+                                                return
+                                              }
+                                              ctx.drawImage(img, 0, 0, width, height)
+                                              const compressed = canvas.toDataURL('image/webp', 0.82)
+                                              setEditingItem({
+                                                ...editingItem,
+                                                [field]: compressed.length < dataUrl.length ? compressed : dataUrl,
+                                              })
                                             }
-                                            reader.readAsDataURL(file)
+                                            img.onerror = () => {
+                                              setEditingItem({ ...editingItem, [field]: dataUrl })
+                                            }
+                                            img.src = dataUrl
                                           }
+                                          reader.readAsDataURL(file)
                                         }}
                                       />
                                     </label>
