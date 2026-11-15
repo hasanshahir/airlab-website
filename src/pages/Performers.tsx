@@ -5,6 +5,7 @@ import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { getPerformers } from '../lib/data'
+import { extractPerformerPhotos, mergePerformersWithLocal } from '../lib/performers'
 import type { PerformerItem, CoAwardeeInfo } from '../types/data'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
@@ -13,21 +14,6 @@ const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   </svg>
 )
 
-const MONTH_ORDER = ['july', 'august', 'september', 'october']
-
-function isLegacyDateRangeItem(item: PerformerItem): boolean {
-  const month = String(item.month || '')
-  const id = String(item.id || '')
-  if (id === 'pom-sep-oct-2026' || id === 'pom-jul-aug-2026') return true
-  return /[–-]/.test(month)
-}
-
-function getMonthSortIndex(month?: string): number {
-  const lower = String(month || '').toLowerCase()
-  const idx = MONTH_ORDER.findIndex(m => lower.includes(m))
-  return idx >= 0 ? idx : 99
-}
-
 export default function Performers() {
   const [performersList, setPerformersList] = useState<PerformerItem[]>(() => getPerformers())
   const [activeCycleIndex, setActiveCycleIndex] = useState(0)
@@ -35,36 +21,11 @@ export default function Performers() {
   const [isPaused, setIsPaused] = useState(false)
 
   useEffect(() => {
-    fetch('/api/content/performers')
+    fetch('/api/content/performers', { cache: 'no-store' })
       .then(r => (r.ok ? r.json() : []))
       .then((d: PerformerItem[]) => {
         if (!Array.isArray(d) || d.length === 0) return
-        const monthWiseApi = d.filter(item => !isLegacyDateRangeItem(item))
-        if (monthWiseApi.length === 0) return
-
-        const local = getPerformers()
-        const merged = local.map(localItem => {
-          const match = monthWiseApi.find(
-            apiItem =>
-              String(apiItem.id) === String(localItem.id) &&
-              String(apiItem.month || '').trim().toLowerCase() ===
-                String(localItem.month || '').trim().toLowerCase()
-          )
-          if (!match) return localItem
-          return {
-            ...localItem,
-            ...match,
-            photos:
-              Array.isArray(match.photos) && match.photos.length > 0
-                ? match.photos
-                : localItem.photos,
-            coAwardees:
-              Array.isArray(match.coAwardees) && match.coAwardees.length > 0
-                ? match.coAwardees
-                : localItem.coAwardees,
-          }
-        })
-        merged.sort((a, b) => getMonthSortIndex(a.month) - getMonthSortIndex(b.month))
+        const merged = mergePerformersWithLocal(d, getPerformers())
         setPerformersList(merged)
         setActiveSlideIndex(0)
       })
@@ -75,11 +36,8 @@ export default function Performers() {
 
   const slides = useMemo(() => {
     if (!featuredPerformer) return []
-    const raw =
-      Array.isArray(featuredPerformer.photos) && featuredPerformer.photos.length > 0
-        ? featuredPerformer.photos
-        : [featuredPerformer.image]
-    const unique = Array.from(new Set(raw.filter(Boolean).map(url => getMemberAvatar(url))))
+    const extracted = extractPerformerPhotos(featuredPerformer)
+    const unique = Array.from(new Set(extracted.map(p => getMemberAvatar(p.url))))
     return unique.length > 0 ? unique : [DEFAULT_AVATAR]
   }, [featuredPerformer])
 

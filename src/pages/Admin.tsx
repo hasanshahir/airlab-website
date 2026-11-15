@@ -110,6 +110,7 @@ const COLLECTION_SCHEMAS: Record<string, Record<string, FieldDef>> = {
     rank: { type: 'number', label: 'Rank (1 = Top)' },
     tags: { type: 'stringList', label: 'Research Tags (comma-separated)' },
     image: { type: 'image', label: 'Ceremony / Profile Photo' },
+    photos: { type: 'imageList', label: 'Additional Ceremony Photos (optional)' },
     order: { type: 'number', label: 'Display Order' },
     published: { type: 'boolean', label: 'Published on Website' },
   },
@@ -197,7 +198,15 @@ const COLLECTION_SCHEMAS: Record<string, Record<string, FieldDef>> = {
     tier: {
       type: 'enum',
       label: 'Tier',
-      options: ['Academic', 'Strategic Compute', 'Government & National'],
+      options: [
+        'Academic',
+        'Strategic Compute',
+        'Government & National',
+        'Host Institution',
+        'Government Grant',
+        'Industry Partner',
+        'Public Health Partner',
+      ],
     },
     logo: { type: 'image', label: 'Partner Logo' },
     url: { type: 'url', label: 'Website URL' },
@@ -571,6 +580,15 @@ export default function AdminDashboard() {
         }
         payload.images = cleanedImages
         delete payload.url
+      } else if (activeTab === 'performers') {
+        const cleanedPhotos = normalizeGalleryImages(payload.photos).map(img => ({
+          url: img.url,
+          caption: (img.caption || '').trim(),
+        }))
+        payload.photos = cleanedPhotos
+        if (!payload.image && cleanedPhotos.length > 0) {
+          payload.image = cleanedPhotos[0].url
+        }
       }
 
       const url = isCreate ? `/api/admin/${activeTab}` : `/api/admin/${activeTab}/${recordId}`
@@ -1370,6 +1388,8 @@ export default function AdminDashboard() {
                               const next = { ...defaults, ...item }
                               if (activeTab === 'gallery') {
                                 next.images = normalizeGalleryImages(item.images, item.url)
+                              } else if (activeTab === 'performers') {
+                                next.photos = normalizeGalleryImages(item.photos)
                               }
                               setEditingItem(next)
                               setIsNew(false)

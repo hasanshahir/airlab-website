@@ -195,7 +195,15 @@ export const collections = [
       tier: {
         type: 'enum',
         listed: true,
-        options: ['Academic', 'Strategic Compute', 'Government & National'],
+        options: [
+          'Academic',
+          'Strategic Compute',
+          'Government & National',
+          'Host Institution',
+          'Government Grant',
+          'Industry Partner',
+          'Public Health Partner',
+        ],
       },
       logo: { type: 'image' },
       url: { type: 'url' },
@@ -253,6 +261,7 @@ export const collections = [
       // `metrics` is a free-form object in the current JSON; stored as-is (see strict:false in model).
       tags: { type: 'stringList' },
       image: { type: 'image' },
+      photos: { type: 'imageList', label: 'Ceremony / Additional Photos' },
     },
   },
   {

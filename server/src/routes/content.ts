@@ -1,7 +1,4 @@
 import { Router } from 'express'
-import { readFile } from 'node:fs/promises'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import mongoose from 'mongoose'
 import { collectionBySlug, collections } from '../content/registry.js'
 import { contentModels } from '../models/content.js'
@@ -13,9 +10,6 @@ import { externalizeImages } from './media.js'
  * it refreshes in the background. Admin edits show up on the site within ~1 min.
  */
 const PUBLIC_CACHE = 'public, max-age=0, s-maxage=60, stale-while-revalidate=86400'
-
-const here = path.dirname(fileURLToPath(import.meta.url))
-const DATA_DIR = path.resolve(here, '../../../src/data')
 
 /**
  * Public, read-only access to website content.
@@ -52,32 +46,12 @@ contentRouter.get('/:slug', async (req, res) => {
     }
   }
 
-  // If database collection is currently empty or unavailable, serve fallback seed data from src/data/*.json
-  // (projects, previous-interns, and gallery are served strictly from the database / admin panel)
-  if (
-    req.params.slug !== 'projects' &&
-    req.params.slug !== 'previous-interns' &&
-    req.params.slug !== 'gallery' &&
-    (!items || items.length === 0)
-  ) {
-    try {
-      const seedPath = path.join(DATA_DIR, def.seedFile)
-      let raw = await readFile(seedPath, 'utf8')
-      if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1)
-      const parsed = JSON.parse(raw)
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        res.set('Cache-Control', PUBLIC_CACHE)
-        return res.json(parsed)
-      }
-    } catch {
-      // ignore read errors and return empty items
-    }
-  }
-
   const dbReady = mongoose.connection.readyState === 1
   res.set(
     'Cache-Control',
-    !dbReady || req.params.slug === 'gallery' ? 'no-store' : PUBLIC_CACHE
+    !dbReady || req.params.slug === 'gallery' || req.params.slug === 'performers'
+      ? 'no-store'
+      : PUBLIC_CACHE
   )
   res.json(items.map(item => externalizeImages(req.params.slug, item)))
 })

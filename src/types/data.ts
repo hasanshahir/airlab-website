@@ -148,6 +148,7 @@ export interface CoAwardeeInfo {
 
 export interface PerformerItem {
   id: string
+  _id?: string
   name: string
   role: string
   department?: string
@@ -161,8 +162,8 @@ export interface PerformerItem {
   cvUrl?: string
   avatar?: string
   tags?: string[]
-  image: string
+  image?: string
   categoryTab?: string
-  photos?: string[]
+  photos?: Array<string | GalleryPhoto>
   coAwardees?: CoAwardeeInfo[]
 }

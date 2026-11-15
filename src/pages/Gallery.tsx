@@ -2,12 +2,16 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react'
-import type { GalleryItem } from '../types/data'
+import type { GalleryItem, PerformerItem } from '../types/data'
+import { getPerformers } from '../lib/data'
+import { extractPerformerPhotos, mergePerformersWithLocal } from '../lib/performers'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 
 const GALLERY_FILTERS = ['All', 'Events', 'Session', 'Mentoring', 'Lab'] as const
 type GalleryFilter = (typeof GALLERY_FILTERS)[number]
+type GalleryCategory = Exclude<GalleryFilter, 'All'>
+type GalleryCardBadge = GalleryCategory | 'Performer of the Month'
 
 const BENTO_SPANS = [
   'sm:col-span-2',
@@ -22,14 +26,15 @@ const BENTO_SPANS = [
 interface GalleryPhotoCard {
   key: string
   title: string
-  cat: Exclude<GalleryFilter, 'All'>
+  cat: GalleryCardBadge
   date?: string
   caption: string
+  description?: string
   url: string
   span?: string
 }
 
-function normalizeGalleryCategory(cat?: string, title?: string): Exclude<GalleryFilter, 'All'> {
+function normalizeGalleryCategory(cat?: string, title?: string): GalleryCategory {
   const c = (cat || '').trim().toLowerCase()
   const t = (title || '').trim().toLowerCase()
   if (
@@ -79,12 +84,14 @@ function expandGalleryItems(items: GalleryItem[]): GalleryPhotoCard[] {
       .filter((p): p is { url: string; caption: string } => Boolean(p && p.url))
 
     normalized.forEach((photo, idx) => {
+      const eventDesc = (item.desc || '').trim()
       cards.push({
         key: `${item._id || item.id}-${idx}`,
         title: item.title,
         cat,
         date: item.date,
-        caption: photo.caption || item.desc || '',
+        caption: photo.caption || eventDesc,
+        description: photo.caption && eventDesc && photo.caption !== eventDesc ? eventDesc : undefined,
         url: photo.url,
         span: normalized.length === 1 ? item.span : undefined,
       })
@@ -93,23 +100,65 @@ function expandGalleryItems(items: GalleryItem[]): GalleryPhotoCard[] {
   return cards
 }
 
+function expandPerformerItems(performers: PerformerItem[]): GalleryPhotoCard[] {
+  const cards: GalleryPhotoCard[] = []
+  const seenUrls = new Set<string>()
+
+  performers.forEach((p, pIdx) => {
+    const photos = extractPerformerPhotos(p)
+    const displayTitle = p.month ? `${p.name} — ${p.month}` : p.name
+    const awardTitle = (p.title || '').trim()
+    const achievement = (p.achievement || '').trim()
+
+    photos.forEach((photo, idx) => {
+      if (seenUrls.has(photo.url)) return
+      seenUrls.add(photo.url)
+
+      const caption = (photo.caption || '').trim() || awardTitle || achievement
+      const description =
+        achievement && achievement !== caption ? achievement : undefined
+
+      cards.push({
+        key: `pom-${p._id || p.id || pIdx}-${idx}`,
+        title: displayTitle,
+        cat: 'Performer of the Month',
+        date: p.month,
+        caption,
+        description,
+        url: photo.url,
+      })
+    })
+  })
+
+  return cards
+}
+
 export default function Gallery() {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
+  const [performersList, setPerformersList] = useState<PerformerItem[]>(() => getPerformers())
   const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState<GalleryFilter>('All')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   useEffect(() => {
     let active = true
-    fetch('/api/content/gallery', { cache: 'no-store' })
-      .then(r => (r.ok ? r.json() : []))
-      .then(d => {
+    Promise.all([
+      fetch('/api/content/gallery', { cache: 'no-store' })
+        .then(r => (r.ok ? r.json() : []))
+        .catch(() => []),
+      fetch('/api/content/performers', { cache: 'no-store' })
+        .then(r => (r.ok ? r.json() : []))
+        .catch(() => []),
+    ])
+      .then(([galleryRes, performersRes]) => {
         if (!active) return
-        if (Array.isArray(d)) {
-          setGalleryItems(d)
+        if (Array.isArray(galleryRes)) {
+          setGalleryItems(galleryRes)
+        }
+        if (Array.isArray(performersRes) && performersRes.length > 0) {
+          setPerformersList(mergePerformersWithLocal(performersRes, getPerformers()))
         }
       })
-      .catch(() => {})
       .finally(() => {
         if (active) setLoading(false)
       })
@@ -118,12 +167,17 @@ export default function Gallery() {
     }
   }, [])
 
-  const allCards = useMemo(() => expandGalleryItems(galleryItems), [galleryItems])
+  const galleryCards = useMemo(() => expandGalleryItems(galleryItems), [galleryItems])
+  const performerCards = useMemo(() => expandPerformerItems(performersList), [performersList])
+  const allCards = useMemo(
+    () => [...galleryCards, ...performerCards],
+    [galleryCards, performerCards]
+  )
 
   const filteredCards = useMemo(() => {
     if (activeFilter === 'All') return allCards
-    return allCards.filter(card => card.cat === activeFilter)
-  }, [allCards, activeFilter])
+    return galleryCards.filter(card => card.cat === activeFilter)
+  }, [allCards, galleryCards, activeFilter])
 
   const selectedCard = selectedIndex !== null ? filteredCards[selectedIndex] ?? null : null
 
@@ -344,7 +398,20 @@ export default function Gallery() {
                       {selectedCard.title}
                     </h3>
                     {selectedCard.caption && (
-                      <p className="text-sm text-[var(--text-muted)] leading-relaxed">{selectedCard.caption}</p>
+                      <p
+                        className={`text-sm leading-relaxed ${
+                          selectedCard.description
+                            ? 'text-[var(--text-primary)] font-medium'
+                            : 'text-[var(--text-muted)]'
+                        }`}
+                      >
+                        {selectedCard.caption}
+                      </p>
+                    )}
+                    {selectedCard.description && (
+                      <p className="text-sm text-[var(--text-muted)] leading-relaxed mt-1.5">
+                        {selectedCard.description}
+                      </p>
                     )}
                   </div>
                 </motion.div>
