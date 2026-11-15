@@ -412,6 +412,11 @@ export default function Home() {
                 className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-4 left-4 right-4 text-white text-xs font-sans font-medium bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl inline-flex items-center justify-between border border-white/10">
+                <span>Artificial Intelligence Research Lab</span>
+                <span className="text-[var(--accent-orange)]">NED University</span>
+              </div>
             </div>
           </div>
         </div>
@@ -506,41 +511,44 @@ export default function Home() {
       </section>
 
       {/* ── 5. TEAM SHOWCASE (Guided by faculty, driven by students, built for Pakistan) ── */}
-      <section className="py-16 sm:py-24 px-6 sm:px-10 max-w-[1320px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          {/* Left Column: Team punchline & text */}
-          <div className="lg:col-span-5 text-left space-y-6">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--text-primary)] font-head leading-tight">
-              Guided by faculty, driven by students, built for Pakistan.
-            </h2>
+      <section className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-24 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
+        <div className="max-w-[1320px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            {/* Left Column: Team punchline & text */}
+            <div className="lg:col-span-5 text-left space-y-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white font-head leading-tight">
+                Guided by faculty, driven by students, built for Pakistan.
+              </h2>
 
-            <p className="text-base sm:text-lg text-[var(--text-muted)] leading-relaxed font-normal">
-              Behind every system is a team that cares about Pakistan. Our interdisciplinary team brings together faculty principal investigators, research interns, and student scholars solving real problems at the forefront of artificial intelligence.
-            </p>
+              <p className="text-base sm:text-lg text-white/85 leading-relaxed font-normal">
+                Behind every system is a team that cares about Pakistan. Our interdisciplinary team brings together faculty principal investigators, research interns, and student scholars solving real problems at the forefront of artificial intelligence.
+              </p>
 
-            <div className="pt-2">
-              <Button
-                to="/team"
-                size="md"
-                className="inline-flex items-center gap-2 font-semibold"
-              >
-                <span>Meet the Team</span>
-              </Button>
+              <div className="pt-4 border-t border-white/15 flex flex-wrap gap-4 items-center">
+                <Button
+                  to="/team"
+                  variant="secondary"
+                  size="md"
+                  className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
+                >
+                  <span>Meet the Team</span>
+                </Button>
+              </div>
             </div>
-          </div>
 
-          {/* Right Column: Bigger Team group photo */}
-          <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-[var(--bg-surface)] group">
-            <img
-              src="/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg"
-              alt="AIR Lab Research Team"
-              className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent pointer-events-none" />
-            <div className="absolute bottom-4 left-4 right-4 text-white text-xs font-sans font-medium bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl inline-flex items-center justify-between border border-white/10">
-              <span>AIR Lab Faculty & Research Cohort</span>
-              <span className="text-[var(--accent-orange)]">Department of CSIT</span>
+            {/* Right Column: Bigger Team group photo */}
+            <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group">
+              <img
+                src="/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg"
+                alt="AIR Lab Research Team"
+                className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-4 left-4 right-4 text-white text-xs font-sans font-medium bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl inline-flex items-center justify-between border border-white/10">
+                <span>AIR Lab Faculty & Research Cohort</span>
+                <span className="text-[var(--accent-orange)]">Department of CSIT</span>
+              </div>
             </div>
           </div>
         </div>
