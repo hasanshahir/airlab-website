@@ -169,8 +169,8 @@ export default function Layout() {
       <header
         ref={navRef}
         className={`sticky top-0 z-40 h-[72px] transition-all duration-200 ${scrolled
-            ? 'bg-[var(--bg-surface-glass)] backdrop-blur-md border-b border-[var(--border-hairline)] shadow-sm'
-            : 'bg-[var(--bg-page)] border-b border-[var(--border-hairline)]'
+          ? 'bg-[var(--bg-surface-glass)] backdrop-blur-md border-b border-[var(--border-hairline)] shadow-sm'
+          : 'bg-[var(--bg-page)] border-b border-[var(--border-hairline)]'
           }`}
       >
         <div className="max-w-[1240px] h-full mx-auto px-4 sm:px-8 flex items-center justify-between gap-4">
@@ -210,8 +210,8 @@ export default function Layout() {
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'research' ? null : 'research')}
                 className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'research' || location.pathname.includes('/projects') || location.pathname.includes('/grants') || location.pathname.includes('/publications')
-                    ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
+                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
                   }`}
                 aria-expanded={activeDropdown === 'research'}
               >
@@ -308,8 +308,8 @@ export default function Layout() {
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'people' ? null : 'people')}
                 className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'people' || location.pathname.includes('/team') || location.pathname.includes('/interns') || location.pathname.includes('/performers')
-                    ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
+                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
                   }`}
                 aria-expanded={activeDropdown === 'people'}
               >
@@ -406,8 +406,8 @@ export default function Layout() {
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'about' ? null : 'about')}
                 className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'about' || location.pathname.includes('/about') || location.pathname.includes('/gallery')
-                    ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
+                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
                   }`}
                 aria-expanded={activeDropdown === 'about'}
               >

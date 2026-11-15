@@ -18,8 +18,8 @@ export const SponsorsGrid: React.FC = () => {
         </div>
       </div>
 
-      {/* Logos-only circular cards centered with tighter spacing */}
-      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 md:gap-6 max-w-3xl mx-auto">
+      {/* Raw logos without circular containers */}
+      <div className="grid grid-cols-2 md:grid-cols-4 items-center justify-items-center gap-8 sm:gap-12 md:gap-16 pt-2 pb-2">
         {sponsors.map(sponsor => (
           <a
             key={sponsor.id}
@@ -28,17 +28,23 @@ export const SponsorsGrid: React.FC = () => {
             rel="noopener noreferrer"
             title={sponsor.name}
             aria-label={sponsor.name}
-            className="group relative w-28 h-28 sm:w-34 sm:h-34 md:w-36 md:h-36 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/60 hover:shadow-xl transition-all duration-300 flex items-center justify-center cursor-pointer hover:-translate-y-1.5 hover:scale-105 p-5 sm:p-6 shadow-xs overflow-hidden shrink-0"
+            className="group flex items-center justify-center p-2 transition-transform duration-300 hover:-translate-y-1 hover:scale-105 cursor-pointer"
           >
             {sponsor.logo ? (
               <img
                 src={sponsor.logo}
                 alt={`${sponsor.name} logo`}
-                className="max-h-14 sm:max-h-18 max-w-[78%] w-auto object-contain transition-transform duration-300 group-hover:scale-110"
+                className={`w-auto object-contain transition-transform duration-300 group-hover:scale-105 ${
+                  sponsor.id === 'neduet'
+                    ? 'h-14 sm:h-16 md:h-20 max-w-[130px]'
+                    : sponsor.id === 'providus'
+                    ? 'h-8 sm:h-9 md:h-11 max-w-[200px]'
+                    : 'h-10 sm:h-12 md:h-14 max-w-[220px]'
+                }`}
                 loading="lazy"
               />
             ) : (
-              <span className="font-sans font-bold text-xs sm:text-sm tracking-wide text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors text-center px-2">
+              <span className="font-sans font-bold text-sm sm:text-base tracking-wide text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors text-center">
                 {sponsor.shortName || sponsor.name}
               </span>
             )}
