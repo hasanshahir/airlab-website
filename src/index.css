@@ -417,30 +417,11 @@ body.is-loading {
 .preloader-content {
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-<<<<<<< fix/projects-modal-and-sheet-data
-.preloader-logo {
-  font-family: var(--font-sans);
-  font-size: 22px;
-  letter-spacing: -0.44px;
-  display: inline-block;
-}
-
-.pl-char {
-  display: inline-block;
-  will-change: transform, opacity, filter;
-}
-
-.preloader-logo-bold {
-  font-weight: 600;
-  color: #19171B;
-}
-
-.preloader-logo-light {
-  font-weight: 300;
-  color: #19171B;
-=======
 .preloader-fluid-mark-wrap {
   width: clamp(84px, 11vw, 118px);
   height: clamp(84px, 11vw, 118px);
@@ -456,28 +437,18 @@ body.is-loading {
   display: block;
   overflow: visible;
   filter: drop-shadow(0 12px 30px rgba(16, 0, 68, 0.12));
->>>>>>> local
 }
 
 /* Right-Side Page Loading / Scroll Indicator (Minimalist Frameless Ruler) */
 .scroll-indicator {
   position: fixed;
-<<<<<<< fix/projects-modal-and-sheet-data
-  right: 32px;
-=======
   right: 16px;
->>>>>>> local
   top: 50%;
   transform: translateY(-50%);
   z-index: 99;
   pointer-events: none;
-<<<<<<< fix/projects-modal-and-sheet-data
-  width: 48px;
-  height: 272px;
-=======
   width: 28px;
   height: 210px;
->>>>>>> local
 }
 
 .scroll-indicator-track {
@@ -491,13 +462,8 @@ body.is-loading {
 
 .scroll-tick {
   height: 1px;
-<<<<<<< fix/projects-modal-and-sheet-data
-  background: rgba(107, 108, 113, 0.18);
-  width: 24px;
-=======
   background: rgba(12, 21, 42, 0.22);
   width: 10px;
->>>>>>> local
   margin-left: auto;
   flex-shrink: 0;
   will-change: width, background-color;
@@ -505,13 +471,8 @@ body.is-loading {
 
 .scroll-tick-major {
   height: 1px;
-<<<<<<< fix/projects-modal-and-sheet-data
-  background: rgba(107, 108, 113, 0.28);
-  width: 40px;
-=======
   background: rgba(12, 21, 42, 0.38);
   width: 18px;
->>>>>>> local
   margin-left: auto;
   flex-shrink: 0;
   will-change: width, background-color;

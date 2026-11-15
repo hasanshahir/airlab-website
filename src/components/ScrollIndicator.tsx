@@ -8,43 +8,17 @@ const VELOCITY_DECAY = 0.92
 const LERP_FACTOR = 0.13
 const TICK_SPACING = 7
 
-<<<<<<< fix/projects-modal-and-sheet-data
-// Tick width ranges (px)
-const MINOR_MIN_W = 24
-const MINOR_MAX_W = 48
-const MAJOR_MIN_W = 40
-const MAJOR_MAX_W = 48
-=======
 // Minimalist hairline width ranges (px)
 const MINOR_MIN_W = 10
 const MINOR_MAX_W = 26
 const MAJOR_MIN_W = 18
 const MAJOR_MAX_W = 28
->>>>>>> local
 
 // How many ticks around the active position are affected
 const BASE_RADIUS = 2.4
 const MAX_RADIUS = 6.5
 
 const COLORS_LIGHT_BG = {
-<<<<<<< fix/projects-modal-and-sheet-data
-  tick: 'rgba(107, 108, 113, 0.18)',
-  major: 'rgba(107, 108, 113, 0.28)',
-  r: 12,
-  g: 21,
-  b: 42, // #0C152A
-  activeA: 1.0,
-  edgeA: 0.2,
-}
-
-const COLORS_DARK_BG = {
-  tick: 'rgba(255, 255, 255, 0.25)',
-  major: 'rgba(255, 255, 255, 0.4)',
-  r: 255,
-  g: 255,
-  b: 255,
-  activeA: 1.0,
-=======
   tick: 'rgba(12, 21, 42, 0.22)',
   major: 'rgba(12, 21, 42, 0.38)',
   r: 12,
@@ -61,7 +35,6 @@ const COLORS_DARK_BG = {
   g: 255,
   b: 255,
   activeA: 0.95,
->>>>>>> local
   edgeA: 0.3,
 }
 
@@ -173,11 +146,7 @@ export default function ScrollIndicator() {
           const alpha =
             colors.edgeA + (colors.activeA - colors.edgeA) * influence
           tickEl.style.background = `rgba(${colors.r},${colors.g},${colors.b},${alpha.toFixed(2)})`
-<<<<<<< fix/projects-modal-and-sheet-data
-          tickEl.style.height = influence > 0.45 ? '1.5px' : '1px'
-=======
           tickEl.style.height = influence > 0.55 ? '1.5px' : '1px'
->>>>>>> local
         } else {
           tickEl.style.background = major ? colors.major : colors.tick
           tickEl.style.height = '1px'
