@@ -417,12 +417,14 @@ export default function Projects() {
                         {proj.startDate || proj.timeTaken}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[var(--text-subtle)]">Funding:</span>
-                      <span className="font-semibold text-[var(--accent-orange)] truncate max-w-[180px]">
-                        {proj.funding}
-                      </span>
-                    </div>
+                    {proj.funding && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-[var(--text-subtle)]">Funding:</span>
+                        <span className="font-semibold text-[var(--accent-orange)] truncate max-w-[180px]">
+                          {proj.funding}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -534,17 +536,19 @@ export default function Projects() {
                           {selectedProject.startDate || selectedProject.timeTaken}
                         </span>
                       </div>
-                      <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                        <span className="text-[var(--text-subtle)] block mb-1">GRANT & FUNDING SOURCE</span>
-                        <Link to="/grants" onClick={() => setSelectedProject(null)} className="font-semibold text-[var(--accent-orange)] hover:underline">
-                          {selectedProject.funding}
-                        </Link>
-                        {selectedProject.grantAmount && selectedProject.grantAmount !== 'NA' && (
-                          <div className="text-[11px] text-[var(--text-primary)] font-bold mt-1">
-                            Amount: {selectedProject.grantAmount}
-                          </div>
-                        )}
-                      </div>
+                      {selectedProject.funding && (
+                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
+                          <span className="text-[var(--text-subtle)] block mb-1">GRANT & FUNDING SOURCE</span>
+                          <Link to="/grants" onClick={() => setSelectedProject(null)} className="font-semibold text-[var(--accent-orange)] hover:underline">
+                            {selectedProject.funding}
+                          </Link>
+                          {selectedProject.grantAmount && selectedProject.grantAmount !== 'NA' && (
+                            <div className="text-[11px] text-[var(--text-primary)] font-bold mt-1">
+                              Amount: {selectedProject.grantAmount}
+                            </div>
+                          )}
+                        </div>
+                      )}
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">STATUS</span>
                         <span className="font-semibold text-[var(--accent-orange)]">{selectedProject.status}</span>

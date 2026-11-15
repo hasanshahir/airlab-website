@@ -4,6 +4,7 @@ import { collectionBySlug, collections } from '../content/registry.js'
 import { contentModels } from '../models/content.js'
 import { HttpError } from '../middleware/errors.js'
 import { externalizeImages } from './media.js'
+import { enrichPerformersList } from '../services/performers.js'
 
 /**
  * Edge (CDN) caches for 60s, then keeps serving the cached copy instantly while
@@ -47,6 +48,9 @@ contentRouter.get('/:slug', async (req, res) => {
   }
 
   const dbReady = mongoose.connection.readyState === 1
+  if (dbReady && req.params.slug === 'performers' && items.length > 0) {
+    items = await enrichPerformersList(items, { externalizeAvatars: true })
+  }
   res.set(
     'Cache-Control',
     !dbReady || req.params.slug === 'gallery' || req.params.slug === 'performers'
@@ -64,6 +68,11 @@ contentRouter.get('/:slug/:id', async (req, res) => {
   if (/^\d+$/.test(raw)) candidates.push(Number(raw))
   const item = await model.findOne({ id: { $in: candidates }, published: true }).lean()
   if (!item) throw new HttpError(404, 'Item not found')
+  let resolvedItem: Record<string, any> = item as any
+  if (req.params.slug === 'performers') {
+    const [enriched] = await enrichPerformersList([resolvedItem], { externalizeAvatars: true })
+    if (enriched) resolvedItem = enriched
+  }
   res.set('Cache-Control', PUBLIC_CACHE)
-  res.json(externalizeImages(req.params.slug, item as any))
+  res.json(externalizeImages(req.params.slug, resolvedItem))
 })

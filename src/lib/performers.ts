@@ -1,6 +1,19 @@
 import type { GalleryPhoto, PerformerItem } from '../types/data'
 
-const MONTH_ORDER = ['july', 'august', 'september', 'october']
+const MONTHS = [
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december',
+]
 
 /**
  * Identifies the two legacy placeholder documents ("Spotlight Awardee" with date-range months)
@@ -16,8 +29,11 @@ export function isLegacyDateRangeItem(item: Partial<PerformerItem>): boolean {
 
 export function getMonthSortIndex(month?: string): number {
   const lower = String(month || '').toLowerCase()
-  const idx = MONTH_ORDER.findIndex(m => lower.includes(m))
-  return idx >= 0 ? idx : 99
+  const monthIdx = MONTHS.findIndex(m => lower.includes(m) || lower.includes(m.slice(0, 3)))
+  if (monthIdx < 0) return Number.MAX_SAFE_INTEGER
+  const yearMatch = lower.match(/\b(20\d{2})\b/)
+  const year = yearMatch ? Number(yearMatch[1]) : 2026
+  return year * 12 + monthIdx
 }
 
 /**

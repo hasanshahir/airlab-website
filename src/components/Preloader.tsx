@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import airLabMark from '../assets/air-lab-mark.png'
 
@@ -25,7 +25,7 @@ const RIBBON_PATH_LENGTH = 1180
  * Fluid Logo-Only Page Reveal & Preloader Component
  * Uses ONLY the official repository logo (`src/assets/air-lab-mark.png`) with zero text.
  *
- * Animates both on initial website open and on page/route reveals:
+ * Animates on initial website open:
  * - Liquid SVG mask traces the exact ribbon geometry of `air-lab-mark.png`
  * - Elastic dot bloom at (387, 48)
  * - Fluid gradient sheen masked strictly inside the logo's alpha channel
@@ -33,28 +33,35 @@ const RIBBON_PATH_LENGTH = 1180
  */
 export default function Preloader() {
   const location = useLocation()
-  const prevPathnameRef = useRef<string>(location.pathname)
-  const [visible, setVisible] = useState(true)
-  const [phase, setPhase] = useState<'initial' | 'drawing' | 'dissolving'>('initial')
-  const [isRouteTransition, setIsRouteTransition] = useState(false)
+  const isAdmin =
+    location.pathname.includes('admin') ||
+    (typeof window !== 'undefined' && window.location.hash.includes('admin'))
 
-  const runRevealSequence = (fastMode: boolean) => {
-    setIsRouteTransition(fastMode)
+  const [visible, setVisible] = useState(() => !isAdmin && !window.__PRELOADER_REVEALED__)
+  const [phase, setPhase] = useState<'initial' | 'drawing' | 'dissolving'>('initial')
+
+  const runRevealSequence = () => {
+    if (isAdmin || window.__PRELOADER_REVEALED__) {
+      setVisible(false)
+      document.body.classList.remove('is-loading')
+      window.__PRELOADER_REVEALED__ = true
+      return () => { }
+    }
+
     setVisible(true)
     setPhase('initial')
-    window.__PRELOADER_REVEALED__ = false
     document.body.classList.add('is-loading')
     window.dispatchEvent(new Event('preloader-start'))
 
-    const drawDuration = fastMode ? 520 : 880
-    const holdDuration = fastMode ? 140 : 280
-    const dissolveDuration = fastMode ? 480 : 680
+    const drawDuration = 480
+    const holdDuration = 120
+    const dissolveDuration = 460
 
     const startTimer = window.setTimeout(() => {
       setPhase('drawing')
-    }, 30)
+    }, 20)
 
-    const revealEventTime = 30 + drawDuration
+    const revealEventTime = 20 + drawDuration
     const revealEventTimer = window.setTimeout(() => {
       window.__PRELOADER_REVEALED__ = true
       window.dispatchEvent(new Event('preloader-reveal'))
@@ -68,22 +75,32 @@ export default function Preloader() {
 
     const doneTimer = window.setTimeout(() => {
       setVisible(false)
-    }, dissolveStartTime + dissolveDuration + 30)
+    }, dissolveStartTime + dissolveDuration + 20)
+
+    // Failsafe timer so it NEVER traps the user on a white screen
+    const failsafeTimer = window.setTimeout(() => {
+      document.body.classList.remove('is-loading')
+      window.__PRELOADER_REVEALED__ = true
+      window.dispatchEvent(new Event('preloader-reveal'))
+      setVisible(false)
+    }, 1200)
 
     return () => {
       window.clearTimeout(startTimer)
       window.clearTimeout(revealEventTimer)
       window.clearTimeout(dissolveTimer)
       window.clearTimeout(doneTimer)
+      window.clearTimeout(failsafeTimer)
       document.body.classList.remove('is-loading')
+      window.__PRELOADER_REVEALED__ = true
     }
   }
 
-  // Initial website load reveal
+  // Initial website load reveal only (once per session)
   useEffect(() => {
-    const cleanup = runRevealSequence(false)
+    const cleanup = runRevealSequence()
     const handleCustomTrigger = () => {
-      runRevealSequence(false)
+      runRevealSequence()
     }
     window.addEventListener('airlab-trigger-preloader', handleCustomTrigger)
     return () => {
@@ -92,19 +109,11 @@ export default function Preloader() {
     }
   }, [])
 
-  // Page / route change reveal
-  useEffect(() => {
-    if (prevPathnameRef.current !== location.pathname) {
-      prevPathnameRef.current = location.pathname
-      return runRevealSequence(true)
-    }
-  }, [location.pathname])
+  if (isAdmin || !visible) return null
 
-  if (!visible) return null
-
-  const drawMs = isRouteTransition ? 520 : 880
-  const dotDelayMs = isRouteTransition ? 280 : 520
-  const dissolveMs = isRouteTransition ? 480 : 680
+  const drawMs = 480
+  const dotDelayMs = 240
+  const dissolveMs = 460
   const isDissolving = phase === 'dissolving'
 
   return (
@@ -135,8 +144,8 @@ export default function Preloader() {
               phase === 'initial'
                 ? 'scale(0.84) translateY(14px)'
                 : phase === 'drawing'
-                ? 'scale(1) translateY(0px)'
-                : 'scale(1.06)',
+                  ? 'scale(1) translateY(0px)'
+                  : 'scale(1.06)',
             filter:
               phase === 'initial'
                 ? 'blur(6px)'

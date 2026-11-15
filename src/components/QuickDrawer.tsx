@@ -11,13 +11,9 @@ import {
   ArrowUpRight,
   ArrowRight,
 } from 'lucide-react'
-import rawTeam from '../data/team.json'
 import type { ProjectItem, TeamMemberData } from '../types/data'
 import { getMemberAvatar } from '../lib/placeholders'
 import { getFacultyPriority } from '../lib/utils'
-
-const initialTeamData = rawTeam as unknown as TeamMemberData[]
-
 
 interface QuickDrawerProps {
   isOpen: boolean
@@ -38,7 +34,7 @@ export default function QuickDrawer({
   const [searchQuery, setSearchQuery] = useState('')
   const [memberFilter, setMemberFilter] = useState<'All' | 'Faculty' | 'Research Interns'>('All')
   const [projectsData, setProjectsData] = useState<ProjectItem[]>([])
-  const [teamData, setTeamData] = useState<TeamMemberData[]>(initialTeamData)
+  const [teamData, setTeamData] = useState<TeamMemberData[]>([])
 
   useEffect(() => {
     let active = true

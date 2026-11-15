@@ -60,15 +60,12 @@ export interface TeamMemberData {
   linkedin?: string
   cvUrl?: string
   designation?: string
-  qualifications?: string[]
-  phone?: string
   isLead?: boolean
   tenure?: string
   startDate?: string
   endDate?: string
   department?: string
   researchFocus?: string
-  tags?: string[]
   term?: string
   year?: number
   order?: number
@@ -138,10 +135,14 @@ export interface InternItem {
 export interface CoAwardeeInfo {
   id: string
   name: string
+  role?: string
+  category?: string
+  department?: string
   researchFocus?: string
   email?: string
   linkedin?: string
   cvUrl?: string
+  avatar?: string
   categoryTab?: string
   note?: string
 }
@@ -149,6 +150,8 @@ export interface CoAwardeeInfo {
 export interface PerformerItem {
   id: string
   _id?: string
+  memberIds?: string[]
+  memberNotes?: Record<string, string>
   name: string
   role: string
   department?: string

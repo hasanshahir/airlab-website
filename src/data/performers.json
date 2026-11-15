@@ -1,6 +1,13 @@
 [
   {
     "id": "ri-areeba-zehra-jafri",
+    "memberIds": [
+      "ri-areeba-zehra-jafri",
+      "ri-muhammad-hammad-khan"
+    ],
+    "memberNotes": {
+      "ri-muhammad-hammad-khan": "Absent during photo ceremony"
+    },
     "name": "Areeba Zehra Jafri & Muhammad Hammad Khan",
     "role": "Research Interns",
     "department": "Department of CSIT · NED University",
@@ -45,6 +52,10 @@
   },
   {
     "id": "ri-haseeb-yaqoob",
+    "memberIds": [
+      "ri-haseeb-yaqoob",
+      "ri-muhammad-shaheer-khan"
+    ],
     "name": "Haseeb Yaqoob & Muhammad Shaheer Khan",
     "role": "Research Interns",
     "department": "Department of CSIT · NED University",
@@ -88,6 +99,9 @@
   },
   {
     "id": "ri-roshaan-tahir",
+    "memberIds": [
+      "ri-roshaan-tahir"
+    ],
     "name": "Roshaan Tahir",
     "role": "Research Intern",
     "department": "Department of CSIT · NED University",
@@ -116,6 +130,9 @@
   },
   {
     "id": "ri-syed-muhammed-ahmed",
+    "memberIds": [
+      "ri-syed-muhammed-ahmed"
+    ],
     "name": "Syed Muhammed Ahmed",
     "role": "Research Intern",
     "department": "Department of CSIT · NED University",

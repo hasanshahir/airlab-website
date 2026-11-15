@@ -11,8 +11,6 @@ export interface TeamMemberData {
   linkedin?: string
   cvUrl?: string
   designation?: string
-  qualifications?: string[]
-  phone?: string
   isLead?: boolean
   tenure?: string
   department?: string
@@ -36,8 +34,6 @@ export class TeamMemberEntity {
   public readonly linkedin?: string
   public readonly cvUrl?: string
   public readonly designation?: string
-  public readonly qualifications?: string[]
-  public readonly phone?: string
   public readonly isLead: boolean
   public readonly tenure?: string
   public readonly department: string
@@ -47,8 +43,8 @@ export class TeamMemberEntity {
   public readonly order: number
 
   constructor(data: TeamMemberData) {
-    this.id = data.id
-    this.name = data.name
+    this.id = String(data.id || (data as any)._id || '')
+    this.name = data.name || ''
     this.role = data.role || 'Research Scholar'
     this.category = data.category || 'Research Interns'
     this.image = getMemberAvatar(data.image)
@@ -56,9 +52,7 @@ export class TeamMemberEntity {
     this.linkedin = data.linkedin
     this.cvUrl = data.cvUrl
     this.designation = data.designation
-    this.qualifications = data.qualifications
-    this.phone = data.phone
-    this.isLead = Boolean(data.isLead || data.id === 'f1' || data.id === 'f2' || getFacultyPriority(data.name, data.id) > 0)
+    this.isLead = Boolean(data.isLead || data.id === 'f1' || data.id === 'f2' || getFacultyPriority(data.name, this.id) > 0)
     this.tenure = data.tenure || 'Current Cohort (2025–2026)'
     this.department = data.department || 'Computer Science & IT (CSIT)'
     this.researchFocus = data.researchFocus

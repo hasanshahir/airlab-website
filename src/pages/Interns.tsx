@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Building2, BookOpen } from 'lucide-react'
-import rawInterns from '../data/interns.json'
+import { Building2, BookOpen, Loader2 } from 'lucide-react'
 import type { InternItem } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import Button from '../components/ui/Button'
@@ -8,18 +7,25 @@ import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 import BlurReveal from '../components/ui/blur-reveal'
 
-const internsData = rawInterns as unknown as InternItem[]
-
 export default function Interns() {
-  const [interns, setInterns] = useState<InternItem[]>(() => internsData)
+  const [interns, setInterns] = useState<InternItem[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/content/interns')
-      .then(r => r.ok ? r.json() : [])
+    let active = true
+    const apiBase = import.meta.env.VITE_API_URL || ''
+    fetch(`${apiBase}/api/content/interns`)
+      .then(r => (r.ok ? r.json() : []))
       .then(d => {
-        if (Array.isArray(d) && d.length > 0) setInterns(d)
+        if (active && Array.isArray(d)) setInterns(d)
       })
       .catch(() => {})
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
   }, [])
 
   return (
@@ -47,7 +53,14 @@ export default function Interns() {
       {/* Grid of Alumni */}
       {interns.length === 0 ? (
         <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)] mb-16">
-          <p className="text-sm font-sans text-[var(--text-muted)]">No intern spotlight entries published yet.</p>
+          {loading ? (
+            <div className="inline-flex items-center gap-2 text-sm font-sans text-[var(--text-muted)]">
+              <Loader2 className="w-4 h-4 animate-spin text-[var(--accent-orange)]" />
+              <span>Loading intern spotlights...</span>
+            </div>
+          ) : (
+            <p className="text-sm font-sans text-[var(--text-muted)]">No intern spotlight entries published yet.</p>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 text-left">

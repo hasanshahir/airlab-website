@@ -6,6 +6,7 @@ import { PositionModel } from '../models/Position.js'
 import { HttpError } from '../middleware/errors.js'
 import { requireAdmin } from '../middleware/auth.js'
 import { getVacancySettings, saveVacancySettings } from '../services/siteSettings.js'
+import { enrichPerformersList, preparePerformerWritePayload } from '../services/performers.js'
 
 export const adminCrudRouter = Router()
 
@@ -130,8 +131,16 @@ function resolve(slug: string | string[] | undefined) {
 // 1. LIST items (includes unpublished items for admin)
 adminCrudRouter.get('/:slug', async (req, res, next) => {
   try {
-    const { model } = resolve(req.params.slug)
+    const { def, model } = resolve(req.params.slug)
     const items = await model.find().sort({ order: 1, createdAt: -1 }).lean()
+    if (def.slug === 'performers' && items.length > 0) {
+      const enriched = await enrichPerformersList(items as Record<string, any>[], {
+        includeUnpublished: true,
+        externalizeAvatars: true,
+      })
+      res.json(enriched)
+      return
+    }
     res.json(items)
   } catch (err) {
     next(err)
@@ -141,14 +150,25 @@ adminCrudRouter.get('/:slug', async (req, res, next) => {
 // 2. CREATE item
 adminCrudRouter.post('/:slug', async (req, res, next) => {
   try {
-    const { model } = resolve(req.params.slug)
-    const clean = sanitizePayload(req.body)
+    const { def, model } = resolve(req.params.slug)
+    let clean = sanitizePayload(req.body)
+    if (def.slug === 'performers') {
+      clean = await preparePerformerWritePayload(clean)
+    }
     const count = await model.countDocuments()
     const item = await model.create({
       ...clean,
       order: typeof clean.order === 'number' ? clean.order : count,
       published: typeof clean.published === 'boolean' ? clean.published : true,
     })
+    if (def.slug === 'performers') {
+      const [enriched] = await enrichPerformersList([item.toJSON()], {
+        includeUnpublished: true,
+        externalizeAvatars: true,
+      })
+      res.status(201).json(enriched || item)
+      return
+    }
     res.status(201).json(item)
   } catch (err) {
     next(err)
@@ -159,14 +179,25 @@ adminCrudRouter.post('/:slug', async (req, res, next) => {
 adminCrudRouter.put('/:slug/:id', async (req, res, next) => {
   try {
     const id = assertValidObjectId(req.params.id)
-    const { model } = resolve(req.params.slug)
-    const clean = sanitizePayload(req.body)
+    const { def, model } = resolve(req.params.slug)
+    let clean = sanitizePayload(req.body)
+    if (def.slug === 'performers') {
+      clean = await preparePerformerWritePayload(clean)
+    }
     const item = await model.findByIdAndUpdate(
       id,
       { $set: clean },
       { new: true, runValidators: true }
     )
     if (!item) throw new HttpError(404, 'Item not found')
+    if (def.slug === 'performers') {
+      const [enriched] = await enrichPerformersList([item.toJSON()], {
+        includeUnpublished: true,
+        externalizeAvatars: true,
+      })
+      res.json(enriched || item)
+      return
+    }
     res.json(item)
   } catch (err) {
     next(err)

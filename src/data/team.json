@@ -5,22 +5,12 @@
     "role": "Principal Investigator & Professor",
     "designation": "Professor & PhD Approved Supervisor",
     "category": "Faculty",
-    "qualifications": [
-      "Ph.D. in Computer Science",
-      "Chairperson / Senior Faculty Member, Department of CSIT"
-    ],
-    "phone": "9221-99261261",
     "email": "mmkhan@neduet.edu.pk",
     "linkedin": "https://www.linkedin.com/in/muhammad-mubashir-khan-phd-smieee-facp-728b1424/",
     "cvUrl": "https://cct.neduet.edu.pk/faculty/dr-muhammad-mubashir-khan",
     "image": "/pfp/mmkhan.jpeg",
     "department": "Department of CSIT, NED University",
     "researchFocus": "Digital Investigation, Intelligent Information Systems & Cybersecurity",
-    "tags": [
-      "Digital Investigation",
-      "Information Discovery",
-      "Cybersecurity"
-    ],
     "startDate": "2018",
     "endDate": "Present",
     "tenure": "2018 — Present (Senior Faculty)",
@@ -36,23 +26,12 @@
     "role": "Faculty Coordinator & PI",
     "designation": "Associate Professor & PhD Approved Supervisor",
     "category": "Faculty",
-    "qualifications": [
-      "Ph.D. (NED University)",
-      "M.E. (Computer System and Networks), MUET",
-      "B.E. (Telecommunication), MUET"
-    ],
-    "phone": "9221-99261261 Ext: 2399",
     "email": "marvi@cloud.neduet.edu.pk",
     "linkedin": "https://www.linkedin.com/in/murk-marvi/",
     "cvUrl": "https://cct.neduet.edu.pk/sites/default/files/csit/CV_new/Marvi25.pdf",
     "image": "/pfp/marvi.jpeg",
     "department": "Department of CSIT, NED University",
     "researchFocus": "Foundational AI, High Performance Networks & Distributed Systems",
-    "tags": [
-      "NLP & LLMs",
-      "Distributed Systems & HPC",
-      "Digital Identity"
-    ],
     "startDate": "2020",
     "endDate": "Present",
     "tenure": "2020 — Present (Tenured Faculty)",
@@ -74,11 +53,6 @@
     "image": "/pfp/saadia.jpeg",
     "department": "Department of CSIT, NED University",
     "researchFocus": "Information Security, Network Forensics & Secure Architecture",
-    "tags": [
-      "Information Security",
-      "Cybersecurity",
-      "Network Security"
-    ],
     "startDate": "2022",
     "endDate": "Present",
     "tenure": "2022 — Present",
@@ -99,11 +73,6 @@
     "image": "/pfp/arsalan.jpeg",
     "department": "Department of CSIT, NED University",
     "researchFocus": "Wireless Security, Software-Defined Radio (SDR) & RF Intelligence",
-    "tags": [
-      "Wireless Security",
-      "Software-Defined Radio",
-      "RF Intelligence"
-    ],
     "startDate": "2022",
     "endDate": "Present",
     "tenure": "2022 — Present",
@@ -124,12 +93,6 @@
     "image": "/pfp/maham.png",
     "department": "Department of CSIT, NED University",
     "researchFocus": "Computer Vision, Natural Language Processing (NLP), Multimodal AI & RAG",
-    "tags": [
-      "Computer Vision",
-      "NLP & LLMs",
-      "Multimodal AI",
-      "RAG"
-    ],
     "startDate": "2023",
     "endDate": "Present",
     "tenure": "2023 — Present",
@@ -150,12 +113,6 @@
     "image": "/pfp/shiza.jpeg",
     "department": "Department of CSIT, NED University",
     "researchFocus": "Artificial Intelligence, Machine Learning, Data Science, Generative AI, RAG & Predictive Analytics",
-    "tags": [
-      "Artificial Intelligence",
-      "Machine Learning",
-      "Generative AI",
-      "Data Science & RAG"
-    ],
     "startDate": "2023",
     "endDate": "Present",
     "tenure": "2023 — Present",
