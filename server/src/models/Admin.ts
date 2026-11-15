@@ -7,6 +7,8 @@ const AdminSchema = new Schema(
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     /** bcrypt hash – never the plain password. Excluded from queries by default. */
     passwordHash: { type: String, required: true, select: false },
+    failedLoginAttempts: { type: Number, default: 0, select: false },
+    lockUntil: { type: Date, default: null, select: false },
     lastLoginAt: { type: Date },
   },
   { timestamps: true, versionKey: false },

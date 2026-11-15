@@ -78,7 +78,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
       data.append('coverNote', `[Designation: ${formData.designation} | Track: ${formData.track}] ${formData.statement}`)
       data.append('github', formData.resumeUrl)
       data.append('resumeUrl', formData.resumeUrl)
-      // Structured copies of the fields so Google Sheets gets clean, separate columns
+      // Structured fields for clean database storage and admin review
       data.append('rollNo', formData.rollNo)
       data.append('department', formData.department)
       data.append('program', formData.program)

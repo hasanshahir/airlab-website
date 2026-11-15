@@ -79,15 +79,17 @@ export interface PublicationItem {
   id: number | string
   title: string
   authors: string
-  venue: string
-  type: 'Journal' | 'Conference' | 'Preprint'
-  year: number
-  month?: string
+  date?: string
+  citation?: string
   link?: string
+  venue?: string
+  type?: 'Journal' | 'Conference' | 'Preprint'
+  year?: number
+  month?: string
   doi?: string
   pdf?: string
   impactFactor?: string
-  tags: string[]
+  tags?: string[]
   abstract?: string
   placeholder?: boolean
 }

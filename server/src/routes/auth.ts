@@ -4,12 +4,21 @@ import jwt from 'jsonwebtoken'
 import { z } from 'zod'
 import { AdminModel } from '../models/Admin.js'
 import { env, isProd } from '../config/env.js'
-import { requireAdmin, type AuthRequest } from '../middleware/auth.js'
+import {
+  requireAdmin,
+  computePasswordFingerprint,
+  JWT_ISSUER,
+  JWT_AUDIENCE,
+  type AuthRequest,
+} from '../middleware/auth.js'
 import { HttpError } from '../middleware/errors.js'
 
 export const authRouter = Router()
 
-// Simple in-memory rate limiter to prevent brute-force attacks on /login
+// Precomputed bcrypt hash used when email is not found to prevent timing-based user enumeration
+const DUMMY_BCRYPT_HASH = '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'
+
+// In-memory IP rate limiter + DB-backed per-account lockout to prevent brute-force attacks
 interface AttemptRecord {
   count: number
   firstAttempt: number
@@ -46,11 +55,20 @@ function resetRateLimit(ip: string) {
 }
 
 const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email().max(254),
+  password: z.string().min(1).max(256),
+})
+
+const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1).max(256),
+  newPassword: z
+    .string()
+    .min(8, 'New password must be at least 8 characters long')
+    .max(256),
 })
 
 authRouter.post('/login', async (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
   const clientIp = req.ip || req.socket.remoteAddress || 'unknown'
 
   if (!checkRateLimit(clientIp)) {
@@ -67,36 +85,66 @@ authRouter.post('/login', async (req, res, next) => {
     const normalizedEmail = email.toLowerCase().trim()
 
     // Strictly authenticate against the database (bcrypt hash comparison)
-    const admin = await AdminModel.findOne({ email: normalizedEmail }).select('+passwordHash')
+    const admin = await AdminModel.findOne({ email: normalizedEmail }).select(
+      '+passwordHash +failedLoginAttempts +lockUntil'
+    )
 
-    if (!admin) {
-      recordFailedAttempt(clientIp)
-      throw new HttpError(401, 'Invalid email or password')
+    // Check DB-level account lockout (persists across serverless cold starts)
+    if (admin?.lockUntil && new Date(admin.lockUntil).getTime() > Date.now()) {
+      return next(
+        new HttpError(
+          429,
+          'This admin account is temporarily locked due to multiple failed login attempts. Please try again in 15 minutes.'
+        )
+      )
     }
 
-    const isValid = await bcrypt.compare(password, admin.passwordHash)
-    if (!isValid) {
+    const hashToCompare = admin?.passwordHash || DUMMY_BCRYPT_HASH
+    const isValid = await bcrypt.compare(password, hashToCompare)
+
+    if (!admin || !isValid) {
       recordFailedAttempt(clientIp)
+      if (admin) {
+        const attempts = (admin.failedLoginAttempts || 0) + 1
+        admin.failedLoginAttempts = attempts
+        if (attempts >= MAX_ATTEMPTS) {
+          admin.lockUntil = new Date(Date.now() + LOCKOUT_MS)
+          admin.failedLoginAttempts = 0
+        }
+        await admin.save()
+      }
       throw new HttpError(401, 'Invalid email or password')
     }
 
     // Reset failed attempts on successful login
     resetRateLimit(clientIp)
-
+    admin.failedLoginAttempts = 0
+    admin.lockUntil = null
     admin.lastLoginAt = new Date()
     await admin.save()
 
+    const pwdFingerprint = computePasswordFingerprint(admin.passwordHash)
     const token = jwt.sign(
-      { id: String(admin._id), email: admin.email, name: admin.name },
+      {
+        id: String(admin._id),
+        email: admin.email,
+        name: admin.name,
+        pwdFingerprint,
+      },
       env.JWT_SECRET,
-      { expiresIn: '7d' }
+      {
+        algorithm: 'HS256',
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE,
+        expiresIn: '12h',
+      }
     )
 
     res.cookie('token', token, {
       httpOnly: true,
       secure: isProd,
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 12 * 60 * 60 * 1000,
     })
 
     res.json({
@@ -114,7 +162,11 @@ authRouter.post('/login', async (req, res, next) => {
 })
 
 authRouter.post('/logout', (_req, res) => {
-  res.clearCookie('token')
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'strict',
+  })
   res.json({ success: true, message: 'Logged out successfully' })
 })
 
@@ -124,17 +176,68 @@ authRouter.get('/me', requireAdmin, async (req: AuthRequest, res, next) => {
       throw new HttpError(401, 'Unauthorized')
     }
 
-    const admin = await AdminModel.findById(req.admin.id)
-    if (!admin) {
-      throw new HttpError(401, 'Admin session invalid')
-    }
-
     res.json({
       admin: {
+        id: req.admin.id,
+        email: req.admin.email,
+        name: req.admin.name,
+      },
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+authRouter.post('/change-password', requireAdmin, async (req: AuthRequest, res, next) => {
+  try {
+    if (!req.admin?.id) {
+      throw new HttpError(401, 'Unauthorized')
+    }
+
+    const { currentPassword, newPassword } = ChangePasswordSchema.parse(req.body)
+    const admin = await AdminModel.findById(req.admin.id).select('+passwordHash')
+    if (!admin) {
+      throw new HttpError(401, 'Admin account not found')
+    }
+
+    const matches = await bcrypt.compare(currentPassword, admin.passwordHash)
+    if (!matches) {
+      throw new HttpError(400, 'Current password is incorrect')
+    }
+
+    admin.passwordHash = await bcrypt.hash(newPassword, 12)
+    admin.failedLoginAttempts = 0
+    admin.lockUntil = null
+    await admin.save()
+
+    const pwdFingerprint = computePasswordFingerprint(admin.passwordHash)
+    const newToken = jwt.sign(
+      {
         id: String(admin._id),
         email: admin.email,
         name: admin.name,
+        pwdFingerprint,
       },
+      env.JWT_SECRET,
+      {
+        algorithm: 'HS256',
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE,
+        expiresIn: '12h',
+      }
+    )
+
+    res.cookie('token', newToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'strict',
+      maxAge: 12 * 60 * 60 * 1000,
+    })
+
+    res.json({
+      success: true,
+      message: 'Password updated successfully. All other sessions have been invalidated.',
+      token: newToken,
     })
   } catch (err) {
     next(err)

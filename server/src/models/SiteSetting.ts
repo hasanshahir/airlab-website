@@ -1,9 +1,8 @@
 import mongoose, { Schema } from 'mongoose'
 
 /**
- * Generic key/value store for site-wide settings that are edited from
- * Google Sheets (e.g. the vacancy modal copy) or captured during sync
- * (e.g. the Apps Script webhook URL used for live application sync).
+ * Generic key/value store for site-wide settings managed strictly via the Admin Panel
+ * (e.g. vacancy modal status and top announcement ribbon copy).
  */
 const SiteSettingSchema = new Schema(
   {

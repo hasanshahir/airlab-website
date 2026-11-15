@@ -1,8 +1,25 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { getSponsors } from '../lib/data'
+import type { Sponsor } from '../types/data'
 
 export const SponsorsGrid: React.FC = () => {
-  const sponsors = getSponsors()
+  const [sponsors, setSponsors] = useState<Sponsor[]>(() => getSponsors())
+
+  useEffect(() => {
+    let active = true
+    fetch('/api/content/sponsors', { cache: 'no-store' })
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (active && Array.isArray(data) && data.length > 0) {
+          setSponsors(data)
+        }
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [])
+
   if (!sponsors || sponsors.length === 0) return null
 
   return (

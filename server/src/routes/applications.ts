@@ -1,12 +1,11 @@
 import { Router } from 'express'
 import multer from 'multer'
 import mongoose from 'mongoose'
-import { ApplicationModel } from '../models/Application.js'
+import { ApplicationModel, APPLICATION_STATUSES } from '../models/Application.js'
 import { PositionModel } from '../models/Position.js'
 import { HttpError } from '../middleware/errors.js'
 import { requireAdmin } from '../middleware/auth.js'
 import { sendApplicationNotification } from '../services/email.js'
-import { pushApplicationToSheets } from '../services/sheetsWebhook.js'
 import { getVacancySettings } from '../services/siteSettings.js'
 
 export const applicationsRouter = Router()
@@ -28,7 +27,6 @@ const upload = multer({
 applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
   try {
     const { positionId, name, email, phone, university, degreeYear, coverNote, github, linkedin } = req.body
-    // Structured fields (sent by the current form) so Sheets gets clean, separate columns.
     const { rollNo, department, program, track, statement } = req.body
     const positionTitleFromBody = req.body.positionTitle || req.body.designation
 
@@ -105,58 +103,28 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
       // ignore
     }
 
-    // Email + live Google Sheets append run in parallel. Both are awaited (serverless
-    // functions are frozen once the response is sent) but neither can fail the request.
-    const emailTask = sendApplicationNotification({
-      applicantName: name,
-      applicantEmail: email,
-      applicantPhone: phone,
-      university,
-      degreeYear,
-      positionTitle: positionTitle || 'Research Intern',
-      coverNote,
-      github,
-      linkedin,
-      cvFile: req.file
-        ? {
-            originalName: req.file.originalname,
-            buffer: req.file.buffer,
-            contentType: req.file.mimetype,
-          }
-        : undefined,
-    })
-
-    const sheetsTask = pushApplicationToSheets({
-      applicationId: String(applicationId),
-      submittedAt: new Date().toISOString(),
-      name,
-      email,
-      phone,
-      positionTitle: positionTitle || 'Research Intern',
-      designation: positionTitle || 'Research Intern',
-      rollNo,
-      department,
-      program,
-      track,
-      university,
-      degreeYear,
-      statement: statement ?? coverNote,
-      portfolio: req.body.resumeUrl || github,
-      linkedin,
-      vacancyTitle: positionTitle || vacancy.title,
-      status: 'New',
-      cv: req.file
-        ? {
-            fileName: req.file.originalname,
-            mimeType: req.file.mimetype || 'application/pdf',
-            base64: req.file.buffer.toString('base64'),
-          }
-        : undefined,
-    })
-
-    const [emailResult] = await Promise.allSettled([emailTask, sheetsTask])
-    if (emailResult.status === 'rejected') {
-      console.error('⚠️ Failed to dispatch application notification email:', emailResult.reason)
+    // Dispatch notification email to admin and confirmation to applicant (never fails the request)
+    try {
+      await sendApplicationNotification({
+        applicantName: name,
+        applicantEmail: email,
+        applicantPhone: phone,
+        university,
+        degreeYear,
+        positionTitle: positionTitle || 'Research Intern',
+        coverNote,
+        github,
+        linkedin,
+        cvFile: req.file
+          ? {
+              originalName: req.file.originalname,
+              buffer: req.file.buffer,
+              contentType: req.file.mimetype,
+            }
+          : undefined,
+      })
+    } catch (emailErr) {
+      console.error('⚠️ Failed to dispatch application notification email:', emailErr)
     }
 
     res.status(201).json({
@@ -184,11 +152,22 @@ applicationsRouter.get('/admin', requireAdmin, async (_req, res, next) => {
 
 applicationsRouter.patch('/admin/:id/status', requireAdmin, async (req, res, next) => {
   try {
+    const id = String(req.params.id)
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new HttpError(400, 'Invalid application ID')
+    }
     const { status, adminNotes } = req.body
+    if (status && !APPLICATION_STATUSES.includes(status)) {
+      throw new HttpError(400, 'Invalid application status')
+    }
+    const update: Record<string, unknown> = {}
+    if (typeof status === 'string') update.status = status
+    if (typeof adminNotes === 'string') update.adminNotes = adminNotes.trim()
+
     const app = await ApplicationModel.findByIdAndUpdate(
-      req.params.id,
-      { ...(status && { status }), ...(adminNotes !== undefined && { adminNotes }) },
-      { new: true }
+      id,
+      { $set: update },
+      { new: true, runValidators: true }
     )
     if (!app) throw new HttpError(404, 'Application not found')
     res.json(app)
@@ -199,7 +178,11 @@ applicationsRouter.patch('/admin/:id/status', requireAdmin, async (req, res, nex
 
 applicationsRouter.delete('/admin/:id', requireAdmin, async (req, res, next) => {
   try {
-    const deleted = await ApplicationModel.findByIdAndDelete(req.params.id)
+    const id = String(req.params.id)
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new HttpError(400, 'Invalid application ID')
+    }
+    const deleted = await ApplicationModel.findByIdAndDelete(id)
     if (!deleted) throw new HttpError(404, 'Application not found')
     res.json({ success: true, message: 'Application deleted' })
   } catch (err) {

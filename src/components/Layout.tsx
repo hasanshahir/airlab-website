@@ -209,7 +209,7 @@ export default function Layout() {
               <button
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'research' ? null : 'research')}
-                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'research' || location.pathname.includes('/projects') || location.pathname.includes('/grants') || location.pathname.includes('/publications')
+                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'research' || location.pathname.includes('/projects') || location.pathname.includes('/grants') || location.pathname.includes('/publications') || location.pathname.includes('/blogs')
                   ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
                   }`}
@@ -280,7 +280,7 @@ export default function Layout() {
                         </Link>
 
                         <Link
-                          to="/publications#blogs"
+                          to="/blogs"
                           className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
                         >
                           <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
@@ -549,7 +549,7 @@ export default function Layout() {
                       <Link to="/publications" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Publications
                       </Link>
-                      <Link to="/publications#blogs" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                      <Link to="/blogs" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
                         Blogs
                       </Link>
                     </div>
@@ -687,6 +687,7 @@ export default function Layout() {
                 <li><Link to="/projects" className="hover:text-white transition-colors">Projects Catalog</Link></li>
                 <li><Link to="/grants" className="hover:text-white transition-colors">Research Grants</Link></li>
                 <li><Link to="/publications" className="hover:text-white transition-colors">Publications</Link></li>
+                <li><Link to="/blogs" className="hover:text-white transition-colors">Research Blogs</Link></li>
                 <li><Link to="/gallery" className="hover:text-white transition-colors">Lab Gallery</Link></li>
               </ul>
             </div>

@@ -6,6 +6,7 @@ import About from './pages/About'
 import Team from './pages/Team'
 import Projects from './pages/Projects'
 import Publications from './pages/Publications'
+import Blogs from './pages/Blogs'
 import Grants from './pages/Grants'
 import Contact from './pages/Contact'
 import Gallery from './pages/Gallery'
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="projects" element={<Projects />} />
             <Route path="grants" element={<Grants />} />
             <Route path="publications" element={<Publications />} />
+            <Route path="blogs" element={<Blogs />} />
             <Route path="contact" element={<Contact />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="performers" element={<Performers />} />

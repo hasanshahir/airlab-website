@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Copy, Check, Award, FileText, Download, Search, Clock } from 'lucide-react'
+import { Copy, Check, Award, FileText, Download, Search } from 'lucide-react'
 import { getPublications } from '../lib/data'
-import rawBlogs from '../data/blogs.json'
 import SectionReveal from '../components/ui/SectionReveal'
 
 export default function Publications() {
@@ -10,7 +9,6 @@ export default function Publications() {
   const [copiedId, setCopiedId] = useState<string | number | null>(null)
 
   const [pubData, setPubData] = useState<any[]>(() => getPublications())
-  const [blogsData, setBlogsData] = useState<any[]>(() => (Array.isArray(rawBlogs) ? rawBlogs : []))
 
   useEffect(() => {
     fetch('/api/content/publications')
@@ -19,18 +17,16 @@ export default function Publications() {
         if (Array.isArray(d) && d.length > 0) setPubData(d)
       })
       .catch(() => { })
-
-    fetch('/api/content/blogs')
-      .then(r => r.ok ? r.json() : [])
-      .then(d => {
-        if (Array.isArray(d)) setBlogsData(d)
-      })
-      .catch(() => { })
   }, [])
 
-  // Enforce sorted order: recent papers at top (descending by year, then by id)
+  // Enforce sorted order: recent papers at top (descending by date/year, then by id)
   const sortedPublications = useMemo(() => {
     return [...pubData].sort((a, b) => {
+      const timeA = a.date ? Date.parse(a.date) : NaN
+      const timeB = b.date ? Date.parse(b.date) : NaN
+      if (!Number.isNaN(timeA) && !Number.isNaN(timeB) && timeB !== timeA) {
+        return timeB - timeA
+      }
       const yearA = Number(a.year) || 0
       const yearB = Number(b.year) || 0
       if (yearB !== yearA) return yearB - yearA
@@ -50,6 +46,8 @@ export default function Publications() {
       return (
         (p.title || '').toLowerCase().includes(q) ||
         (p.authors || '').toLowerCase().includes(q) ||
+        (p.date || '').toLowerCase().includes(q) ||
+        (p.citation || '').toLowerCase().includes(q) ||
         (p.venue || '').toLowerCase().includes(q) ||
         tagsList.some((t: string) => t.toLowerCase().includes(q))
       )
@@ -57,9 +55,13 @@ export default function Publications() {
   }, [sortedPublications, searchQuery])
 
   const copyBibtex = (p: typeof pubData[0]) => {
-    const bib = `@${p.type === 'Journal' ? 'article' : 'inproceedings'}{air_${p.id},\n  title={${p.title}},\n  author={${p.authors}},\n  ${p.type === 'Journal' ? 'journal' : 'booktitle'}={${p.venue}},\n  year={${p.year}}\n}`
-    navigator.clipboard.writeText(bib)
-    setCopiedId(p.id)
+    const citationText =
+      p.citation && String(p.citation).trim()
+        ? String(p.citation).trim()
+        : `@${p.type === 'Journal' ? 'article' : 'inproceedings'}{air_${p.id || p._id},\n  title={${p.title}},\n  author={${p.authors}},\n  ${p.type === 'Journal' ? 'journal' : 'booktitle'}={${p.venue || ''}},\n  year={${p.year || ''}}\n}`
+    navigator.clipboard.writeText(citationText)
+    const itemKey = p._id || p.id || p.title
+    setCopiedId(itemKey)
     setTimeout(() => setCopiedId(null), 2000)
   }
 
@@ -69,7 +71,7 @@ export default function Publications() {
       <div className="mb-14 text-left max-w-3xl">
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Research Papers & Publications
+            Publications
           </h1>
         </SectionReveal>
 
@@ -111,53 +113,81 @@ export default function Publications() {
           >
             {filtered.map((pub, i) => {
               const isJournal = pub.type === 'Journal'
+              const itemKey = pub._id || pub.id || pub.title || i
+              const displayDate = pub.date || (pub.year && Number(pub.year) > 0 ? String(pub.year) : '')
+              const hasBadges = Boolean(pub.type || pub.impactFactor || displayDate)
               return (
                 <div
-                  key={pub.id}
+                  key={itemKey}
                   className="p-8 sm:p-10 flex flex-col md:flex-row md:items-start justify-between gap-6 group hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 text-left bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl"
                   style={{ transitionDelay: `${i * 20}ms` }}
                 >
                   <div className="space-y-3.5 flex-1">
                     {/* Header Badges */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      {isJournal ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
-                          <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                          Journal Paper
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white">
-                          <FileText className="w-3.5 h-3.5" />
-                          Conference Proceeding
-                        </span>
-                      )}
+                    {hasBadges && (
+                      <div className="flex flex-wrap items-center gap-2">
+                        {pub.type &&
+                          (isJournal ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--accent-orange-light)] text-[var(--accent-orange)] border border-[var(--accent-orange)]/20">
+                              <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                              Journal Paper
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white">
+                              <FileText className="w-3.5 h-3.5" />
+                              {pub.type === 'Preprint' ? 'Preprint' : 'Conference Proceeding'}
+                            </span>
+                          ))}
 
-                      {'impactFactor' in pub && pub.impactFactor && (
-                        <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]">
-                          {pub.impactFactor}
-                        </span>
-                      )}
+                        {'impactFactor' in pub && pub.impactFactor && (
+                          <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]">
+                            {pub.impactFactor}
+                          </span>
+                        )}
 
-                      <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)]">
-                        Year: {pub.year}
-                      </span>
-                    </div>
+                        {displayDate && (
+                          <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--bg-page)] text-[var(--accent-orange)] border border-[var(--border-hairline)]">
+                            Published: {displayDate}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {/* Paper Title */}
                     <h2 className="text-[20px] sm:text-[22px] font-semibold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug">
-                      {pub.title}
+                      {pub.link ? (
+                        <a href={pub.link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                          {pub.title}
+                        </a>
+                      ) : (
+                        pub.title
+                      )}
                     </h2>
 
-                    {/* Venue */}
-                    <div className="text-sm font-medium text-[var(--text-muted)] flex items-center gap-2">
-                      <span className="text-[var(--ink-dark)] font-bold font-sans text-xs">VENUE:</span>
-                      <span>{pub.venue}</span>
-                    </div>
-
                     {/* Authors */}
-                    <p className="text-xs sm:text-[13.5px] font-sans text-[var(--text-muted)]">
-                      Authors: <span className="text-[var(--text-primary)] font-semibold">{pub.authors}</span>
-                    </p>
+                    {(pub.authors || pub.author) && (
+                      <p className="text-xs sm:text-[13.5px] font-sans text-[var(--text-muted)]">
+                        Author(s): <span className="text-[var(--text-primary)] font-semibold">{pub.authors || pub.author}</span>
+                      </p>
+                    )}
+
+                    {/* Citation */}
+                    {pub.citation && (
+                      <div className="p-3.5 rounded-xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-xs sm:text-[13px] font-sans text-[var(--text-muted)] leading-relaxed">
+                        <span className="font-semibold text-[var(--text-primary)] uppercase tracking-wider text-[10px] block mb-1">
+                          Citation
+                        </span>
+                        {pub.citation}
+                      </div>
+                    )}
+
+                    {/* Venue */}
+                    {pub.venue && (
+                      <div className="text-sm font-medium text-[var(--text-muted)] flex items-center gap-2">
+                        <span className="text-[var(--ink-dark)] font-bold font-sans text-xs">VENUE:</span>
+                        <span>{pub.venue}</span>
+                      </div>
+                    )}
 
                     {/* DOI */}
                     {pub.doi && (
@@ -174,7 +204,7 @@ export default function Publications() {
                     )}
 
                     {/* Tags */}
-                    {pub.tags && Array.isArray(pub.tags) && (
+                    {pub.tags && Array.isArray(pub.tags) && pub.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 pt-2">
                         {pub.tags.map((tag: string, idx: number) => (
                           <span
@@ -188,7 +218,7 @@ export default function Publications() {
                     )}
                   </div>
 
-                  {/* Action Buttons: Read Link, PDF, BibTeX Cite */}
+                  {/* Action Buttons: Read Link, PDF, Citation Copy */}
                   <div className="flex sm:flex-col items-center sm:items-end gap-2.5 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--border-hairline)]">
                     {pub.link && (
                       <a
@@ -216,9 +246,9 @@ export default function Publications() {
                     <button
                       onClick={() => copyBibtex(pub)}
                       className="h-9 px-4 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--bg-surface)] text-xs font-sans flex items-center gap-1.5 transition-colors cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] whitespace-nowrap font-medium"
-                      title="Copy BibTeX Citation"
+                      title="Copy Citation"
                     >
-                      {copiedId === pub.id ? (
+                      {copiedId === itemKey ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
                           <span className="text-[var(--accent-orange)] font-semibold">Citation Copied!</span>
@@ -245,75 +275,6 @@ export default function Publications() {
           </div>
         )}
       </div>
-
-      {/* ── 2. BLOGS SECTION (Underneath Publications) ── */}
-      <section id="blogs" className="mt-24 pt-16 border-t border-[var(--border-hairline)] text-left">
-        <div className="mb-10 max-w-2xl">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
-            Research Blogs & Dispatches
-          </h2>
-          <p className="text-sm sm:text-base text-[var(--text-muted)] mt-2 leading-relaxed font-normal">
-            In-depth architectural breakdowns, engineering postmortems, and field deployment dispatches authored by AIR Lab scientists and researchers.
-          </p>
-        </div>
-
-        {blogsData.length === 0 ? (
-          <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
-            <p className="text-sm font-sans text-[var(--text-muted)]">
-              No blog posts published yet.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {blogsData.map((blog: any) => (
-              <article
-                key={blog.id}
-                className="p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-4 font-medium">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                      <span>{blog.readTime || 'Research Dispatch'}</span>
-                    </div>
-                    <span>{blog.date}</span>
-                  </div>
-
-                  <h3 className="text-lg font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-3">
-                    {blog.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed font-normal mb-5">
-                    {blog.excerpt}
-                  </p>
-
-                  {Array.isArray(blog.tags) && blog.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-6">
-                      {blog.tags.map((tag: string) => (
-                        <span
-                          key={tag}
-                          className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] font-medium"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[var(--text-primary)]">
-                    {blog.author}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] transition-colors">
-                    <span>Read Notes</span>
-                  </span>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
     </div>
   )
 }

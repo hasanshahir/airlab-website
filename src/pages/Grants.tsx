@@ -157,7 +157,7 @@ export default function Grants() {
       <div className="mb-14 text-left max-w-3xl">
         <SectionReveal delay={0.08}>
           <h1 className="font-head font-semibold text-[var(--text-primary)] tracking-tight">
-            Research Funding
+            Research Grants
           </h1>
         </SectionReveal>
       </div>

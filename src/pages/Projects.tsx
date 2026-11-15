@@ -9,8 +9,8 @@ import {
   Users,
 } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { getProjects, getTeamMembers } from '../lib/data'
-import type { ProjectItem, TeamMemberData } from '../types/data'
+import { getProjects } from '../lib/data'
+import type { ProjectItem } from '../types/data'
 import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
 
 function parseDateScore(dateStr?: string): number {
@@ -150,6 +150,16 @@ function projectMatchesResearchArea(project: ProjectItem, targetArea: string): b
   return false
 }
 
+function getCanonicalProjectKey(title?: string): string {
+  if (!title) return ''
+  const clean = title.trim().toLowerCase()
+  const prefixMatch = clean.split(/\s*[:–—]\s*/)[0]?.trim()
+  if (prefixMatch && prefixMatch.length >= 4 && prefixMatch !== clean) {
+    return prefixMatch
+  }
+  return clean.replace(/[^a-z0-9]+/g, ' ').trim()
+}
+
 export default function Projects() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [activeCategory, setActiveCategory] = useState<string>('All')
@@ -168,44 +178,85 @@ export default function Projects() {
       areas: getProjectAreas(p),
     }))
   })
-  const [allMembers, setAllMembers] = useState<TeamMemberData[]>(() => getTeamMembers())
 
   useEffect(() => {
     let active = true
-    Promise.all([
-      fetch('/api/content/projects').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/content/team').then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([projs, team]) => {
-      if (!active) return
-      if (Array.isArray(projs) && projs.length > 0) {
-        const localList = getProjects()
-        const merged = projs.map(p => {
-          const local = localList.find(
-            lp =>
-              String(lp.id) === String(p.id) ||
-              lp.title.trim().toLowerCase() === String(p.title || '').trim().toLowerCase()
-          )
-          const rawAreas = (Array.isArray(p.areas) && p.areas.length > 0)
-            ? p.areas
-            : (local?.areas || getProjectAreas(p))
-          const areas = rawAreas.map(normalizeAreaName)
-          const useLocalCover =
-            local?.coverImage?.startsWith('/projects/') &&
-            (!p.coverImage || String(p.coverImage).includes('unsplash.com'))
-          return {
-            ...local,
-            ...p,
-            coverImage: useLocalCover ? local!.coverImage : (p.coverImage || local?.coverImage),
-            images: useLocalCover ? local!.images : (p.images?.length ? p.images : local?.images),
-            pi: p.pi || local?.pi,
-            areas,
+    fetch('/api/content/projects')
+      .then(r => (r.ok ? r.json() : []))
+      .catch(() => [])
+      .then((projs: ProjectItem[]) => {
+        if (!active) return
+        if (Array.isArray(projs) && projs.length > 0) {
+          const localList = getProjects()
+          const dedupedMap = new Map<string, ProjectItem>()
+          for (const p of projs) {
+            const key = getCanonicalProjectKey(p.title) || String(p.id)
+            const prev = dedupedMap.get(key)
+            if (!prev) {
+              dedupedMap.set(key, p)
+            } else {
+              const prevMembers = Array.isArray(prev.teamMembers) ? prev.teamMembers : []
+              const currMembers = Array.isArray(p.teamMembers) ? p.teamMembers : []
+              dedupedMap.set(key, {
+                ...prev,
+                ...p,
+                teamMembers: currMembers.length >= prevMembers.length ? currMembers : prevMembers,
+              })
+            }
           }
-        })
-        setProjectsData(merged)
-      }
-      if (Array.isArray(team) && team.length > 0) setAllMembers(team)
-    })
-    return () => { active = false }
+
+          const merged = Array.from(dedupedMap.values()).map(p => {
+            const pKey = getCanonicalProjectKey(p.title)
+            const local = localList.find(
+              lp =>
+                String(lp.id) === String(p.id) ||
+                lp.title.trim().toLowerCase() === String(p.title || '').trim().toLowerCase() ||
+                (pKey && getCanonicalProjectKey(lp.title) === pKey)
+            )
+            const rawAreas =
+              Array.isArray(p.areas) && p.areas.length > 0
+                ? p.areas
+                : local?.areas || getProjectAreas(local || p)
+            const areas = rawAreas.map(normalizeAreaName)
+            const useLocalCover =
+              local?.coverImage?.startsWith('/projects/') &&
+              (!p.coverImage ||
+                String(p.coverImage).includes('unsplash.com') ||
+                String(p.coverImage).includes('ibb.co'))
+            const apiMembers = Array.isArray(p.teamMembers) ? p.teamMembers.filter(Boolean) : []
+            const localMembers = Array.isArray(local?.teamMembers)
+              ? local!.teamMembers!.filter(Boolean)
+              : []
+            const teamMembers =
+              apiMembers.length > 1
+                ? apiMembers
+                : localMembers.length > apiMembers.length
+                  ? localMembers
+                  : apiMembers
+
+            return {
+              ...local,
+              ...p,
+              coverImage:
+                (useLocalCover
+                  ? local!.coverImage
+                  : p.coverImage || local?.coverImage) || '',
+              images:
+                (useLocalCover
+                  ? local!.images
+                  : p.images?.length
+                    ? p.images
+                    : local?.images) || [],
+              teamMembers,
+              areas,
+            } as ProjectItem
+          })
+          setProjectsData(merged)
+        }
+      })
+    return () => {
+      active = false
+    }
   }, [])
 
   // Synchronize activeArea with URL query parameter (?area=...) when directed from Home cards
@@ -362,20 +413,12 @@ export default function Projects() {
     })
   }, [projectsData, activeArea, activeCategory, query])
 
-  // Resolve team members associated with selected project
-  const projectMembers = useMemo(() => {
-    if (!selectedProject?.memberIds) return []
-    return selectedProject.memberIds
-      .map(id => allMembers.find(m => m.id === id))
-      .filter((m): m is NonNullable<typeof m> => Boolean(m))
-  }, [selectedProject, allMembers])
-
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* ── Section Header ── */}
       <div className="mb-14 text-left max-w-3xl">
         <h1 className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] font-head">
-          Applied AI Systems & Projects
+          Project Catalog
         </h1>
       </div>
 
@@ -509,14 +552,6 @@ export default function Projects() {
                         {proj.funding}
                       </span>
                     </div>
-                    {proj.pi && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-[var(--text-subtle)]">Supervisor:</span>
-                        <span className="font-medium text-[var(--text-primary)] truncate max-w-[180px]">
-                          {proj.pi}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -624,21 +659,6 @@ export default function Projects() {
 
                     {/* Specs Table */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs font-sans mb-8">
-                      {selectedProject.areas && selectedProject.areas.length > 0 && (
-                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl col-span-1 sm:col-span-2">
-                          <span className="text-[var(--text-subtle)] block mb-2 font-semibold">CORE RESEARCH AREAS</span>
-                          <div className="flex flex-wrap gap-1.5">
-                            {selectedProject.areas.map(area => (
-                              <span
-                                key={area}
-                                className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-[var(--bg-page)] text-[var(--text-primary)] border border-[var(--border-hairline)]"
-                              >
-                                {area}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">PROJECT TIMELINE</span>
                         <span className="font-semibold text-[var(--text-primary)]">
@@ -656,18 +676,6 @@ export default function Projects() {
                           </div>
                         )}
                       </div>
-                      {selectedProject.pi && (
-                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                          <span className="text-[var(--text-subtle)] block mb-1">SUPERVISOR</span>
-                          <span className="font-semibold text-[var(--text-primary)]">{selectedProject.pi}</span>
-                        </div>
-                      )}
-                      {selectedProject.industryAdvisor && selectedProject.industryAdvisor !== 'N/A' && (
-                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                          <span className="text-[var(--text-subtle)] block mb-1">INDUSTRY ADVISOR</span>
-                          <span className="font-semibold text-[var(--text-primary)]">{selectedProject.industryAdvisor}</span>
-                        </div>
-                      )}
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">STATUS</span>
                         <span className="font-semibold text-[var(--accent-orange)]">{selectedProject.status} Review</span>
@@ -691,77 +699,19 @@ export default function Projects() {
                       )}
                     </div>
 
-                    {/* ── Student Researchers & Engineers Section ── */}
+                    {/* ── Group Members Section ── */}
                     {selectedProject.teamMembers && selectedProject.teamMembers.length > 0 && (
                       <div className="mb-6 pt-6 border-t border-[var(--border-hairline)]">
                         <h4 className="text-xs font-sans font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3.5 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-[var(--accent-orange)]" /> Student Researchers & Engineers
+                          <Users className="w-3.5 h-3.5 text-[var(--accent-orange)]" /> Group Members:
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           {selectedProject.teamMembers.map((member, idx) => (
                             <div
                               key={idx}
-                              className="px-4 py-2.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-xl flex items-center justify-between text-xs font-sans"
+                              className="px-4 py-2.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-xl flex items-center text-xs font-sans"
                             >
                               <span className="font-semibold text-[var(--text-primary)]">{member}</span>
-                              <span className="text-[10px] text-[var(--ink-dark)] bg-white px-2 py-0.5 rounded-full border border-[var(--border-hairline)]">
-                                Researcher
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* ── Project Team Members Section ── */}
-                    {projectMembers.length > 0 && (
-                      <div className="mb-2 pt-6 border-t border-[var(--border-hairline)]">
-                        <h4 className="text-xs font-sans font-semibold uppercase tracking-wider text-[var(--text-subtle)] mb-3.5 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-[var(--ink-dark)]" /> Project Leads & Team
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                          {projectMembers.map(member => (
-                            <div
-                              key={member.id}
-                              className="p-3.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl flex items-center gap-3 group/member hover:border-[var(--accent-orange)] transition-all"
-                            >
-                              <img
-                                src={member.image || './pfp/marvi.jpeg'}
-                                alt={member.name}
-                                className="w-12 h-12 rounded-xl object-cover border border-[var(--border-hairline)] shrink-0 bg-white"
-                                onError={e => {
-                                  ;(e.target as HTMLImageElement).src =
-                                    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><rect width="44" height="44" fill="%23E5E1EA"/><text x="50%" y="55%" font-size="14" font-family="sans-serif" fill="%237A7A82" dominant-baseline="middle" text-anchor="middle">AI</text></svg>'
-                                }}
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="font-semibold text-xs text-[var(--text-primary)] truncate font-head group-hover/member:text-[var(--accent-orange)] transition-colors">
-                                  {member.name}
-                                </div>
-                                <div className="text-[11px] text-[var(--text-muted)] truncate font-sans">
-                                  {member.role || member.category}
-                                </div>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Link
-                                    to={`/team?member=${member.id}`}
-                                    onClick={() => setSelectedProject(null)}
-                                    className="text-[10px] font-sans text-[var(--accent-orange)] hover:underline inline-flex items-center gap-0.5 font-semibold"
-                                  >
-                                    Profile
-                                  </Link>
-                                  {member.linkedin && (
-                                    <a
-                                      href={member.linkedin}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-[10px] font-sans text-[var(--text-subtle)] hover:text-[var(--ink-dark)] inline-flex items-center gap-0.5"
-                                      onClick={e => e.stopPropagation()}
-                                    >
-                                      LinkedIn
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
                             </div>
                           ))}
                         </div>

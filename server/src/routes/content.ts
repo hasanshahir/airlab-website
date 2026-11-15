@@ -53,7 +53,7 @@ contentRouter.get('/:slug', async (req, res) => {
       if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1)
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed) && parsed.length > 0) {
-        res.set('Cache-Control', 'public, max-age=60')
+        res.set('Cache-Control', 'no-cache')
         return res.json(parsed)
       }
     } catch {
@@ -61,7 +61,7 @@ contentRouter.get('/:slug', async (req, res) => {
     }
   }
 
-  res.set('Cache-Control', 'public, max-age=60')
+  res.set('Cache-Control', 'no-cache')
   res.json(items)
 })
 

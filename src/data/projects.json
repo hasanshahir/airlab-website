@@ -12,10 +12,10 @@
     ],
     "description": "Familiar is a face recognition system evaluated on a newly collected, regionally diverse Pakistani dataset. It checks image quality before attempting recognition and adapts to local variations in lighting, glasses and facial hair, while remaining efficient on large databases. The prototype is intended for authorized uses such as searching campus camera footage, with humans making the final decision.",
     "teamMembers": [
-      "Muhammad Ayan (CT-23010)",
-      "Hamza Masood (CT-23016)",
-      "Muhammad Anas (CT-23035)",
-      "Bilal Ahmed (CT-23048)"
+      "Muhammad Obaid (CT-23025)",
+      "Akhyar Ahmed Turk (CT-23034)",
+      "Muhammad Rehan (CT-23039)",
+      "Qazi Asim Kamal (CT-23044)"
     ],
     "funding": "Indigenous Dataset Collection & Research Project",
     "grantSupplier": "Indigenous Dataset Collection & Research Project",
@@ -28,12 +28,6 @@
     "coverImage": "/projects/familiar.jpg",
     "images": [
       "/projects/familiar.jpg"
-    ],
-    "teamMembers": [
-      "Muhammad Obaid",
-      "Akhyar Ahmed Turk",
-      "Muhammad Rehan",
-      "Qazi Asim Kamal"
     ],
     "tags": [
       "Biometrics",
@@ -132,7 +126,7 @@
     ],
     "description": "Naqshkaar is an AI interior design platform for Pakistan that generates 3D room designs from a real catalogue of purchasable local products, scaled to true room dimensions and checked against space and budget limits. Unlike tools such as Planner 5D or RoomGPT, it uses PKR prices, accounts for local needs like ceiling-fan clearance, AC and UPS placement, and prayer space, and lets users pick each item from AI-shortlisted options. The result is a design they can visualize and buy, with an itemised cost estimate and direct purchase links.",
     "teamMembers": [
-      "Mureed Hussain (Team Lead - CT-23036)",
+      "Mureed Hussain (CT-23036)",
       "Muhammad Sami (CT-23027)",
       "Faiq Ahmed (CT-23030)",
       "Muhammad Sameed (CT-23046)"
@@ -149,12 +143,6 @@
     "coverImage": "/projects/naqshkaar.jpg",
     "images": [
       "/projects/naqshkaar.jpg"
-    ],
-    "teamMembers": [
-      "Mureed Hussain",
-      "Muhammad Sameed",
-      "Faiq Ahmed",
-      "Muhammad Sami"
     ],
     "tags": [
       "3D Interior Design",
@@ -381,10 +369,10 @@
     ],
     "description": "Strategic Agent is an AI platform that continuously collects market news, earnings reports, regulatory updates and social discussion, and turns them into concise, actionable summaries for business decision-makers. It extracts key trends, tracks competitors and flags sudden market shifts, replacing hours of manual searching with a single automated dashboard.",
     "teamMembers": [
-      "Aisha Siddiqa (CT-22001)",
-      "Syed Muhammad Daniyal (CT-22014)",
-      "Abdul Ahad (CT-22019)",
-      "Muhammad Daniyal (CT-22031)"
+      "Syed Anas Ahmed (AI-22013)",
+      "Fareeha Fatima (AI-22023)",
+      "Faraz Ahmed (AI-22028)",
+      "Sajeel Tariq (AI-22029)"
     ],
     "funding": "Undergraduate FYDP",
     "grantSupplier": "Undergraduate FYDP",
@@ -417,10 +405,10 @@
     ],
     "description": "This project builds an autonomous AI travel assistant that creates custom travel itineraries for Pakistan and monitors trips in real time. It factors in safety, weather, road conditions and personal preferences, and can adjust plans on the fly if routes close or conditions change. The system uses multiple specialized AI agents working together to give travelers a safer, more predictable journey.",
     "teamMembers": [
-      "Syed Muhammad Danial (DT-22009)",
-      "Muhammad Asjad (DT-22020)",
-      "Muhammad Anas (DT-22026)",
-      "Syeda Maria Zaidi (DT-22032)"
+      "Laibah Shahid (CT-22061)",
+      "Tooba Kashaf (CT-22068)",
+      "Haiqa Siddiqua (CT-22071)",
+      "Muhammad Zohaib Khan (CT-22072)"
     ],
     "funding": "NEDAASC Funded",
     "grantSupplier": "NEDAASC Funded",

@@ -40,7 +40,7 @@ export function getFinishedProjects(): ProjectItem[] {
 }
 
 export function getPublications(): PublicationItem[] {
-  return (publicationsData as PublicationItem[]).sort((a, b) => b.year - a.year)
+  return (publicationsData as PublicationItem[]).sort((a, b) => (b.year || 0) - (a.year || 0))
 }
 
 export function getPerformers(): PerformerItem[] {

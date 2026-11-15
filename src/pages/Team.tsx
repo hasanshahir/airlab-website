@@ -166,22 +166,23 @@ export default function Team() {
   }, [])
 
   const alumniList = useMemo(() => {
-    const list = [...HARDCODED_ALUMNI_INTERNS]
-    const candidates = [
-      ...(Array.isArray(sortedPreviousInterns) ? sortedPreviousInterns : []),
-      ...allMembersRaw.filter(m => m.category === 'Alumni' || (m.category as string) === 'Previous Interns'),
-    ]
+    const baseList = Array.isArray(sortedPreviousInterns) && sortedPreviousInterns.length > 0
+      ? [...sortedPreviousInterns]
+      : [...HARDCODED_ALUMNI_INTERNS]
+    const candidates = allMembersRaw.filter(
+      m => m.category === 'Alumni' || (m.category as string) === 'Previous Interns'
+    )
     for (const item of candidates) {
-      const idx = list.findIndex(
+      const idx = baseList.findIndex(
         m => m.id === item.id || (m.name && item.name && m.name.trim().toLowerCase() === item.name.trim().toLowerCase())
       )
       if (idx >= 0) {
-        list[idx] = { ...list[idx], ...item }
+        baseList[idx] = { ...baseList[idx], ...item }
       } else {
-        list.push(item)
+        baseList.push(item)
       }
     }
-    return list
+    return baseList
   }, [sortedPreviousInterns, allMembersRaw])
 
 

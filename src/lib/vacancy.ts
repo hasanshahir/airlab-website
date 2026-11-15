@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-/** Vacancy modal + top-ribbon copy, edited from the "Vacancies" tab in Google Sheets. */
+/** Vacancy modal + top-ribbon copy, managed strictly via the Admin Panel. */
 export interface VacancySettings {
   status: 'Open' | 'Closed'
   badge: string
@@ -22,36 +22,36 @@ export const DEFAULT_VACANCY_SETTINGS: VacancySettings = {
     'Applications are currently closed. Please check back soon or follow our updates for the next intake.',
 }
 
-function sanitizeVacancyCopy(data: Partial<VacancySettings> | null | undefined): VacancySettings {
+function normalizeVacancyCopy(data: Partial<VacancySettings> | null | undefined): VacancySettings {
   if (!data || typeof data !== 'object') return DEFAULT_VACANCY_SETTINGS
-  const isLegacyText = (val?: string) =>
-    !val || /internship|fellowship|vacanc/i.test(val)
 
   return {
     status: data.status === 'Closed' ? 'Closed' : 'Open',
-    badge: isLegacyText(data.badge) ? DEFAULT_VACANCY_SETTINGS.badge : data.badge!,
-    title: isLegacyText(data.title) ? DEFAULT_VACANCY_SETTINGS.title : data.title!,
-    description: isLegacyText(data.description) ? DEFAULT_VACANCY_SETTINGS.description : data.description!,
-    ribbonLabel:
-      !data.ribbonLabel || /open|internship|fellowship|vacanc/i.test(data.ribbonLabel)
-        ? DEFAULT_VACANCY_SETTINGS.ribbonLabel
-        : data.ribbonLabel,
-    ribbonText: isLegacyText(data.ribbonText) ? DEFAULT_VACANCY_SETTINGS.ribbonText : data.ribbonText!,
-    closedMessage: data.closedMessage || DEFAULT_VACANCY_SETTINGS.closedMessage,
+    badge: data.badge?.trim() || DEFAULT_VACANCY_SETTINGS.badge,
+    title: data.title?.trim() || DEFAULT_VACANCY_SETTINGS.title,
+    description: typeof data.description === 'string' ? data.description.trim() : DEFAULT_VACANCY_SETTINGS.description,
+    ribbonLabel: data.ribbonLabel?.trim() || DEFAULT_VACANCY_SETTINGS.ribbonLabel,
+    ribbonText: data.ribbonText?.trim() || DEFAULT_VACANCY_SETTINGS.ribbonText,
+    closedMessage: data.closedMessage?.trim() || DEFAULT_VACANCY_SETTINGS.closedMessage,
   }
 }
 
-// One shared request per page load, reused by every component that needs it.
+// Shared cache with ability to invalidate when updated via Admin Panel
 let cache: VacancySettings | null = null
 let inflight: Promise<VacancySettings> | null = null
+
+export function invalidateVacancyCache(nextSettings?: VacancySettings) {
+  cache = nextSettings ? normalizeVacancyCopy(nextSettings) : null
+  inflight = null
+}
 
 function loadVacancySettings(): Promise<VacancySettings> {
   if (cache) return Promise.resolve(cache)
   if (!inflight) {
-    const req: Promise<VacancySettings> = fetch('/api/settings/vacancy')
+    const req: Promise<VacancySettings> = fetch('/api/settings/vacancy', { cache: 'no-store' })
       .then(r => (r.ok ? r.json() : null))
       .then((data): VacancySettings => {
-        const resolved = sanitizeVacancyCopy(data)
+        const resolved = normalizeVacancyCopy(data)
         cache = resolved
         return resolved
       })

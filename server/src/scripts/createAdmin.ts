@@ -10,13 +10,24 @@ if (!name || !email || !password) {
   process.exit(1)
 }
 
+if (password.length < 8) {
+  console.error('❌ Password must be at least 8 characters long.')
+  process.exit(1)
+}
+
 async function main() {
   await connectDB()
-  const passwordHash = await bcrypt.hash(password, 10)
+  const passwordHash = await bcrypt.hash(password, 12)
 
   const admin = await AdminModel.findOneAndUpdate(
-    { email: email.toLowerCase() },
-    { name, email: email.toLowerCase(), passwordHash },
+    { email: email.toLowerCase().trim() },
+    {
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      passwordHash,
+      failedLoginAttempts: 0,
+      lockUntil: null,
+    },
     { upsert: true, new: true }
   )
 
