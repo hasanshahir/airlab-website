@@ -379,9 +379,10 @@ export default function Home() {
           <CoverflowCarousel
             slides={HERO_CAROUSEL_IMAGES}
             autoPlay
-            transitionDuration={680}
-            pauseDuration={1100}
-            cardWidth="clamp(275px, 36vw, 440px)"
+            transitionDuration={850}
+            pauseDuration={850}
+            cardWidth="min(80cqh, 74cqw)"
+            gap={-0.06}
             label="AIR Lab Hero Coverflow Carousel"
             className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
           >
@@ -390,7 +391,7 @@ export default function Home() {
         )}
 
         {/* ── CAROUSEL VERSION TOGGLE (V1 / V2) RIGHT BELOW THE CAROUSEL ── */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 pt-3 flex items-center justify-center">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 pt-1.5 flex items-center justify-center">
           <div
             role="radiogroup"
             aria-label="Hero Carousel Version"

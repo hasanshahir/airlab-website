@@ -35,13 +35,13 @@ export interface CoverflowCarouselProps {
   loop?: boolean;
   /** Automatically animate right-to-left, pause on each centered card, and repeat. */
   autoPlay?: boolean;
-  /** Duration in ms of the quick slide transition between cards. @default 680 */
+  /** Duration in ms of the smooth glide between cards. @default 850 */
   transitionDuration?: number;
-  /** Pause in ms after landing on the centered view before advancing. @default 1100 */
+  /** Pause in ms after landing on the centered view before advancing. @default 850 */
   pauseDuration?: number;
-  /** Legacy prop alias (seconds) — if provided, scales transition/pause timing. */
+  /** Legacy prop alias (seconds). */
   speed?: number;
-  /** Width of the horizontal edge fade mask in percent (0 disables). @default 12 */
+  /** Width of the horizontal edge fade mask in percent (0 disables). @default 10 */
   edgeFade?: number;
   showCaption?: boolean;
   showPagination?: boolean;
@@ -56,18 +56,18 @@ export interface CoverflowCarouselProps {
 
 export function CoverflowCarousel({
   slides,
-  rotate = 44,
-  depth = 0.6,
+  rotate = 42,
+  depth = 0.52,
   perspective = 3,
   falloff = 0.56,
-  fade = 0.1,
-  cardWidth = "clamp(275px, 36vw, 440px)",
-  gap = 0.05,
+  fade = 0.08,
+  cardWidth = "min(80cqh, 74cqw)",
+  gap = -0.06,
   loop = true,
   autoPlay = true,
-  transitionDuration = 680,
-  pauseDuration = 1100,
-  edgeFade = 12,
+  transitionDuration = 850,
+  pauseDuration = 850,
+  edgeFade = 10,
   showCaption = false,
   showPagination = false,
   showNavigation = false,
@@ -76,7 +76,18 @@ export function CoverflowCarousel({
   className,
   cardClassName,
 }: CoverflowCarouselProps) {
-  const count = slides.length;
+  const baseCount = slides.length;
+
+  // When looping with a small slide list (e.g. 5 hero photos), repeat the list
+  // around the 3D ring so outer cards at ±2 and ±3 stay at full presence and
+  // only wrap at ±5 well outside the viewport.
+  const ringSlides = React.useMemo(() => {
+    if (!loop || baseCount === 0 || baseCount >= 10) return slides;
+    const repeats = Math.ceil(10 / baseCount);
+    return Array.from({ length: repeats }, () => slides).flat();
+  }, [baseCount, loop, slides]);
+
+  const count = ringSlides.length;
 
   const frameRef = React.useRef<HTMLDivElement>(null);
   const cardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
@@ -108,10 +119,11 @@ export function CoverflowCarousel({
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  /** Nearest whole card, folded back into 0..count-1. */
+  /** Nearest whole card, folded back into 0..baseCount-1. */
   const indexAt = React.useCallback(
-    (pos: number) => (count > 0 ? ((Math.round(pos) % count) + count) % count : 0),
-    [count],
+    (pos: number) =>
+      baseCount > 0 ? ((Math.round(pos) % baseCount) + baseCount) % baseCount : 0,
+    [baseCount],
   );
 
   const syncSelected = React.useCallback(
@@ -136,8 +148,7 @@ export function CoverflowCarousel({
     cardRefs.current.forEach((card, index) => {
       if (!card) return;
 
-      // Fold the distance into the shorter way round the ring. This is the
-      // whole looping mechanism — no cloned nodes, no shuffling the DOM.
+      // Fold the distance into the shorter way round the ring.
       let offset = index - pos;
       if (loop && count > 0) {
         offset = ((offset % count) + count) % count;
@@ -145,18 +156,14 @@ export function CoverflowCarousel({
       }
 
       const distance = Math.abs(offset);
-      // Both the tilt and the recession ease off as cards travel out —
-      // doubling the distance adds only about half again as much of each.
       const ramp = Math.pow(distance, falloff);
-      // Capped short of edge-on so a far card never turns its back.
       const tilt = Math.min(rotate * ramp, 82) * Math.sign(offset);
 
       card.style.transform =
         `translateX(calc(-50% + ${offset * pitch}px)) ` +
         `translateZ(${-depth * width * ramp}px) rotateY(${-tilt}deg)`;
 
-      // A card is teleported across the ring at exactly half a turn out, so it
-      // has to be gone by then or the jump is visible.
+      // Fade smoothly before the half-turn wrap point off-screen.
       const edge = loop ? Math.min(1, Math.max(0, count / 2 - distance)) : 1;
       card.style.opacity = String(Math.max(0, 1 - fade * distance) * edge);
       card.style.zIndex = String(1000 - Math.round(distance * 100));
@@ -178,8 +185,8 @@ export function CoverflowCarousel({
     [count, loop],
   );
 
-  // Smoothly animate `posRef` to `target` over `transitionDuration` ms,
-  // land on the centered view, pause for `pauseDuration` ms, and repeat.
+  // Smoothly animate `posRef` to `target` using a sine ease-in-out S-curve
+  // (zero velocity jump on start/stop), pause briefly on the centered view, and repeat.
   const settle = React.useCallback(
     function runSettle(target: number) {
       clearPauseTimer();
@@ -200,7 +207,7 @@ export function CoverflowCarousel({
         pauseTimerRef.current = setTimeout(() => {
           pauseTimerRef.current = null;
           if (dragRef.current !== null) return;
-          // Advance +1 so cards glide from right to left and land on the next centered view.
+          // Advance +1 so cards glide seamlessly from right to left.
           runSettle(clamp(Math.round(targetRef.current) + 1));
         }, pauseDuration);
       };
@@ -213,13 +220,13 @@ export function CoverflowCarousel({
       }
 
       const startTime = performance.now();
-      const duration = Math.max(180, transitionDuration);
+      const duration = Math.max(220, transitionDuration);
 
       const step = (now: number) => {
         const elapsed = now - startTime;
         const t = Math.min(1, elapsed / duration);
-        // Smooth cubic ease-out: quick initial motion, crisp gentle landing on center.
-        const eased = 1 - Math.pow(1 - t, 3);
+        // Sine S-curve: gentle acceleration from rest + feather-soft landing on center.
+        const eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
         posRef.current = startPos + delta * eased;
         paint();
 
@@ -247,8 +254,6 @@ export function CoverflowCarousel({
     ],
   );
 
-  // Kick off the initial quick entrance animation into the default view (0),
-  // then pause ~1s and repeat right-to-left.
   React.useEffect(() => {
     if (!canAutoPlay) return;
     settle(Math.round(targetRef.current));
@@ -263,13 +268,13 @@ export function CoverflowCarousel({
 
   const goTo = React.useCallback(
     (index: number) => {
-      // Take the shorter way round rather than unwinding the whole ring.
+      const span = baseCount || 1;
       const target = loop
-        ? index + Math.round((targetRef.current - index) / count) * count
+        ? index + Math.round((targetRef.current - index) / span) * span
         : index;
       settle(clamp(target));
     },
-    [clamp, count, loop, settle],
+    [baseCount, clamp, loop, settle],
   );
 
   const nudge = React.useCallback(
@@ -304,7 +309,6 @@ export function CoverflowCarousel({
     const now = performance.now();
     const previous = posRef.current;
     posRef.current = clamp(drag.pos - (event.clientX - drag.x) / pitch);
-    // Cards per second, for the throw.
     drag.v = ((posRef.current - previous) / Math.max(now - drag.t, 1)) * 1000;
     drag.t = now;
 
@@ -316,13 +320,10 @@ export function CoverflowCarousel({
     const drag = dragRef.current;
     if (!drag || drag.id !== event.pointerId) return;
     dragRef.current = null;
-    // Let a flick carry, but never more than two cards.
     const carried = Math.max(-2, Math.min(2, drag.v * 0.18));
     settle(clamp(Math.round(posRef.current + carried)));
   };
 
-  // Card width drives pitch, depth and perspective, so it is the only thing
-  // worth measuring — and only when the box actually changes.
   useIsoLayoutEffect(() => {
     const frame = frameRef.current;
     if (!frame) return;
@@ -359,7 +360,10 @@ export function CoverflowCarousel({
   return (
     <div
       className={cn("relative w-full overflow-hidden", className)}
-      style={{ ["--cf-card" as string]: cardWidth }}
+      style={{
+        containerType: "size",
+        ["--cf-card" as string]: cardWidth,
+      }}
       role="region"
       aria-roledescription="carousel"
       aria-label={label}
@@ -386,11 +390,9 @@ export function CoverflowCarousel({
               nudge(1);
             }
           }}
-          // Vertical padding keeps the drop shadows clear of the overflow clip.
-          className="w-full cursor-grab overflow-hidden py-10 outline-none ring-ring focus-visible:ring-2 active:cursor-grabbing"
+          className="w-full cursor-grab overflow-hidden py-3 outline-none ring-ring focus-visible:ring-2 active:cursor-grabbing"
           style={{
             perspective: `calc(var(--cf-card) * ${perspective})`,
-            // Horizontal drag is ours; the page keeps vertical scrolling.
             touchAction: "pan-y",
             maskImage: mask,
             WebkitMaskImage: mask,
@@ -403,7 +405,7 @@ export function CoverflowCarousel({
               transformStyle: "preserve-3d",
             }}
           >
-            {slides.map((slide, index) => (
+            {ringSlides.map((slide, index) => (
               <div
                 key={`${slide.src}-${index}`}
                 ref={(node) => {
@@ -411,9 +413,9 @@ export function CoverflowCarousel({
                 }}
                 role="group"
                 aria-roledescription="slide"
-                aria-label={`${index + 1} of ${count}`}
+                aria-label={`${(index % Math.max(baseCount, 1)) + 1} of ${baseCount}`}
                 className={cn(
-                  "absolute left-1/2 top-0 aspect-square overflow-hidden rounded-2xl bg-muted shadow-xl will-change-transform",
+                  "absolute left-1/2 top-0 aspect-square overflow-hidden rounded-xl bg-muted shadow-lg will-change-transform",
                   cardClassName,
                 )}
                 style={{ width: "var(--cf-card)" }}
