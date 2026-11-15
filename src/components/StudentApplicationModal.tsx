@@ -22,7 +22,7 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
     email: '',
     phone: '',
     rollNo: '',
-    designation: 'Research Intern (Undergraduate)',
+    designation: 'Research Intern',
     department: 'Computer Science & IT',
     program: 'Undergraduate BS (3rd/4th Year)',
     track: 'Foundational LLMs & Urdu NLP',
@@ -288,14 +288,10 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                           onChange={e => setFormData({ ...formData, designation: e.target.value })}
                           className="w-full pl-10 pr-3.5 h-10 sm:h-11 rounded-xl border border-neutral-300 bg-neutral-50 text-[13.5px] text-neutral-900 focus:bg-white focus:border-[#ff5500] focus:ring-2 focus:ring-[#ff5500]/20 transition-all font-sans cursor-pointer font-medium"
                         >
-                          <option value="Research Intern (Undergraduate)">Research Intern (Undergraduate)</option>
-                          <option value="Graduate Research Assistant (MS / PhD)">Graduate Research Assistant (MS / PhD)</option>
-                          <option value="NLP & Large Language Models Fellow">NLP &amp; Large Language Models Fellow</option>
-                          <option value="Computer Vision & Edge AI Researcher">Computer Vision &amp; Edge AI Researcher</option>
-                          <option value="Autonomous Robotics & SLAM Engineer">Autonomous Robotics &amp; SLAM Engineer</option>
-                          <option value="AI Systems Full-Stack Developer">AI Systems Full-Stack Developer</option>
-                          <option value="Clinical AI & Healthcare Data Fellow">Clinical AI &amp; Healthcare Data Fellow</option>
-                          <option value="Visiting Research Fellow">Visiting Research Fellow</option>
+                          <option value="Research Intern">Research Intern (Undergraduate / Fresh Graduate)</option>
+                          <option value="Graduate Research Assistant (GRA)">Graduate Research Assistant (GRA — MS / PhD)</option>
+                          <option value="Research Fellow / AI Systems Engineer">Research Fellow / AI Systems Engineer (Full-Time)</option>
+                          <option value="Visiting Research Fellow">Visiting Research Fellow (External Collaborator)</option>
                         </select>
                       </div>
                     </div>

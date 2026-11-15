@@ -16,8 +16,8 @@ import rawTeam from '../data/team.json'
 import type { ProjectItem, TeamMemberData } from '../types/data'
 import { getMemberAvatar } from '../lib/placeholders'
 
-const projectsData = rawProjects as unknown as ProjectItem[]
-const teamData = rawTeam as unknown as TeamMemberData[]
+const initialProjectsData = rawProjects as unknown as ProjectItem[]
+const initialTeamData = rawTeam as unknown as TeamMemberData[]
 
 
 interface QuickDrawerProps {
@@ -38,6 +38,23 @@ export default function QuickDrawer({
   const [tab, setTab] = useState<'projects' | 'members'>(initialTab)
   const [searchQuery, setSearchQuery] = useState('')
   const [memberFilter, setMemberFilter] = useState<'All' | 'Faculty' | 'Research Interns'>('All')
+  const [projectsData, setProjectsData] = useState<ProjectItem[]>(initialProjectsData)
+  const [teamData, setTeamData] = useState<TeamMemberData[]>(initialTeamData)
+
+  useEffect(() => {
+    let active = true
+    Promise.all([
+      fetch('/api/content/projects').then(r => (r.ok ? r.json() : [])).catch(() => []),
+      fetch('/api/content/team').then(r => (r.ok ? r.json() : [])).catch(() => []),
+    ]).then(([projs, team]) => {
+      if (!active) return
+      if (Array.isArray(projs) && projs.length > 0) setProjectsData(projs)
+      if (Array.isArray(team) && team.length > 0) setTeamData(team)
+    })
+    return () => {
+      active = false
+    }
+  }, [])
 
   // Sync tab if initialTab changes when opening
   useEffect(() => {
@@ -98,7 +115,7 @@ export default function QuickDrawer({
 
       return parseDateScore(b.startDate || b.timeTaken) - parseDateScore(a.startDate || a.timeTaken)
     })
-  }, [searchQuery])
+  }, [searchQuery, projectsData])
 
   // Filtered members
   const filteredMembers = teamData.filter(m => {

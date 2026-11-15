@@ -6,6 +6,8 @@ export const APPLICATION_STATUSES = ['New', 'Shortlisted', 'Rejected', 'Accepted
 const ApplicationSchema = new Schema(
   {
     position: { type: Schema.Types.ObjectId, ref: 'Position', required: false, index: true },
+    positionTitle: { type: String, trim: true, default: 'Research Intern' },
+    designation: { type: String, trim: true },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
     phone: { type: String, required: true, trim: true },

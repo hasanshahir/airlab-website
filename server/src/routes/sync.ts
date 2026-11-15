@@ -195,6 +195,13 @@ syncRouter.get('/applications', async (req, res, next) => {
         }
       }
 
+      let positionTitle = d.positionTitle || d.designation || ''
+      if (!positionTitle && degStr) {
+        const posMatch = degStr.match(/^([^\u2014\-]+)\s*[\u2014\-]/)
+        if (posMatch) positionTitle = posMatch[1].trim()
+      }
+      if (!positionTitle) positionTitle = 'Research Intern'
+
       return {
         applicationId: String(d._id),
         submittedAt: d.createdAt,
@@ -202,6 +209,8 @@ syncRouter.get('/applications', async (req, res, next) => {
         fullName: d.name,
         email: d.email,
         phone: d.phone,
+        positionTitle,
+        designation: positionTitle,
         rollNo,
         department,
         program,
@@ -284,7 +293,7 @@ syncRouter.post('/cleanup', async (req, res, next) => {
       }
       if (slug === 'projects') {
         filters.push({ id: { $type: 'number' } })
-        filters.push({ id: { $in: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'PRJ-1', 'PRJ-2', 'PRJ-3', 'PRJ-4', 'PRJ-5', 'PRJ-6', 'PRJ-7', 'PRJ-8', 'PRJ-9', 'PRJ-10'] } })
+        filters.push({ id: { $in: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'PRJ-1', 'PRJ-2', 'PRJ-3', 'PRJ-4', 'PRJ-5', 'PRJ-6', 'PRJ-7', 'PRJ-8', 'PRJ-9', 'PRJ-10', 'PRJ-NED-SAC'] } })
       }
       if (['interns', 'previous-interns', 'gallery', 'collaborations', 'performers', 'blogs', 'grants', 'publications', 'sponsors'].includes(slug)) {
         const r = await model.deleteMany({})
@@ -371,11 +380,25 @@ syncRouter.post('/sheets', async (req, res, next) => {
         await projectsModel.deleteMany({
           $or: [
             { id: { $type: 'number' } },
-            { id: { $in: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'PRJ-1', 'PRJ-2', 'PRJ-3', 'PRJ-4', 'PRJ-5', 'PRJ-6', 'PRJ-7', 'PRJ-8', 'PRJ-9', 'PRJ-10'] } },
+            { id: { $in: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'PRJ-1', 'PRJ-2', 'PRJ-3', 'PRJ-4', 'PRJ-5', 'PRJ-6', 'PRJ-7', 'PRJ-8', 'PRJ-9', 'PRJ-10', 'PRJ-NED-SAC'] } },
             { coverImage: { $regex: 'unsplash\\.com', $options: 'i' } },
             { placeholder: true },
           ],
         })
+      }
+
+      const grantsModelCleanup = contentModels.get('grants')
+      if (grantsModelCleanup && Array.isArray(fundedProjects)) {
+        if (clearBeforeSync) {
+          await grantsModelCleanup.deleteMany({})
+        } else if (removePlaceholders) {
+          await grantsModelCleanup.deleteMany({
+            $or: [
+              { id: { $in: ['grant-meta-pytorch', 'grant-google-academic', 'grant-ignite-ncbc', 'grant-nedaasc-travel'] } },
+              { placeholder: true },
+            ],
+          })
+        }
       }
     }
 
@@ -389,26 +412,33 @@ syncRouter.post('/sheets', async (req, res, next) => {
 
         stats.facultyAndInterns.processed++
         const roleRaw = (parseString(row.Role || row.role) || '').toLowerCase()
+        const isAlumni =
+          roleRaw.includes('alumni') ||
+          roleRaw.includes('former') ||
+          roleRaw.includes('past')
         const isFaculty =
-          roleRaw.includes('fac') ||
-          roleRaw.includes('prof') ||
-          roleRaw.includes('dr') ||
-          row.category === 'Faculty' ||
-          Boolean(row.isLead) ||
-          name.toLowerCase().includes('marvi') ||
-          name.toLowerCase().includes('mubashir')
-        const category = isFaculty ? 'Faculty' : 'Research Interns'
-        const role = parseString(row.Role || row.role) || (isFaculty ? 'Faculty Member' : 'Research Intern')
-        const isLead = Boolean(row.isLead || name.toLowerCase().includes('marvi') || name.toLowerCase().includes('mubashir'))
+          !isAlumni && (
+            roleRaw.includes('fac') ||
+            roleRaw.includes('prof') ||
+            roleRaw.includes('dr') ||
+            row.category === 'Faculty' ||
+            Boolean(row.isLead) ||
+            name.toLowerCase().includes('marvi') ||
+            name.toLowerCase().includes('mubashir')
+          )
+        const category = isAlumni ? 'Alumni' : isFaculty ? 'Faculty' : 'Research Interns'
+        const role = parseString(row.Role || row.role) || (isFaculty ? 'Faculty Member' : isAlumni ? 'Former Research Intern' : 'Research Intern')
+        const isLead = Boolean(!isAlumni && (row.isLead || name.toLowerCase().includes('marvi') || name.toLowerCase().includes('mubashir')))
         const image = parseString(row.image) || (name.toLowerCase().includes('marvi') ? './pfp/marvi.jpeg' : '')
         const email = parseString(row.Email || row.email)
         const linkedin = parseString(row.Linkedin || row.linkedin)
         const cvUrl = parseString(row.Resume || row.resume || row.CV || row.cv || row.cvUrl || row['Resume Link'] || row['CV Link'])
         const specialty = parseString(row.Specialty || row.specialty || row.tags)
         const tags = specialty ? parseStringList(specialty) : []
+        const dept = parseString(row.Dept || row.dept || row.Department || row.department) || 'Computer Science & IT'
 
         // ID resolution: use explicit ID if provided, otherwise stable slug derived from name
-        const rawId = parseString(row.id || row.ID) || (isFaculty ? `fac-${slugify(name)}` : `ri-${slugify(name)}`)
+        const rawId = parseString(row.id || row.ID) || (isAlumni ? `pri-${slugify(name)}` : isFaculty ? `fac-${slugify(name)}` : `ri-${slugify(name)}`)
 
         const docData: Record<string, any> = {
           id: rawId,
@@ -417,6 +447,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
           role,
           email,
           linkedin,
+          department: dept,
           cvUrl: cvUrl || '',
           researchFocus: specialty,
           tags,
@@ -426,6 +457,24 @@ syncRouter.post('/sheets', async (req, res, next) => {
         }
 
         if (!dryRun) {
+          if (isAlumni) {
+            const prevModel = contentModels.get('previous-interns')
+            if (prevModel) {
+              await prevModel.findOneAndUpdate(
+                { $or: [{ id: rawId }, { name: new RegExp(`^${name.trim()}$`, 'i') }] },
+                {
+                  id: rawId,
+                  name,
+                  email,
+                  linkedin,
+                  tenure: role,
+                  department: dept,
+                  published: true,
+                },
+                { upsert: true, new: true }
+              )
+            }
+          }
           // Look up by ID, or email, or exact name
           const filter: any = {
             $or: [{ id: rawId }],
@@ -517,6 +566,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
         const pi = parseString(row['Name of PI'] || row.pi || row.leadInvestigator)
         const grantAmount = parseString(row['Grant Amour'] || row['Grant Amount'] || row.grantAmount)
         const funderUrl = parseString(row['Funder Website'] || row.funderUrl)
+        const pictures = parseString(row.Pictures || row.pictures || row.coverImage)
 
         const rawId = parseString(row.id || row.ID) || `fnd-${slugify(title).slice(0, 36)}`
 
@@ -530,6 +580,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
           funding: grantSupplier || '',
           timeTaken: timeTaken || '',
           startDate: timeTaken || '',
+          coverImage: pictures || '',
           description: projectDetails || '',
           pi: pi || '',
           grantAmount: grantAmount || '',
@@ -566,6 +617,7 @@ syncRouter.post('/sheets', async (req, res, next) => {
               leadInvestigator: pi || '',
               description: projectDetails || '',
               url: funderUrl || '',
+              image: pictures || '',
               published: true,
             }
             const grantFilter: any = {

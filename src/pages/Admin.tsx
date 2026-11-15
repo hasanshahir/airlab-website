@@ -381,6 +381,11 @@ export default function AdminDashboard() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-sm">{app.name}</span>
+                      {(app.positionTitle || app.designation) && (
+                        <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-orange-500/10 text-[#ff5500] border border-[#ff5500]/20">
+                          {app.positionTitle || app.designation}
+                        </span>
+                      )}
                       <span className="text-xs text-[var(--text-muted)] font-sans">({app.university})</span>
                       <span
                         className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${

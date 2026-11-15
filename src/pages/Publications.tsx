@@ -2,49 +2,28 @@ import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, Award, FileText, Download, ExternalLink, Search, Clock, ArrowRight } from 'lucide-react'
 import { getPublications } from '../lib/data'
+import rawBlogs from '../data/blogs.json'
 import SectionReveal from '../components/ui/SectionReveal'
-
-const labBlogs = [
-  {
-    id: 'blog-1',
-    title: 'Fine-Tuning Transformer Architectures on Low-Resource Urdu Corpora',
-    author: 'AIR Lab NLP Group',
-    date: 'October 2026',
-    readTime: '6 min read',
-    tags: ['NLP', 'Transformers', 'Urdu LLM'],
-    excerpt: 'A technical deep-dive into byte-level BPE tokenization, vocabulary compression, and parameter-efficient LoRA adapters tailored for regional South Asian linguistic nuance.',
-  },
-  {
-    id: 'blog-2',
-    title: 'Optimizing TensorRT INT8 Neural Inference for Micro-UAV Robotics',
-    author: 'Robotics & Embedded Vision Team',
-    date: 'September 2026',
-    readTime: '8 min read',
-    tags: ['Robotics', 'TensorRT', 'Edge AI'],
-    excerpt: 'Achieving sub-12ms spatial visual odometry on embedded NVIDIA Jetson platforms while managing rigorous thermal constraints and limited flight power envelopes.',
-  },
-  {
-    id: 'blog-3',
-    title: 'Deployment Lessons: Explainable Deep Learning in Clinical Radiology Screening',
-    author: 'Medical AI Research Division',
-    date: 'August 2026',
-    readTime: '5 min read',
-    tags: ['Healthcare', 'Clinical AI', 'Explainability'],
-    excerpt: 'Key findings from hospital pilot trials evaluating vision-language models for assisted automated chest radiograph reporting across partner clinical centers.',
-  },
-]
 
 export default function Publications() {
   const [searchQuery, setSearchQuery] = useState('')
   const [copiedId, setCopiedId] = useState<number | null>(null)
 
   const [pubData, setPubData] = useState<any[]>(() => getPublications())
+  const [blogsData, setBlogsData] = useState<any[]>(() => (Array.isArray(rawBlogs) ? rawBlogs : []))
 
   useEffect(() => {
     fetch('/api/content/publications')
       .then(r => r.ok ? r.json() : [])
       .then(d => {
         if (Array.isArray(d)) setPubData(d)
+      })
+      .catch(() => { })
+
+    fetch('/api/content/blogs')
+      .then(r => r.ok ? r.json() : [])
+      .then(d => {
+        if (Array.isArray(d)) setBlogsData(d)
       })
       .catch(() => { })
   }, [])
@@ -270,53 +249,63 @@ export default function Publications() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {labBlogs.map(blog => (
-            <article
-              key={blog.id}
-              className="p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-4 font-medium">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                    <span>{blog.readTime}</span>
+        {blogsData.length === 0 ? (
+          <div className="text-center py-20 border border-dashed border-[var(--border-hairline)] rounded-3xl bg-[var(--bg-surface)]">
+            <p className="text-sm font-sans text-[var(--text-muted)]">
+              No blog posts published yet.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {blogsData.map((blog: any) => (
+              <article
+                key={blog.id}
+                className="p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-4 font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                      <span>{blog.readTime || 'Research Dispatch'}</span>
+                    </div>
+                    <span>{blog.date}</span>
                   </div>
-                  <span>{blog.date}</span>
+
+                  <h3 className="text-lg font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-3">
+                    {blog.title}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed font-normal mb-5">
+                    {blog.excerpt}
+                  </p>
+
+                  {Array.isArray(blog.tags) && blog.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-6">
+                      {blog.tags.map((tag: string) => (
+                        <span
+                          key={tag}
+                          className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] font-medium"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <h3 className="text-lg font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-3">
-                  {blog.title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed font-normal mb-5">
-                  {blog.excerpt}
-                </p>
-
-                <div className="flex flex-wrap gap-1.5 mb-6">
-                  {blog.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="px-2.5 py-0.5 rounded-full text-[11px] font-sans bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)] font-medium"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
+                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
+                  <span className="text-xs font-semibold text-[var(--text-primary)]">
+                    {blog.author}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:translate-x-1 transition-transform">
+                    <span>Read Notes</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </span>
                 </div>
-              </div>
-
-              <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
-                <span className="text-xs font-semibold text-[var(--text-primary)]">
-                  {blog.author}
-                </span>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:translate-x-1 transition-transform">
-                  <span>Read Notes</span>
-                  <ArrowRight className="w-3 h-3" />
-                </span>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   )

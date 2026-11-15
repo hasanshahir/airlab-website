@@ -7,15 +7,9 @@ const collaborationsData = rawCollaborations as unknown as CollaborationItem[]
 import SectionReveal from '../components/ui/SectionReveal'
 
 const partnersList = [
-  { name: 'PLAID', type: 'Fintech AI' },
-  { name: 'Grasshopper', type: 'Autonomous Systems' },
-  { name: 'PAI 02', type: 'Robotics Labs' },
-  { name: 'commune', type: 'Community Tech' },
-  { name: 'Google DeepMind', type: 'Foundation Models' },
-  { name: 'Numeral', type: 'Automated Accounting' },
-  { name: 'Perplexity AI', type: 'Conversational Search' },
-  { name: 'NVIDIA Research', type: 'Compute Architecture' },
-  { name: 'HEC Pakistan', type: 'National Grants' },
+  { name: 'Sindh HEC', type: 'Government Research Grants' },
+  { name: 'SIEHS', type: 'Emergency Healthcare FYDP Partner' },
+  { name: 'NEDAASC', type: 'Alumni Research Funding' },
   { name: 'NEDUET CSIT', type: 'Academic Department' },
 ]
 
@@ -50,7 +44,7 @@ export default function Collaborations() {
 
       {/* ── Partner Organization Logos ── */}
       <div className="mb-20 text-left">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {partnersList.map((partner, idx) => (
             <SectionReveal key={partner.name} staggerIndex={idx}>
               <div className="h-28 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] p-4 flex flex-col items-center justify-center text-center hover:border-[var(--accent-orange)]/40 hover:shadow-sm transition-all duration-200">

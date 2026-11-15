@@ -30,6 +30,7 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
     const { positionId, name, email, phone, university, degreeYear, coverNote, github, linkedin } = req.body
     // Structured fields (sent by the current form) so Sheets gets clean, separate columns.
     const { rollNo, department, program, track, statement } = req.body
+    const positionTitleFromBody = req.body.positionTitle || req.body.designation
 
     if (!name || !email || !phone || !university || !degreeYear) {
       throw new HttpError(400, 'Missing required applicant fields')
@@ -68,6 +69,8 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
       if (mongoose.connection.readyState === 1) {
         const application = await ApplicationModel.create({
           position: assignedPosition,
+          positionTitle: positionTitleFromBody || 'Research Intern',
+          designation: positionTitleFromBody || 'Research Intern',
           name,
           email,
           phone,
@@ -92,9 +95,9 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
 
     console.log(`📩 Application received from ${name} (${email})`)
 
-    let positionTitle: string | undefined
+    let positionTitle: string | undefined = positionTitleFromBody
     try {
-      if (assignedPosition && mongoose.connection.readyState === 1) {
+      if (!positionTitle && assignedPosition && mongoose.connection.readyState === 1) {
         const posDoc = await PositionModel.findById(assignedPosition).lean()
         if (posDoc) positionTitle = posDoc.title
       }
@@ -110,7 +113,7 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
       applicantPhone: phone,
       university,
       degreeYear,
-      positionTitle,
+      positionTitle: positionTitle || 'Research Intern',
       coverNote,
       github,
       linkedin,
@@ -129,6 +132,8 @@ applicationsRouter.post('/', upload.single('cv'), async (req, res, next) => {
       name,
       email,
       phone,
+      positionTitle: positionTitle || 'Research Intern',
+      designation: positionTitle || 'Research Intern',
       rollNo,
       department,
       program,

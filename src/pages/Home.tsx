@@ -1,8 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   Brain,
-  Bot,
   Code,
   LineChart,
   Layers,
@@ -16,68 +15,35 @@ import {
   ShieldAlert,
   ShieldCheck,
   Terminal,
-  Images,
-  Box,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
-import airLabMark from '../assets/air-lab-mark.png'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
-import HeroBackgroundSlideshow, { LAB_SLIDES } from '../components/HeroBackgroundSlideshow'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
+import { getProjects, getGrants } from '../lib/data'
+import { useVacancySettings } from '../lib/vacancy'
+import type { ProjectItem, Grant } from '../types/data'
 
-const HERO_CAROUSEL_IMAGES = LAB_SLIDES.map(({ src, alt }) => ({ src, alt }))
-
-const recentUpdates = [
+const HERO_CAROUSEL_IMAGES = [
   {
-    id: 'update-1',
-    category: 'NLP Research',
-    date: 'Recent Release',
-    title: 'Urdu Multilingual LLM Pretraining Milestone',
-    desc: 'Pretraining byte-level tokenizers and parameter-efficient LoRA fine-tuning pipelines tailored for low-resource regional dialects.',
-    link: '/projects#PRJ-1',
-    actionText: 'Explore Project',
-    icon: Brain,
+    src: '/carousel-images/6530466a-3815-4434-a181-85e97c3ae385.jpg',
+    alt: 'AIR Lab Research & Prototyping Laboratory',
   },
   {
-    id: 'update-2',
-    category: 'Fellowships',
-    date: 'Admissions Open',
-    title: 'Fall 2026 Student Research Fellowships Open',
-    desc: 'Funded fellowship positions open for graduate and undergraduate scholars in edge AI, vision odometry, and TinyML acceleration.',
-    actionType: 'apply',
-    actionText: 'Apply for Vacancy',
-    icon: GraduationCap,
+    src: '/carousel-images/6a392586-ef4f-41db-9be7-cee1a0018f1f.jpg',
+    alt: 'High Performance Neural Computing Rig',
   },
   {
-    id: 'update-3',
-    category: 'Robotics Lab',
-    date: 'Lab Benchmark',
-    title: 'Autonomous UAV Edge Perception Trial Completed',
-    desc: 'Field testing real-time visual odometry and edge neural inference algorithms on embedded Jetson computing hardware.',
-    link: '/projects#PRJ-6',
-    actionText: 'View Benchmark',
-    icon: Bot,
+    src: '/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg',
+    alt: 'Interdisciplinary Student Collaboration & ML Pipelines',
   },
   {
-    id: 'update-4',
-    category: 'Student Spotlight',
-    date: 'Monthly Honors',
-    title: 'Performer of the Month Research Spotlight',
-    desc: 'Honoring student researchers and lab fellows for groundbreaking contributions to multi-modal clinical diagnostic models.',
-    link: '/performers',
-    actionText: 'Meet Performers',
-    icon: Award,
+    src: '/carousel-images/adc711cf-26d5-4a13-ac9f-4e29f0cf13d7.jpg',
+    alt: 'AIR Lab Research Fellows Station',
   },
   {
-    id: 'update-5',
-    category: 'Research Grants',
-    date: 'Active Grants',
-    title: 'National Infrastructure & Smart Grid Funding',
-    desc: 'Secured competitive collaborative funding for power grid surge forecasting and renewable dispatch transformer models.',
-    link: '/grants#grant-meta-pytorch',
-    actionText: 'View Grants',
-    icon: Cpu,
+    src: '/carousel-images/cb2f092f-f6df-418b-b84c-04085f274522.jpg',
+    alt: 'Department of CSIT & AIR Lab Entrance',
   },
 ]
 
@@ -123,21 +89,110 @@ const coreResearchAreas = [
 export default function Home() {
   const navigate = useNavigate()
   const [applyModalOpen, setApplyModalOpen] = useState(false)
-  const [heroMode, setHeroMode] = useState<'carousel' | 'slideshow'>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = window.localStorage.getItem('airlab_hero_mode')
-      if (saved === 'slideshow' || saved === 'carousel') return saved
-    }
-    return 'carousel'
-  })
   const updatesScrollRef = useRef<HTMLDivElement>(null)
+  const vacancy = useVacancySettings()
+  const [projects, setProjects] = useState<ProjectItem[]>(() => getProjects())
+  const [grants, setGrants] = useState<Grant[]>(() => getGrants())
 
-  const handleHeroModeChange = (mode: 'carousel' | 'slideshow') => {
-    setHeroMode(mode)
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('airlab_hero_mode', mode)
+  useEffect(() => {
+    let active = true
+    const apiBase = import.meta.env.VITE_API_URL || ''
+
+    fetch(`${apiBase}/api/content/projects`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && Array.isArray(data) && data.length > 0) {
+          setProjects(data)
+        }
+      })
+      .catch(() => {})
+
+    fetch(`${apiBase}/api/content/grants`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && Array.isArray(data) && data.length > 0) {
+          setGrants(data)
+        }
+      })
+      .catch(() => {})
+
+    return () => {
+      active = false
     }
-  }
+  }, [])
+
+  const recentUpdates = useMemo(() => {
+    const items: Array<{
+      id: string
+      category: string
+      date: string
+      title: string
+      desc: string
+      link?: string
+      actionType?: 'apply'
+      actionText: string
+      icon: typeof Brain
+    }> = []
+
+    const fundedProjects = projects.filter((p) => p.category === 'Funded')
+    const ugProjects = projects.filter((p) => p.category !== 'Funded')
+
+    for (const p of fundedProjects.slice(0, 2)) {
+      items.push({
+        id: `update-proj-${p.id}`,
+        category: p.grantSupplier || 'Funded Project',
+        date: p.timeTaken || p.startDate || 'Ongoing',
+        title: p.title,
+        desc: p.description,
+        link: `/projects#${p.id}`,
+        actionText: 'Explore Project',
+        icon: Layers,
+      })
+    }
+
+    for (const g of grants.slice(0, 2)) {
+      items.push({
+        id: `update-grant-${g.id}`,
+        category: g.funder || 'Research Grant',
+        date: g.status === 'Active' ? 'Active Grant' : g.status,
+        title: g.title,
+        desc:
+          g.description ||
+          `${g.amount ? `${g.amount} · ` : ''}${g.leadInvestigator ? `PI: ${g.leadInvestigator}` : g.duration}`,
+        link: `/grants#${g.id}`,
+        actionText: 'View Grant',
+        icon: Award,
+      })
+    }
+
+    for (const p of ugProjects.slice(0, 3)) {
+      items.push({
+        id: `update-ug-${p.id}`,
+        category: (p.grantSupplier && p.grantSupplier !== 'NA' ? p.grantSupplier : '') || 'Undergraduate Research',
+        date: p.timeTaken || p.startDate || 'FYDP',
+        title: p.title,
+        desc: p.description,
+        link: `/projects#${p.id}`,
+        actionText: 'Explore Project',
+        icon: Cpu,
+      })
+    }
+
+    if (vacancy.status === 'Open') {
+      items.push({
+        id: 'update-vacancy',
+        category: vacancy.badge || 'Vacancies',
+        date: 'Admissions Open',
+        title: vacancy.title,
+        desc: vacancy.description,
+        actionType: 'apply',
+        actionText: 'Apply for Vacancy',
+        icon: GraduationCap,
+      })
+    }
+
+    return items
+  }, [projects, grants, vacancy])
 
   const scrollUpdates = (direction: 'left' | 'right') => {
     if (updatesScrollRef.current) {
@@ -151,149 +206,76 @@ export default function Home() {
 
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
-      {/* ── 1. FULL-WIDTH HERO SHOWCASE (Toggleable between 3D Curved Carousel & Classic Slideshow) ── */}
+      {/* ── 1. FULL-WIDTH HERO SHOWCASE (3D Curved Carousel) ── */}
       <section className="relative w-full z-10">
-        {heroMode === 'carousel' ? (
-          <TiltedGridHero
-            images={HERO_CAROUSEL_IMAGES}
-            tileHeight={48}
-            speed={6}
-            axis={50}
-            gap={4}
-            curve={72}
-            className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
-          >
-            <div className="relative z-10 flex h-full w-full max-w-4xl mx-auto flex-col items-center justify-center px-6 text-center">
-              {/* Soft, edge-less shadow behind the text only (carousel photos remain 100% full brightness) */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-2xl h-64 -z-10"
-                style={{
-                  background:
-                    'radial-gradient(closest-side, rgba(10, 0, 28, 0.58) 0%, rgba(10, 0, 28, 0.26) 55%, transparent 100%)',
-                }}
-              />
+        <TiltedGridHero
+          images={HERO_CAROUSEL_IMAGES}
+          tileHeight={48}
+          speed={6}
+          axis={50}
+          gap={4}
+          curve={72}
+          className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+        >
+          <div className="relative z-10 flex h-full w-full max-w-4xl mx-auto flex-col items-center justify-center px-6 text-center">
+            {/* Soft, edge-less shadow behind the text only (carousel photos remain 100% full brightness) */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-2xl h-64 -z-10"
+              style={{
+                background:
+                  'radial-gradient(closest-side, rgba(10, 0, 28, 0.58) 0%, rgba(10, 0, 28, 0.26) 55%, transparent 100%)',
+              }}
+            />
 
-              {/* Clean centered 3D extruded slogan */}
-              <h1
-                className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl"
-                style={{
-                  textShadow:
-                    '0 1px 0 rgba(16, 0, 43, 0.95), 0 2px 0 rgba(16, 0, 43, 0.9), 0 3px 0 rgba(16, 0, 43, 0.85), 0 4px 0 rgba(16, 0, 43, 0.75), 0 8px 20px rgba(0, 0, 0, 0.95), 0 18px 42px rgba(0, 0, 0, 0.8)',
-                }}
+            {/* Clean centered 3D extruded slogan */}
+            <h1
+              className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl"
+              style={{
+                textShadow:
+                  '0 1px 0 rgba(16, 0, 43, 0.95), 0 2px 0 rgba(16, 0, 43, 0.9), 0 3px 0 rgba(16, 0, 43, 0.85), 0 4px 0 rgba(16, 0, 43, 0.75), 0 8px 20px rgba(0, 0, 0, 0.95), 0 18px 42px rgba(0, 0, 0, 0.8)',
+              }}
+            >
+              Where Intelligence Meets Engineering.
+            </h1>
+
+            {/* Tactile 3D Action Button centered directly below the text */}
+            <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center gap-3.5">
+              <Link
+                to="/projects"
+                className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/25 shadow-[0_4px_0_rgba(16,0,43,0.55),0_12px_28px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_0_rgba(16,0,43,0.55),0_16px_34px_rgba(0,0,0,0.65)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_2px_0_rgba(16,0,43,0.55),0_6px_14px_rgba(0,0,0,0.5)] transition-all duration-200 flex items-center gap-2 cursor-pointer group"
               >
-                Where Intelligence Meets Engineering.
-              </h1>
-
-              {/* Tactile 3D Action Button centered directly below the text */}
-              <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center gap-3.5">
-                <Link
-                  to="/projects"
-                  className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/25 shadow-[0_4px_0_rgba(16,0,43,0.55),0_12px_28px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_0_rgba(16,0,43,0.55),0_16px_34px_rgba(0,0,0,0.65)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_2px_0_rgba(16,0,43,0.55),0_6px_14px_rgba(0,0,0,0.5)] transition-all duration-200 flex items-center gap-2 cursor-pointer group"
-                >
-                  <Layers className="w-4 h-4 shrink-0" />
-                  <span>Explore Projects</span>
-                  <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-                </Link>
-              </div>
+                <Layers className="w-4 h-4 shrink-0" />
+                <span>Explore Projects</span>
+                <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
+              </Link>
             </div>
-          </TiltedGridHero>
-        ) : (
-          <HeroBackgroundSlideshow autoPlayInterval={5000}>
-            <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-6">
-              {/* LOGO ON THE LEFT: Clean, iconic, white on imagery */}
-              <div className="shrink-0 flex items-center justify-center">
-                <img
-                  src={airLabMark}
-                  alt="AIR Lab Mark"
-                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain brightness-0 invert drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
-                />
-              </div>
-
-              {/* Subtle vertical separator on desktop */}
-              <div className="hidden md:block w-px h-24 bg-white/30 shrink-0" />
-
-              {/* TEXT ON THE RIGHT: Clean punchy slogan */}
-              <div className="text-center md:text-left flex flex-col items-center md:items-start max-w-2xl">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-head text-white tracking-tight leading-[1.08] drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] select-none">
-                  Where Intelligence Meets Engineering.
-                </h1>
-
-                {/* Action Buttons directly on the photography */}
-                <div className="mt-7 flex flex-wrap items-center justify-center md:justify-start gap-3.5">
-                  <Link
-                    to="/projects"
-                    className="h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 cursor-pointer active:scale-98 group"
-                  >
-                    <Layers className="w-4 h-4 shrink-0" />
-                    <span>Explore Projects</span>
-                    <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </HeroBackgroundSlideshow>
-        )}
-
-        {/* ── MINIMAL CLEAN QUICK LINKS STRIP + HERO VIEW TOGGLE ── */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6">
-            <Link
-              to="/projects"
-              className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
-            >
-              All Projects &rarr;
-            </Link>
-            <span className="text-[var(--border-hairline)]">•</span>
-            <Link
-              to="/grants"
-              className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
-            >
-              <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-              Active Grants &rarr;
-            </Link>
-            <span className="text-[var(--border-hairline)]">•</span>
-            <Link
-              to="/team"
-              className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
-            >
-              All Team Members &rarr;
-            </Link>
           </div>
+        </TiltedGridHero>
 
-          {/* Hero View Mode Toggle */}
-          <div
-            role="group"
-            aria-label="Hero display mode"
-            className="inline-flex items-center p-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-xs mx-auto sm:mx-0"
+        {/* ── MINIMAL CLEAN QUICK LINKS STRIP ── */}
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
+          <Link
+            to="/projects"
+            className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
           >
-            <button
-              type="button"
-              onClick={() => handleHeroModeChange('slideshow')}
-              aria-pressed={heroMode === 'slideshow'}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                heroMode === 'slideshow'
-                  ? 'bg-[var(--accent-orange)] text-white shadow-xs'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              <Images className="w-3.5 h-3.5" />
-              <span>Slideshow</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleHeroModeChange('carousel')}
-              aria-pressed={heroMode === 'carousel'}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                heroMode === 'carousel'
-                  ? 'bg-[var(--accent-orange)] text-white shadow-xs'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              <Box className="w-3.5 h-3.5" />
-              <span>3D Carousel</span>
-            </button>
-          </div>
+            All Projects &rarr;
+          </Link>
+          <span className="text-[var(--border-hairline)]">•</span>
+          <Link
+            to="/grants"
+            className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
+          >
+            <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+            Active Grants &rarr;
+          </Link>
+          <span className="text-[var(--border-hairline)]">•</span>
+          <Link
+            to="/team"
+            className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
+          >
+            All Team Members &rarr;
+          </Link>
         </div>
       </section>
 
@@ -361,7 +343,7 @@ export default function Home() {
                     </h3>
                   </div>
 
-                  <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-relaxed font-normal mt-2">
+                  <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-relaxed font-normal mt-2 line-clamp-3">
                     {item.desc}
                   </p>
                 </div>

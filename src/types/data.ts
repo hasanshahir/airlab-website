@@ -27,6 +27,7 @@ export interface ProjectItem {
   id: number | string
   title: string
   category: 'Funded' | 'R&D' | 'Undergraduate' | 'Postgraduate' | string
+  programTitle?: string
   areas?: string[]
   description: string
   funding: string

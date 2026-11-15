@@ -7,6 +7,8 @@ export interface SheetApplicationRow {
   name: string
   email: string
   phone: string
+  positionTitle?: string
+  designation?: string
   rollNo?: string
   department?: string
   program?: string

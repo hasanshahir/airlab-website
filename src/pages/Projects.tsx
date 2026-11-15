@@ -59,12 +59,6 @@ const CANONICAL_PROJECT_AREAS: Record<string, string[]> = {
     'Development',
     'Efficient Computing & TinyML',
   ],
-  'PRJ-NED-SAC': [
-    'Cyber',
-    'Efficient Computing & TinyML',
-    'Development',
-    'AI Safety & Alignment',
-  ],
   'PRJ-1': [
     'Foundational Models & NLP',
     'Cyber',
@@ -184,7 +178,11 @@ export default function Projects() {
       if (Array.isArray(projs) && projs.length > 0) {
         const localList = getProjects()
         const merged = projs.map(p => {
-          const local = localList.find(lp => String(lp.id) === String(p.id))
+          const local = localList.find(
+            lp =>
+              String(lp.id) === String(p.id) ||
+              lp.title.trim().toLowerCase() === String(p.title || '').trim().toLowerCase()
+          )
           const areas = (Array.isArray(p.areas) && p.areas.length > 0)
             ? p.areas
             : (local?.areas || getProjectAreas(p))
@@ -497,7 +495,7 @@ export default function Projects() {
                     <div className="flex items-center justify-between">
                       <span className="text-[var(--text-subtle)]">Timeline:</span>
                       <span className="font-semibold text-[var(--text-primary)]">
-                        {proj.startDate} — {proj.endDate || 'Present'}
+                        {proj.timeTaken || (proj.endDate ? `${proj.startDate} — ${proj.endDate}` : proj.startDate)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -640,8 +638,7 @@ export default function Projects() {
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">PROJECT TIMELINE</span>
                         <span className="font-semibold text-[var(--text-primary)]">
-                          {selectedProject.startDate} — {selectedProject.endDate || 'Ongoing'}
-                          {selectedProject.timeTaken ? ` (${selectedProject.timeTaken})` : ''}
+                          {selectedProject.timeTaken || (selectedProject.endDate ? `${selectedProject.startDate} — ${selectedProject.endDate}` : selectedProject.startDate)}
                         </span>
                       </div>
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">

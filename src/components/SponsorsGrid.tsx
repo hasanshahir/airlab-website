@@ -1,5 +1,5 @@
 import React from 'react'
-import { ExternalLink, Handshake } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { getSponsors } from '../lib/data'
 
 export const SponsorsGrid: React.FC = () => {
@@ -8,19 +8,10 @@ export const SponsorsGrid: React.FC = () => {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <div>
-          <span className="text-xs font-sans uppercase font-bold text-[var(--accent-orange)] tracking-wider">
-            COLLABORATIVE ALLIANCES
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-head font-semibold text-[var(--text-primary)] tracking-tight mt-1">
-            Sponsors & Institutional Partners
-          </h2>
-        </div>
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-muted)]">
-          <Handshake className="w-4 h-4 text-[var(--accent-orange)]" />
-          <span>{sponsors.length} Strategic Alliances</span>
-        </div>
+      <div className="mb-8">
+        <h2 className="text-2xl sm:text-3xl font-head font-semibold text-[var(--text-primary)] tracking-tight">
+          Sponsors & Institutional Partners
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

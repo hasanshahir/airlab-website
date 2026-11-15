@@ -30,13 +30,19 @@ function resolve(slug: string) {
 
 contentRouter.get('/:slug', async (req, res) => {
   const { def, model } = resolve(req.params.slug)
-  const items = await model
-    .find({ published: true })
-    .sort({ order: 1, ...(def.defaultSort ?? {}), createdAt: 1 })
-    .lean()
+  let items: any[] = []
 
-  // If database collection is currently empty, serve fallback seed data from src/data/*.json
-  if (items.length === 0) {
+  try {
+    items = await model
+      .find({ published: true })
+      .sort({ order: 1, ...(def.defaultSort ?? {}), createdAt: 1 })
+      .lean()
+  } catch {
+    // Database connection or query error; fall through to seed fallback
+  }
+
+  // If database collection is currently empty or unavailable, serve fallback seed data from src/data/*.json
+  if (!items || items.length === 0) {
     try {
       const seedPath = path.join(DATA_DIR, def.seedFile)
       let raw = await readFile(seedPath, 'utf8')

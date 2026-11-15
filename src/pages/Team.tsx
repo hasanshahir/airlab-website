@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, ExternalLink, GraduationCap, Calendar, Search, Sparkles, FileText } from 'lucide-react'
-import { getTeamMembers, getPreviousInterns } from '../lib/data'
+import { getTeamMembers } from '../lib/data'
 import type { TeamMemberData } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
@@ -16,6 +16,97 @@ const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
 )
 
 type TabType = 'faculty' | 'interns' | 'previous'
+
+const HARDCODED_ALUMNI_INTERNS = [
+  {
+    id: 'pri1',
+    name: 'Muhammad Ahmed Raza',
+    email: 'raza4520222@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/muhammad-ahmed-raza-8130072bb',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri2',
+    name: 'Wania Manzoor',
+    email: 'manzoor4501868@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/wania-manzoor-',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri3',
+    name: 'Muhammad Zohaib Khan',
+    email: 'khan4504302@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/muhammad-zohaib-khan-3bab09203/',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri4',
+    name: 'Muhammad Taha',
+    email: 'taha4605051@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/muhammad-taha-5b9546285',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri5',
+    name: 'Abdul Rehman',
+    email: 'rehman4605578@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/abdul-rehman-21a7752a7',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri6',
+    name: 'Fatima Azeemi',
+    email: 'azeemi4502943@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/fatima-azeemi-466988266',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri7',
+    name: 'Muhammad Saim Asim',
+    email: 'asim4606091@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/muhammad-saim-asim-1695b72b8',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri8',
+    name: 'Faisal Shahid',
+    email: 'shahid4500192@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/faisalshahid03/',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri9',
+    name: 'Iqra Iqbal',
+    email: 'iqbal4503948@cloud.neduet.edu.pk',
+    linkedin: 'https://pk.linkedin.com/in/iqra-iqbal-a2234b271',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri10',
+    name: 'Faiq Ahmed',
+    email: 'ahmed4603833@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/faiq-ahmed1/',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  },
+  {
+    id: 'pri11',
+    name: 'Unaiza Asif',
+    email: 'asif4601743@cloud.neduet.edu.pk',
+    linkedin: 'https://www.linkedin.com/in/unaiza-asif',
+    tenure: 'Former Research Intern',
+    department: 'Computer Science & IT'
+  }
+]
 
 export default function Team() {
   const [searchParams] = useSearchParams()
@@ -44,32 +135,54 @@ export default function Team() {
   }, [searchParams])
 
   const [allMembersRaw, setAllMembersRaw] = useState<TeamMemberData[]>(() => getTeamMembers())
-  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>(() => getPreviousInterns())
+  const [sortedPreviousInterns, setSortedPreviousInterns] = useState<any[]>(() => HARDCODED_ALUMNI_INTERNS)
 
   useEffect(() => {
     let active = true
     Promise.all([
-      fetch('/api/content/team').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/content/previous-interns').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/content/team', { cache: 'no-store' }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/content/previous-interns', { cache: 'no-store' }).then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([team, prev]) => {
       if (!active) return
-      if (Array.isArray(team)) {
-        const fallbackFaculty = getTeamMembers().filter(m => m.category === 'Faculty')
-        const merged = [...fallbackFaculty]
-        for (const item of team) {
-          const idx = merged.findIndex(m => m.id === item.id || m.name.trim().toLowerCase() === item.name.trim().toLowerCase())
-          if (idx >= 0) {
-            merged[idx] = { ...merged[idx], ...item }
-          } else {
-            merged.push(item)
-          }
-        }
-        setAllMembersRaw(merged)
+      if (Array.isArray(team) && team.length > 0) {
+        const localMembers = getTeamMembers()
+        const enriched = team.map((item: any) => {
+          const local = localMembers.find(
+            m =>
+              String(m.id) === String(item.id) ||
+              m.name.trim().toLowerCase() === String(item.name || '').trim().toLowerCase()
+          )
+          return local ? { ...local, ...item, image: item.image || local.image } : item
+        })
+        setAllMembersRaw(enriched)
       }
-      if (Array.isArray(prev)) setSortedPreviousInterns(prev)
+      if (Array.isArray(prev) && prev.length > 0) {
+        setSortedPreviousInterns(prev)
+      } else {
+        setSortedPreviousInterns(HARDCODED_ALUMNI_INTERNS)
+      }
     })
     return () => { active = false }
   }, [])
+
+  const alumniList = useMemo(() => {
+    const list = [...HARDCODED_ALUMNI_INTERNS]
+    const candidates = [
+      ...(Array.isArray(sortedPreviousInterns) ? sortedPreviousInterns : []),
+      ...allMembersRaw.filter(m => m.category === 'Alumni' || (m.category as string) === 'Previous Interns'),
+    ]
+    for (const item of candidates) {
+      const idx = list.findIndex(
+        m => m.id === item.id || (m.name && item.name && m.name.trim().toLowerCase() === item.name.trim().toLowerCase())
+      )
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...item }
+      } else {
+        list.push(item)
+      }
+    }
+    return list
+  }, [sortedPreviousInterns, allMembersRaw])
 
 
   const allMembers = useMemo(() => {
@@ -107,7 +220,7 @@ export default function Team() {
   const tabs: { id: TabType; label: string; count?: number }[] = [
     { id: 'faculty', label: 'Faculty', count: facultyMembers.length },
     { id: 'interns', label: 'Research Interns', count: internMembers.length },
-    { id: 'previous', label: 'Alumni Interns', count: sortedPreviousInterns.length },
+    { id: 'previous', label: 'Alumni Interns', count: alumniList.length },
   ]
 
   return (
@@ -479,7 +592,7 @@ export default function Team() {
                   </p>
                 </div>
                 <span className="px-3.5 py-1.5 rounded-full text-xs font-sans font-medium bg-[var(--ink-dark)] text-white shrink-0">
-                  {sortedPreviousInterns.length} Alumni Recorded
+                  {alumniList.length} Alumni Recorded
                 </span>
               </div>
 
@@ -494,7 +607,7 @@ export default function Team() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border-hairline)]">
-                    {sortedPreviousInterns.map((p: any) => (
+                    {alumniList.map((p: any) => (
                       <tr
                         key={p.id}
                         id={`member-${p.id}`}
