@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
-import { Calendar, CheckCircle2, Clock, Landmark } from 'lucide-react'
+import { Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
 import type { Grant } from '../types/data'
 import SectionReveal from '../components/ui/SectionReveal'
@@ -170,89 +170,98 @@ export default function Grants() {
               return (
                 <div
                   key={grant.id}
-                  className="p-8 sm:p-10 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200"
+                  className="relative overflow-hidden group p-8 sm:p-10 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200"
                 >
-                  <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
-                    {/* Grant Image preview if available (Bigger size) */}
-                    {grant.image && (
-                      <div className="w-full lg:w-[440px] xl:w-[500px] h-72 sm:h-80 lg:h-auto lg:min-h-[320px] rounded-2xl overflow-hidden shrink-0 bg-[var(--bg-page)] border border-[var(--border-hairline)] shadow-sm">
-                        <img
-                          src={grant.image}
-                          alt={grant.title}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
+                  {/* Subtle low-opacity background image with gradient overlay */}
+                  {grant.image && (
+                    <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+                      <img
+                        src={grant.image}
+                        alt=""
+                        className="w-full h-full object-cover opacity-[0.18] dark:opacity-[0.24] group-hover:opacity-[0.24] dark:group-hover:opacity-[0.30] group-hover:scale-[1.02] transition-all duration-500 ease-out"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-surface)]/95 via-[var(--bg-surface)]/80 to-[var(--bg-surface)]/45 pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)]/90 via-[var(--bg-surface)]/30 to-[var(--bg-surface)]/15 pointer-events-none" />
+                    </div>
+                  )}
 
-                    <div className="flex-1">
-                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <span
-                              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-sans font-semibold ${isActive
-                                  ? 'bg-emerald-600 text-white'
-                                  : 'bg-[var(--ink-dark)] text-white'
-                                }`}
-                            >
-                              {isActive ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
-                              {grant.status}
+                  <div className="relative z-10">
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-5">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2 mb-3.5">
+                          <span
+                            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-sans font-semibold ${isActive
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-[var(--ink-dark)] text-white'
+                              }`}
+                          >
+                            {isActive ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
+                            {grant.status}
+                          </span>
+
+                          {grant.programTitle && (
+                            <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--ink-dark)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium">
+                              <Landmark className="w-3 h-3" />
+                              {grant.programTitle}
                             </span>
+                          )}
 
-                            {grant.programTitle && (
-                              <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--ink-dark)] bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center gap-1.5 font-medium">
-                                <Landmark className="w-3 h-3" />
-                                {grant.programTitle}
-                              </span>
-                            )}
+                          {grant.duration && (
+                            <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)] inline-flex items-center gap-1.5 font-medium">
+                              <Calendar className="w-3 h-3" />
+                              {grant.duration}
+                            </span>
+                          )}
 
-                            {grant.duration && (
-                              <span className="px-3 py-1 rounded-full text-xs font-sans text-[var(--text-muted)] bg-[var(--bg-page)] border border-[var(--border-hairline)] inline-flex items-center gap-1.5 font-medium">
-                                <Calendar className="w-3 h-3" />
-                                {grant.duration}
-                              </span>
-                            )}
-
-                            {grant.placeholder && <PlaceholderBadge />}
-                          </div>
-
-                          <h2 className="text-xl sm:text-2xl font-head font-semibold text-[var(--text-primary)] leading-snug">
-                            {grant.title}
-                          </h2>
-                          <div className="text-sm font-semibold text-[var(--accent-orange)] font-sans mt-1.5">
-                            Grant Supplier: {grant.funder}
-                          </div>
+                          {grant.placeholder && <PlaceholderBadge />}
                         </div>
 
-                        {grant.amount && (
-                          <div className="px-5 py-3.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-left md:text-right shrink-0 shadow-xs">
-                            <div className="text-[11px] font-sans font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                              Granted Amount
-                            </div>
-                            <AnimatedGrantAmount amount={grant.amount} />
-                          </div>
-                        )}
+                        <h2 className="text-xl sm:text-2xl font-head font-semibold text-[var(--text-primary)] leading-snug max-w-3xl">
+                          {grant.title}
+                        </h2>
+                        <div className="text-sm font-semibold text-[var(--accent-orange)] font-sans mt-1.5">
+                          Grant Supplier: {grant.funder}
+                        </div>
                       </div>
 
-                      {grant.description && (
-                        <p className="text-sm sm:text-[14.5px] text-[var(--text-muted)] leading-relaxed mb-6 font-normal">
-                          {grant.description}
-                        </p>
+                      {grant.amount && (
+                        <div className="px-5 py-3.5 rounded-2xl bg-[var(--bg-page)]/95 backdrop-blur-xs border border-[var(--border-hairline)] text-left md:text-right shrink-0 shadow-xs">
+                          <div className="text-[11px] font-sans font-bold tracking-wider text-[var(--text-subtle)] uppercase">
+                            Granted Amount
+                          </div>
+                          <AnimatedGrantAmount amount={grant.amount} />
+                        </div>
                       )}
+                    </div>
 
-                      {grant.url && (
-                        <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-end text-xs font-sans">
+                    {grant.description && (
+                      <p className="text-sm sm:text-[14.5px] text-[var(--text-muted)] leading-relaxed mb-6 font-normal max-w-4xl">
+                        {grant.description}
+                      </p>
+                    )}
+
+                    {(grant.leadInvestigator || grant.url) && (
+                      <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-4 text-xs font-sans">
+                        {grant.leadInvestigator && (
+                          <span className="flex items-center gap-1.5 text-[var(--text-subtle)]">
+                            <User className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                            <span>PI: <strong className="text-[var(--text-primary)]">{grant.leadInvestigator}</strong></span>
+                          </span>
+                        )}
+
+                        {grant.url && (
                           <a
                             href={grant.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 font-semibold"
+                            className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 font-semibold ml-auto"
                           >
                             <span>Funder Website</span>
                           </a>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
