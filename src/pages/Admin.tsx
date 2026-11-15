@@ -228,7 +228,7 @@ const COLLECTION_SCHEMAS: Record<string, Record<string, FieldDef>> = {
       type: 'enum',
       label: 'Category',
       required: true,
-      options: ['Lab', 'Visit', 'Session', 'Mentoring'],
+      options: ['Lab', 'Events', 'Session', 'Mentoring'],
     },
     date: { type: 'date', label: 'Date', placeholder: 'e.g. Oct 2026' },
     desc: { type: 'text', label: 'Event Description (default caption)' },

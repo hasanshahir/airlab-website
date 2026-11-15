@@ -6,7 +6,7 @@ import type { GalleryItem } from '../types/data'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 
-const GALLERY_FILTERS = ['All', 'Visit', 'Session', 'Mentoring', 'Lab'] as const
+const GALLERY_FILTERS = ['All', 'Events', 'Session', 'Mentoring', 'Lab'] as const
 type GalleryFilter = (typeof GALLERY_FILTERS)[number]
 
 const BENTO_SPANS = [
@@ -32,8 +32,17 @@ interface GalleryPhotoCard {
 function normalizeGalleryCategory(cat?: string, title?: string): Exclude<GalleryFilter, 'All'> {
   const c = (cat || '').trim().toLowerCase()
   const t = (title || '').trim().toLowerCase()
-  if (c === 'visit' || c.includes('visit') || c.includes('campus') || c.includes('ceremony') || c.includes('performer')) {
-    return 'Visit'
+  if (
+    c === 'events' ||
+    c === 'event' ||
+    c === 'visit' ||
+    c.includes('event') ||
+    c.includes('visit') ||
+    c.includes('campus') ||
+    c.includes('ceremony') ||
+    c.includes('performer')
+  ) {
+    return 'Events'
   }
   if (c === 'session' || c.includes('session') || c.includes('sprint') || c.includes('student')) {
     return 'Session'

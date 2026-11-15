@@ -230,7 +230,7 @@ export const collections = [
         label: 'Category',
         required: true,
         listed: true,
-        options: ['Lab', 'Visit', 'Session', 'Mentoring'],
+        options: ['Lab', 'Events', 'Session', 'Mentoring'],
       },
       date: { type: 'date', listed: true },
       desc: { type: 'text', label: 'Description' },
