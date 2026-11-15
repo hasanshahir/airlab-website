@@ -62,18 +62,29 @@ export default function TitleReveal({
   }, [])
 
   useEffect(() => {
-    if (window.__PRELOADER_REVEALED__) {
-      setPreloaderReady(true)
-      return
+    const checkState = () => {
+      if (window.__PRELOADER_REVEALED__ && !document.body.classList.contains('is-loading')) {
+        setPreloaderReady(true)
+      } else if (waitForPreloader || document.body.classList.contains('is-loading')) {
+        setPreloaderReady(false)
+      }
+    }
+    checkState()
+
+    const onStart = () => {
+      if (waitForPreloader) setPreloaderReady(false)
     }
     const onReveal = () => setPreloaderReady(true)
-    window.addEventListener('preloader-reveal', onReveal, { once: true })
-    const fallback = window.setTimeout(() => setPreloaderReady(true), 2600)
+
+    window.addEventListener('preloader-start', onStart)
+    window.addEventListener('preloader-reveal', onReveal)
+    const fallback = window.setTimeout(() => setPreloaderReady(true), 2200)
     return () => {
+      window.removeEventListener('preloader-start', onStart)
       window.removeEventListener('preloader-reveal', onReveal)
       window.clearTimeout(fallback)
     }
-  }, [])
+  }, [waitForPreloader])
 
   useEffect(() => {
     const el = rootRef.current
