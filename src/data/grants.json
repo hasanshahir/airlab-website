@@ -1,18 +1,5 @@
 [
   {
-    "id": "grant-sindh-hec-identity",
-    "title": "Connected Identity Intelligence Platform for Digital Investigation",
-    "funder": "Government of Sindh — Sindh Higher Education Commission (Sindh HEC)",
-    "programTitle": "Sindh Research Support Program",
-    "amount": "Rs. 5 million",
-    "duration": "June 26 - Present",
-    "status": "Active",
-    "leadInvestigator": "Dr. Murk Marvi",
-    "description": "This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.",
-    "url": "https://sindhhec.gov.pk/",
-    "image": "https://i.ibb.co/0pLB2b49/project-04.jpg"
-  },
-  {
     "id": "grant-sindh-hec-discovery",
     "title": "Integrated Information Discovery System for Digital Investigation",
     "funder": "Government of Sindh — Sindh Higher Education Commission (Sindh HEC)",
@@ -24,5 +11,18 @@
     "description": "This project builds an on-premises investigation workspace for regulatory, compliance, audit, and journalistic work. Investigators usually start with little information about a subject and spend hours gathering and cross-checking public data from disconnected sites and tools. The platform cuts that work to minutes while keeping every result traceable to its source and a human in control.",
     "url": "https://sindhhec.gov.pk/",
     "image": "https://i.ibb.co/gML0Tzsv/project-05.jpg"
+  },
+  {
+    "id": "grant-sindh-hec-identity",
+    "title": "Connected Identity Intelligence Platform for Digital Investigation",
+    "funder": "Government of Sindh — Sindh Higher Education Commission (Sindh HEC)",
+    "programTitle": "Sindh Research Support Program",
+    "amount": "Rs. 5 million",
+    "duration": "June 26 - Present",
+    "status": "Active",
+    "leadInvestigator": "Dr. Murk Marvi",
+    "description": "This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.",
+    "url": "https://sindhhec.gov.pk/",
+    "image": "https://i.ibb.co/0pLB2b49/project-04.jpg"
   }
 ]

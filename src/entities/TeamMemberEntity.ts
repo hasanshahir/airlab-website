@@ -1,4 +1,5 @@
 import { getMemberAvatar } from '../lib/placeholders'
+import { getFacultyPriority } from '../lib/utils'
 
 export interface TeamMemberData {
   id: string
@@ -57,7 +58,7 @@ export class TeamMemberEntity {
     this.designation = data.designation
     this.qualifications = data.qualifications
     this.phone = data.phone
-    this.isLead = Boolean(data.isLead || data.id === 'f1')
+    this.isLead = Boolean(data.isLead || data.id === 'f1' || data.id === 'f2' || getFacultyPriority(data.name, data.id) > 0)
     this.tenure = data.tenure || 'Current Cohort (2025–2026)'
     this.department = data.department || 'Computer Science & IT (CSIT)'
     this.researchFocus = data.researchFocus
@@ -167,6 +168,9 @@ export class TeamMemberEntity {
       // Leads/faculty first
       if (a.isLead && !b.isLead) return -1
       if (!a.isLead && b.isLead) return 1
+      // Ensure Prof. Dr. Muhammad Mubashir Khan appears above Dr. Murk Marvi
+      const priorityDiff = getFacultyPriority(b.name, b.id) - getFacultyPriority(a.name, a.id)
+      if (priorityDiff !== 0) return priorityDiff
       // Sort by year descending (recent at top)
       if (b.year !== a.year) return b.year - a.year
       return (b.order || 0) - (a.order || 0)

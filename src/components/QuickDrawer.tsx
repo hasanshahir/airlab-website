@@ -15,6 +15,7 @@ import rawProjects from '../data/projects.json'
 import rawTeam from '../data/team.json'
 import type { ProjectItem, TeamMemberData } from '../types/data'
 import { getMemberAvatar } from '../lib/placeholders'
+import { getFacultyPriority } from '../lib/utils'
 
 const initialProjectsData = rawProjects as unknown as ProjectItem[]
 const initialTeamData = rawTeam as unknown as TeamMemberData[]
@@ -113,21 +114,26 @@ export default function QuickDrawer({
         return ym ? parseInt(ym[1], 10) : 0
       }
 
-      return parseDateScore(b.startDate || b.timeTaken) - parseDateScore(a.startDate || a.timeTaken)
+      const dateDiff = parseDateScore(b.startDate || b.timeTaken) - parseDateScore(a.startDate || a.timeTaken)
+      if (dateDiff !== 0) return dateDiff
+
+      return getFacultyPriority(b.pi) - getFacultyPriority(a.pi)
     })
   }, [searchQuery, projectsData])
 
   // Filtered members
-  const filteredMembers = teamData.filter(m => {
-    if (memberFilter !== 'All' && m.category !== memberFilter) return false
-    if (!searchQuery.trim()) return true
-    const q = searchQuery.toLowerCase()
-    return (
-      m.name.toLowerCase().includes(q) ||
-      m.role.toLowerCase().includes(q) ||
-      (m.researchFocus && m.researchFocus.toLowerCase().includes(q))
-    )
-  })
+  const filteredMembers = teamData
+    .filter(m => {
+      if (memberFilter !== 'All' && m.category !== memberFilter) return false
+      if (!searchQuery.trim()) return true
+      const q = searchQuery.toLowerCase()
+      return (
+        m.name.toLowerCase().includes(q) ||
+        m.role.toLowerCase().includes(q) ||
+        (m.researchFocus && m.researchFocus.toLowerCase().includes(q))
+      )
+    })
+    .sort((a, b) => getFacultyPriority(b.name, b.id) - getFacultyPriority(a.name, a.id))
 
   if (typeof document === 'undefined') return null
 

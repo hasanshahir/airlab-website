@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getProjects } from '../lib/data'
+import { getFacultyPriority } from '../lib/utils'
 import type { ProjectItem } from '../types/data'
 import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
 
@@ -408,8 +409,9 @@ export default function Projects() {
 
       const scoreA = Math.max(parseDateScore(a.startDate), parseDateScore(a.timeTaken), parseDateScore(a.endDate))
       const scoreB = Math.max(parseDateScore(b.startDate), parseDateScore(b.timeTaken), parseDateScore(b.endDate))
+      if (scoreB !== scoreA) return scoreB - scoreA
 
-      return scoreB - scoreA
+      return getFacultyPriority(b.pi) - getFacultyPriority(a.pi)
     })
   }, [projectsData, activeArea, activeCategory, query])
 

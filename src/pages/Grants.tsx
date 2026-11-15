@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
+import { getFacultyPriority } from '../lib/utils'
 import type { Grant } from '../types/data'
 import SectionReveal from '../components/ui/SectionReveal'
 import PlaceholderBadge from '../components/ui/PlaceholderBadge'
@@ -147,7 +148,10 @@ export default function Grants() {
       if (isActiveA && !isActiveB) return -1
       if (!isActiveA && isActiveB) return 1
 
-      return parseGrantDateScore(b.duration) - parseGrantDateScore(a.duration)
+      const dateDiff = parseGrantDateScore(b.duration) - parseGrantDateScore(a.duration)
+      if (dateDiff !== 0) return dateDiff
+
+      return getFacultyPriority(b.leadInvestigator) - getFacultyPriority(a.leadInvestigator)
     })
   }, [grants])
 
