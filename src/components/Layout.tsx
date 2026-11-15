@@ -16,6 +16,7 @@ import {
   Image as GalleryIcon,
 } from 'lucide-react'
 import AirLabLogo from './AirLabLogo'
+import airLabMark from '../assets/air-lab-mark.png'
 import ParticleField from './ParticleField'
 import StudentApplicationModal from './StudentApplicationModal'
 import { useVacancySettings } from '../lib/vacancy'
@@ -662,13 +663,15 @@ export default function Layout() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-16 border-b border-white/10">
             {/* Column 1: Lab Charter & Location */}
             <div className="space-y-4">
-              <Link to="/" onClick={handleLogoTap} className="inline-block select-none" aria-label="AIR Lab Home">
+              <Link to="/" onClick={handleLogoTap} className="inline-block select-none group" aria-label="AIR Lab Home">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-white font-bold text-lg font-head">
-                    AI
-                  </div>
+                  <img
+                    src={airLabMark}
+                    alt="AIR Lab Mark"
+                    className="w-10 h-10 object-contain shrink-0 transition-transform duration-200 group-hover:scale-105"
+                  />
                   <div>
-                    <div className="text-base font-bold tracking-tight text-white font-head leading-none">AIR Lab</div>
+                    <div className="text-base font-bold tracking-tight text-white font-head leading-none group-hover:text-[var(--accent-orange)] transition-colors">AIR Lab</div>
                     <div className="text-[11px] text-white/60 tracking-wider uppercase font-sans mt-1">NED UNIVERSITY · CSIT</div>
                   </div>
                 </div>
