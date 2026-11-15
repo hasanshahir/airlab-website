@@ -8,33 +8,33 @@ const LERP_FACTOR = 0.12
 const TICK_SPACING = 8
 
 // Tick width ranges (px)
-const MINOR_MIN_W = 24
-const MINOR_MAX_W = 48
-const MAJOR_MIN_W = 40
-const MAJOR_MAX_W = 48
+const MINOR_MIN_W = 14
+const MINOR_MAX_W = 30
+const MAJOR_MIN_W = 22
+const MAJOR_MAX_W = 30
 
 // How many ticks around the active position are affected
 const BASE_RADIUS = 2
 const MAX_RADIUS = 8
 
 const COLORS_LIGHT_BG = {
-  tick: 'rgba(107, 108, 113, 0.18)',
-  major: 'rgba(107, 108, 113, 0.28)',
+  tick: 'rgba(12, 21, 42, 0.34)',
+  major: 'rgba(12, 21, 42, 0.56)',
   r: 12,
   g: 21,
   b: 42, // #0C152A
   activeA: 1.0,
-  edgeA: 0.2,
+  edgeA: 0.45,
 }
 
 const COLORS_DARK_BG = {
-  tick: 'rgba(255, 255, 255, 0.25)',
-  major: 'rgba(255, 255, 255, 0.4)',
+  tick: 'rgba(255, 255, 255, 0.4)',
+  major: 'rgba(255, 255, 255, 0.65)',
   r: 255,
   g: 255,
   b: 255,
   activeA: 1.0,
-  edgeA: 0.3,
+  edgeA: 0.48,
 }
 
 /**
@@ -107,6 +107,9 @@ export default function ScrollIndicator() {
       currentProgress = lerp(currentProgress, progress, LERP_FACTOR)
 
       const isOnDark = checkDarkOverlap()
+      if (containerRef.current) {
+        containerRef.current.classList.toggle('is-dark', isOnDark)
+      }
       const colors = isOnDark ? COLORS_DARK_BG : COLORS_LIGHT_BG
 
       // Active tick index (fractional)
@@ -145,10 +148,10 @@ export default function ScrollIndicator() {
           const alpha =
             colors.edgeA + (colors.activeA - colors.edgeA) * influence
           tickEl.style.background = `rgba(${colors.r},${colors.g},${colors.b},${alpha.toFixed(2)})`
-          tickEl.style.height = influence > 0.45 ? '1.5px' : '1px'
+          tickEl.style.height = influence > 0.45 ? '2px' : '1.5px'
         } else {
           tickEl.style.background = major ? colors.major : colors.tick
-          tickEl.style.height = '1px'
+          tickEl.style.height = '1.5px'
         }
       }
 
