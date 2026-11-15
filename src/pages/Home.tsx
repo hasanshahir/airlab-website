@@ -9,9 +9,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  Cpu,
-  GraduationCap,
-  ShieldAlert,
+   ShieldAlert,
   ShieldCheck,
   Terminal,
 } from 'lucide-react'
@@ -88,11 +86,19 @@ const coreResearchAreas = [
 export default function Home() {
   const navigate = useNavigate()
   const [applyModalOpen, setApplyModalOpen] = useState(false)
-  const updatesScrollRef = useRef<HTMLDivElement>(null)
+  const updatesTrackRef = useRef<HTMLDivElement>(null)
+  const updatesOffsetRef = useRef(0)
+  const updatesVelocityRef = useRef(55) // px/sec default moving left
+  const updatesTargetVelocityRef = useRef(55)
+  const updatesManualBoostRef = useRef(0)
   const vacancy = useVacancySettings()
   const [projects, setProjects] = useState<ProjectItem[]>(() => getProjects())
   const [grants, setGrants] = useState<Grant[]>(() => getGrants())
-  const areasScrollRef = useRef<HTMLDivElement>(null)
+  const areasTrackRef = useRef<HTMLDivElement>(null)
+  const areasOffsetRef = useRef(0)
+  const areasVelocityRef = useRef(55) // px/sec default moving left
+  const areasTargetVelocityRef = useRef(55)
+  const areasManualBoostRef = useRef(0)
 
   useEffect(() => {
     let active = true
@@ -131,7 +137,6 @@ export default function Home() {
       link?: string
       actionType?: 'apply'
       actionText: string
-      icon: typeof Brain
     }> = []
 
     const fundedProjects = projects.filter((p) => p.category === 'Funded')
@@ -146,7 +151,6 @@ export default function Home() {
         desc: p.description,
         link: `/projects#${p.id}`,
         actionText: 'Explore Project',
-        icon: Layers,
       })
     }
 
@@ -161,7 +165,6 @@ export default function Home() {
           `${g.amount ? `${g.amount} · ` : ''}${g.leadInvestigator ? `PI: ${g.leadInvestigator}` : g.duration}`,
         link: `/grants#${g.id}`,
         actionText: 'View Grant',
-        icon: Award,
       })
     }
 
@@ -174,7 +177,6 @@ export default function Home() {
         desc: p.description,
         link: `/projects#${p.id}`,
         actionText: 'Explore Project',
-        icon: Cpu,
       })
     }
 
@@ -187,31 +189,135 @@ export default function Home() {
         desc: vacancy.description,
         actionType: 'apply',
         actionText: 'Apply for Vacancy',
-        icon: GraduationCap,
       })
     }
 
     return items
   }, [projects, grants, vacancy])
 
-  const scrollUpdates = (direction: 'left' | 'right') => {
-    if (updatesScrollRef.current) {
-      const scrollAmount = 340
-      updatesScrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      })
+  const loopedUpdates = useMemo(() => {
+    if (recentUpdates.length === 0) return []
+    return [...recentUpdates, ...recentUpdates, ...recentUpdates]
+  }, [recentUpdates])
+
+  const loopedAreas = useMemo(() => {
+    return [...coreResearchAreas, ...coreResearchAreas, ...coreResearchAreas]
+  }, [])
+
+  useEffect(() => {
+    let rafId = 0
+    let lastTime = performance.now()
+
+    const stepRibbon = (
+      track: HTMLDivElement | null,
+      itemCount: number,
+      offsetRef: React.MutableRefObject<number>,
+      velocityRef: React.MutableRefObject<number>,
+      targetVelocityRef: React.MutableRefObject<number>,
+      manualBoostRef: React.MutableRefObject<number>,
+      dt: number
+    ) => {
+      if (!track || itemCount === 0) return
+      const children = track.children
+      if (children.length < itemCount * 2) return
+
+      const firstEl = children[0] as HTMLElement
+      const secondSetEl = children[itemCount] as HTMLElement
+      const singleSetWidth = secondSetEl.offsetLeft - firstEl.offsetLeft
+      if (singleSetWidth <= 0) return
+
+      velocityRef.current +=
+        (targetVelocityRef.current - velocityRef.current) * Math.min(1, dt * 10)
+
+      const manualStep = manualBoostRef.current * Math.min(1, dt * 8)
+      manualBoostRef.current -= manualStep
+
+      offsetRef.current += velocityRef.current * dt + manualStep
+
+      if (offsetRef.current >= singleSetWidth) {
+        offsetRef.current -= singleSetWidth
+      } else if (offsetRef.current < 0) {
+        offsetRef.current += singleSetWidth
+      }
+
+      track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`
+    }
+
+    const tick = (now: number) => {
+      const dt = Math.min((now - lastTime) / 1000, 0.05)
+      lastTime = now
+
+      stepRibbon(
+        updatesTrackRef.current,
+        recentUpdates.length,
+        updatesOffsetRef,
+        updatesVelocityRef,
+        updatesTargetVelocityRef,
+        updatesManualBoostRef,
+        dt
+      )
+
+      stepRibbon(
+        areasTrackRef.current,
+        coreResearchAreas.length,
+        areasOffsetRef,
+        areasVelocityRef,
+        areasTargetVelocityRef,
+        areasManualBoostRef,
+        dt
+      )
+
+      rafId = requestAnimationFrame(tick)
+    }
+
+    rafId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafId)
+  }, [recentUpdates.length])
+
+  const updateRibbonHoverVelocity = (
+    e: React.MouseEvent<HTMLDivElement>,
+    targetVelocityRef: React.MutableRefObject<number>
+  ) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    if (rect.width <= 0) return
+    const relX = (e.clientX - rect.left) / rect.width
+    const edgeZone = 0.2 // 20% leftmost and 20% rightmost zones
+
+    if (relX < edgeZone) {
+      const intensity = 1 - relX / edgeZone
+      targetVelocityRef.current = -(140 + intensity * 180)
+    } else if (relX > 1 - edgeZone) {
+      const intensity = (relX - (1 - edgeZone)) / edgeZone
+      targetVelocityRef.current = 140 + intensity * 180
+    } else {
+      targetVelocityRef.current = 0
     }
   }
 
+  const handleUpdatesMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    updateRibbonHoverVelocity(e, updatesTargetVelocityRef)
+  }
+
+  const handleUpdatesMouseLeave = () => {
+    updatesTargetVelocityRef.current = 55
+  }
+
+  const handleAreasMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    updateRibbonHoverVelocity(e, areasTargetVelocityRef)
+  }
+
+  const handleAreasMouseLeave = () => {
+    areasTargetVelocityRef.current = 55
+  }
+
+  const scrollUpdates = (direction: 'left' | 'right') => {
+    const step = 360
+    updatesManualBoostRef.current += direction === 'left' ? -step : step
+  }
+
   const scrollAreas = (direction: 'left' | 'right') => {
-    if (areasScrollRef.current) {
-      const scrollAmount = 380
-      areasScrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      })
-    }
+    const step = 380
+    areasManualBoostRef.current += direction === 'left' ? -step : step
   }
 
   return (
@@ -319,18 +425,20 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Horizontal Scrollable Cards Rail */}
+        {/* Dynamic Looping Ribbon of Cards */}
         <div
-          ref={updatesScrollRef}
-          className="flex gap-5 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          onMouseMove={handleUpdatesMouseMove}
+          onMouseLeave={handleUpdatesMouseLeave}
+          className="relative overflow-hidden py-2 -my-2 select-none"
         >
-          {recentUpdates.map(item => {
-            const Icon = item.icon
-            return (
+          <div
+            ref={updatesTrackRef}
+            className="flex gap-5 w-max pb-4 will-change-transform"
+          >
+            {loopedUpdates.map((item, idx) => (
               <article
-                key={item.id}
-                className="min-w-[290px] sm:min-w-[340px] max-w-[360px] p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/50 shadow-xs hover:shadow-md transition-all shrink-0 snap-start flex flex-col justify-between group"
+                key={`${item.id}-${idx}`}
+                className="min-w-[290px] sm:min-w-[340px] max-w-[360px] p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/50 shadow-xs hover:shadow-md transition-all shrink-0 flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
@@ -343,14 +451,9 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 mb-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-white text-[var(--accent-orange)] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <h3 className="text-base font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug">
-                      {item.title}
-                    </h3>
-                  </div>
+                  <h3 className="text-base font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2.5">
+                    {item.title}
+                  </h3>
 
                   <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-relaxed font-normal mt-2 line-clamp-3">
                     {item.desc}
@@ -361,16 +464,26 @@ export default function Home() {
                   <span className="text-[11px] text-[var(--text-subtle)] font-medium">
                     {item.category}
                   </span>
-                  <Link
-                    to={item.link!}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline transition-colors"
-                  >
-                    <span>{item.actionText}</span>
-                  </Link>
+                  {item.actionType === 'apply' ? (
+                    <button
+                      type="button"
+                      onClick={() => setApplyModalOpen(true)}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline transition-colors cursor-pointer"
+                    >
+                      <span>{item.actionText}</span>
+                    </button>
+                  ) : (
+                    <Link
+                      to={item.link!}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline transition-colors"
+                    >
+                      <span>{item.actionText}</span>
+                    </Link>
+                  )}
                 </div>
               </article>
-            )
-          })}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -407,9 +520,9 @@ export default function Home() {
             {/* Right: Bigger AIR Lab Photo */}
             <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group">
               <img
-                src="/carousel-images/6530466a-3815-4434-a181-85e97c3ae385.jpg"
-                alt="AIR Lab NED University"
-                className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
+                src="/about-lab.jpg"
+                alt="AIR Lab NED University Team"
+                className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
             </div>
@@ -447,50 +560,55 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Single-Row Horizontal Scrollable Track */}
+        {/* Dynamic Looping Ribbon of Core Research Areas */}
         <div
-          ref={areasScrollRef}
-          className="flex gap-6 overflow-x-auto pb-6 pt-1 scrollbar-none snap-x snap-mandatory scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          onMouseMove={handleAreasMouseMove}
+          onMouseLeave={handleAreasMouseLeave}
+          className="relative overflow-hidden py-2 -my-2 select-none"
         >
-          {coreResearchAreas.map((area, idx) => {
-            const Icon = area.icon
-            const targetUrl = `/projects?area=${encodeURIComponent(area.title)}`
-            return (
-              <div
-                key={idx}
-                onClick={() => navigate(targetUrl)}
-                className="min-w-[310px] sm:min-w-[360px] max-w-[380px] shrink-0 snap-start relative overflow-hidden p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
-              >
-                {/* Subtle low-opacity background image texture ensuring all text remains crisp and visible */}
-                <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
-                  <img
-                    src={area.image}
-                    alt=""
-                    className="w-full h-full object-cover opacity-[0.18] dark:opacity-[0.24] group-hover:opacity-[0.26] dark:group-hover:opacity-[0.32] group-hover:scale-105 transition-all duration-500 ease-out"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-[var(--bg-surface)]/60 to-[var(--bg-surface)]/10 pointer-events-none" />
-                </div>
-
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-11 h-11 rounded-2xl bg-white border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all shadow-xs">
-                      <Icon className="w-5 h-5" />
-                    </div>
+          <div
+            ref={areasTrackRef}
+            className="flex gap-6 w-max pb-6 pt-1 will-change-transform"
+          >
+            {loopedAreas.map((area, idx) => {
+              const Icon = area.icon
+              const targetUrl = `/projects?area=${encodeURIComponent(area.title)}`
+              return (
+                <div
+                  key={`${area.title}-${idx}`}
+                  onClick={() => navigate(targetUrl)}
+                  className="min-w-[310px] sm:min-w-[360px] max-w-[380px] shrink-0 relative overflow-hidden p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                >
+                  {/* Subtle low-opacity background image texture ensuring all text remains crisp and visible */}
+                  <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+                    <img
+                      src={area.image}
+                      alt=""
+                      className="w-full h-full object-cover opacity-[0.18] dark:opacity-[0.24] group-hover:opacity-[0.26] dark:group-hover:opacity-[0.32] group-hover:scale-105 transition-all duration-500 ease-out"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-[var(--bg-surface)]/60 to-[var(--bg-surface)]/10 pointer-events-none" />
                   </div>
 
-                  <h3 className="font-head font-semibold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors mb-2.5">
-                    {area.title}
-                  </h3>
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="w-11 h-11 rounded-2xl bg-white border border-[var(--border-hairline)] text-[var(--ink-dark)] flex items-center justify-center group-hover:scale-105 group-hover:text-[var(--accent-orange)] transition-all shadow-xs">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                    </div>
 
-                  <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
-                    {area.desc}
-                  </p>
+                    <h3 className="font-head font-semibold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors mb-2.5">
+                      {area.title}
+                    </h3>
+
+                    <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
+                      {area.desc}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
 
         {/* Single "See Projects" Button */}
@@ -534,9 +652,9 @@ export default function Home() {
             {/* Right Column: Bigger Team group photo */}
             <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group">
               <img
-                src="/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg"
+                src="/team-group.jpg"
                 alt="AIR Lab Research Team"
-                className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
             </div>
