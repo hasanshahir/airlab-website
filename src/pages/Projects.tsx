@@ -403,7 +403,7 @@ export default function Projects() {
                     <div className="flex items-center justify-between">
                       <span className="text-[var(--text-subtle)]">Timeline:</span>
                       <span className="font-semibold text-[var(--text-primary)]">
-                        {proj.timeTaken || (proj.endDate ? `${proj.startDate} — ${proj.endDate}` : proj.startDate)}
+                        {proj.startDate || proj.timeTaken}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -526,7 +526,7 @@ export default function Projects() {
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">PROJECT TIMELINE</span>
                         <span className="font-semibold text-[var(--text-primary)]">
-                          {selectedProject.timeTaken || (selectedProject.endDate ? `${selectedProject.startDate} — ${selectedProject.endDate}` : selectedProject.startDate)}
+                          {selectedProject.startDate || selectedProject.timeTaken}
                         </span>
                       </div>
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
