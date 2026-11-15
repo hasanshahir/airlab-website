@@ -1,5 +1,5 @@
 import React from 'react'
-import { Mail, MapPin, Phone, ExternalLink } from 'lucide-react'
+import { Mail, MapPin, Phone } from 'lucide-react'
 
 export const ContactSection: React.FC = () => {
   return (
@@ -15,7 +15,7 @@ export const ContactSection: React.FC = () => {
             Connect with AIR Lab
           </h2>
           <p className="text-sm sm:text-base text-[var(--text-muted)] leading-relaxed mb-8 font-normal">
-            For academic collaborations, sponsored industry grants, student fellowship inquiries, or dataset access requests, reach our coordination team directly.
+            For academic collaborations, sponsored industry grants, research inquiries, or dataset access requests, reach our coordination team directly.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -65,7 +65,6 @@ export const ContactSection: React.FC = () => {
                 className="text-xs font-sans text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 shrink-0 font-semibold"
               >
                 <span>NED University Website</span>
-                <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>

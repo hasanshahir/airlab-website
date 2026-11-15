@@ -13,14 +13,32 @@ export interface VacancySettings {
 
 export const DEFAULT_VACANCY_SETTINGS: VacancySettings = {
   status: 'Open',
-  badge: 'FELLOWSHIP & INTERNSHIP ADMISSIONS',
-  title: 'Apply for Research Vacancy',
-  description:
-    'Department of CSIT · NED University. Work directly with faculty on LLMs, edge perception, and robotics testbeds.',
-  ribbonLabel: 'Applications Open:',
-  ribbonText: 'Student Research Internship & Fellowship Vacancies Open for Fall 2026 — NEDUET CSIT',
+  badge: 'AIR LAB APPLICATIONS',
+  title: 'Application Form',
+  description: '',
+  ribbonLabel: 'AIR Lab NED:',
+  ribbonText: 'Advancing Sovereign AI, Foundational Models, Cyber Defense, and Edge Systems for Pakistan — Department of CSIT, NED University',
   closedMessage:
     'Applications are currently closed. Please check back soon or follow our updates for the next intake.',
+}
+
+function sanitizeVacancyCopy(data: Partial<VacancySettings> | null | undefined): VacancySettings {
+  if (!data || typeof data !== 'object') return DEFAULT_VACANCY_SETTINGS
+  const isLegacyText = (val?: string) =>
+    !val || /internship|fellowship|vacanc/i.test(val)
+
+  return {
+    status: data.status === 'Closed' ? 'Closed' : 'Open',
+    badge: isLegacyText(data.badge) ? DEFAULT_VACANCY_SETTINGS.badge : data.badge!,
+    title: isLegacyText(data.title) ? DEFAULT_VACANCY_SETTINGS.title : data.title!,
+    description: isLegacyText(data.description) ? DEFAULT_VACANCY_SETTINGS.description : data.description!,
+    ribbonLabel:
+      !data.ribbonLabel || /open|internship|fellowship|vacanc/i.test(data.ribbonLabel)
+        ? DEFAULT_VACANCY_SETTINGS.ribbonLabel
+        : data.ribbonLabel,
+    ribbonText: isLegacyText(data.ribbonText) ? DEFAULT_VACANCY_SETTINGS.ribbonText : data.ribbonText!,
+    closedMessage: data.closedMessage || DEFAULT_VACANCY_SETTINGS.closedMessage,
+  }
 }
 
 // One shared request per page load, reused by every component that needs it.
@@ -33,10 +51,7 @@ function loadVacancySettings(): Promise<VacancySettings> {
     const req: Promise<VacancySettings> = fetch('/api/settings/vacancy')
       .then(r => (r.ok ? r.json() : null))
       .then((data): VacancySettings => {
-        const resolved: VacancySettings = {
-          ...DEFAULT_VACANCY_SETTINGS,
-          ...(data && typeof data === 'object' ? data : {}),
-        }
+        const resolved = sanitizeVacancyCopy(data)
         cache = resolved
         return resolved
       })
@@ -65,4 +80,3 @@ export function useVacancySettings(): VacancySettings {
 
   return settings
 }
-

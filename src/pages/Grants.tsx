@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { ExternalLink, Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
+import { Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
 import type { Grant } from '../types/data'
 import SectionReveal from '../components/ui/SectionReveal'
@@ -42,15 +42,9 @@ export default function Grants() {
       {/* Header */}
       <div className="mb-14 text-left max-w-3xl">
         <SectionReveal delay={0.08}>
-          <h1 className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
-            Research Funding & Sponsored Grants
+          <h1 className="font-head font-semibold text-[var(--text-primary)] tracking-tight">
+            Research Funding
           </h1>
-        </SectionReveal>
-
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-            Official government research programs, Sindh Higher Education Commission awards, national technology grants, and international fellowships supporting computational intelligence at AIR Lab.
-          </p>
         </SectionReveal>
       </div>
 
@@ -64,10 +58,10 @@ export default function Grants() {
                   key={grant.id}
                   className="p-8 sm:p-10 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200"
                 >
-                  <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Grant Image preview if available */}
+                  <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+                    {/* Grant Image preview if available (Bigger size) */}
                     {grant.image && (
-                      <div className="w-full lg:w-72 h-48 sm:h-56 rounded-2xl overflow-hidden shrink-0 bg-[var(--bg-page)] border border-[var(--border-hairline)]">
+                      <div className="w-full lg:w-[440px] xl:w-[500px] h-72 sm:h-80 lg:h-auto lg:min-h-[320px] rounded-2xl overflow-hidden shrink-0 bg-[var(--bg-page)] border border-[var(--border-hairline)] shadow-sm">
                         <img
                           src={grant.image}
                           alt={grant.title}
@@ -151,7 +145,6 @@ export default function Grants() {
                             className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 font-semibold"
                           >
                             <span>Funder Website</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
                           </a>
                         )}
                       </div>

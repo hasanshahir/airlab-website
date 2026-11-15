@@ -7,9 +7,7 @@ import { z } from 'zod'
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().positive().default(5000),
-  MONGO_URI: z
-    .string({ error: 'MONGO_URI is required – copy server/.env.example to server/.env and fill it in' })
-    .regex(/^mongodb(\+srv)?:\/\//, 'MONGO_URI must start with mongodb:// or mongodb+srv://'),
+  MONGO_URI: z.string().optional().default(''),
   JWT_SECRET: z.string().default('airlab-secret-key-fallback-2026'),
   /** Comma-separated list of origins allowed to call the API (only needed when frontend is on another origin). */
   CORS_ORIGINS: z

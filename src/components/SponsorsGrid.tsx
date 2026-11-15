@@ -1,5 +1,4 @@
 import React from 'react'
-import { ExternalLink } from 'lucide-react'
 import { getSponsors } from '../lib/data'
 
 export const SponsorsGrid: React.FC = () => {
@@ -25,12 +24,12 @@ export const SponsorsGrid: React.FC = () => {
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="h-12 w-12 rounded-xl bg-[var(--bg-page)] border border-[var(--border-hairline)] p-2 flex items-center justify-center overflow-hidden">
+                <div className="h-12 px-2.5 py-1.5 min-w-[56px] max-w-[150px] rounded-xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-center justify-center overflow-hidden shrink-0">
                   {sponsor.logo ? (
                     <img
                       src={sponsor.logo}
                       alt={`${sponsor.name} logo`}
-                      className="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all"
+                      className="h-8 max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all"
                       loading="lazy"
                     />
                   ) : (
@@ -54,7 +53,6 @@ export const SponsorsGrid: React.FC = () => {
 
             <div className="pt-4 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans text-[var(--accent-orange)] font-semibold">
               <span className="group-hover:underline">Visit Sponsor Site</span>
-              <ExternalLink className="w-3.5 h-3.5" />
             </div>
           </a>
         ))}

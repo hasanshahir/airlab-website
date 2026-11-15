@@ -7,8 +7,6 @@ import {
   CheckCircle2,
   Clock,
   Users,
-  ExternalLink,
-  ArrowRight,
 } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getProjects, getTeamMembers } from '../lib/data'
@@ -46,7 +44,7 @@ const CANONICAL_PROJECT_AREAS: Record<string, string[]> = {
     'Foundational Models & NLP',
     'Efficient Computing & TinyML',
     'Cyber',
-    'Development',
+    'Software Development',
   ],
   'PRJ-9': [
     'Adversarial AI',
@@ -56,23 +54,23 @@ const CANONICAL_PROJECT_AREAS: Record<string, string[]> = {
   ],
   'PRJ-10': [
     'Foundational Models & NLP',
-    'Development',
+    'Software Development',
     'Efficient Computing & TinyML',
   ],
   'PRJ-1': [
     'Foundational Models & NLP',
     'Cyber',
     'AI Safety & Alignment',
-    'Development',
+    'Software Development',
   ],
   'PRJ-2': [
     'Cyber',
-    'Development',
+    'Software Development',
     'Foundational Models & NLP',
     'Adversarial AI',
   ],
   'PRJ-3': [
-    'Development',
+    'Software Development',
     'Cyber',
     'Adversarial AI',
     'Foundational Models & NLP',
@@ -80,24 +78,28 @@ const CANONICAL_PROJECT_AREAS: Record<string, string[]> = {
   'PRJ-4': [
     'Foundational Models & NLP',
     'Efficient Computing & TinyML',
-    'Development',
+    'Software Development',
     'AI Safety & Alignment',
   ],
   'PRJ-5': [
-    'Development',
+    'Software Development',
     'Cyber',
     'Foundational Models & NLP',
   ],
   'PRJ-6': [
     'Foundational Models & NLP',
-    'Development',
+    'Software Development',
     'AI Safety & Alignment',
   ],
 }
 
+function normalizeAreaName(area: string): string {
+  return area.trim().toLowerCase() === 'development' ? 'Software Development' : area
+}
+
 function getProjectAreas(project: ProjectItem): string[] {
   if (Array.isArray(project.areas) && project.areas.length > 0) {
-    return project.areas
+    return project.areas.map(normalizeAreaName)
   }
   const idStr = String(project.id)
   if (CANONICAL_PROJECT_AREAS[idStr]) {
@@ -183,9 +185,10 @@ export default function Projects() {
               String(lp.id) === String(p.id) ||
               lp.title.trim().toLowerCase() === String(p.title || '').trim().toLowerCase()
           )
-          const areas = (Array.isArray(p.areas) && p.areas.length > 0)
+          const rawAreas = (Array.isArray(p.areas) && p.areas.length > 0)
             ? p.areas
             : (local?.areas || getProjectAreas(p))
+          const areas = rawAreas.map(normalizeAreaName)
           return {
             ...local,
             ...p,
@@ -370,7 +373,7 @@ export default function Projects() {
         </h1>
 
         <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-          Portfolio of foundation architectures, edge robotics pipelines, and clinical diagnostic benchmarks developed at AIR Lab.
+          From funded research to student-built systems, every project at AIR Lab is designed to solve a real problem for the people of Pakistan.
         </p>
       </div>
 
@@ -522,7 +525,6 @@ export default function Projects() {
                   </span>
                   <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1.5 group-hover:underline">
                     <span>View Details</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </div>
@@ -644,7 +646,7 @@ export default function Projects() {
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
                         <span className="text-[var(--text-subtle)] block mb-1">GRANT & FUNDING SOURCE</span>
                         <Link to="/grants" onClick={() => setSelectedProject(null)} className="font-semibold text-[var(--accent-orange)] hover:underline">
-                          {selectedProject.funding} &rarr;
+                          {selectedProject.funding}
                         </Link>
                         {selectedProject.grantAmount && selectedProject.grantAmount !== 'NA' && (
                           <div className="text-[11px] text-[var(--text-primary)] font-bold mt-1">
@@ -654,8 +656,14 @@ export default function Projects() {
                       </div>
                       {selectedProject.pi && (
                         <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                          <span className="text-[var(--text-subtle)] block mb-1">PRINCIPAL INVESTIGATOR</span>
+                          <span className="text-[var(--text-subtle)] block mb-1">FACULTY SUPERVISOR / PI</span>
                           <span className="font-semibold text-[var(--text-primary)]">{selectedProject.pi}</span>
+                        </div>
+                      )}
+                      {selectedProject.industryAdvisor && selectedProject.industryAdvisor !== 'N/A' && (
+                        <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
+                          <span className="text-[var(--text-subtle)] block mb-1">INDUSTRY ADVISOR</span>
+                          <span className="font-semibold text-[var(--text-primary)]">{selectedProject.industryAdvisor}</span>
                         </div>
                       )}
                       <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
@@ -676,7 +684,6 @@ export default function Projects() {
                             className="text-[var(--ink-dark)] hover:underline font-semibold flex items-center gap-1"
                           >
                             <span>Visit Website</span>
-                            <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
                       )}
@@ -738,7 +745,7 @@ export default function Projects() {
                                     onClick={() => setSelectedProject(null)}
                                     className="text-[10px] font-sans text-[var(--accent-orange)] hover:underline inline-flex items-center gap-0.5 font-semibold"
                                   >
-                                    Profile &rarr;
+                                    Profile
                                   </Link>
                                   {member.linkedin && (
                                     <a
@@ -748,7 +755,7 @@ export default function Projects() {
                                       className="text-[10px] font-sans text-[var(--text-subtle)] hover:text-[var(--ink-dark)] inline-flex items-center gap-0.5"
                                       onClick={e => e.stopPropagation()}
                                     >
-                                      LinkedIn <ExternalLink className="w-2.5 h-2.5" />
+                                      LinkedIn
                                     </a>
                                   )}
                                 </div>

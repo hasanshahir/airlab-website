@@ -6,7 +6,6 @@ import {
   LineChart,
   Layers,
   Award,
-  ArrowRight,
   Calendar,
   ChevronLeft,
   ChevronRight,
@@ -68,7 +67,7 @@ const coreResearchAreas = [
   },
   {
     icon: Terminal,
-    title: 'Development',
+    title: 'Software Development',
     image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80',
     desc: 'High-performance AI engineering, production-grade microservices, scalable distributed inference pipelines, and intelligent software systems.',
   },
@@ -93,6 +92,7 @@ export default function Home() {
   const vacancy = useVacancySettings()
   const [projects, setProjects] = useState<ProjectItem[]>(() => getProjects())
   const [grants, setGrants] = useState<Grant[]>(() => getGrants())
+  const areasScrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let active = true
@@ -204,6 +204,16 @@ export default function Home() {
     }
   }
 
+  const scrollAreas = (direction: 'left' | 'right') => {
+    if (areasScrollRef.current) {
+      const scrollAmount = 380
+      areasScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      })
+    }
+  }
+
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
       {/* ── 1. FULL-WIDTH HERO SHOWCASE (3D Curved Carousel) ── */}
@@ -247,7 +257,6 @@ export default function Home() {
               >
                 <Layers className="w-4 h-4 shrink-0" />
                 <span>Explore Projects</span>
-                <span className="text-sm font-sans group-hover:translate-x-0.5 transition-transform">↳</span>
               </Link>
             </div>
           </div>
@@ -352,24 +361,12 @@ export default function Home() {
                   <span className="text-[11px] text-[var(--text-subtle)] font-medium">
                     {item.category}
                   </span>
-                  {item.actionType === 'apply' ? (
-                    <button
-                      type="button"
-                      onClick={() => setApplyModalOpen(true)}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                    >
-                      <span>{item.actionText}</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  ) : (
-                    <Link
-                      to={item.link!}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline group-hover:translate-x-0.5 transition-transform"
-                    >
-                      <span>{item.actionText}</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  )}
+                  <Link
+                    to={item.link!}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline transition-colors"
+                  >
+                    <span>{item.actionText}</span>
+                  </Link>
                 </div>
               </article>
             )
@@ -377,53 +374,85 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 3. ABOUT AIR LAB SECTION (Full Bleed Deep Ink Band) ── */}
-      <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-20 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
-        <div className="max-w-[1240px] mx-auto">
-          <div className="max-w-3xl">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-white leading-tight font-head">
-              Empowering Regional AI Innovation at NED University
-            </h2>
+      {/* ── 3. ABOUT AIR LAB SECTION (Two Columns: Punch Line & Bigger Lab Photo) ── */}
+      <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-24 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
+        <div className="max-w-[1320px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            {/* Left: Punch line and about text */}
+            <div className="lg:col-span-5 text-left space-y-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-head">
+                Advancing Cutting-Edge AI & Translating Innovation
+              </h2>
 
-            <p className="text-base sm:text-lg text-white/85 leading-relaxed mb-6 font-normal">
-              The Artificial Intelligence Research Lab (AIR Lab) at NED University is dedicated to pushing the boundaries of machine learning, natural language processing, and computer vision.
-            </p>
+              <p className="text-base sm:text-lg text-white/85 leading-relaxed font-normal">
+                The Artificial Intelligence Research Lab (AIR Lab) at NED University is established to advance cutting-edge artificial intelligence and translate theoretical exploration into real-world impact.
+              </p>
 
-            <p className="text-base sm:text-lg text-white/80 leading-relaxed mb-10 font-normal">
-              Our mission is to develop foundational models optimized for the region&apos;s unique linguistic and infrastructural challenges, ensuring AI benefits all segments of society.
-            </p>
+              <p className="text-base sm:text-lg text-white/80 leading-relaxed font-normal">
+                Bridging academia and industry, we develop intelligent systems that are robust, ethical, explainable, and scalable—shaping the future of AI in Pakistan.
+              </p>
 
-            <div className="pt-6 border-t border-white/15 flex flex-wrap gap-4 items-center">
-              <Button
-                to="/team"
-                variant="secondary"
-                size="md"
-                className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold"
-              >
-                Meet the Team
-              </Button>
-              <button
-                type="button"
-                onClick={() => setApplyModalOpen(true)}
-                className="h-10 px-5 rounded-full text-[13.5px] font-medium text-white hover:text-white/80 flex items-center gap-1.5 transition-colors cursor-pointer group"
-              >
-                <span>Apply for Internship</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
+              <div className="pt-4 border-t border-white/15 flex flex-wrap gap-4 items-center">
+                <Button
+                  to="/about"
+                  variant="secondary"
+                  size="md"
+                  className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
+                >
+                  <span>About AIR Lab</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Right: Bigger AIR Lab Photo */}
+            <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group">
+              <img
+                src="/carousel-images/6530466a-3815-4434-a181-85e97c3ae385.jpg"
+                alt="AIR Lab NED University"
+                className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 4. CORE RESEARCH AREAS (High-Contrast Clean Cards) ── */}
+      {/* ── 4. CORE RESEARCH AREAS (Single-Row Horizontal Slider with Single "See Projects" Button) ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
-        <div className="mb-12 border-b border-[var(--border-hairline)] pb-6 text-left">
+        <div className="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--border-hairline)] text-left">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head">
             Core Research Areas
           </h2>
+
+          {/* Horizontal Slider Controls (< and >) */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => scrollAreas('left')}
+              className="w-10 h-10 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              aria-label="Previous research areas"
+              title="Scroll left"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollAreas('right')}
+              className="w-10 h-10 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              aria-label="Next research areas"
+              title="Scroll right"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Single-Row Horizontal Scrollable Track */}
+        <div
+          ref={areasScrollRef}
+          className="flex gap-6 overflow-x-auto pb-6 pt-1 scrollbar-none snap-x snap-mandatory scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {coreResearchAreas.map((area, idx) => {
             const Icon = area.icon
             const targetUrl = `/projects?area=${encodeURIComponent(area.title)}`
@@ -431,7 +460,7 @@ export default function Home() {
               <div
                 key={idx}
                 onClick={() => navigate(targetUrl)}
-                className="relative overflow-hidden p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group cursor-pointer"
+                className="min-w-[310px] sm:min-w-[360px] max-w-[380px] shrink-0 snap-start relative overflow-hidden p-8 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
               >
                 {/* Subtle low-opacity background image texture ensuring all text remains crisp and visible */}
                 <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
@@ -459,30 +488,66 @@ export default function Home() {
                     {area.desc}
                   </p>
                 </div>
-
-                <div className="relative z-10 pt-5 mt-6 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans font-medium text-[var(--accent-orange)]">
-                  <Link
-                    to={targetUrl}
-                    onClick={e => e.stopPropagation()}
-                    className="inline-flex items-center gap-1.5 hover:underline font-semibold"
-                  >
-                    <span>View Projects</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
               </div>
             )
           })}
         </div>
+
+        {/* Single "See Projects" Button */}
+        <div className="mt-8 flex justify-center sm:justify-start">
+          <Button
+            to="/projects"
+            size="md"
+            className="inline-flex items-center gap-2 font-semibold px-7"
+          >
+            <span>See Projects</span>
+          </Button>
+        </div>
       </section>
 
-      {/* ── 5. RESEARCH PARTNERS & SPONSORS ── */}
-      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-head">
-            Funded by National & Global Partners
-          </h2>
+      {/* ── 5. TEAM SHOWCASE (Guided by faculty, driven by students, built for Pakistan) ── */}
+      <section className="py-16 sm:py-24 px-6 sm:px-10 max-w-[1320px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          {/* Left Column: Team punchline & text */}
+          <div className="lg:col-span-5 text-left space-y-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--text-primary)] font-head leading-tight">
+              Guided by faculty, driven by students, built for Pakistan.
+            </h2>
+
+            <p className="text-base sm:text-lg text-[var(--text-muted)] leading-relaxed font-normal">
+              Behind every system is a team that cares about Pakistan. Our interdisciplinary team brings together faculty principal investigators, research interns, and student scholars solving real problems at the forefront of artificial intelligence.
+            </p>
+
+            <div className="pt-2">
+              <Button
+                to="/team"
+                size="md"
+                className="inline-flex items-center gap-2 font-semibold"
+              >
+                <span>Meet the Team</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Right Column: Bigger Team group photo */}
+          <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-[var(--bg-surface)] group">
+            <img
+              src="/carousel-images/a4ddd83a-92b4-4c4a-abaa-fd36bff46d3b.jpg"
+              alt="AIR Lab Research Team"
+              className="w-full h-full absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute bottom-4 left-4 right-4 text-white text-xs font-sans font-medium bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl inline-flex items-center justify-between border border-white/10">
+              <span>AIR Lab Faculty & Research Cohort</span>
+              <span className="text-[var(--accent-orange)]">Department of CSIT</span>
+            </div>
+          </div>
         </div>
+      </section>
+
+      {/* ── 6. COLLABORATORS & SPONSORS ── */}
+      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
         <SponsorsGrid />
       </section>
 

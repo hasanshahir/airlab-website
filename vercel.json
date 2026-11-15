@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/(pfp|gallery|carousel-images|apple-watch)/(.*)",
+      "source": "/(pfp|gallery|carousel-images|apple-watch|projects)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

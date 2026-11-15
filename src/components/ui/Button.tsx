@@ -38,7 +38,7 @@ export const Button: React.FC<ButtonProps> = ({
       'bg-transparent hover:bg-[var(--surface-alt)] text-[var(--text-primary)] font-medium transition-colors duration-150',
   }
 
-  const showArrow = arrow !== undefined ? arrow : variant === 'primary'
+  const showArrow = Boolean(arrow)
 
   const sharedClasses = `group inline-flex items-center justify-center gap-2 rounded-full tracking-tight font-sans transition-all active:translate-y-[1px] select-none cursor-pointer whitespace-nowrap ${sizeStyles[size]} ${variantStyles[variant]} ${className}`
 

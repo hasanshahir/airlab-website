@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import mongoose from 'mongoose'
 import { collectionBySlug, collections } from '../content/registry.js'
 import { contentModels } from '../models/content.js'
 import { HttpError } from '../middleware/errors.js'
@@ -32,13 +33,16 @@ contentRouter.get('/:slug', async (req, res) => {
   const { def, model } = resolve(req.params.slug)
   let items: any[] = []
 
-  try {
-    items = await model
-      .find({ published: true })
-      .sort({ order: 1, ...(def.defaultSort ?? {}), createdAt: 1 })
-      .lean()
-  } catch {
-    // Database connection or query error; fall through to seed fallback
+  if (mongoose.connection.readyState === 1) {
+    try {
+      items = await model
+        .find({ published: true })
+        .sort({ order: 1, ...(def.defaultSort ?? {}), createdAt: 1 })
+        .maxTimeMS(4000)
+        .lean()
+    } catch {
+      items = []
+    }
   }
 
   // If database collection is currently empty or unavailable, serve fallback seed data from src/data/*.json

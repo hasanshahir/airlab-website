@@ -1,7 +1,7 @@
 [
   {
     "id": "PRJ-7",
-    "title": "Familiar: Quality-Aware Face Recognition System for Pakistani Subjects",
+    "title": "Familiar: A Quality-Aware Face Recognition System for Pakistani Subjects",
     "category": "Undergraduate",
     "status": "Ongoing",
     "areas": [
@@ -20,21 +20,28 @@
     "funding": "Indigenous Dataset Collection & Research Project",
     "grantSupplier": "Indigenous Dataset Collection & Research Project",
     "grantAmount": "",
-    "pi": "",
+    "pi": "Dr. Murk Marvi",
     "funderUrl": "",
     "timeTaken": "Aug 26 - May 27",
     "startDate": "Aug 2026",
     "endDate": "May 2027",
-    "coverImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80",
+    "coverImage": "/projects/familiar.jpg",
     "images": [
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
+      "/projects/familiar.jpg"
+    ],
+    "teamMembers": [
+      "Muhammad Obaid",
+      "Akhyar Ahmed Turk",
+      "Muhammad Rehan",
+      "Qazi Asim Kamal"
     ],
     "tags": [
       "Biometrics",
       "Face Recognition",
       "Pakistani Demographics",
       "Vector Indexing",
-      "Computer Vision"
+      "Domain-Adaptive Deep Learning",
+      "HNSW"
     ]
   },
   {
@@ -46,7 +53,7 @@
       "Foundational Models & NLP",
       "Efficient Computing & TinyML",
       "Cyber",
-      "Development"
+      "Software Development"
     ],
     "description": "This project proposes a locally hosted, web-based research assistant for NED UET that uses small language models to summarize papers, compare them thematically and methodologically, and help draft new papers with LaTeX support. Because everything runs on campus hardware, unpublished research never leaves the institution, which avoids the privacy and IP risks of cloud LLMs while still delivering competitive quality.",
     "teamMembers": [
@@ -120,7 +127,7 @@
     "status": "Ongoing",
     "areas": [
       "Foundational Models & NLP",
-      "Development",
+      "Software Development",
       "Efficient Computing & TinyML"
     ],
     "description": "Naqshkaar is an AI interior design platform for Pakistan that generates 3D room designs from a real catalogue of purchasable local products, scaled to true room dimensions and checked against space and budget limits. Unlike tools such as Planner 5D or RoomGPT, it uses PKR prices, accounts for local needs like ceiling-fan clearance, AC and UPS placement, and prayer space, and lets users pick each item from AI-shortlisted options. The result is a design they can visualize and buy, with an itemised cost estimate and direct purchase links.",
@@ -133,21 +140,94 @@
     "funding": "Multimodal Generative 3D Platform",
     "grantSupplier": "Multimodal Generative 3D Platform",
     "grantAmount": "",
-    "pi": "",
+    "pi": "Dr. Murk Marvi",
+    "industryAdvisor": "Muzammil Jethwa (Senior Solutions Engineer, Mazik Global)",
     "funderUrl": "",
     "timeTaken": "Aug 26 - May 27",
     "startDate": "Aug 2026",
     "endDate": "May 2027",
-    "coverImage": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
+    "coverImage": "/projects/naqshkaar.jpg",
     "images": [
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80"
+      "/projects/naqshkaar.jpg"
+    ],
+    "teamMembers": [
+      "Mureed Hussain",
+      "Muhammad Sameed",
+      "Faiq Ahmed",
+      "Muhammad Sami"
     ],
     "tags": [
       "3D Interior Design",
       "Generative AI",
       "Multimodal AI",
       "PKR Catalogue",
-      "Spatial Constraints"
+      "Spatial Constraints",
+      "Mazik Global"
+    ]
+  },
+  {
+    "id": "PRJ-11",
+    "title": "CORTEX — Cognitive Retrieval with Tiered Expansion",
+    "category": "Undergraduate",
+    "status": "Ongoing",
+    "areas": [
+      "Foundational Models & NLP",
+      "Software Development",
+      "Efficient Computing & TinyML",
+      "Cyber"
+    ],
+    "description": "CORTEX is a modular, tiered memory architecture for large language models (LLMs) designed to improve retrieval efficiency and optimize long-term memory storage. It organizes information across multiple memory tiers, enabling relevant information to be retrieved, updated, consolidated, and forgotten intelligently.",
+    "funding": "Departmental / Self-Funded",
+    "grantSupplier": "",
+    "grantAmount": "",
+    "pi": "Dr. Murk Marvi",
+    "industryAdvisor": "N/A",
+    "funderUrl": "",
+    "timeTaken": "2026 — 2027",
+    "startDate": "Aug 2026",
+    "coverImage": "/projects/cortex.jpg",
+    "images": [
+      "/projects/cortex.jpg"
+    ],
+    "tags": [
+      "LLMs",
+      "Memory Architecture",
+      "Cognitive Retrieval",
+      "Tiered Memory",
+      "Memory Manager",
+      "Vector Search"
+    ]
+  },
+  {
+    "id": "PRJ-12",
+    "title": "Taleem-e-Aam (Model-Craft)",
+    "category": "Undergraduate",
+    "status": "Ongoing",
+    "areas": [
+      "Foundational Models & NLP",
+      "Software Development",
+      "AI Safety & Alignment"
+    ],
+    "description": "Taleem-e-Aam is an AI-powered educational project that adapts a small, open-source language model to improve Urdu understanding and address the linguistic and cultural needs of Pakistani students. Using efficient fine-tuning techniques such as LoRA/QLoRA and reinforcement learning, the project aims to develop an educational application that provides accessible, accurate, and contextually relevant Urdu-based learning support.",
+    "funding": "Departmental / Self-Funded",
+    "grantSupplier": "",
+    "grantAmount": "",
+    "pi": "Dr. Murk Marvi",
+    "industryAdvisor": "N/A",
+    "funderUrl": "",
+    "timeTaken": "2026 — 2027",
+    "startDate": "Aug 2026",
+    "coverImage": "/projects/taleem-e-aam.jpg",
+    "images": [
+      "/projects/taleem-e-aam.jpg"
+    ],
+    "tags": [
+      "Urdu NLP",
+      "Educational AI",
+      "LoRA / QLoRA",
+      "SLM",
+      "Reinforcement Learning",
+      "Model-Craft"
     ]
   },
   {
@@ -160,7 +240,7 @@
       "Foundational Models & NLP",
       "Cyber",
       "AI Safety & Alignment",
-      "Development"
+      "Software Development"
     ],
     "description": "This project addresses three under-studied identity resolution problems in Pakistan by building three independent AI services: multilingual entity resolution with Urdu/English NER and CNIC-aware matching, LLM-driven generation of Urdu and English name variants (such as Mubashir, Mubashar and Mubasher) with confidence scores, and face matching with demographic-fairness auditing on a regionally representative test set. Each service is evaluated on curated benchmarks and backed by a peer-reviewed publication. Deliverables include trained models, annotated benchmark datasets released for reuse, model cards, and a published API specification so any compliant application can integrate the services.",
     "funding": "Government of Sindh — Sindh Higher Education Commission (Sindh HEC)",
@@ -190,7 +270,7 @@
     "status": "Ongoing",
     "areas": [
       "Cyber",
-      "Development",
+      "Software Development",
       "Foundational Models & NLP",
       "Adversarial AI"
     ],
@@ -220,7 +300,7 @@
     "category": "Undergraduate",
     "status": "Finished",
     "areas": [
-      "Development",
+      "Software Development",
       "Cyber",
       "Adversarial AI",
       "Foundational Models & NLP"
@@ -259,7 +339,7 @@
     "areas": [
       "Foundational Models & NLP",
       "Efficient Computing & TinyML",
-      "Development",
+      "Software Development",
       "AI Safety & Alignment"
     ],
     "description": "This project develops a voice agent that calls patients after they use an ambulance service, speaks to them in Urdu or English, and gathers feedback on the care they received. By automating these calls, ambulance services can consistently hear from more patients without increasing call-centre workloads. The system converts speech to text, understands spoken responses, and summarises the results for service quality managers.",
@@ -295,7 +375,7 @@
     "category": "Undergraduate",
     "status": "Finished",
     "areas": [
-      "Development",
+      "Software Development",
       "Cyber",
       "Foundational Models & NLP"
     ],
@@ -332,7 +412,7 @@
     "status": "Finished",
     "areas": [
       "Foundational Models & NLP",
-      "Development",
+      "Software Development",
       "AI Safety & Alignment"
     ],
     "description": "This project builds an autonomous AI travel assistant that creates custom travel itineraries for Pakistan and monitors trips in real time. It factors in safety, weather, road conditions and personal preferences, and can adjust plans on the fly if routes close or conditions change. The system uses multiple specialized AI agents working together to give travelers a safer, more predictable journey.",

@@ -16,10 +16,11 @@ export interface Grant {
 export interface Sponsor {
   id: string
   name: string
+  shortName?: string
   type: string
   logo?: string
   url?: string
-  tier?: 'Academic' | 'Strategic Compute' | 'Government & National'
+  tier?: string
   placeholder?: boolean
 }
 
@@ -35,6 +36,7 @@ export interface ProjectItem {
   grantSupplier?: string
   grantAmount?: string
   pi?: string
+  industryAdvisor?: string
   funderUrl?: string
   teamMembers?: string[]
   timeTaken?: string
@@ -122,4 +124,24 @@ export interface InternItem {
   quote?: string
   paper?: string
   image?: string
+}
+
+export interface PerformerItem {
+  id: string
+  name: string
+  role: string
+  department?: string
+  month: string
+  rank?: number
+  title?: string
+  achievement?: string
+  researchFocus?: string
+  email?: string
+  linkedin?: string
+  cvUrl?: string
+  avatar?: string
+  tags?: string[]
+  image: string
+  categoryTab?: string
+  photos?: string[]
 }

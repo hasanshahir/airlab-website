@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "id": "neduet",
+    "name": "NED University of Engineering and Technology",
+    "shortName": "NED UET",
+    "url": "https://www.neduet.edu.pk/",
+    "logo": "/partners/neduet.svg",
+    "tier": "Host Institution",
+    "type": "Academic & Research Partner"
+  },
+  {
+    "id": "sindh-hec",
+    "name": "Sindh Higher Education Commission",
+    "shortName": "Sindh HEC",
+    "url": "https://sindhhec.gov.pk/",
+    "logo": "/partners/sindh-hec.png",
+    "tier": "Government Grant",
+    "type": "Govt. of Sindh Higher Education Commission"
+  },
+  {
+    "id": "providus",
+    "name": "Providus Technologies",
+    "shortName": "Providus",
+    "url": "https://www.linkedin.com/company/providus-technologies/posts/",
+    "logo": "/partners/providus.webp",
+    "tier": "Industry Partner",
+    "type": "AI & Enterprise Technologies"
+  },
+  {
+    "id": "siehs",
+    "name": "Sindh Integrated Emergency & Health Services (SIEHS 1122)",
+    "shortName": "SIEHS",
+    "url": "https://www.linkedin.com/company/siehspk/home/",
+    "logo": "/partners/siehs.png",
+    "tier": "Public Health Partner",
+    "type": "Emergency & Health Services"
+  }
+]
