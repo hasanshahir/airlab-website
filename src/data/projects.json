@@ -103,14 +103,14 @@
     "funding": "LLM Security & Agent Provenance Research",
     "grantSupplier": "LLM Security & Agent Provenance Research",
     "grantAmount": "",
-    "pi": "",
+    "pi": "Dr. Murk Marvi (Co-Supervisor: Ms. Dua Agha)",
     "funderUrl": "",
     "timeTaken": "Aug 26 - May 27",
     "startDate": "Aug 2026",
     "endDate": "May 2027",
-    "coverImage": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80",
+    "coverImage": "/projects/memtrace.jpg",
     "images": [
-      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80"
+      "/projects/memtrace.jpg"
     ],
     "tags": [
       "LLM Security",

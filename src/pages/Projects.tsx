@@ -189,9 +189,15 @@ export default function Projects() {
             ? p.areas
             : (local?.areas || getProjectAreas(p))
           const areas = rawAreas.map(normalizeAreaName)
+          const useLocalCover =
+            local?.coverImage?.startsWith('/projects/') &&
+            (!p.coverImage || String(p.coverImage).includes('unsplash.com'))
           return {
             ...local,
             ...p,
+            coverImage: useLocalCover ? local!.coverImage : (p.coverImage || local?.coverImage),
+            images: useLocalCover ? local!.images : (p.images?.length ? p.images : local?.images),
+            pi: p.pi || local?.pi,
             areas,
           }
         })
@@ -368,13 +374,9 @@ export default function Projects() {
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* ── Section Header ── */}
       <div className="mb-14 text-left max-w-3xl">
-        <h1 className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] mb-4 font-head">
+        <h1 className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] font-head">
           Applied AI Systems & Projects
         </h1>
-
-        <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal">
-          From funded research to student-built systems, every project at AIR Lab is designed to solve a real problem for the people of Pakistan.
-        </p>
       </div>
 
       {/* ── Category Filter Pills & Search ── */}
@@ -509,7 +511,7 @@ export default function Projects() {
                     </div>
                     {proj.pi && (
                       <div className="flex items-center justify-between">
-                        <span className="text-[var(--text-subtle)]">PI:</span>
+                        <span className="text-[var(--text-subtle)]">Supervisor:</span>
                         <span className="font-medium text-[var(--text-primary)] truncate max-w-[180px]">
                           {proj.pi}
                         </span>
@@ -656,7 +658,7 @@ export default function Projects() {
                       </div>
                       {selectedProject.pi && (
                         <div className="p-4 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-2xl">
-                          <span className="text-[var(--text-subtle)] block mb-1">FACULTY SUPERVISOR / PI</span>
+                          <span className="text-[var(--text-subtle)] block mb-1">SUPERVISOR</span>
                           <span className="font-semibold text-[var(--text-primary)]">{selectedProject.pi}</span>
                         </div>
                       )}

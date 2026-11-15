@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { Calendar, User, CheckCircle2, Clock, Landmark } from 'lucide-react'
 import { getGrants } from '../lib/data'
 import type { Grant } from '../types/data'
@@ -10,6 +10,120 @@ function parseGrantDateScore(durationStr?: string): number {
   const lower = durationStr.toLowerCase()
   const yearMatch = lower.match(/\b(19\d\d|20\d\d)\b/)
   return yearMatch ? parseInt(yearMatch[1], 10) : 0
+}
+
+function parseNumericGrantAmount(raw: string): { prefix: string; target: number; suffix: string } | null {
+  if (!raw) return null
+  const trimmed = raw.trim()
+
+  let prefix = ''
+  if (/^rs\.?\s*/i.test(trimmed)) {
+    prefix = 'Rs. '
+  } else if (/^pkr\s*/i.test(trimmed)) {
+    prefix = 'PKR '
+  } else if (/^\$/.test(trimmed)) {
+    prefix = '$'
+  }
+
+  const numMatch = trimmed.match(/(\d[\d,]*(?:\.\d+)?)/)
+  if (!numMatch) return null
+
+  const baseValue = parseFloat(numMatch[1].replace(/,/g, ''))
+  if (isNaN(baseValue)) return null
+
+  const lower = trimmed.toLowerCase()
+  let multiplier = 1
+  if (lower.includes('billion')) {
+    multiplier = 1_000_000_000
+  } else if (lower.includes('million') || /\b\d+(?:\.\d+)?\s*m\b/i.test(trimmed)) {
+    multiplier = 1_000_000
+  } else if (lower.includes('crore')) {
+    multiplier = 10_000_000
+  } else if (lower.includes('lakh') || lower.includes('lac')) {
+    multiplier = 100_000
+  } else if (lower.includes('thousand') || /\b\d+(?:\.\d+)?\s*k\b/i.test(trimmed)) {
+    multiplier = 1_000
+  }
+
+  return {
+    prefix,
+    target: Math.round(baseValue * multiplier),
+    suffix: '',
+  }
+}
+
+function AnimatedGrantAmount({ amount }: { amount: string }) {
+  const parsed = useMemo(() => parseNumericGrantAmount(amount), [amount])
+  const [displayValue, setDisplayValue] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const hasAnimatedRef = useRef(false)
+
+  useEffect(() => {
+    if (!parsed) return
+    hasAnimatedRef.current = false
+
+    const el = containerRef.current
+    const startAnimation = () => {
+      if (hasAnimatedRef.current) return
+      hasAnimatedRef.current = true
+
+      const duration = 1800
+      const startTime = performance.now()
+
+      const tick = (now: number) => {
+        const elapsed = now - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        // Ease-out cubic for smooth deceleration on final digits
+        const eased = 1 - Math.pow(1 - progress, 3)
+        setDisplayValue(Math.round(eased * parsed.target))
+
+        if (progress < 1) {
+          requestAnimationFrame(tick)
+        } else {
+          setDisplayValue(parsed.target)
+        }
+      }
+
+      requestAnimationFrame(tick)
+    }
+
+    if (typeof IntersectionObserver === 'undefined' || !el) {
+      startAnimation()
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0]?.isIntersecting) {
+          startAnimation()
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.2 }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [parsed])
+
+  if (!parsed) {
+    return (
+      <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-head text-[var(--text-primary)] tracking-tight mt-1">
+        {amount}
+      </div>
+    )
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="text-2xl sm:text-3xl xl:text-4xl font-extrabold font-head text-[var(--text-primary)] tracking-tight tabular-nums mt-1 leading-none"
+    >
+      {parsed.prefix}
+      {displayValue.toLocaleString('en-US')}
+      {parsed.suffix}
+    </div>
+  )
 }
 
 export default function Grants() {
@@ -108,11 +222,11 @@ export default function Grants() {
                         </div>
 
                         {grant.amount && (
-                          <div className="px-4 py-2.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-left md:text-right shrink-0">
-                            <div className="text-[10px] font-sans text-[var(--text-subtle)] uppercase">Granted Amount</div>
-                            <div className="text-base sm:text-lg font-bold font-sans text-[var(--text-primary)] mt-0.5">
-                              {grant.amount}
+                          <div className="px-5 py-3.5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] text-left md:text-right shrink-0 shadow-xs">
+                            <div className="text-[11px] font-sans font-bold tracking-wider text-[var(--text-subtle)] uppercase">
+                              PI
                             </div>
+                            <AnimatedGrantAmount amount={grant.amount} />
                           </div>
                         )}
                       </div>
@@ -128,7 +242,7 @@ export default function Grants() {
                           {grant.leadInvestigator && (
                             <span className="flex items-center gap-1.5">
                               <User className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                              <span>PI: <strong className="text-[var(--text-primary)]">{grant.leadInvestigator}</strong></span>
+                              <span>Supervisor: <strong className="text-[var(--text-primary)]">{grant.leadInvestigator}</strong></span>
                             </span>
                           )}
                           <span className="flex items-center gap-1.5">
