@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'
 import mongoose from 'mongoose'
 import { env, isProd } from './config/env.js'
 import { contentRouter } from './routes/content.js'
+import { mediaRouter } from './routes/media.js'
 import { positionsRouter } from './routes/positions.js'
 import { authRouter } from './routes/auth.js'
 import { applicationsRouter } from './routes/applications.js'
@@ -52,6 +53,7 @@ export function createApp() {
 
   app.use('/api/auth', authRouter)
   app.use('/api/content', contentRouter)
+  app.use('/api/media', mediaRouter)
   app.use('/api/positions', positionsRouter)
   app.use('/api/applications', applicationsRouter)
   app.use('/api/admin', adminCrudRouter)

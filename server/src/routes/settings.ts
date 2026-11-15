@@ -7,7 +7,7 @@ export const settingsRouter = Router()
 settingsRouter.get('/vacancy', async (_req, res, next) => {
   try {
     const settings = await getVacancySettings()
-    res.set('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400')
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=86400')
     res.json(settings)
   } catch (err) {
     next(err)

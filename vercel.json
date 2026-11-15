@@ -1,4 +1,5 @@
 {
+  "regions": ["bom1"],
   "headers": [
     {
       "source": "/(pfp|gallery|carousel-images|apple-watch|projects)/(.*)",

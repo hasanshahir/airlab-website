@@ -6,6 +6,13 @@ import mongoose from 'mongoose'
 import { collectionBySlug, collections } from '../content/registry.js'
 import { contentModels } from '../models/content.js'
 import { HttpError } from '../middleware/errors.js'
+import { externalizeImages } from './media.js'
+
+/**
+ * Edge (CDN) caches for 60s, then keeps serving the cached copy instantly while
+ * it refreshes in the background. Admin edits show up on the site within ~1 min.
+ */
+const PUBLIC_CACHE = 'public, max-age=0, s-maxage=60, stale-while-revalidate=86400'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = path.resolve(here, '../../../src/data')
@@ -59,7 +66,7 @@ contentRouter.get('/:slug', async (req, res) => {
       if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1)
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed) && parsed.length > 0) {
-        res.set('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400')
+        res.set('Cache-Control', PUBLIC_CACHE)
         return res.json(parsed)
       }
     } catch {
@@ -70,11 +77,9 @@ contentRouter.get('/:slug', async (req, res) => {
   const dbReady = mongoose.connection.readyState === 1
   res.set(
     'Cache-Control',
-    !dbReady || req.params.slug === 'gallery'
-      ? 'no-store'
-      : 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400'
+    !dbReady || req.params.slug === 'gallery' ? 'no-store' : PUBLIC_CACHE
   )
-  res.json(items)
+  res.json(items.map(item => externalizeImages(req.params.slug, item)))
 })
 
 contentRouter.get('/:slug/:id', async (req, res) => {
@@ -85,6 +90,6 @@ contentRouter.get('/:slug/:id', async (req, res) => {
   if (/^\d+$/.test(raw)) candidates.push(Number(raw))
   const item = await model.findOne({ id: { $in: candidates }, published: true }).lean()
   if (!item) throw new HttpError(404, 'Item not found')
-  res.set('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400')
-  res.json(item)
+  res.set('Cache-Control', PUBLIC_CACHE)
+  res.json(externalizeImages(req.params.slug, item as any))
 })
