@@ -103,21 +103,11 @@ export default function Blogs() {
   return (
     <div className="min-h-screen pt-16 sm:pt-24 pb-28 px-4 sm:px-8 max-w-[1240px] mx-auto relative font-sans text-[var(--text-primary)]">
       {/* ── Section Header ── */}
-      <div className="mb-14 text-left max-w-3xl">
+      <div className="mb-10 text-left max-w-3xl">
         <SectionReveal delay={0.08}>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] text-xs font-sans text-[var(--text-subtle)] mb-4 font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-            <span>DISPATCHES & FIELD NOTES</span>
-          </div>
           <h1 className="text-3xl sm:text-5xl font-semibold text-[var(--text-primary)] tracking-tight leading-[1.1] font-head">
-            Research Blogs & Dispatches
+            Blogs
           </h1>
-        </SectionReveal>
-
-        <SectionReveal delay={0.16}>
-          <p className="text-[17px] sm:text-[19px] text-[var(--text-muted)] mt-4 leading-relaxed font-normal">
-            In-depth architectural breakdowns, engineering postmortems, and field deployment dispatches authored by AIR Lab scientists and researchers.
-          </p>
         </SectionReveal>
       </div>
 
