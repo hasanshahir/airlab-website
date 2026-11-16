@@ -13,6 +13,8 @@ import {
   ShieldAlert,
   ShieldCheck,
   Terminal,
+  LayoutGrid,
+  SlidersHorizontal,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import TitleReveal from '../components/ui/TitleReveal'
@@ -59,7 +61,7 @@ const coreResearchAreas = [
   {
     icon: Brain,
     title: 'Foundational Models & NLP',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=1000&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1000&auto=format&fit=crop&q=80',
     desc: 'Pretraining multilingual LLMs tailored for low-resource regional dialects with advanced byte-level tokenizers and parameter-efficient fine-tuning.',
   },
   {
@@ -101,24 +103,15 @@ function ActiveResearchAreaCaption({
 }) {
   const { activeSlide } = useHoverSliderContext()
   const active = coreResearchAreas[activeSlide] ?? coreResearchAreas[0]
-  const Icon = active.icon
 
   return (
     <div
       onClick={() => onSelectArea(active.title)}
-      className="mt-4 p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] flex items-start gap-4 cursor-pointer hover:border-[var(--accent-orange)]/40 transition-colors"
+      className="mt-3 px-4 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] cursor-pointer hover:border-[var(--accent-orange)]/40 transition-colors text-left"
     >
-      <div className="w-10 h-10 rounded-xl bg-white border border-[var(--border-hairline)] text-[var(--accent-orange)] flex items-center justify-center shrink-0 shadow-xs">
-        <Icon className="w-5 h-5" />
-      </div>
-      <div className="min-w-0 text-left">
-        <div className="font-head font-semibold text-base text-[var(--text-primary)] mb-1">
-          {active.title}
-        </div>
-        <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
-          {active.desc}
-        </p>
-      </div>
+      <p className="text-[15px] sm:text-base text-[var(--text-muted)] leading-snug font-normal">
+        {active.desc}
+      </p>
     </div>
   )
 }
@@ -127,6 +120,7 @@ export default function Home() {
   const navigate = useNavigate()
   const [applyModalOpen, setApplyModalOpen] = useState(false)
   const [carouselVersion, setCarouselVersion] = useState<'v1' | 'v2'>('v1')
+  const [researchLayout, setResearchLayout] = useState<'grid' | 'slideshow'>('grid')
   const updatesTrackRef = useRef<HTMLDivElement>(null)
   const updatesOffsetRef = useRef(0)
   const updatesVelocityRef = useRef(55) // px/sec default moving left
@@ -621,9 +615,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 4. CORE RESEARCH AREAS (Animated Hover Slideshow) ── */}
-      <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
-        <div className="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--border-hairline)] text-left">
+      {/* ── 4. CORE RESEARCH AREAS ── */}
+      <section className="py-12 sm:py-14 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-3 border-b border-[var(--border-hairline)] text-left">
           <TitleReveal
             as="h2"
             className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] font-head"
@@ -631,72 +625,141 @@ export default function Home() {
             Core Research Areas
           </TitleReveal>
 
-          <Button
-            to="/projects"
-            size="sm"
-            className="inline-flex items-center gap-2 font-semibold px-5 shrink-0"
-          >
-            <span>See Projects</span>
-          </Button>
-        </div>
-
-        <HoverSlider className="rounded-3xl bg-[var(--bg-surface)]/80 border border-[var(--border-hairline)] p-6 sm:p-10 lg:p-12 shadow-sm">
-          <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-[var(--accent-orange)] font-sans text-left">
-            / research tracks
-          </p>
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 lg:gap-12">
-            {/* Left Column: Staggered Hover Titles */}
-            <div className="lg:col-span-6 flex flex-col items-start space-y-3 sm:space-y-4 text-left">
-              {coreResearchAreas.map((area, index) => (
-                <button
-                  key={area.title}
-                  type="button"
-                  onClick={() =>
-                    navigate(`/projects?area=${encodeURIComponent(area.title)}`)
-                  }
-                  className="text-left cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
-                >
-                  <TextStaggerHover
-                    index={index}
-                    className="font-head text-2xl sm:text-3xl xl:text-[34px] font-bold uppercase tracking-tight leading-tight text-[var(--text-primary)]"
-                    text={area.title}
-                  />
-                </button>
-              ))}
+          <div className="flex items-center gap-3 shrink-0">
+            <div
+              className="inline-flex items-center p-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)]"
+              role="group"
+              aria-label="Core Research Areas layout toggle"
+            >
+              <button
+                type="button"
+                onClick={() => setResearchLayout('grid')}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  researchLayout === 'grid'
+                    ? 'bg-[var(--accent-orange)] text-white shadow-xs'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>All Areas</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setResearchLayout('slideshow')}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  researchLayout === 'slideshow'
+                    ? 'bg-[var(--accent-orange)] text-white shadow-xs'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span>Slideshow</span>
+              </button>
             </div>
 
-            {/* Right Column: Clipped Animated Image + Active Area Description */}
-            <div className="lg:col-span-6 flex flex-col">
-              <HoverSliderImageWrap className="rounded-2xl overflow-hidden border border-[var(--border-hairline)] shadow-md aspect-[4/3] max-h-[380px] w-full bg-[var(--ink-dark)]">
+            <Button
+              to="/projects"
+              size="sm"
+              className="inline-flex items-center gap-2 font-semibold px-5 shrink-0"
+            >
+              <span>See Projects</span>
+            </Button>
+          </div>
+        </div>
+
+        {researchLayout === 'grid' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {coreResearchAreas.map((area) => (
+              <div
+                key={area.title}
+                onClick={() =>
+                  navigate(`/projects?area=${encodeURIComponent(area.title)}`)
+                }
+                className="group rounded-2xl bg-[var(--bg-surface)]/90 border border-[var(--border-hairline)] overflow-hidden hover:border-[var(--accent-orange)]/45 hover:shadow-lg transition-all duration-200 cursor-pointer flex flex-col text-left"
+              >
+                <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[var(--ink-dark)]">
+                  <img
+                    src={area.image}
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder-project.svg'
+                    }}
+                    alt={area.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent pointer-events-none" />
+                  <h3 className="absolute bottom-2.5 left-3.5 right-3.5 font-head text-base sm:text-lg font-bold text-white leading-snug drop-shadow-sm">
+                    {area.title}
+                  </h3>
+                </div>
+                <div className="px-4 py-3 flex-1 flex items-center">
+                  <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-snug font-normal line-clamp-3">
+                    {area.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <HoverSlider className="rounded-3xl bg-[var(--bg-surface)]/80 border border-[var(--border-hairline)] p-5 sm:p-8 shadow-sm">
+            <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-10">
+              {/* Left Column: Staggered Hover Titles */}
+              <div className="lg:col-span-6 flex flex-col items-start space-y-2 text-left">
                 {coreResearchAreas.map((area, index) => (
-                  <div
+                  <button
                     key={area.title}
+                    type="button"
                     onClick={() =>
                       navigate(`/projects?area=${encodeURIComponent(area.title)}`)
                     }
-                    className="cursor-pointer"
+                    className="text-left cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
                   >
-                    <HoverSliderImage
+                    <TextStaggerHover
                       index={index}
-                      imageUrl={area.image}
-                      src={area.image}
-                      alt={area.title}
-                      className="size-full object-cover"
-                      loading="eager"
-                      decoding="async"
+                      className="font-head text-xl sm:text-2xl xl:text-[28px] font-bold uppercase tracking-tight leading-tight text-[var(--text-primary)]"
+                      text={area.title}
                     />
-                  </div>
+                  </button>
                 ))}
-              </HoverSliderImageWrap>
+              </div>
 
-              <ActiveResearchAreaCaption
-                onSelectArea={(title) =>
-                  navigate(`/projects?area=${encodeURIComponent(title)}`)
-                }
-              />
+              {/* Right Column: Clipped Animated Image + Active Area Description */}
+              <div className="lg:col-span-6 flex flex-col">
+                <HoverSliderImageWrap className="rounded-2xl overflow-hidden border border-[var(--border-hairline)] shadow-md aspect-[16/10] max-h-[320px] w-full bg-[var(--ink-dark)]">
+                  {coreResearchAreas.map((area, index) => (
+                    <div
+                      key={area.title}
+                      onClick={() =>
+                        navigate(`/projects?area=${encodeURIComponent(area.title)}`)
+                      }
+                      className="cursor-pointer"
+                    >
+                      <HoverSliderImage
+                        index={index}
+                        imageUrl={area.image}
+                        src={area.image}
+                        alt={area.title}
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder-project.svg'
+                        }}
+                        className="size-full object-cover"
+                        loading="eager"
+                        decoding="async"
+                      />
+                    </div>
+                  ))}
+                </HoverSliderImageWrap>
+
+                <ActiveResearchAreaCaption
+                  onSelectArea={(title) =>
+                    navigate(`/projects?area=${encodeURIComponent(title)}`)
+                  }
+                />
+              </div>
             </div>
-          </div>
-        </HoverSlider>
+          </HoverSlider>
+        )}
       </section>
 
       {/* ── 5. TEAM SHOWCASE (Guided by faculty, driven by students, built for Pakistan) ── */}
