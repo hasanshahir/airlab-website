@@ -104,42 +104,25 @@ function ActiveResearchAreaCaption({
 }) {
   const { activeSlide } = useHoverSliderContext()
   const active = coreResearchAreas[activeSlide] ?? coreResearchAreas[0]
-  const Icon = active.icon
 
   return (
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ type: 'spring', stiffness: 400, damping: 28 }}
       onClick={() => onSelectArea(active.title)}
-      className="group mt-3.5 p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-card)] flex items-start gap-4 cursor-pointer transition-colors"
+      className="group mt-3 px-4 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-card)] cursor-pointer transition-colors text-left"
     >
       <AnimatePresence mode="wait">
-        <motion.div
+        <motion.p
           key={active.title}
           initial={{ opacity: 0, y: 6, filter: 'blur(4px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           exit={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-start gap-4 w-full"
+          className="text-[15px] sm:text-base text-[var(--text-muted)] leading-snug font-normal"
         >
-          <div className="w-10 h-10 rounded-xl bg-white border border-[var(--border-hairline)] text-[var(--accent-orange)] flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-            <Icon className="w-5 h-5" />
-          </div>
-          <div className="min-w-0 flex-1 text-left">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <div className="font-head font-semibold text-base text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
-                {active.title}
-              </div>
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--accent-orange)] shrink-0">
-                <span>Explore Track</span>
-                <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </span>
-            </div>
-            <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
-              {active.desc}
-            </p>
-          </div>
-        </motion.div>
+          {active.desc}
+        </motion.p>
       </AnimatePresence>
     </motion.div>
   )
