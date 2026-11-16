@@ -151,15 +151,6 @@ export default function Performers() {
         >
           Performer of the Month
         </TitleReveal>
-
-        <BlurReveal
-          as="p"
-          waitForPreloader
-          delay={0.12}
-          className="text-sm sm:text-base text-[var(--text-muted)] leading-relaxed font-normal"
-        >
-          Monthly spotlight honoring the researchers who demonstrated exceptional scientific rigor, landmark publications, and engineering leadership at AIR Lab.
-        </BlurReveal>
       </div>
 
       {/* ── Performer Card or Placeholder ── */}
