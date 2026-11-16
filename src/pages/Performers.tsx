@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Medal, Mail, FileText, ChevronLeft, ChevronRight, Loader2, Sparkles } from 'lucide-react'
+import { Medal, Mail, FileText, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 import { TextReveal } from '../components/ui/cascade-text'
@@ -284,14 +284,6 @@ export default function Performers() {
                   </>
                 )}
 
-                <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between text-white text-xs font-sans pointer-events-none">
-                  <span className="bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full font-medium">
-                    {featuredPerformer.month}
-                  </span>
-                  <span className="bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[11px]">
-                    AIR Lab Awardee
-                  </span>
-                </div>
               </div>
 
               {/* Compact Slideshow Dots & Thumbnails */}
@@ -343,42 +335,20 @@ export default function Performers() {
 
             {/* Bottom 2-Column Band: Awardee Identity & Links (Left) + Faculty Commendation & CTA (Right) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch pt-5 border-t border-[var(--border-hairline)]">
-              {/* Left: Awardee Header + Detail Cards */}
+              {/* Left: Awardee Header & Profile Links (no repeated names) */}
               <div className="lg:col-span-6 flex flex-col justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-sans font-semibold bg-[var(--ink-dark)] text-white inline-block">
-                      {featuredPerformer.role || 'Research Intern'}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-sans font-semibold bg-[var(--ink-dark)] text-white inline-block">
+                    {featuredPerformer.role || 'Research Intern'}
+                  </span>
+                  {featuredPerformer.department && (
+                    <span className="text-xs text-[var(--text-muted)] font-sans">
+                      {featuredPerformer.department}
                     </span>
-                    {featuredPerformer.department && (
-                      <span className="text-xs text-[var(--text-muted)] font-sans">
-                        {featuredPerformer.department}
-                      </span>
-                    )}
-                  </div>
-
-                  <h2 className="text-xl sm:text-2xl lg:text-[26px] font-bold font-head text-[var(--text-primary)] tracking-tight leading-snug">
-                    {awardees.map((person, idx) => (
-                      <span key={person.id || person.name || idx}>
-                        {idx > 0 && (
-                          <span className="text-[var(--text-muted)] font-normal">
-                            {idx === awardees.length - 1 ? ' & ' : ', '}
-                          </span>
-                        )}
-                        <Link
-                          to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
-                          title={`View ${person.name} on Team page`}
-                          className="inline-flex items-baseline gap-1 hover:text-[var(--accent-orange)] transition-colors underline decoration-[var(--border-hairline-dark)] underline-offset-4 hover:decoration-[var(--accent-orange)]"
-                        >
-                          <TextReveal as="span" text={person.name} blurOnReveal staggerDelay={16} duration={250} />
-                        </Link>
-                      </span>
-                    ))}
-                  </h2>
+                  )}
                 </div>
 
-                {/* Awardee Detail Cards */}
-                <div className="space-y-2">
+                <div className="space-y-2.5 flex-1 flex flex-col justify-center">
                   {awardees.map((person, idx) => {
                     const cleanLinkedin = normalizeLinkedInUrl(person.linkedin)
                     const cleanCv =
@@ -388,18 +358,25 @@ export default function Performers() {
                       !person.cvUrl.includes('placeholder')
                         ? person.cvUrl
                         : null
+                    const isSingle = awardees.length === 1
 
                     return (
                       <div
                         key={person.id || person.name || idx}
-                        className="px-3.5 py-2.5 rounded-xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2"
+                        className={
+                          isSingle
+                            ? 'flex flex-col gap-3'
+                            : 'px-3.5 py-2.5 rounded-xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-wrap items-center justify-between gap-2'
+                        }
                       >
-                        <div className="flex flex-wrap items-center gap-2 min-w-0">
+                        <div className="flex items-center gap-2.5 min-w-0">
                           {person.avatar && (
                             <img
                               src={getMemberAvatar(person.avatar)}
                               alt={person.name}
-                              className="w-7 h-7 rounded-full object-cover border border-[var(--border-hairline)] shrink-0 bg-[var(--bg-surface)]"
+                              className={`${
+                                isSingle ? 'w-10 h-10' : 'w-8 h-8'
+                              } rounded-full object-cover border border-[var(--border-hairline)] shrink-0 bg-[var(--bg-surface)]`}
                               onError={e => {
                                 e.currentTarget.style.display = 'none'
                               }}
@@ -407,46 +384,52 @@ export default function Performers() {
                           )}
                           <Link
                             to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
-                            title={`View ${person.name} profile`}
-                            className="text-xs sm:text-sm font-bold font-head text-[var(--text-primary)] hover:text-[var(--accent-orange)] transition-colors"
+                            title={`View ${person.name} on Team page`}
+                            className={`${
+                              isSingle
+                                ? 'text-xl sm:text-2xl lg:text-[26px]'
+                                : 'text-base sm:text-lg'
+                            } font-bold font-head text-[var(--text-primary)] hover:text-[var(--accent-orange)] transition-colors underline decoration-[var(--border-hairline-dark)] underline-offset-4 hover:decoration-[var(--accent-orange)] leading-snug`}
                           >
-                            {person.name}
+                            <TextReveal as="span" text={person.name} blurOnReveal staggerDelay={16} duration={250} />
                           </Link>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {cleanLinkedin && (
-                            <a
-                              href={cleanLinkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                            >
-                              <Linkedin className="w-3 h-3" />
-                              <span>LinkedIn</span>
-                            </a>
-                          )}
-                          {cleanCv && (
-                            <a
-                              href={cleanCv}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                            >
-                              <FileText className="w-3 h-3" />
-                              <span>Resume</span>
-                            </a>
-                          )}
-                          {person.email && (
-                            <a
-                              href={`mailto:${person.email}`}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                            >
-                              <Mail className="w-3 h-3" />
-                              <span>Email</span>
-                            </a>
-                          )}
-                        </div>
+                        {(cleanLinkedin || cleanCv || person.email) && (
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {cleanLinkedin && (
+                              <a
+                                href={cleanLinkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                              >
+                                <Linkedin className="w-3 h-3" />
+                                <span>LinkedIn</span>
+                              </a>
+                            )}
+                            {cleanCv && (
+                              <a
+                                href={cleanCv}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                              >
+                                <FileText className="w-3 h-3" />
+                                <span>Resume</span>
+                              </a>
+                            )}
+                            {person.email && (
+                              <a
+                                href={`mailto:${person.email}`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
+                              >
+                                <Mail className="w-3 h-3" />
+                                <span>Email</span>
+                              </a>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )
                   })}
@@ -455,7 +438,7 @@ export default function Performers() {
 
               {/* Right: Faculty Commendation & CTA */}
               <div className="lg:col-span-6 flex flex-col justify-between gap-3">
-                {(featuredPerformer.title || featuredPerformer.achievement || featuredPerformer.researchFocus) && (
+                {(featuredPerformer.title || featuredPerformer.achievement) && (
                   <div className="p-4 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] space-y-2 flex-1">
                     <span className="text-[11px] font-sans font-semibold text-[var(--ink-dark)] uppercase tracking-wider block">
                       Faculty Commendation &amp; Impact
@@ -479,15 +462,6 @@ export default function Performers() {
                       >
                         {featuredPerformer.achievement}
                       </BlurReveal>
-                    )}
-                    {featuredPerformer.researchFocus && (
-                      <div className="pt-2 border-t border-[var(--border-hairline)] flex items-start gap-1.5 text-[11px] font-sans text-[var(--text-muted)]">
-                        <Sparkles className="w-3 h-3 text-[var(--accent-orange)] shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-semibold text-[var(--text-primary)] mr-1">Research Focus:</span>
-                          <span>{featuredPerformer.researchFocus}</span>
-                        </div>
-                      </div>
                     )}
                   </div>
                 )}
