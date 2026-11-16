@@ -154,7 +154,7 @@ export default function About() {
           as="h1"
           waitForPreloader
           hoverColor="#C77DFF"
-          className="font-head font-bold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight mb-4"
+          className="font-head font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight mb-4"
         >
           About AIR Lab
         </TitleReveal>
@@ -163,7 +163,7 @@ export default function About() {
           as="p"
           waitForPreloader
           delay={0.14}
-          className="text-lg sm:text-2xl text-white/75 leading-snug font-normal max-w-3xl"
+          className="text-lg sm:text-2xl text-white/85 leading-snug font-normal max-w-3xl"
         >
           Research-grade minds. Production-ready systems. Built for Pakistan.
         </BlurReveal>
@@ -198,19 +198,30 @@ export default function About() {
             <div className="md:text-right md:pr-4 space-y-5">
               <TitleReveal
                 as="h2"
+                waitForPreloader
                 hoverColor="#C77DFF"
-                className="font-head font-bold text-2xl sm:text-3xl text-white tracking-tight"
+                className="font-head font-extrabold text-3xl sm:text-4xl lg:text-[42px] text-white tracking-tight"
               >
                 About
               </TitleReveal>
               <ResearchFlowVisual />
             </div>
 
-            <div className="md:pl-4 space-y-4 text-left text-[15.5px] sm:text-[17px] text-white/80 leading-relaxed font-normal">
-              <BlurReveal as="p" delay={0.08}>
+            <div className="md:pl-4 space-y-4 text-left">
+              <BlurReveal
+                as="p"
+                waitForPreloader
+                delay={0.08}
+                className="text-[15.5px] sm:text-[17px] text-white/90 leading-relaxed font-normal"
+              >
                 AIR Lab, the artificial intelligence research lab at NED University, turns cutting-edge research into production-ready systems. We build models, fine-tune and optimize open-source ones to run on local hardware, and gather the data to teach them Pakistan’s languages and realities.
               </BlurReveal>
-              <BlurReveal as="p" delay={0.18}>
+              <BlurReveal
+                as="p"
+                waitForPreloader
+                delay={0.18}
+                className="text-[15.5px] sm:text-[17px] text-white/90 leading-relaxed font-normal"
+              >
                 Our work spans cybersecurity and adversarial AI, small language models, computer vision, natural language processing, speech-based agents, and agentic AI. We don’t stop at papers and prototypes. We engineer, test, and deploy systems that people and institutions can use. Every project begins with one question: what do the people of Pakistan need?
               </BlurReveal>
             </div>
@@ -233,14 +244,14 @@ export default function About() {
               <TitleReveal
                 as="h2"
                 hoverColor="#C77DFF"
-                className="font-head font-bold text-2xl sm:text-3xl text-white tracking-tight"
+                className="font-head font-extrabold text-3xl sm:text-4xl lg:text-[42px] text-white tracking-tight"
               >
                 Vision
               </TitleReveal>
               <BlurReveal
                 as="p"
                 delay={0.1}
-                className="text-[16px] sm:text-[18px] text-white/85 leading-relaxed font-normal"
+                className="text-[16px] sm:text-[18px] text-white/90 leading-relaxed font-normal"
               >
                 To make Pakistan a builder of AI, not just a consumer of it, with solutions designed around our people, our languages, and our values.
               </BlurReveal>
@@ -260,14 +271,14 @@ export default function About() {
               <TitleReveal
                 as="h2"
                 hoverColor="#C77DFF"
-                className="font-head font-bold text-2xl sm:text-3xl text-white tracking-tight"
+                className="font-head font-extrabold text-3xl sm:text-4xl lg:text-[42px] text-white tracking-tight"
               >
                 Mission
               </TitleReveal>
               <BlurReveal
                 as="p"
                 delay={0.1}
-                className="text-[16px] sm:text-[18px] text-white/85 leading-relaxed font-normal"
+                className="text-[16px] sm:text-[18px] text-white/90 leading-relaxed font-normal"
               >
                 To conduct cutting-edge AI research and turn it into secure, production-ready systems built around the languages, data, and needs of the people of Pakistan, while training the next generation of AI researchers and engineers.
               </BlurReveal>
@@ -291,7 +302,7 @@ export default function About() {
               <TitleReveal
                 as="h2"
                 hoverColor="#C77DFF"
-                className="font-head font-bold text-2xl sm:text-3xl text-white tracking-tight"
+                className="font-head font-extrabold text-3xl sm:text-4xl lg:text-[42px] text-white tracking-tight"
               >
                 Aims
               </TitleReveal>
@@ -381,7 +392,7 @@ export default function About() {
               <TitleReveal
                 as="h2"
                 hoverColor="#C77DFF"
-                className="font-head font-bold text-2xl sm:text-3xl text-white tracking-tight"
+                className="font-head font-extrabold text-3xl sm:text-4xl lg:text-[42px] text-white tracking-tight"
               >
                 Objectives
               </TitleReveal>
