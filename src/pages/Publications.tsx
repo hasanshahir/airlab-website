@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, Award, FileText, Download, Search, X } from 'lucide-react'
 import { getPublications } from '../lib/data'
 import TitleReveal from '../components/ui/TitleReveal'
-import BlurReveal from '../components/ui/blur-reveal'
 
 export default function Publications() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -66,15 +65,6 @@ export default function Publications() {
         >
           Publications
         </TitleReveal>
-
-        <BlurReveal
-          as="p"
-          waitForPreloader
-          delay={0.16}
-          className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal"
-        >
-          Groundbreaking peer-reviewed journals, international conference proceedings, and foundational preprints sorted chronologically by most recent first.
-        </BlurReveal>
       </div>
 
       {/* Search & Count Bar */}

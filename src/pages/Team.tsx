@@ -7,7 +7,6 @@ import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { normalizeLinkedInUrl } from '../lib/utils'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
 import TitleReveal from '../components/ui/TitleReveal'
-import BlurReveal from '../components/ui/blur-reveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
@@ -144,17 +143,8 @@ export default function Team() {
           waitForPreloader
           className="font-head font-semibold text-[var(--text-primary)] mb-4 tracking-tight"
         >
-          Faculty Leads
+          LAB MEMBERS
         </TitleReveal>
-
-        <BlurReveal
-          as="p"
-          waitForPreloader
-          delay={0.16}
-          className="text-[17px] sm:text-[19px] text-[var(--text-muted)] leading-relaxed font-normal"
-        >
-          Guided by faculty, driven by students, built for Pakistan. Behind every system is a team that cares about Pakistan
-        </BlurReveal>
       </div>
 
       {/* Tabs Control (Pill-shaped selectors) */}
