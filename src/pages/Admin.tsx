@@ -704,7 +704,7 @@ export default function AdminDashboard() {
           }
         }
         payload = {
-          ...( !isCreate && payload.id !== undefined ? { id: payload.id } : {} ),
+          ...(!isCreate && payload.id !== undefined ? { id: payload.id } : {}),
           month: String(payload.month || '').trim(),
           memberIds: selectedIds,
           memberNotes: cleanedNotes,
@@ -1501,22 +1501,22 @@ export default function AdminDashboard() {
                                       : 1
                                 return `${item.month || 'No Month'} • ${count} performer${count === 1 ? '' : 's'}`
                               })()
-                            : item.tenure && item.department
-                              ? `${item.tenure} • ${item.department}`
-                              : item.authors ||
-                              item.author ||
-                              item.role ||
-                              item.category ||
-                              item.type ||
-                              item.term ||
-                              item.month ||
-                              item.funder ||
-                              item.venue ||
-                              item.cat ||
-                              item.tenure ||
-                              item.department ||
-                              item.date ||
-                              '—'}
+                              : item.tenure && item.department
+                                ? `${item.tenure} • ${item.department}`
+                                : item.authors ||
+                                item.author ||
+                                item.role ||
+                                item.category ||
+                                item.type ||
+                                item.term ||
+                                item.month ||
+                                item.funder ||
+                                item.venue ||
+                                item.cat ||
+                                item.tenure ||
+                                item.department ||
+                                item.date ||
+                                '—'}
                         </td>
                         <td className="py-3 px-4">
                           <span
@@ -1761,11 +1761,10 @@ export default function AdminDashboard() {
                                                 key={cat}
                                                 type="button"
                                                 onClick={() => setMemberCategoryFilter(cat)}
-                                                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border cursor-pointer transition-colors ${
-                                                  memberCategoryFilter === cat
+                                                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border cursor-pointer transition-colors ${memberCategoryFilter === cat
                                                     ? 'bg-[var(--accent-orange)] text-white border-[var(--accent-orange)]'
                                                     : 'bg-[var(--bg-page)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:text-[var(--text-primary)]'
-                                                }`}
+                                                  }`}
                                               >
                                                 {cat}
                                               </button>
@@ -1788,19 +1787,17 @@ export default function AdminDashboard() {
                                                   key={member.id}
                                                   type="button"
                                                   onClick={() => toggleMember(member.id)}
-                                                  className={`w-full px-3 py-2 flex items-center justify-between gap-2.5 text-left text-xs transition-colors cursor-pointer ${
-                                                    isSelected
+                                                  className={`w-full px-3 py-2 flex items-center justify-between gap-2.5 text-left text-xs transition-colors cursor-pointer ${isSelected
                                                       ? 'bg-[var(--accent-orange)]/10'
                                                       : 'hover:bg-[var(--bg-surface)]'
-                                                  }`}
+                                                    }`}
                                                 >
                                                   <div className="flex items-center gap-2.5 min-w-0">
                                                     <span
-                                                      className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                                                        isSelected
+                                                      className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isSelected
                                                           ? 'bg-[var(--accent-orange)] border-[var(--accent-orange)] text-white'
                                                           : 'border-[var(--border-hairline)] bg-[var(--bg-surface)]'
-                                                      }`}
+                                                        }`}
                                                     >
                                                       {isSelected && <Check className="w-3 h-3" />}
                                                     </span>

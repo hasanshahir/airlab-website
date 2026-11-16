@@ -29,18 +29,18 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary:
-      'bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white font-medium shadow-sm hover:shadow transition-all duration-150',
+      'bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white font-semibold shadow-[0_2px_10px_-2px_rgba(123,44,191,0.45),inset_0_1px_0_rgba(255,255,255,0.22)] hover:shadow-[0_6px_20px_-3px_rgba(123,44,191,0.55),inset_0_1px_0_rgba(255,255,255,0.28)] hover:-translate-y-0.5 transition-all duration-200',
     secondary:
-      'bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline)] font-medium transition-all duration-150',
+      'bg-[var(--bg-surface)] hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline)] hover:border-[var(--border-hairline-dark)] shadow-[var(--shadow-sm)] hover:-translate-y-0.5 font-medium transition-all duration-200',
     outline:
-      'bg-transparent hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] font-medium transition-colors duration-150',
+      'bg-transparent hover:bg-[var(--surface-alt)] text-[var(--text-primary)] border border-[var(--border-hairline-dark)] hover:-translate-y-0.5 font-medium transition-all duration-200',
     ghost:
       'bg-transparent hover:bg-[var(--surface-alt)] text-[var(--text-primary)] font-medium transition-colors duration-150',
   }
 
   const showArrow = Boolean(arrow)
 
-  const sharedClasses = `group inline-flex items-center justify-center gap-2 rounded-full tracking-tight font-sans transition-all active:translate-y-[1px] select-none cursor-pointer whitespace-nowrap ${sizeStyles[size]} ${variantStyles[variant]} ${className}`
+  const sharedClasses = `group inline-flex items-center justify-center gap-2 rounded-full tracking-tight font-sans transition-all active:translate-y-[1px] active:scale-[0.98] select-none cursor-pointer whitespace-nowrap ${sizeStyles[size]} ${variantStyles[variant]} ${className}`
 
   const content = (
     <>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain,
   Code,
@@ -15,6 +15,7 @@ import {
   Terminal,
   LayoutGrid,
   SlidersHorizontal,
+  ArrowUpRight,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import TitleReveal from '../components/ui/TitleReveal'
@@ -103,16 +104,82 @@ function ActiveResearchAreaCaption({
 }) {
   const { activeSlide } = useHoverSliderContext()
   const active = coreResearchAreas[activeSlide] ?? coreResearchAreas[0]
+  const Icon = active.icon
 
   return (
-    <div
+    <motion.div
+      whileHover={{ y: -2 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 28 }}
       onClick={() => onSelectArea(active.title)}
-      className="mt-3 px-4 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] cursor-pointer hover:border-[var(--accent-orange)]/40 transition-colors text-left"
+      className="group mt-3.5 p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-card)] flex items-start gap-4 cursor-pointer transition-colors"
     >
-      <p className="text-[15px] sm:text-base text-[var(--text-muted)] leading-snug font-normal">
-        {active.desc}
-      </p>
-    </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={active.title}
+          initial={{ opacity: 0, y: 6, filter: 'blur(4px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-start gap-4 w-full"
+        >
+          <div className="w-10 h-10 rounded-xl bg-white border border-[var(--border-hairline)] text-[var(--accent-orange)] flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+            <Icon className="w-5 h-5" />
+          </div>
+          <div className="min-w-0 flex-1 text-left">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="font-head font-semibold text-base text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                {active.title}
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--accent-orange)] shrink-0">
+                <span>Explore Track</span>
+                <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </span>
+            </div>
+            <p className="text-sm text-[var(--text-muted)] leading-relaxed font-normal">
+              {active.desc}
+            </p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+function ResearchAreaTrackRow({
+  area,
+  index,
+  onSelect,
+}: {
+  area: (typeof coreResearchAreas)[number]
+  index: number
+  onSelect: (title: string) => void
+}) {
+  const { activeSlide, changeSlide } = useHoverSliderContext()
+  const isActive = activeSlide === index
+
+  return (
+    <button
+      type="button"
+      onMouseEnter={() => changeSlide(index)}
+      onFocus={() => changeSlide(index)}
+      onClick={() => onSelect(area.title)}
+      className="group w-full text-left cursor-pointer bg-transparent border-0 py-1 px-0 focus:outline-none flex items-baseline gap-3.5"
+    >
+      <span
+        className={`text-xs font-mono font-semibold tabular-nums transition-colors duration-200 shrink-0 ${
+          isActive
+            ? 'text-[var(--accent-orange)]'
+            : 'text-[var(--text-subtle)]/45 group-hover:text-[var(--accent-orange)]/75'
+        }`}
+      >
+        0{index + 1}
+      </span>
+      <TextStaggerHover
+        index={index}
+        className="font-head text-xl sm:text-2xl xl:text-[28px] font-bold uppercase tracking-tight leading-tight text-[var(--text-primary)]"
+        text={area.title}
+      />
+    </button>
   )
 }
 
@@ -296,32 +363,18 @@ export default function Home() {
     return () => cancelAnimationFrame(rafId)
   }, [recentUpdates.length])
 
-  const updateRibbonHoverVelocity = (
-    e: React.MouseEvent<HTMLDivElement>,
-    targetVelocityRef: React.MutableRefObject<number>
-  ) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    if (rect.width <= 0) return
-    const relX = (e.clientX - rect.left) / rect.width
-    const edgeZone = 0.2 // 20% leftmost and 20% rightmost zones
-
-    if (relX < edgeZone) {
-      const intensity = 1 - relX / edgeZone
-      targetVelocityRef.current = -(140 + intensity * 180)
-    } else if (relX > 1 - edgeZone) {
-      const intensity = (relX - (1 - edgeZone)) / edgeZone
-      targetVelocityRef.current = 140 + intensity * 180
-    } else {
-      targetVelocityRef.current = 0
-    }
-  }
-
-  const handleUpdatesMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    updateRibbonHoverVelocity(e, updatesTargetVelocityRef)
+  const handleUpdatesMouseEnter = () => {
+    updatesTargetVelocityRef.current = 0
   }
 
   const handleUpdatesMouseLeave = () => {
     updatesTargetVelocityRef.current = 55
+  }
+
+  const handleUpdatesWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 4) {
+      updatesManualBoostRef.current += e.deltaX * 1.2
+    }
   }
 
   const scrollUpdates = (direction: 'left' | 'right') => {
@@ -372,32 +425,50 @@ export default function Home() {
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
       {/* ── 1. FULL-WIDTH HERO SHOWCASE (V1 Curved / V2 Coverflow) ── */}
       <section className="relative w-full z-10">
-        {carouselVersion === 'v1' ? (
-          <TiltedGridHero
-            images={HERO_CAROUSEL_IMAGES}
-            tileHeight={48}
-            speed={6}
-            axis={50}
-            gap={4}
-            curve={72}
-            className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
-          >
-            {heroOverlay}
-          </TiltedGridHero>
-        ) : (
-          <CoverflowCarousel
-            slides={HERO_CAROUSEL_IMAGES}
-            autoPlay
-            transitionDuration={850}
-            pauseDuration={850}
-            cardWidth="min(80cqh, 74cqw)"
-            gap={-0.06}
-            label="AIR Lab Hero Coverflow Carousel"
-            className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
-          >
-            {heroOverlay}
-          </CoverflowCarousel>
-        )}
+        <AnimatePresence mode="wait" initial={false}>
+          {carouselVersion === 'v1' ? (
+            <motion.div
+              key="hero-v1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.26, ease: 'easeOut' }}
+            >
+              <TiltedGridHero
+                images={HERO_CAROUSEL_IMAGES}
+                tileHeight={48}
+                speed={6}
+                axis={50}
+                gap={4}
+                curve={72}
+                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+              >
+                {heroOverlay}
+              </TiltedGridHero>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="hero-v2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.26, ease: 'easeOut' }}
+            >
+              <CoverflowCarousel
+                slides={HERO_CAROUSEL_IMAGES}
+                autoPlay
+                transitionDuration={850}
+                pauseDuration={850}
+                cardWidth="min(80cqh, 74cqw)"
+                gap={-0.06}
+                label="AIR Lab Hero Coverflow Carousel"
+                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+              >
+                {heroOverlay}
+              </CoverflowCarousel>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── CAROUSEL VERSION TOGGLE (V1 / V2) RIGHT BELOW THE CAROUSEL ── */}
         <div className="max-w-[1240px] mx-auto px-4 sm:px-8 pt-1.5 flex items-center justify-center">
@@ -440,27 +511,30 @@ export default function Home() {
         </div>
 
         {/* ── MINIMAL CLEAN QUICK LINKS STRIP ── */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-5 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
           <Link
             to="/projects"
-            className="text-[var(--accent-orange)] hover:underline font-semibold flex items-center gap-1 transition-colors"
+            className="group px-3 py-1 rounded-full bg-[var(--bg-surface)]/70 hover:bg-[var(--bg-surface)] text-[var(--accent-orange)] font-semibold flex items-center gap-1.5 border border-[var(--border-hairline)] transition-all"
           >
-            All Projects &rarr;
+            <span>All Projects</span>
+            <span className="transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
           </Link>
-          <span className="text-[var(--border-hairline)]">•</span>
+          <span className="text-[var(--border-hairline)] hidden sm:inline">•</span>
           <Link
             to="/grants"
-            className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
+            className="group px-3 py-1 rounded-full hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] font-medium flex items-center gap-1.5 transition-all"
           >
             <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-            Active Grants &rarr;
+            <span>Active Grants</span>
+            <span className="transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
           </Link>
-          <span className="text-[var(--border-hairline)]">•</span>
+          <span className="text-[var(--border-hairline)] hidden sm:inline">•</span>
           <Link
             to="/team"
-            className="hover:text-[var(--text-primary)] hover:underline font-medium flex items-center gap-1 transition-colors"
+            className="group px-3 py-1 rounded-full hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] font-medium flex items-center gap-1.5 transition-all"
           >
-            All Team Members &rarr;
+            <span>All Team Members</span>
+            <span className="transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
           </Link>
         </div>
       </section>
@@ -478,41 +552,55 @@ export default function Home() {
 
           {/* Horizontal Navigation Arrow Buttons */}
           <div className="flex items-center gap-2">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.94 }}
               type="button"
               onClick={() => scrollUpdates('left')}
-              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-colors cursor-pointer shadow-xs"
               aria-label="Previous updates"
               title="Scroll left"
             >
               <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.94 }}
               type="button"
               onClick={() => scrollUpdates('right')}
-              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-colors cursor-pointer shadow-xs"
               aria-label="Next updates"
               title="Scroll right"
             >
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </motion.button>
           </div>
         </div>
 
         {/* Dynamic Looping Ribbon of Cards */}
         <div
-          onMouseMove={handleUpdatesMouseMove}
+          onMouseEnter={handleUpdatesMouseEnter}
           onMouseLeave={handleUpdatesMouseLeave}
-          className="relative overflow-hidden py-2 -my-2 select-none"
+          onWheel={handleUpdatesWheel}
+          className="relative overflow-hidden py-3 -my-3 select-none ribbon-edge-mask"
         >
           <div
             ref={updatesTrackRef}
             className="flex gap-5 w-max pb-4 will-change-transform"
           >
             {loopedUpdates.map((item, idx) => (
-              <article
+              <motion.article
                 key={`${item.id}-${idx}`}
-                className="min-w-[290px] sm:min-w-[340px] max-w-[360px] p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/50 shadow-xs hover:shadow-md transition-all shrink-0 flex flex-col justify-between group"
+                whileHover={{ y: -4 }}
+                transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+                onClick={() => {
+                  if (item.actionType === 'apply') {
+                    setApplyModalOpen(true)
+                  } else if (item.link) {
+                    navigate(item.link)
+                  }
+                }}
+                className="min-w-[290px] sm:min-w-[340px] max-w-[360px] p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors shrink-0 flex flex-col justify-between group cursor-pointer"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
@@ -541,21 +629,27 @@ export default function Home() {
                   {item.actionType === 'apply' ? (
                     <button
                       type="button"
-                      onClick={() => setApplyModalOpen(true)}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline transition-colors cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setApplyModalOpen(true)
+                      }}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:underline transition-colors cursor-pointer"
                     >
                       <span>{item.actionText}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </button>
                   ) : (
                     <Link
                       to={item.link!}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:underline transition-colors"
                     >
                       <span>{item.actionText}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </Link>
                   )}
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
@@ -595,6 +689,7 @@ export default function Home() {
                   to="/about"
                   variant="secondary"
                   size="md"
+                  arrow
                   className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
                 >
                   <span>About AIR Lab</span>
@@ -603,14 +698,21 @@ export default function Home() {
             </div>
 
             {/* Right: Bigger AIR Lab Photo */}
-            <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group">
+            <motion.div
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group"
+            >
               <img
                 src="/about-lab.jpg"
                 alt="AIR Lab NED University Team"
-                className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
                 loading="lazy"
               />
-            </div>
+              <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15 rounded-3xl" />
+            </motion.div>
           </div>
         </div>
       </section>
@@ -627,39 +729,47 @@ export default function Home() {
 
           <div className="flex items-center gap-3 shrink-0">
             <div
-              className="inline-flex items-center p-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)]"
+              className="inline-flex items-center p-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs"
               role="group"
               aria-label="Core Research Areas layout toggle"
             >
-              <button
-                type="button"
-                onClick={() => setResearchLayout('grid')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  researchLayout === 'grid'
-                    ? 'bg-[var(--accent-orange)] text-white shadow-xs'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                <span>All Areas</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setResearchLayout('slideshow')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  researchLayout === 'slideshow'
-                    ? 'bg-[var(--accent-orange)] text-white shadow-xs'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                <span>Slideshow</span>
-              </button>
+              {(
+                [
+                  { id: 'grid', label: 'All Areas', icon: LayoutGrid },
+                  { id: 'slideshow', label: 'Slideshow', icon: SlidersHorizontal },
+                ] as const
+              ).map((opt) => {
+                const isActive = researchLayout === opt.id
+                const OptIcon = opt.icon
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setResearchLayout(opt.id)}
+                    className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer select-none ${
+                      isActive
+                        ? 'text-white'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="researchAreasLayoutTogglePill"
+                        className="absolute inset-0 rounded-full bg-[var(--accent-orange)] shadow-xs"
+                        transition={{ type: 'spring', stiffness: 480, damping: 34 }}
+                      />
+                    )}
+                    <OptIcon className="relative z-10 w-3.5 h-3.5" />
+                    <span className="relative z-10">{opt.label}</span>
+                  </button>
+                )
+              })}
             </div>
 
             <Button
               to="/projects"
               size="sm"
+              arrow
               className="inline-flex items-center gap-2 font-semibold px-5 shrink-0"
             >
               <span>See Projects</span>
@@ -667,99 +777,114 @@ export default function Home() {
           </div>
         </div>
 
-        {researchLayout === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {coreResearchAreas.map((area) => (
-              <div
-                key={area.title}
-                onClick={() =>
-                  navigate(`/projects?area=${encodeURIComponent(area.title)}`)
-                }
-                className="group rounded-2xl bg-[var(--bg-surface)]/90 border border-[var(--border-hairline)] overflow-hidden hover:border-[var(--accent-orange)]/45 hover:shadow-lg transition-all duration-200 cursor-pointer flex flex-col text-left"
-              >
-                <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[var(--ink-dark)]">
-                  <img
-                    src={area.image}
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder-project.svg'
-                    }}
-                    alt={area.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent pointer-events-none" />
-                  <h3 className="absolute bottom-2.5 left-3.5 right-3.5 font-head text-base sm:text-lg font-bold text-white leading-snug drop-shadow-sm">
-                    {area.title}
-                  </h3>
-                </div>
-                <div className="px-4 py-3 flex-1 flex items-center">
-                  <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-snug font-normal line-clamp-3">
-                    {area.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <HoverSlider className="rounded-3xl bg-[var(--bg-surface)]/80 border border-[var(--border-hairline)] p-5 sm:p-8 shadow-sm">
-            <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-10">
-              {/* Left Column: Staggered Hover Titles */}
-              <div className="lg:col-span-6 flex flex-col items-start space-y-2 text-left">
-                {coreResearchAreas.map((area, index) => (
-                  <button
-                    key={area.title}
-                    type="button"
-                    onClick={() =>
-                      navigate(`/projects?area=${encodeURIComponent(area.title)}`)
-                    }
-                    className="text-left cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
-                  >
-                    <TextStaggerHover
-                      index={index}
-                      className="font-head text-xl sm:text-2xl xl:text-[28px] font-bold uppercase tracking-tight leading-tight text-[var(--text-primary)]"
-                      text={area.title}
-                    />
-                  </button>
-                ))}
-              </div>
-
-              {/* Right Column: Clipped Animated Image + Active Area Description */}
-              <div className="lg:col-span-6 flex flex-col">
-                <HoverSliderImageWrap className="rounded-2xl overflow-hidden border border-[var(--border-hairline)] shadow-md aspect-[16/10] max-h-[320px] w-full bg-[var(--ink-dark)]">
-                  {coreResearchAreas.map((area, index) => (
-                    <div
-                      key={area.title}
-                      onClick={() =>
-                        navigate(`/projects?area=${encodeURIComponent(area.title)}`)
-                      }
-                      className="cursor-pointer"
-                    >
-                      <HoverSliderImage
-                        index={index}
-                        imageUrl={area.image}
-                        src={area.image}
-                        alt={area.title}
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder-project.svg'
-                        }}
-                        className="size-full object-cover"
-                        loading="eager"
-                        decoding="async"
-                      />
-                    </div>
-                  ))}
-                </HoverSliderImageWrap>
-
-                <ActiveResearchAreaCaption
-                  onSelectArea={(title) =>
-                    navigate(`/projects?area=${encodeURIComponent(title)}`)
+        <AnimatePresence mode="wait">
+          {researchLayout === 'grid' ? (
+            <motion.div
+              key="research-grid"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            >
+              {coreResearchAreas.map((area, idx) => (
+                <motion.div
+                  key={area.title}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: idx * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -4 }}
+                  onClick={() =>
+                    navigate(`/projects?area=${encodeURIComponent(area.title)}`)
                   }
-                />
-              </div>
-            </div>
-          </HoverSlider>
-        )}
+                  className="group rounded-2xl bg-[var(--bg-surface)]/90 border border-[var(--border-hairline)] overflow-hidden hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors duration-200 cursor-pointer flex flex-col text-left"
+                >
+                  <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[var(--ink-dark)]">
+                    <img
+                      src={area.image}
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-project.svg'
+                      }}
+                      alt={area.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent pointer-events-none" />
+                    <h3 className="absolute bottom-2.5 left-3.5 right-3.5 font-head text-base sm:text-lg font-bold text-white leading-snug drop-shadow-sm">
+                      {area.title}
+                    </h3>
+                  </div>
+                  <div className="px-4 py-3 flex-1 flex items-center">
+                    <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-snug font-normal line-clamp-3">
+                      {area.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="research-slideshow"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <HoverSlider className="rounded-3xl bg-[var(--bg-surface)]/80 border border-[var(--border-hairline)] p-5 sm:p-8 shadow-[var(--shadow-card)]">
+                <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-10">
+                  {/* Left Column: Staggered Hover Titles */}
+                  <div className="lg:col-span-6 flex flex-col items-start space-y-2 text-left">
+                    {coreResearchAreas.map((area, index) => (
+                      <ResearchAreaTrackRow
+                        key={area.title}
+                        area={area}
+                        index={index}
+                        onSelect={(title) =>
+                          navigate(`/projects?area=${encodeURIComponent(title)}`)
+                        }
+                      />
+                    ))}
+                  </div>
+
+                  {/* Right Column: Clipped Animated Image + Active Area Description */}
+                  <div className="lg:col-span-6 flex flex-col">
+                    <HoverSliderImageWrap className="rounded-2xl overflow-hidden border border-[var(--border-hairline)] shadow-md aspect-[16/10] max-h-[320px] w-full bg-[var(--ink-dark)]">
+                      {coreResearchAreas.map((area, index) => (
+                        <div
+                          key={area.title}
+                          onClick={() =>
+                            navigate(`/projects?area=${encodeURIComponent(area.title)}`)
+                          }
+                          className="cursor-pointer group relative"
+                        >
+                          <HoverSliderImage
+                            index={index}
+                            imageUrl={area.image}
+                            src={area.image}
+                            alt={area.title}
+                            onError={(e) => {
+                              e.currentTarget.src = '/placeholder-project.svg'
+                            }}
+                            className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            loading="eager"
+                            decoding="async"
+                          />
+                        </div>
+                      ))}
+                    </HoverSliderImageWrap>
+
+                    <ActiveResearchAreaCaption
+                      onSelectArea={(title) =>
+                        navigate(`/projects?area=${encodeURIComponent(title)}`)
+                      }
+                    />
+                  </div>
+                </div>
+              </HoverSlider>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* ── 5. TEAM SHOWCASE (Guided by faculty, driven by students, built for Pakistan) ── */}
@@ -788,6 +913,7 @@ export default function Home() {
                   to="/team"
                   variant="secondary"
                   size="md"
+                  arrow
                   className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
                 >
                   <span>Meet the Team</span>
@@ -796,14 +922,21 @@ export default function Home() {
             </div>
 
             {/* Right Column: Bigger Team group photo */}
-            <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group">
+            <motion.div
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group"
+            >
               <img
                 src="/team-group.jpg"
                 alt="AIR Lab Research Team"
-                className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
                 loading="lazy"
               />
-            </div>
+              <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15 rounded-3xl" />
+            </motion.div>
           </div>
         </div>
       </section>

@@ -226,27 +226,36 @@ export default function Gallery() {
       </div>
 
       {/* Category Filter Pills */}
-      <div className="mb-10 flex flex-wrap items-center gap-2.5 text-left">
-        {GALLERY_FILTERS.map(filter => {
-          const isActive = activeFilter === filter
-          return (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => {
-                setActiveFilter(filter)
-                setSelectedIndex(null)
-              }}
-              className={`h-10 px-5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer border ${
-                isActive
-                  ? 'bg-[var(--accent-orange)] text-white border-[var(--accent-orange)] shadow-sm'
-                  : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {filter}
-            </button>
-          )
-        })}
+      <div className="mb-10 text-left">
+        <div className="inline-flex flex-wrap items-center gap-1.5 p-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs w-fit">
+          {GALLERY_FILTERS.map(filter => {
+            const isActive = activeFilter === filter
+            return (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => {
+                  setActiveFilter(filter)
+                  setSelectedIndex(null)
+                }}
+                className={`relative px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer select-none ${
+                  isActive
+                    ? 'text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="galleryActiveFilterPill"
+                    className="absolute inset-0 rounded-full bg-[var(--accent-orange)] shadow-xs"
+                    transition={{ type: 'spring', stiffness: 480, damping: 34 }}
+                  />
+                )}
+                <span className="relative z-10">{filter}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Image Grid with 24px Rounded Cards */}

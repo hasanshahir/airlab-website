@@ -141,32 +141,52 @@ export default function Blogs() {
       {/* ── Search & Filter Controls ── */}
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-[var(--border-hairline)] pb-6 text-left">
         {/* Tag Pills */}
-        <div className="flex flex-wrap items-center gap-2">
-          {allTags.map(tag => (
-            <button
-              key={tag}
-              onClick={() => setSelectedTag(tag)}
-              className={`px-4 py-1.5 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${
-                selectedTag === tag
-                  ? 'bg-[var(--ink-dark)] text-white shadow-xs'
-                  : 'bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-hairline)]'
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
+        <div className="inline-flex flex-wrap items-center gap-1.5 p-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs w-fit">
+          {allTags.map(tag => {
+            const isActive = selectedTag === tag
+            return (
+              <button
+                key={tag}
+                onClick={() => setSelectedTag(tag)}
+                className={`relative px-4 py-1.5 rounded-full text-xs font-sans font-medium transition-colors cursor-pointer select-none ${
+                  isActive
+                    ? 'text-white font-semibold'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="blogsActiveTagPill"
+                    className="absolute inset-0 rounded-full bg-[var(--ink-dark)] shadow-xs"
+                    transition={{ type: 'spring', stiffness: 480, damping: 34 }}
+                  />
+                )}
+                <span className="relative z-10">{tag}</span>
+              </button>
+            )
+          })}
         </div>
 
         {/* Search input */}
         <div className="relative w-full md:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)] pointer-events-none" />
           <input
             type="text"
             placeholder="Search articles, topics, authors..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
+            className="w-full pl-10 pr-9 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:bg-white focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/15 transition-all"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[var(--text-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-alt)] transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 

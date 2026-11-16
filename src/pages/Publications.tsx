@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Copy, Check, Award, FileText, Download, Search } from 'lucide-react'
+import { Copy, Check, Award, FileText, Download, Search, X } from 'lucide-react'
 import { getPublications } from '../lib/data'
 import TitleReveal from '../components/ui/TitleReveal'
 import BlurReveal from '../components/ui/blur-reveal'
@@ -84,14 +84,24 @@ export default function Publications() {
         </div>
 
         <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)] pointer-events-none" />
           <input
             type="text"
             placeholder="Search papers, authors, venues..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
+            className="w-full pl-10 pr-9 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:bg-white focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/15 transition-all"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[var(--text-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-alt)] transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 

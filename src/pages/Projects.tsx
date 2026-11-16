@@ -7,6 +7,9 @@ import {
   CheckCircle2,
   Clock,
   Users,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpRight,
 } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getFacultyPriority } from '../lib/utils'
@@ -222,6 +225,11 @@ export default function Projects() {
 
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') setSelectedProject(null)
+        else if (e.key === 'ArrowLeft' && selectedProject.images && selectedProject.images.length > 1) {
+          setActiveGalleryIndex(prev => (prev - 1 + selectedProject.images!.length) % selectedProject.images!.length)
+        } else if (e.key === 'ArrowRight' && selectedProject.images && selectedProject.images.length > 1) {
+          setActiveGalleryIndex(prev => (prev + 1) % selectedProject.images!.length)
+        }
       }
       window.addEventListener('keydown', handleKeyDown)
 
@@ -298,31 +306,51 @@ export default function Projects() {
       {/* ── Category Filter Pills & Search ── */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 mb-8 pb-6 border-b border-[var(--border-hairline)]">
         {/* Category Pills (Old visible filters restored: All, Funded, Undergraduate, Postgraduate) */}
-        <div className="flex flex-wrap items-center gap-2">
-          {visibleCategories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => handleCategoryChange(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer ${activeCategory === cat && !activeArea
-                  ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
-                  : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)] hover:text-[var(--text-primary)] hover:border-[var(--accent-orange)]/40'
-                }`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="inline-flex flex-wrap items-center gap-1.5 p-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs w-fit">
+          {visibleCategories.map(cat => {
+            const isActive = activeCategory === cat && !activeArea
+            return (
+              <button
+                key={cat}
+                onClick={() => handleCategoryChange(cat)}
+                className={`relative px-4 py-1.5 rounded-full text-xs font-sans font-medium transition-colors cursor-pointer select-none ${isActive
+                    ? 'text-white font-semibold'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                  }`}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="projectsActiveCategoryPill"
+                    className="absolute inset-0 rounded-full bg-[var(--accent-orange)] shadow-xs"
+                    transition={{ type: 'spring', stiffness: 480, damping: 34 }}
+                  />
+                )}
+                <span className="relative z-10">{cat}</span>
+              </button>
+            )
+          })}
         </div>
 
         {/* Search Input (Pill Shaped) */}
         <div className="relative w-full lg:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)] pointer-events-none" />
           <input
             type="text"
             placeholder="Search projects, grants..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
+            className="w-full pl-10 pr-9 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:bg-white focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/15 transition-all"
           />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              aria-label="Clear search"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[var(--text-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-alt)] transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -355,17 +383,21 @@ export default function Projects() {
           transition={{ duration: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left"
         >
-          {filtered.map(proj => {
+          {filtered.map((proj, idx) => {
             const isOngoing = proj.status === 'Ongoing'
             return (
-              <div
+              <motion.div
                 key={proj.id}
                 id={String(proj.id)}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.32, delay: Math.min(idx * 0.04, 0.24), ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -4 }}
                 onClick={() => {
                   setSelectedProject(proj)
                   setActiveGalleryIndex(0)
                 }}
-                className="group bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl p-6 flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer relative"
+                className="group bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl p-6 flex flex-col justify-between hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors duration-200 cursor-pointer relative"
               >
                 <div>
                   {/* Image Cover Banner */}
@@ -433,11 +465,12 @@ export default function Projects() {
                   <span className="text-[var(--text-subtle)] uppercase tracking-wider text-[11px] font-medium">
                     {proj.category}
                   </span>
-                  <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1.5 group-hover:underline">
+                  <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1 group-hover:underline">
                     <span>View Details</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </span>
                 </div>
-              </div>
+              </motion.div>
             )
           })}
         </motion.div>
@@ -492,15 +525,52 @@ export default function Projects() {
                   <div className="p-6 sm:p-8 overflow-y-auto flex-1">
                     {/* Image Gallery Viewer */}
                     <div className="mb-6">
-                      <div className="h-64 sm:h-80 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] border border-[var(--border-hairline)] mb-3">
-                        <img
-                          src={getProjectCover(selectedProject.images?.[activeGalleryIndex] || selectedProject.coverImage)}
-                          onError={(e) => {
-                            e.currentTarget.src = DEFAULT_PROJECT_COVER
-                          }}
-                          alt={`${selectedProject.title} preview ${activeGalleryIndex + 1}`}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="relative h-64 sm:h-80 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] border border-[var(--border-hairline)] mb-3">
+                        <AnimatePresence mode="wait">
+                          <motion.img
+                            key={activeGalleryIndex}
+                            initial={{ opacity: 0, scale: 1.01 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            src={getProjectCover(selectedProject.images?.[activeGalleryIndex] || selectedProject.coverImage)}
+                            onError={(e) => {
+                              e.currentTarget.src = DEFAULT_PROJECT_COVER
+                            }}
+                            alt={`${selectedProject.title} preview ${activeGalleryIndex + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </AnimatePresence>
+
+                        {selectedProject.images && selectedProject.images.length > 1 && (
+                          <>
+                            <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-sans font-medium pointer-events-none">
+                              {activeGalleryIndex + 1} / {selectedProject.images.length}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setActiveGalleryIndex(
+                                  prev => (prev - 1 + selectedProject.images!.length) % selectedProject.images!.length
+                                )
+                              }
+                              aria-label="Previous project image"
+                              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/55 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-colors cursor-pointer shadow-sm"
+                            >
+                              <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setActiveGalleryIndex(prev => (prev + 1) % selectedProject.images!.length)
+                              }
+                              aria-label="Next project image"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/55 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-colors cursor-pointer shadow-sm"
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
                       </div>
                       {selectedProject.images && selectedProject.images.length > 1 && (
                         <div className="flex items-center gap-2.5 overflow-x-auto pb-1">

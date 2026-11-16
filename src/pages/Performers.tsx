@@ -185,23 +185,33 @@ export default function Performers() {
           <div className="p-5 sm:p-7 relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-5xl mx-auto transition-all duration-300 hover:border-[var(--accent-orange)]/40 text-left">
             {/* Month Selector (Most recent first: October to July) */}
             <div className="flex flex-wrap items-center justify-center gap-2 pb-4 border-b border-[var(--border-hairline)] mb-5">
-              {performersList.map((p, idx) => (
-                <button
-                  key={`${p._id || p.id || 'item'}-${p.month || idx}-${idx}`}
-                  type="button"
-                  onClick={() => {
-                    setActiveCycleIndex(idx)
-                    setSlideState({ index: 0, direction: 1 })
-                  }}
-                  className={`px-3.5 py-1 rounded-full text-xs font-sans font-medium border transition-colors cursor-pointer ${
-                    activeCycleIndex === idx
-                      ? 'bg-[var(--ink-dark)] text-white border-[var(--ink-dark)] shadow-xs'
-                      : 'bg-[var(--bg-page)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-orange)]'
-                  }`}
-                >
-                  {p.month}
-                </button>
-              ))}
+              {performersList.map((p, idx) => {
+                const isActive = activeCycleIndex === idx
+                return (
+                  <button
+                    key={`${p._id || p.id || 'item'}-${p.month || idx}-${idx}`}
+                    type="button"
+                    onClick={() => {
+                      setActiveCycleIndex(idx)
+                      setSlideState({ index: 0, direction: 1 })
+                    }}
+                    className={`relative px-3.5 py-1 rounded-full text-xs font-sans font-medium border transition-colors cursor-pointer select-none ${
+                      isActive
+                        ? 'text-white border-transparent font-semibold'
+                        : 'bg-[var(--bg-page)] text-[var(--text-muted)] border-[var(--border-hairline)] hover:border-[var(--accent-orange)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="performersActiveMonthPill"
+                        className="absolute inset-0 rounded-full bg-[var(--ink-dark)] shadow-xs"
+                        transition={{ type: 'spring', stiffness: 480, damping: 34 }}
+                      />
+                    )}
+                    <span className="relative z-10">{p.month}</span>
+                  </button>
+                )
+              })}
             </div>
 
             {/* Centerpiece Image Slideshow */}

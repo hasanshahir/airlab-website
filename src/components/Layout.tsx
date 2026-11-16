@@ -14,6 +14,7 @@ import {
   GraduationCap,
   Building,
   Image as GalleryIcon,
+  ArrowUp,
 } from 'lucide-react'
 import AirLabLogo from './AirLabLogo'
 import airLabMark from '../assets/air-lab-mark.png'
@@ -29,6 +30,7 @@ export default function Layout() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [mobileAccordion, setMobileAccordion] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
+  const [showBackToTop, setShowBackToTop] = useState(false)
   const navRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
   const navigate = useNavigate()
@@ -61,7 +63,9 @@ export default function Layout() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10)
+      const y = window.scrollY
+      setScrolled(y > 10)
+      setShowBackToTop(y > 540)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
@@ -189,19 +193,30 @@ export default function Layout() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-2">
+          <nav className="hidden lg:flex items-center gap-1.5">
             {/* Home */}
             <NavLink
               to="/"
               end
               className={({ isActive }) =>
-                `px-3.5 py-2 rounded-full text-[14px] font-medium transition-all ${isActive
-                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
+                `relative px-3.5 py-2 rounded-full text-[14px] font-medium transition-colors ${isActive
+                  ? 'text-[var(--text-primary)] font-semibold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
                 }`
               }
             >
-              Home
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <motion.span
+                      layoutId="desktopNavActivePill"
+                      className="absolute inset-0 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs -z-10"
+                      transition={{ type: 'spring', stiffness: 460, damping: 34 }}
+                    />
+                  )}
+                  <span className="relative z-10">Home</span>
+                </>
+              )}
             </NavLink>
 
             {/* Research Dropdown */}
@@ -210,39 +225,56 @@ export default function Layout() {
               onMouseEnter={() => setActiveDropdown('research')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <button
-                type="button"
-                onClick={() => setActiveDropdown(activeDropdown === 'research' ? null : 'research')}
-                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'research' || location.pathname.includes('/projects') || location.pathname.includes('/grants') || location.pathname.includes('/publications') || location.pathname.includes('/blogs')
-                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
-                  }`}
-                aria-expanded={activeDropdown === 'research'}
-              >
-                <span>Research</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'research' ? 'rotate-180' : ''}`} />
-              </button>
+              {(() => {
+                const isSectionActive =
+                  location.pathname.includes('/projects') ||
+                  location.pathname.includes('/grants') ||
+                  location.pathname.includes('/publications') ||
+                  location.pathname.includes('/blogs')
+                const isOpen = activeDropdown === 'research'
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setActiveDropdown(isOpen ? null : 'research')}
+                    className={`relative px-3.5 py-2 rounded-full text-[14px] font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer ${isOpen || isSectionActive
+                      ? 'text-[var(--text-primary)] font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
+                      }`}
+                    aria-expanded={isOpen}
+                  >
+                    {isSectionActive && (
+                      <motion.span
+                        layoutId="desktopNavActivePill"
+                        className="absolute inset-0 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs -z-10"
+                        transition={{ type: 'spring', stiffness: 460, damping: 34 }}
+                      />
+                    )}
+                    <span className="relative z-10">Research</span>
+                    <ChevronDown className={`relative z-10 w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[var(--accent-orange)]' : ''}`} />
+                  </button>
+                )
+              })()}
 
               <AnimatePresence>
                 {activeDropdown === 'research' && (
                   <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="absolute top-full left-0 mt-1.5 w-[520px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 440, damping: 30 }}
+                    className="absolute top-full left-0 mt-2 w-[530px] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
                   >
                     <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
                         EXPLORE PORTFOLIO
                       </div>
                       <div className="space-y-1">
                         <Link
                           to="/projects"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Layers className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <Layers className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Projects Catalog</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -252,10 +284,10 @@ export default function Layout() {
 
                         <Link
                           to="/grants"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Award className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <Award className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Research Grants</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -266,16 +298,16 @@ export default function Layout() {
                     </div>
 
                     <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
                         ARTICLES
                       </div>
                       <div className="space-y-1">
                         <Link
                           to="/publications"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <BookOpen className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <BookOpen className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Publications</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -285,10 +317,10 @@ export default function Layout() {
 
                         <Link
                           to="/blogs"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <FileText className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <FileText className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Blogs</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -308,39 +340,55 @@ export default function Layout() {
               onMouseEnter={() => setActiveDropdown('people')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <button
-                type="button"
-                onClick={() => setActiveDropdown(activeDropdown === 'people' ? null : 'people')}
-                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'people' || location.pathname.includes('/team') || location.pathname.includes('/interns') || location.pathname.includes('/performers')
-                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
-                  }`}
-                aria-expanded={activeDropdown === 'people'}
-              >
-                <span>People</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'people' ? 'rotate-180' : ''}`} />
-              </button>
+              {(() => {
+                const isSectionActive =
+                  location.pathname.includes('/team') ||
+                  location.pathname.includes('/interns') ||
+                  location.pathname.includes('/performers')
+                const isOpen = activeDropdown === 'people'
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setActiveDropdown(isOpen ? null : 'people')}
+                    className={`relative px-3.5 py-2 rounded-full text-[14px] font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer ${isOpen || isSectionActive
+                      ? 'text-[var(--text-primary)] font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
+                      }`}
+                    aria-expanded={isOpen}
+                  >
+                    {isSectionActive && (
+                      <motion.span
+                        layoutId="desktopNavActivePill"
+                        className="absolute inset-0 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs -z-10"
+                        transition={{ type: 'spring', stiffness: 460, damping: 34 }}
+                      />
+                    )}
+                    <span className="relative z-10">People</span>
+                    <ChevronDown className={`relative z-10 w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[var(--accent-orange)]' : ''}`} />
+                  </button>
+                )
+              })()}
 
               <AnimatePresence>
                 {activeDropdown === 'people' && (
                   <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="absolute top-full left-0 mt-1.5 w-[560px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 440, damping: 30 }}
+                    className="absolute top-full left-0 mt-2 w-[560px] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
                   >
                     <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
                         LAB MEMBERS
                       </div>
                       <div className="space-y-1">
                         <Link
                           to="/team?tab=faculty"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Users className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <Users className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Faculty Leads</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -350,10 +398,10 @@ export default function Layout() {
 
                         <Link
                           to="/team?tab=interns"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <GraduationCap className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <GraduationCap className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Research Interns</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -363,10 +411,10 @@ export default function Layout() {
 
                         <Link
                           to="/team?tab=previous"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Users className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <Users className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Past Interns</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -377,16 +425,16 @@ export default function Layout() {
                     </div>
 
                     <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
                         COMMUNITY & SPOTLIGHT
                       </div>
                       <div className="space-y-1">
                         <Link
                           to="/performers"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Award className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <Award className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Performer of the Month</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -406,39 +454,54 @@ export default function Layout() {
               onMouseEnter={() => setActiveDropdown('about')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <button
-                type="button"
-                onClick={() => setActiveDropdown(activeDropdown === 'about' ? null : 'about')}
-                className={`px-3.5 py-2 rounded-full text-[14px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer ${activeDropdown === 'about' || location.pathname.includes('/about') || location.pathname.includes('/gallery')
-                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
-                  }`}
-                aria-expanded={activeDropdown === 'about'}
-              >
-                <span>About</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'about' ? 'rotate-180' : ''}`} />
-              </button>
+              {(() => {
+                const isSectionActive =
+                  location.pathname.includes('/about') ||
+                  location.pathname.includes('/gallery')
+                const isOpen = activeDropdown === 'about'
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setActiveDropdown(isOpen ? null : 'about')}
+                    className={`relative px-3.5 py-2 rounded-full text-[14px] font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer ${isOpen || isSectionActive
+                      ? 'text-[var(--text-primary)] font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
+                      }`}
+                    aria-expanded={isOpen}
+                  >
+                    {isSectionActive && (
+                      <motion.span
+                        layoutId="desktopNavActivePill"
+                        className="absolute inset-0 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs -z-10"
+                        transition={{ type: 'spring', stiffness: 460, damping: 34 }}
+                      />
+                    )}
+                    <span className="relative z-10">About</span>
+                    <ChevronDown className={`relative z-10 w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[var(--accent-orange)]' : ''}`} />
+                  </button>
+                )
+              })()}
 
               <AnimatePresence>
                 {activeDropdown === 'about' && (
                   <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="absolute top-full left-0 mt-1.5 w-[520px] bg-[var(--bg-surface-elevated)] border border-[var(--border-hairline)] rounded-3xl p-6 shadow-xl grid grid-cols-2 gap-6 z-50"
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 440, damping: 30 }}
+                    className="absolute top-full left-0 mt-2 w-[520px] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
                   >
                     <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
                         ABOUT US
                       </div>
                       <div className="space-y-1">
                         <Link
                           to="/about"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <Building className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <Building className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>About AIR Lab</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -449,16 +512,16 @@ export default function Layout() {
                     </div>
 
                     <div>
-                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3">
+                      <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
                         LIFE AT THE LAB
                       </div>
                       <div className="space-y-1">
                         <Link
                           to="/gallery"
-                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-colors group"
+                          className="block p-2.5 rounded-2xl hover:bg-[var(--bg-surface)] transition-all duration-150 group"
                         >
-                          <div className="flex items-center gap-2 font-medium text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)]">
-                            <GalleryIcon className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)]" />
+                          <div className="flex items-center gap-2 font-semibold text-[13.5px] text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors">
+                            <GalleryIcon className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--accent-orange)] group-hover:scale-110 transition-all" />
                             <span>Lab Gallery</span>
                           </div>
                           <p className="text-[12px] text-[var(--text-muted)] mt-0.5 leading-snug">
@@ -476,24 +539,37 @@ export default function Layout() {
             <NavLink
               to="/contact"
               className={({ isActive }) =>
-                `px-3.5 py-2 rounded-full text-[14px] font-medium transition-all ${isActive
-                  ? 'text-[var(--text-primary)] font-semibold bg-[var(--bg-surface)]'
+                `relative px-3.5 py-2 rounded-full text-[14px] font-medium transition-colors ${isActive
+                  ? 'text-[var(--text-primary)] font-semibold'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/60'
                 }`
               }
             >
-              Contact
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <motion.span
+                      layoutId="desktopNavActivePill"
+                      className="absolute inset-0 rounded-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] shadow-2xs -z-10"
+                      transition={{ type: 'spring', stiffness: 460, damping: 34 }}
+                    />
+                  )}
+                  <span className="relative z-10">Contact</span>
+                </>
+              )}
             </NavLink>
           </nav>
 
           {/* Right Action CTA: Apply Now */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            <button
+            <motion.button
+              whileHover={{ y: -1.5 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setApplyModalOpen(true)}
-              className="inline-flex items-center justify-center h-10 px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-semibold tracking-tight transition-all duration-150 cursor-pointer shadow-sm active:translate-y-[1px]"
+              className="inline-flex items-center justify-center h-10 px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-semibold tracking-tight transition-colors duration-150 cursor-pointer shadow-[0_2px_10px_-2px_rgba(123,44,191,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] hover:shadow-[0_6px_18px_-3px_rgba(123,44,191,0.55),inset_0_1px_0_rgba(255,255,255,0.3)]"
             >
               <span>Apply Now</span>
-            </button>
+            </motion.button>
 
             {/* Mobile Menu Button */}
             <button
@@ -529,75 +605,105 @@ export default function Layout() {
                 <div className="border border-[var(--border-hairline)] rounded-2xl overflow-hidden">
                   <button
                     onClick={() => setMobileAccordion(mobileAccordion === 'research' ? null : 'research')}
-                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left"
+                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left cursor-pointer"
                   >
                     <span>Research</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${mobileAccordion === 'research' ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileAccordion === 'research' ? 'rotate-180 text-[var(--accent-orange)]' : ''}`} />
                   </button>
-                  {mobileAccordion === 'research' && (
-                    <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
-                      <Link to="/projects" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Projects Catalog
-                      </Link>
-                      <Link to="/grants" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Research Grants
-                      </Link>
-                      <Link to="/publications" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Publications
-                      </Link>
-                      <Link to="/blogs" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Blogs
-                      </Link>
-                    </div>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {mobileAccordion === 'research' && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
+                          <Link to="/projects" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Projects Catalog
+                          </Link>
+                          <Link to="/grants" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Research Grants
+                          </Link>
+                          <Link to="/publications" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Publications
+                          </Link>
+                          <Link to="/blogs" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Blogs
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* People Accordion */}
                 <div className="border border-[var(--border-hairline)] rounded-2xl overflow-hidden">
                   <button
                     onClick={() => setMobileAccordion(mobileAccordion === 'people' ? null : 'people')}
-                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left"
+                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left cursor-pointer"
                   >
                     <span>People</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${mobileAccordion === 'people' ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileAccordion === 'people' ? 'rotate-180 text-[var(--accent-orange)]' : ''}`} />
                   </button>
-                  {mobileAccordion === 'people' && (
-                    <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
-                      <Link to="/team?tab=faculty" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Faculty Leads
-                      </Link>
-                      <Link to="/team?tab=interns" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Research Interns
-                      </Link>
-                      <Link to="/team?tab=previous" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Past Interns
-                      </Link>
-                      <Link to="/performers" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Performer of the Month
-                      </Link>
-                    </div>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {mobileAccordion === 'people' && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
+                          <Link to="/team?tab=faculty" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Faculty Leads
+                          </Link>
+                          <Link to="/team?tab=interns" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Research Interns
+                          </Link>
+                          <Link to="/team?tab=previous" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Past Interns
+                          </Link>
+                          <Link to="/performers" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Performer of the Month
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* About Accordion */}
                 <div className="border border-[var(--border-hairline)] rounded-2xl overflow-hidden">
                   <button
                     onClick={() => setMobileAccordion(mobileAccordion === 'about' ? null : 'about')}
-                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left"
+                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] text-left cursor-pointer"
                   >
                     <span>About</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${mobileAccordion === 'about' ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileAccordion === 'about' ? 'rotate-180 text-[var(--accent-orange)]' : ''}`} />
                   </button>
-                  {mobileAccordion === 'about' && (
-                    <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
-                      <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        About AIR Lab
-                      </Link>
-                      <Link to="/gallery" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                        Lab Gallery
-                      </Link>
-                    </div>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {mobileAccordion === 'about' && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-3 bg-[var(--bg-surface-elevated)] space-y-1">
+                          <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            About AIR Lab
+                          </Link>
+                          <Link to="/gallery" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-xs rounded-xl hover:bg-[var(--bg-surface)] text-[var(--text-primary)]">
+                            Lab Gallery
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 <Link
@@ -767,6 +873,27 @@ export default function Layout() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Back-to-Top Button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, scale: 0.85, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.85, y: 12 }}
+            whileHover={{ y: -2, scale: 1.04 }}
+            whileTap={{ scale: 0.94 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            aria-label="Scroll back to top"
+            title="Back to top"
+            className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-[var(--bg-surface-elevated)]/95 backdrop-blur-md border border-[var(--border-hairline-dark)] text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] shadow-[0_8px_24px_-4px_rgba(16,0,43,0.18)] flex items-center justify-center cursor-pointer transition-colors"
+          >
+            <ArrowUp className="w-4 h-4" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Global Student Application Modal */}
       <StudentApplicationModal

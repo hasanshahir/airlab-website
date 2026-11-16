@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, GraduationCap, Calendar, Search, Sparkles, FileText, Loader2 } from 'lucide-react'
+import { Mail, GraduationCap, Calendar, Search, Sparkles, FileText, Loader2, X } from 'lucide-react'
 import type { TeamMemberData } from '../types/data'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { normalizeLinkedInUrl } from '../lib/utils'
@@ -159,7 +159,7 @@ export default function Team() {
 
       {/* Tabs Control (Pill-shaped selectors) */}
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-6">
-        <div className="inline-flex items-center gap-2 p-1.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-full shadow-xs">
+        <div className="inline-flex items-center gap-1.5 p-1.5 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-full shadow-2xs w-fit">
           {tabs.map(tab => {
             const isActive = activeTab === tab.id
             return (
@@ -169,16 +169,23 @@ export default function Team() {
                   setActiveTab(tab.id)
                   setHighlightedMemberId(null)
                 }}
-                className={`relative px-4 py-2 rounded-full text-[13.5px] font-medium transition-all duration-150 cursor-pointer select-none whitespace-nowrap flex items-center gap-2 ${
+                className={`relative px-4 py-2 rounded-full text-[13.5px] font-medium transition-colors duration-150 cursor-pointer select-none whitespace-nowrap flex items-center gap-2 ${
                   isActive
-                    ? 'bg-[var(--accent-orange)] text-white shadow-xs font-semibold'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-page)]'
+                    ? 'text-white font-semibold'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                <span>{tab.label}</span>
+                {isActive && (
+                  <motion.span
+                    layoutId="teamActiveTabPill"
+                    className="absolute inset-0 rounded-full bg-[var(--accent-orange)] shadow-xs"
+                    transition={{ type: 'spring', stiffness: 480, damping: 34 }}
+                  />
+                )}
+                <span className="relative z-10">{tab.label}</span>
                 {tab.count !== undefined && (
                   <span
-                    className={`text-[11px] font-sans px-2 py-0.5 rounded-full ${
+                    className={`relative z-10 text-[11px] font-sans px-2 py-0.5 rounded-full transition-colors ${
                       isActive ? 'bg-white/20 text-white' : 'bg-[var(--bg-page)] text-[var(--text-muted)] border border-[var(--border-hairline)]'
                     }`}
                   >
@@ -193,14 +200,24 @@ export default function Team() {
         {/* Search bar inside interns tab */}
         {activeTab === 'interns' && (
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-subtle)] pointer-events-none" />
             <input
               type="text"
               placeholder="Search by name or focus area..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-[var(--accent-orange)] transition-all"
+              className="w-full pl-10 pr-9 h-10 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-xs font-sans text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:bg-white focus:border-[var(--accent-orange)] focus:ring-2 focus:ring-[var(--accent-orange)]/15 transition-all"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[var(--text-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-alt)] transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         )}
       </div>
