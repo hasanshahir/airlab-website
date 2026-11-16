@@ -49,9 +49,9 @@ const ARROW_SIZE_STYLES: Record<InteractiveHoverButtonSize, string> = {
 
 const VARIANT_STYLES: Record<InteractiveHoverButtonVariant, string> = {
   default:
-    "border border-[var(--border-hairline-dark)] bg-background text-foreground shadow-[var(--shadow-sm)]",
+    "border border-[var(--border-hairline-dark)] bg-background text-foreground shadow-[var(--shadow-sm)] hover:border-[var(--accent-orange)]",
   primary:
-    "border border-transparent bg-[var(--accent-orange)] text-white shadow-[0_2px_10px_-2px_rgba(123,44,191,0.45),inset_0_1px_0_rgba(255,255,255,0.22)] hover:shadow-[0_6px_20px_-3px_rgba(123,44,191,0.55)]",
+    "border border-[var(--accent-orange)] bg-[var(--accent-orange)] text-white shadow-[0_2px_10px_-2px_rgba(123,44,191,0.45),inset_0_1px_0_rgba(255,255,255,0.22)] hover:shadow-[0_6px_20px_-3px_rgba(123,44,191,0.35)]",
   secondary:
     "border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-[var(--shadow-sm)] hover:border-[var(--accent-orange)]",
   outline:
@@ -59,25 +59,25 @@ const VARIANT_STYLES: Record<InteractiveHoverButtonVariant, string> = {
   ghost:
     "border border-transparent bg-transparent text-[var(--text-primary)]",
   dark:
-    "border border-transparent bg-[var(--ink-dark)] text-white shadow-xs",
+    "border border-[var(--ink-dark)] bg-[var(--ink-dark)] text-white shadow-xs",
 };
 
 const VARIANT_DOT_STYLES: Record<InteractiveHoverButtonVariant, string> = {
   default: "bg-primary group-hover:bg-primary",
-  primary: "bg-white/90 group-hover:bg-[var(--accent-orange-hover)]",
+  primary: "bg-white group-hover:bg-white",
   secondary: "bg-primary group-hover:bg-primary",
   outline: "bg-primary group-hover:bg-primary",
   ghost: "bg-primary group-hover:bg-primary",
-  dark: "bg-primary group-hover:bg-primary",
+  dark: "bg-white group-hover:bg-white",
 };
 
 const VARIANT_HOVER_TEXT: Record<InteractiveHoverButtonVariant, string> = {
   default: "text-primary-foreground",
-  primary: "text-white",
+  primary: "text-[var(--accent-orange)]",
   secondary: "text-primary-foreground",
   outline: "text-primary-foreground",
   ghost: "text-primary-foreground",
-  dark: "text-white",
+  dark: "text-[var(--ink-dark)]",
 };
 
 /**
