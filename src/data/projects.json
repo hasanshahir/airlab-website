@@ -157,12 +157,13 @@
       "Cyber"
     ],
     "description": "CORTEX is a modular, tiered memory architecture for large language models (LLMs) designed to improve retrieval efficiency and optimize long-term memory storage. It organizes information across multiple memory tiers, enabling relevant information to be retrieved, updated, consolidated, and forgotten intelligently.",
-    "grantSupplier": "",
+    "grantSupplier": "Undergraduate FYDP",
     "grantAmount": "",
     "pi": "Dr. Murk Marvi",
     "industryAdvisor": "N/A",
-    "timeTaken": "2026 — 2027",
+    "timeTaken": "Aug 26 - May 27",
     "startDate": "Aug 2026",
+    "endDate": "May 2027",
     "coverImage": "/projects/cortex.jpg",
     "images": [
       "/projects/cortex.jpg"
@@ -187,12 +188,13 @@
       "AI Safety & Alignment"
     ],
     "description": "Taleem-e-Aam is an AI-powered educational project that adapts a small, open-source language model to improve Urdu understanding and address the linguistic and cultural needs of Pakistani students. Using efficient fine-tuning techniques such as LoRA/QLoRA and reinforcement learning, the project aims to develop an educational application that provides accessible, accurate, and contextually relevant Urdu-based learning support.",
-    "grantSupplier": "",
+    "grantSupplier": "Undergraduate FYDP",
     "grantAmount": "",
     "pi": "Dr. Murk Marvi",
     "industryAdvisor": "N/A",
-    "timeTaken": "2026 — 2027",
+    "timeTaken": "Aug 26 - May 27",
     "startDate": "Aug 2026",
+    "endDate": "May 2027",
     "coverImage": "/projects/taleem-e-aam.jpg",
     "images": [
       "/projects/taleem-e-aam.jpg"
@@ -388,8 +390,8 @@
       "Haiqa Siddiqua (CT-22071)",
       "Muhammad Zohaib Khan (CT-22072)"
     ],
-    "grantSupplier": "NEDAASC Funded",
-    "grantAmount": "",
+    "grantSupplier": "NEDAASC",
+    "grantAmount": "Rs. 97,000",
     "pi": "",
     "timeTaken": "Aug 25 - May 26",
     "startDate": "Aug 2025",
