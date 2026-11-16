@@ -387,7 +387,13 @@ export default function Home() {
         Where Intelligence Meets
         <br />
         <HandwritingText
-          text="Engineering."
+          words={[
+            'Engineering.',
+            'Creativity.',
+            'Innovation.',
+            'Discovery.',
+            'Impact.',
+          ]}
           className="text-[var(--accent-orange)] mt-1"
           height="1.18em"
           strokeWidth={1.8}
