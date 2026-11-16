@@ -39,12 +39,7 @@ export default function Preloader() {
 
   const isAlreadyRevealed = () => {
     if (typeof window === 'undefined') return true
-    if (window.__PRELOADER_REVEALED__) return true
-    try {
-      return sessionStorage.getItem('airlab_preloader_revealed') === 'true'
-    } catch {
-      return false
-    }
+    return Boolean(window.__PRELOADER_REVEALED__)
   }
 
   const [visible, setVisible] = useState(() => !isAdmin && !isAlreadyRevealed())
@@ -66,24 +61,19 @@ export default function Preloader() {
     document.body.classList.add('is-loading')
     window.dispatchEvent(new Event('preloader-start'))
 
-    const drawDuration = 380
-    const holdDuration = 100
-    const dissolveDuration = 360
+    const drawDuration = 750
+    const holdDuration = 220
+    const dissolveDuration = 420
 
     const markRevealed = () => {
       window.__PRELOADER_REVEALED__ = true
-      try {
-        sessionStorage.setItem('airlab_preloader_revealed', 'true')
-      } catch {
-        // ignore
-      }
     }
 
     const startTimer = window.setTimeout(() => {
       setPhase('drawing')
-    }, 20)
+    }, 30)
 
-    const revealEventTime = 20 + drawDuration
+    const revealEventTime = 30 + drawDuration
     const revealEventTimer = window.setTimeout(() => {
       markRevealed()
       window.dispatchEvent(new Event('preloader-reveal'))
@@ -98,7 +88,7 @@ export default function Preloader() {
     const doneTimer = window.setTimeout(() => {
       markRevealed()
       setVisible(false)
-    }, dissolveStartTime + dissolveDuration + 20)
+    }, dissolveStartTime + dissolveDuration + 30)
 
     // Robust failsafe: NEVER trap the user on a blank screen under any circumstance
     const failsafeTimer = window.setTimeout(() => {
@@ -106,7 +96,7 @@ export default function Preloader() {
       markRevealed()
       window.dispatchEvent(new Event('preloader-reveal'))
       setVisible(false)
-    }, 900)
+    }, 2200)
 
     return () => {
       window.clearTimeout(startTimer)
@@ -115,8 +105,6 @@ export default function Preloader() {
       window.clearTimeout(doneTimer)
       window.clearTimeout(failsafeTimer)
       document.body.classList.remove('is-loading')
-      markRevealed()
-      setVisible(false)
     }
   }
 
@@ -143,9 +131,9 @@ export default function Preloader() {
 
   if (isAdmin || !visible) return null
 
-  const drawMs = 380
-  const dotDelayMs = 180
-  const dissolveMs = 360
+  const drawMs = 750
+  const dotDelayMs = 320
+  const dissolveMs = 420
   const isDissolving = phase === 'dissolving'
 
   return (

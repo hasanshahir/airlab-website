@@ -33,16 +33,23 @@
   --font-weight-extrabold: 800;
 
   /* Surface & Canvas (Crisp Pure White) */
-  --bg-page: #FFFFFF;               /* Pure white canvas for high contrast */
-  --bg-backdrop: #F8F6FA;           /* Subtle outer canvas */
-  --bg-surface: #F4EFF9;            /* Soft elevated lavender-grey surface */
-  --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
+  --bg-page: #FFFFFF;
+  /* Pure white canvas for high contrast */
+  --bg-backdrop: #F8F6FA;
+  /* Subtle outer canvas */
+  --bg-surface: #F4EFF9;
+  /* Soft elevated lavender-grey surface */
+  --bg-surface-elevated: #FFFFFF;
+  /* Crisp white elevated surface */
   --bg-surface-glass: rgba(255, 255, 255, 0.95);
-  --surface-alt: #EDE3F7;           /* Interactive secondary hover surface */
+  --surface-alt: #EDE3F7;
+  /* Interactive secondary hover surface */
 
   /* Deep Ink Surfaces (Full-bleed dark bands) */
-  --ink-dark: #10002B;              /* Deepest abyssal midnight violet */
-  --ink-dark-surface: #240046;      /* Deep royal purple surface */
+  --ink-dark: #10002B;
+  /* Deepest abyssal midnight violet */
+  --ink-dark-surface: #240046;
+  /* Deep royal purple surface */
 
   /* Primary Accent (Electric Royal Violet #7B2CBF — WCAG AA Verified 5.2:1 on white) */
   --accent-orange: #7B2CBF;
@@ -63,11 +70,16 @@
   --accent-warm-white: #FFFFFF;
 
   /* Typography Colors (High Contrast on White) */
-  --text-primary: #10002B;          /* Abyssal violet — 16.5:1 contrast on white */
-  --text-muted: #3C096C;            /* Royal purple muted body copy — 9.8:1 contrast */
-  --text-subtle: #5A189A;           /* Vivid purple metadata & labels */
-  --text-on-dark: #FFFFFF;          /* Pure white high-contrast text on dark bands */
-  --text-on-dark-muted: #E0AAFF;    /* Soft lavender muted text on dark bands */
+  --text-primary: #10002B;
+  /* Abyssal violet — 16.5:1 contrast on white */
+  --text-muted: #3C096C;
+  /* Royal purple muted body copy — 9.8:1 contrast */
+  --text-subtle: #5A189A;
+  /* Vivid purple metadata & labels */
+  --text-on-dark: #FFFFFF;
+  /* Pure white high-contrast text on dark bands */
+  --text-on-dark-muted: #E0AAFF;
+  /* Soft lavender muted text on dark bands */
 
   --ink: var(--text-primary);
   --ink-2: var(--text-muted);
@@ -108,16 +120,23 @@
   --font-mono: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Surface & Canvas (Crisp Pure White) */
-  --bg-page: #FFFFFF;               /* Pure white canvas */
-  --bg-backdrop: #FAF8FD;           /* Subtle outer canvas */
-  --bg-surface: #F7F3FB;            /* Soft pastel mist surface */
-  --bg-surface-elevated: #FFFFFF;   /* Crisp white elevated surface */
+  --bg-page: #FFFFFF;
+  /* Pure white canvas */
+  --bg-backdrop: #FAF8FD;
+  /* Subtle outer canvas */
+  --bg-surface: #F7F3FB;
+  /* Soft pastel mist surface */
+  --bg-surface-elevated: #FFFFFF;
+  /* Crisp white elevated surface */
   --bg-surface-glass: rgba(255, 255, 255, 0.95);
-  --surface-alt: #E7C6FF;           /* Interactive secondary hover surface (Pastel Lavender) */
+  --surface-alt: #E7C6FF;
+  /* Interactive secondary hover surface (Pastel Lavender) */
 
   /* Deep Ink Surfaces (Full-bleed dark bands) */
-  --ink-dark: #1A0B2E;              /* Deep twilight velvet purple-black */
-  --ink-dark-surface: #2B1347;      /* Velvet purple surface */
+  --ink-dark: #1A0B2E;
+  /* Deep twilight velvet purple-black */
+  --ink-dark-surface: #2B1347;
+  /* Velvet purple surface */
 
   /* Primary Accent (Vibrant Orchid Pink #C042BA — Matching Ai2 pill aesthetic, 5.1:1 on white) */
   --accent-orange: #C042BA;
@@ -138,11 +157,16 @@
   --accent-warm-white: #FFFFFF;
 
   /* Typography Colors (High Contrast on White) */
-  --text-primary: #1A0B2E;          /* Deep twilight ink — 16.2:1 contrast on white */
-  --text-muted: #4C2D7A;            /* Muted twilight — 8.6:1 contrast on white */
-  --text-subtle: #7E57C2;           /* Soft periwinkle-purple metadata */
-  --text-on-dark: #FFFFFF;          /* Pure white high-contrast text on dark bands */
-  --text-on-dark-muted: #FFD6FF;    /* Soft pastel pink muted text on dark bands */
+  --text-primary: #1A0B2E;
+  /* Deep twilight ink — 16.2:1 contrast on white */
+  --text-muted: #4C2D7A;
+  /* Muted twilight — 8.6:1 contrast on white */
+  --text-subtle: #7E57C2;
+  /* Soft periwinkle-purple metadata */
+  --text-on-dark: #FFFFFF;
+  /* Pure white high-contrast text on dark bands */
+  --text-on-dark-muted: #FFD6FF;
+  /* Soft pastel pink muted text on dark bands */
 
   --ink: var(--text-primary);
   --ink-2: var(--text-muted);
@@ -164,6 +188,7 @@
 
 /* ── Base Styling (Clean Modern Typography & High Contrast) ── */
 @layer base {
+
   *,
   *::before,
   *::after {
@@ -341,6 +366,7 @@
     0% {
       transform: translateX(0%);
     }
+
     100% {
       transform: translateX(-50%);
     }
@@ -380,7 +406,7 @@ body.is-loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: transparent;
+  background-color: var(--bg-page, #ffffff);
   will-change: transform, opacity;
 }
 
@@ -634,6 +660,7 @@ body.is-loading {
     opacity: 0.45;
     transform: scale(1);
   }
+
   to {
     opacity: 0;
     transform: scale(3);
@@ -862,4 +889,3 @@ body.is-loading {
 .rt.rt--tablet .rt-caption-line {
   font-size: 22px;
 }
-

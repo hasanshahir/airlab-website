@@ -743,11 +743,11 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* ── 4. Structured Multi-Column Ai2-Inspired Footer (Deep Ink Band) ── */}
-      <footer className="w-full bg-[var(--ink-dark)] text-[var(--text-on-dark)] pt-20 pb-14 relative font-sans border-t border-[var(--border-hairline)]">
+      {/* ── 4. Clean Compact Footer (Deep Ink Band) ── */}
+      <footer className="w-full bg-[var(--ink-dark)] text-[var(--text-on-dark)] pt-14 pb-10 relative font-sans border-t border-[var(--border-hairline)]">
         <div className="max-w-[1240px] mx-auto px-6 sm:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-16 border-b border-white/10">
-            {/* Column 1: Lab Charter & Location */}
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10 pb-10 border-b border-white/10">
+            {/* Left: Lab Identity, Address, Contact Info & LinkedIn */}
             <div className="space-y-4">
               <Link to="/" onClick={handleLogoTap} className="inline-block select-none group" aria-label="AIR Lab Home">
                 <div className="flex items-center gap-3">
@@ -757,64 +757,54 @@ export default function Layout() {
                     className="w-10 h-10 object-contain shrink-0 transition-transform duration-200 group-hover:scale-105"
                   />
                   <div>
-                    <div className="text-base font-bold tracking-tight text-white font-head leading-none group-hover:text-[var(--accent-orange)] transition-colors">AIR Lab</div>
+                    <div className="text-base font-bold tracking-tight text-white font-head leading-none group-hover:text-white/80 transition-colors">AIR Lab</div>
                     <div className="text-[11px] text-white/60 tracking-wider uppercase font-sans mt-1">NED UNIVERSITY · CSIT</div>
                   </div>
                 </div>
               </Link>
-              <p className="text-[13.5px] text-[var(--text-on-dark-muted)] leading-relaxed max-w-sm">
-                The Artificial Intelligence Research Laboratory, Department of Computer Science & Information Technology (CSIT), NED University of Engineering & Technology. Advancing foundation models, edge perception, and robotics.
-              </p>
-              <div className="pt-2 text-[12px] text-white/60 space-y-1.5 font-sans">
+
+              <div className="pt-1 text-[13px] text-white/80 space-y-2 font-sans">
                 <div>NED University Main Campus, Karachi 75270</div>
                 <div>
                   <a
                     href="mailto:contact@airlab.neduet.edu.pk"
-                    className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 font-semibold"
+                    className="text-white/90 hover:text-white hover:underline inline-flex items-center gap-2 font-medium transition-colors"
                   >
-                    <Mail className="w-3.5 h-3.5" />
+                    <Mail className="w-3.5 h-3.5 text-white/75" />
                     <span>contact@airlab.neduet.edu.pk</span>
                   </a>
                 </div>
               </div>
+
+              <div className="pt-1">
+                <a
+                  href="https://www.linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow AIR Lab on LinkedIn for latest updates"
+                  className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-medium text-white transition-colors"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-4 h-4 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+                  </svg>
+                  <span>Follow us on LinkedIn</span>
+                </a>
+              </div>
             </div>
 
-            {/* Column 2: Research */}
+            {/* Right: NED CSIT & Inquiries */}
             <div>
               <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
-                Research
+                NED CSIT &amp; Inquiries
               </h5>
-              <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
-                <li><Link to="/about" className="hover:text-white transition-colors">About AIR Lab</Link></li>
-                <li><Link to="/projects" className="hover:text-white transition-colors">Projects Catalog</Link></li>
-                <li><Link to="/grants" className="hover:text-white transition-colors">Research Grants</Link></li>
-                <li><Link to="/publications" className="hover:text-white transition-colors">Publications</Link></li>
-                <li><Link to="/blogs" className="hover:text-white transition-colors">Research Blogs</Link></li>
-                <li><Link to="/gallery" className="hover:text-white transition-colors">Lab Gallery</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 3: People & Partners */}
-            <div>
-              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
-                People & Partners
-              </h5>
-              <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
-                <li><Link to="/team" className="hover:text-white transition-colors">Faculty & Scholars</Link></li>
-                <li><Link to="/performers" className="hover:text-white transition-colors">Performers of the Month</Link></li>
-                <li><Link to="/interns" className="hover:text-white transition-colors">Research Interns</Link></li>
-                <li><Link to="/contact" className="hover:text-white transition-colors">Contact Coordination</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 4: NED CSIT & Inquiries */}
-            <div>
-              <h5 className="text-[12px] font-bold uppercase tracking-wider text-white/50 mb-4 font-sans">
-                NED CSIT & Inquiries
-              </h5>
-              <ul className="space-y-2.5 text-[14px] text-[var(--text-on-dark-muted)]">
+              <ul className="space-y-2.5 text-[14px] text-white/75">
                 <li>
-                  <Link to="/contact" className="text-white hover:text-[var(--accent-orange)] transition-colors font-semibold inline-flex items-center gap-1.5">
+                  <Link to="/contact" className="text-white hover:text-white/80 transition-colors font-semibold inline-flex items-center gap-1.5">
                     <span>Contact Us</span>
                   </Link>
                 </li>
@@ -838,33 +828,17 @@ export default function Layout() {
                     NED University
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="mailto:contact@airlab.neduet.edu.pk"
-                    className="text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1 font-semibold"
-                  >
-                    <Mail className="w-3 h-3" />
-                    <span>contact@airlab.neduet.edu.pk</span>
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
 
-          {/* Subdued Brand Signature */}
-          <div className="pt-10 pb-4 text-center select-none overflow-hidden">
-            <span className="block text-[clamp(44px,11vw,110px)] font-bold tracking-tight text-white/[0.04] font-head leading-none whitespace-nowrap">
-              AIR LAB NEDUET
-            </span>
-          </div>
-
           {/* Bottom Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between text-[12px] text-white/50 gap-3 pt-6 border-t border-white/10 font-sans">
+          <div className="flex flex-col sm:flex-row items-center justify-between text-[12px] text-white/55 gap-3 pt-6 font-sans">
             <div>
               &copy; {new Date().getFullYear()} Artificial Intelligence Research Lab &bull; Department of CSIT, NED University.
             </div>
             <div className="flex items-center gap-3">
-              <a href="mailto:contact@airlab.neduet.edu.pk" className="hover:text-[var(--accent-orange)] transition-colors">
+              <a href="mailto:contact@airlab.neduet.edu.pk" className="hover:text-white transition-colors">
                 contact@airlab.neduet.edu.pk
               </a>
               <span>&bull;</span>

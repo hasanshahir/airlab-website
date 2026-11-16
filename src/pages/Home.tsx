@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -7,9 +7,6 @@ import {
   LineChart,
   Layers,
   Award,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
   ShieldAlert,
   ShieldCheck,
   Terminal,
@@ -19,7 +16,6 @@ import {
 import Button from '../components/ui/Button'
 import TitleReveal from '../components/ui/TitleReveal'
 import BlurReveal from '../components/ui/blur-reveal'
-import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
 import { CoverflowCarousel } from '@/components/ui/coverflow-carousel'
@@ -31,9 +27,6 @@ import {
   TextStaggerHover,
   useHoverSliderContext,
 } from '@/components/ui/animated-slideshow'
-import { getGrants, getProjects } from '../lib/data'
-import { useVacancySettings } from '../lib/vacancy'
-import type { ProjectItem, Grant } from '../types/data'
 
 const HERO_CAROUSEL_IMAGES = [
   {
@@ -149,11 +142,10 @@ function ResearchAreaTrackRow({
       className="group w-full text-left cursor-pointer bg-transparent border-0 py-1 px-0 focus:outline-none flex items-baseline gap-3.5"
     >
       <span
-        className={`text-xs font-mono font-semibold tabular-nums transition-colors duration-200 shrink-0 ${
-          isActive
+        className={`text-xs font-mono font-semibold tabular-nums transition-colors duration-200 shrink-0 ${isActive
             ? 'text-[var(--accent-orange)]'
             : 'text-[var(--text-subtle)]/45 group-hover:text-[var(--accent-orange)]/75'
-        }`}
+          }`}
       >
         0{index + 1}
       </span>
@@ -168,265 +160,49 @@ function ResearchAreaTrackRow({
 
 export default function Home() {
   const navigate = useNavigate()
-  const [applyModalOpen, setApplyModalOpen] = useState(false)
   const [carouselVersion, setCarouselVersion] = useState<'v1' | 'v2'>('v1')
   const [researchLayout, setResearchLayout] = useState<'grid' | 'slideshow'>('grid')
-  const updatesTrackRef = useRef<HTMLDivElement>(null)
-  const updatesOffsetRef = useRef(0)
-  const updatesVelocityRef = useRef(55) // px/sec default moving left
-  const updatesTargetVelocityRef = useRef(55)
-  const updatesManualBoostRef = useRef(0)
-  const vacancy = useVacancySettings()
-  const [projects, setProjects] = useState<ProjectItem[]>(() => {
-    try {
-      return getProjects()
-    } catch {
-      return []
-    }
-  })
-  const [grants, setGrants] = useState<Grant[]>(() => getGrants())
-
-  useEffect(() => {
-    let active = true
-    const apiBase = import.meta.env.VITE_API_URL || ''
-
-    fetch(`${apiBase}/api/content/projects`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (active && Array.isArray(data)) {
-          setProjects(data)
-        }
-      })
-      .catch(() => { })
-
-    fetch(`${apiBase}/api/content/grants`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (active && Array.isArray(data) && data.length > 0) {
-          setGrants(data)
-        }
-      })
-      .catch(() => { })
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  const recentUpdates = useMemo(() => {
-    const items: Array<{
-      id: string
-      category: string
-      date: string
-      title: string
-      desc: string
-      link?: string
-      actionType?: 'apply'
-      actionText: string
-    }> = []
-
-    const fundedProjects = projects.filter((p) => p.category === 'Funded')
-    const ugProjects = projects.filter((p) => p.category !== 'Funded')
-
-    for (const p of fundedProjects.slice(0, 2)) {
-      items.push({
-        id: `update-proj-${p.id}`,
-        category: p.grantSupplier || 'Funded Project',
-        date: p.timeTaken || p.startDate || 'Ongoing',
-        title: p.title,
-        desc: p.description,
-        link: `/projects#${p.id}`,
-        actionText: 'Explore Project',
-      })
-    }
-
-    for (const g of grants.slice(0, 2)) {
-      items.push({
-        id: `update-grant-${g.id}`,
-        category: g.funder || 'Research Grant',
-        date: g.status === 'Active' ? 'Active Grant' : g.status,
-        title: g.title,
-        desc:
-          g.description ||
-          `${g.amount ? `${g.amount} · ` : ''}${g.leadInvestigator ? `PI: ${g.leadInvestigator}` : g.duration}`,
-        link: `/grants#${g.id}`,
-        actionText: 'View Grant',
-      })
-    }
-
-    for (const p of ugProjects.slice(0, 3)) {
-      items.push({
-        id: `update-ug-${p.id}`,
-        category: (p.grantSupplier && p.grantSupplier !== 'NA' ? p.grantSupplier : '') || 'Undergraduate Research',
-        date: p.timeTaken || p.startDate || 'FYDP',
-        title: p.title,
-        desc: p.description,
-        link: `/projects#${p.id}`,
-        actionText: 'Explore Project',
-      })
-    }
-
-    if (vacancy.status === 'Open') {
-      items.push({
-        id: 'update-vacancy',
-        category: vacancy.badge || 'Vacancies',
-        date: 'Admissions Open',
-        title: vacancy.title,
-        desc: vacancy.description,
-        actionType: 'apply',
-        actionText: 'Apply for Vacancy',
-      })
-    }
-
-    return items
-  }, [projects, grants, vacancy])
-
-  const loopedUpdates = useMemo(() => {
-    if (recentUpdates.length === 0) return []
-    return [...recentUpdates, ...recentUpdates, ...recentUpdates]
-  }, [recentUpdates])
-
-  useEffect(() => {
-    let rafId = 0
-    let lastTime = performance.now()
-
-    const stepRibbon = (
-      track: HTMLDivElement | null,
-      itemCount: number,
-      offsetRef: React.MutableRefObject<number>,
-      velocityRef: React.MutableRefObject<number>,
-      targetVelocityRef: React.MutableRefObject<number>,
-      manualBoostRef: React.MutableRefObject<number>,
-      dt: number
-    ) => {
-      if (!track || itemCount === 0) return
-      const children = track.children
-      if (children.length < itemCount * 2) return
-
-      const firstEl = children[0] as HTMLElement
-      const secondSetEl = children[itemCount] as HTMLElement
-      const singleSetWidth = secondSetEl.offsetLeft - firstEl.offsetLeft
-      if (singleSetWidth <= 0) return
-
-      velocityRef.current +=
-        (targetVelocityRef.current - velocityRef.current) * Math.min(1, dt * 10)
-
-      const manualStep = manualBoostRef.current * Math.min(1, dt * 8)
-      manualBoostRef.current -= manualStep
-
-      offsetRef.current += velocityRef.current * dt + manualStep
-
-      if (offsetRef.current >= singleSetWidth) {
-        offsetRef.current -= singleSetWidth
-      } else if (offsetRef.current < 0) {
-        offsetRef.current += singleSetWidth
-      }
-
-      track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`
-    }
-
-    const tick = (now: number) => {
-      const dt = Math.min((now - lastTime) / 1000, 0.05)
-      lastTime = now
-
-      stepRibbon(
-        updatesTrackRef.current,
-        recentUpdates.length,
-        updatesOffsetRef,
-        updatesVelocityRef,
-        updatesTargetVelocityRef,
-        updatesManualBoostRef,
-        dt
-      )
-
-      rafId = requestAnimationFrame(tick)
-    }
-
-    rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
-  }, [recentUpdates.length])
-
-  const updateRibbonHoverVelocity = (
-    e: React.MouseEvent<HTMLDivElement>,
-    targetVelocityRef: React.MutableRefObject<number>
-  ) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    if (rect.width <= 0) return
-    const relX = (e.clientX - rect.left) / rect.width
-    const edgeZone = 0.25 // Outer 25% on each edge controls scrolling direction & speed
-
-    if (relX < edgeZone) {
-      // Hovering left side -> scrolls right (reverse)
-      const intensity = 1 - relX / edgeZone
-      targetVelocityRef.current = -(140 + intensity * 200)
-    } else if (relX > 1 - edgeZone) {
-      // Hovering right side -> scrolls left (forward)
-      const intensity = (relX - (1 - edgeZone)) / edgeZone
-      targetVelocityRef.current = 140 + intensity * 200
-    } else {
-      // Center area -> pause/standby so users can easily read or click cards
-      targetVelocityRef.current = 0
-    }
-  }
-
-  const handleUpdatesMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    updateRibbonHoverVelocity(e, updatesTargetVelocityRef)
-  }
-
-  const handleUpdatesMouseLeave = () => {
-    updatesTargetVelocityRef.current = 55
-  }
-
-  const handleUpdatesWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 4) {
-      updatesManualBoostRef.current += e.deltaX * 1.2
-    }
-  }
-
-  const scrollUpdates = (direction: 'left' | 'right') => {
-    const step = 360
-    updatesManualBoostRef.current += direction === 'left' ? -step : step
-  }
 
   const heroOverlay = (
     <div className="relative z-10 flex h-full w-full max-w-4xl mx-auto flex-col items-center justify-center px-6 text-center pointer-events-none">
-      {/* Clean high-visibility radial light scrim behind the text so the carousel stays visible without visual clutter */}
+      {/* Clean high-visibility radial light scrim behind the text so the carousel stays calm and legible */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-2xl h-64 -z-10 rounded-full blur-md"
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[96%] max-w-3xl h-72 sm:h-80 -z-10 rounded-full blur-xl"
         style={{
           background:
-            'radial-gradient(closest-side, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.45) 55%, transparent 100%)',
+            'radial-gradient(closest-side, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.78) 52%, rgba(255, 255, 255, 0.25) 82%, transparent 100%)',
         }}
       />
 
       <h1
-        className="max-w-2xl text-center text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-zinc-900 font-head select-none pointer-events-auto"
+        className="w-full max-w-4xl text-center text-2xl sm:text-4xl md:text-5xl lg:text-[54px] font-bold leading-[1.12] tracking-tight text-zinc-900 font-head select-none pointer-events-auto"
         style={{
-          textShadow: '0 2px 18px rgba(255, 255, 255, 0.95)',
+          textShadow: '0 2px 20px rgba(255, 255, 255, 0.98)',
         }}
       >
-        Where Intelligence Meets
-        <br />
-        <HandwritingText
-          words={[
-            'Engineering.',
-            'Creativity.',
-            'Innovation.',
-            'Discovery.',
-            'Impact.',
-          ]}
-          className="text-[var(--accent-orange)] mt-1"
-          height="1.18em"
-          strokeWidth={1.8}
-        />
+        <span className="block sm:whitespace-nowrap">Where Intelligence Meets</span>
+        <span className="mt-1.5 flex items-center justify-center w-full">
+          <HandwritingText
+            words={[
+              'Engineering.',
+              'Creativity.',
+              'Innovation.',
+              'Discovery.',
+              'Impact.',
+            ]}
+            className="text-[var(--accent-orange)]"
+            height="1.15em"
+            strokeWidth={1.8}
+          />
+        </span>
       </h1>
 
       {/* Tactile Action Button centered directly below the text */}
-      <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center gap-3.5 pointer-events-auto">
+      <div className="mt-5 sm:mt-6 flex flex-wrap items-center justify-center gap-3.5 pointer-events-auto">
         <Link
           to="/projects"
-          className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/40 shadow-[0_10px_28px_rgba(123,44,191,0.38)] hover:shadow-[0_14px_34px_rgba(123,44,191,0.5)] hover:-translate-y-0.5 active:translate-y-0.5 transition-all duration-200 flex items-center gap-2 cursor-pointer group"
+          className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/40 shadow-[0_10px_28px_rgba(123,44,191,0.34)] hover:shadow-[0_14px_34px_rgba(123,44,191,0.48)] hover:-translate-y-0.5 active:translate-y-0.5 transition-all duration-200 flex items-center gap-2 cursor-pointer group"
         >
           <Layers className="w-4 h-4 shrink-0" />
           <span>Explore Projects</span>
@@ -438,7 +214,7 @@ export default function Home() {
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
       {/* ── 1. FULL-WIDTH HERO SHOWCASE (V1 Curved / V2 Coverflow) ── */}
-      <section className="relative w-full z-10">
+      <section className="relative w-full z-10 bg-[var(--bg-page)]">
         <AnimatePresence mode="wait" initial={false}>
           {carouselVersion === 'v1' ? (
             <motion.div
@@ -450,11 +226,12 @@ export default function Home() {
             >
               <TiltedGridHero
                 images={HERO_CAROUSEL_IMAGES}
-                tileHeight={48}
+                tileHeight={52}
                 speed={6}
                 axis={50}
                 gap={4}
                 curve={72}
+                imageClassName="opacity-65 saturate-[0.75] brightness-[1.04]"
                 className="h-[400px] sm:h-[520px] md:h-[600px] lg:h-[640px] w-full bg-transparent"
               >
                 {heroOverlay}
@@ -506,8 +283,8 @@ export default function Home() {
                   aria-checked={isActive}
                   onClick={() => setCarouselVersion(option.id)}
                   className={`relative px-3.5 py-1 rounded-full text-xs font-semibold transition-colors duration-180 cursor-pointer select-none ${isActive
-                      ? 'text-white'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                    ? 'text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                 >
                   {isActive && (
@@ -550,121 +327,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 2. RECENT UPDATES SECTION (Clean, Minimal, Directly Labeled) ── */}
-      <section className="py-10 sm:py-12 px-4 sm:px-8 max-w-[1240px] mx-auto relative z-10">
-        {/* Header Row with Prev/Next Controls */}
-        <div className="flex items-center justify-between gap-4 mb-6 pb-3 border-b border-[var(--border-hairline)]">
-          <TitleReveal
-            as="h2"
-            className="text-xl sm:text-2xl font-bold font-head text-[var(--text-primary)]"
-          >
-            Recent Updates
-          </TitleReveal>
-
-          {/* Horizontal Navigation Arrow Buttons */}
-          <div className="flex items-center gap-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.94 }}
-              type="button"
-              onClick={() => scrollUpdates('left')}
-              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-colors cursor-pointer shadow-xs"
-              aria-label="Previous updates"
-              title="Scroll left"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.94 }}
-              type="button"
-              onClick={() => scrollUpdates('right')}
-              className="w-9 h-9 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--accent-orange)] hover:text-white border border-[var(--border-hairline)] text-[var(--text-primary)] flex items-center justify-center transition-colors cursor-pointer shadow-xs"
-              aria-label="Next updates"
-              title="Scroll right"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </motion.button>
-          </div>
-        </div>
-
-        {/* Dynamic Looping Ribbon of Cards */}
-        <div
-          onMouseMove={handleUpdatesMouseMove}
-          onMouseLeave={handleUpdatesMouseLeave}
-          onWheel={handleUpdatesWheel}
-          className="relative overflow-hidden py-3 -my-3 select-none ribbon-edge-mask"
-        >
-          <div
-            ref={updatesTrackRef}
-            className="flex gap-5 w-max pb-4 will-change-transform"
-          >
-            {loopedUpdates.map((item, idx) => (
-              <motion.article
-                key={`${item.id}-${idx}`}
-                whileHover={{ y: -4 }}
-                transition={{ type: 'spring', stiffness: 420, damping: 28 }}
-                onClick={() => {
-                  if (item.actionType === 'apply') {
-                    setApplyModalOpen(true)
-                  } else if (item.link) {
-                    navigate(item.link)
-                  }
-                }}
-                className="min-w-[260px] sm:min-w-[320px] md:min-w-[340px] max-w-[85vw] sm:max-w-[360px] p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors shrink-0 flex flex-col justify-between group cursor-pointer"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="text-[11.5px] font-semibold text-[var(--accent-orange)] font-sans">
-                      {item.category}
-                    </span>
-                    <div className="flex items-center gap-1 text-[11px] text-[var(--text-subtle)] font-medium">
-                      <Calendar className="w-3 h-3" />
-                      <span>{item.date}</span>
-                    </div>
-                  </div>
-
-                  <h3 className="text-base font-bold font-head text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2.5">
-                    {item.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-relaxed font-normal mt-2 line-clamp-3">
-                    {item.desc}
-                  </p>
-                </div>
-
-                <div className="pt-3 mt-4 border-t border-[var(--border-hairline)] flex items-center justify-between">
-                  <span className="text-[11px] text-[var(--text-subtle)] font-medium">
-                    {item.category}
-                  </span>
-                  {item.actionType === 'apply' ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setApplyModalOpen(true)
-                      }}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:underline transition-colors cursor-pointer"
-                    >
-                      <span>{item.actionText}</span>
-                    </button>
-                  ) : (
-                    <Link
-                      to={item.link!}
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:underline transition-colors"
-                    >
-                      <span>{item.actionText}</span>
-                    </Link>
-                  )}
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 3. ABOUT AIR LAB SECTION (Two Columns: Punch Line & Bigger Lab Photo) ── */}
+      {/* ── 2. ABOUT AIR LAB SECTION (Two Columns: Punch Line & Bigger Lab Photo) ── */}
       <section id="explore-anchor" className="w-full bg-[var(--ink-dark)] text-white py-16 sm:py-24 px-6 sm:px-10 relative z-10 border-y border-[var(--border-hairline)]">
         <div className="max-w-[1320px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
@@ -754,11 +417,10 @@ export default function Home() {
                     key={opt.id}
                     type="button"
                     onClick={() => setResearchLayout(opt.id)}
-                    className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer select-none ${
-                      isActive
+                    className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer select-none ${isActive
                         ? 'text-white'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
+                      }`}
                   >
                     {isActive && (
                       <motion.span
@@ -948,16 +610,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 6. COLLABORATORS & SPONSORS ── */}
+      {/* ── COLLABORATORS & SPONSORS ── */}
       <section className="py-16 sm:py-20 px-6 sm:px-10 max-w-[1240px] mx-auto relative z-10 border-t border-[var(--border-hairline)]">
         <SponsorsGrid />
       </section>
-
-      {/* Student Application Modal */}
-      <StudentApplicationModal
-        isOpen={applyModalOpen}
-        onClose={() => setApplyModalOpen(false)}
-      />
     </div>
   )
 }
