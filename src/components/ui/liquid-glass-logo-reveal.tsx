@@ -617,7 +617,9 @@ void main() {
 }`
 
 function createRenderer(canvas: HTMLCanvasElement) {
-  const gl = canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false })
+  const gl =
+    canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false }) ||
+    canvas.getContext('webgl2')
   if (!gl) return null
 
   const compile = (type: number, src: string) => {
@@ -989,9 +991,10 @@ export function LiquidGlassLogoReveal({
     if (!renderer) {
       canvas.remove()
       setFallback(true)
+      const fallbackDurationMs = Math.round(2550 / Math.max(0.25, stateRef.current.speed || 1))
       const fallbackTimer = window.setTimeout(() => {
         stateRef.current.onComplete?.()
-      }, 1200)
+      }, fallbackDurationMs)
       return () => window.clearTimeout(fallbackTimer)
     }
 
@@ -1198,6 +1201,7 @@ export function LiquidGlassLogoReveal({
   }, [logo])
 
   const fallbackMaskUrl = useMemo(() => (fallback ? resolveLogoUrl(logo) : ''), [fallback, logo])
+  const fallbackDurationSec = useMemo(() => (2.55 / Math.max(0.25, speed || 1)).toFixed(2), [speed])
 
   return (
     <div
@@ -1205,7 +1209,7 @@ export function LiquidGlassLogoReveal({
       role="img"
       aria-label={label}
       className={cn(
-        'relative isolate overflow-hidden select-none',
+        'relative isolate overflow-hidden select-none flex items-center justify-center',
         replayOnClick && 'cursor-pointer',
         className
       )}
@@ -1219,25 +1223,64 @@ export function LiquidGlassLogoReveal({
       {...rest}
     >
       {fallback && (
-        <span
+        <div
           aria-hidden
-          className="absolute inset-0 m-auto block"
+          className="relative flex items-center justify-center"
           style={{
-            width: settings.tileSize * settings.logoScale * settings.finalScale * BOX_FRAC,
-            height: settings.tileSize * settings.logoScale * settings.finalScale * BOX_FRAC,
-            maxWidth: '40%',
-            maxHeight: '40%',
-            backgroundColor: settings.logoColor,
-            maskImage: `url("${fallbackMaskUrl}")`,
-            WebkitMaskImage: `url("${fallbackMaskUrl}")`,
-            maskSize: 'contain',
-            WebkitMaskSize: 'contain',
-            maskRepeat: 'no-repeat',
-            WebkitMaskRepeat: 'no-repeat',
-            maskPosition: 'center',
-            WebkitMaskPosition: 'center',
+            width: Math.min(settings.tileSize, 220),
+            height: Math.min(settings.tileSize, 220),
           }}
-        />
+        >
+          {/* Radial surface ripple */}
+          <span
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              border: '2px solid rgba(157, 78, 221, 0.38)',
+              animation: `lg-fallback-ripple ${fallbackDurationSec}s cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+            }}
+          />
+          {/* Liquid-glass squircle tile with purple/orchid rim dispersion & sheen */}
+          <div
+            className="absolute inset-0 overflow-hidden pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(255,255,255,0.72) 0%, rgba(244,239,249,0.38) 55%, rgba(231,198,255,0.45) 100%)',
+              border: '1.5px solid rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              animation: `lg-fallback-tile ${fallbackDurationSec}s cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+            }}
+          >
+            <span
+              className="absolute -inset-1/2 pointer-events-none"
+              style={{
+                background:
+                  'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.75) 50%, transparent 100%)',
+                animation: `lg-fallback-sheen ${fallbackDurationSec}s ease-in-out forwards`,
+              }}
+            />
+          </div>
+          {/* AIR Lab mark */}
+          <span
+            className="relative z-10 block"
+            style={{
+              width: settings.tileSize * settings.logoScale * BOX_FRAC,
+              height: settings.tileSize * settings.logoScale * BOX_FRAC,
+              maxWidth: '58%',
+              maxHeight: '58%',
+              backgroundColor: settings.logoColor,
+              maskImage: `url("${fallbackMaskUrl}")`,
+              WebkitMaskImage: `url("${fallbackMaskUrl}")`,
+              maskSize: 'contain',
+              WebkitMaskSize: 'contain',
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+              maskPosition: 'center',
+              WebkitMaskPosition: 'center',
+              animation: `lg-fallback-logo ${fallbackDurationSec}s cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+            }}
+          />
+        </div>
       )}
     </div>
   )

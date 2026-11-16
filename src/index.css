@@ -486,6 +486,112 @@ body.is-loading {
   filter: drop-shadow(0 12px 30px rgba(16, 0, 68, 0.12));
 }
 
+/* Liquid Glass Fallback Animation (when WebGL2 context is unavailable/exhausted) */
+@keyframes lg-fallback-tile {
+  0% {
+    opacity: 0;
+    transform: scale(0.22);
+    border-radius: 50%;
+    filter: blur(8px);
+    box-shadow: 0 0 0 0 rgba(157, 78, 221, 0), inset 0 0 24px rgba(255, 255, 255, 0.9);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(0.95);
+    border-radius: 50%;
+    filter: blur(1px);
+    box-shadow: 0 18px 42px -10px rgba(123, 44, 191, 0.22), inset 0 1px 16px rgba(255, 255, 255, 0.95);
+  }
+  42% {
+    opacity: 1;
+    transform: scale(1.02);
+    border-radius: 26%;
+    filter: blur(0px);
+    box-shadow:
+      0 20px 48px -12px rgba(123, 44, 191, 0.24),
+      -6px -6px 18px rgba(251, 131, 232, 0.32),
+      6px 6px 18px rgba(123, 44, 191, 0.34),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
+  }
+  68% {
+    opacity: 1;
+    transform: scale(1);
+    border-radius: 26%;
+    filter: blur(0px);
+  }
+  84% {
+    opacity: 0;
+    transform: scale(1.12);
+    border-radius: 28%;
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+    border-radius: 30%;
+  }
+}
+
+@keyframes lg-fallback-ripple {
+  0%, 14% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  26% {
+    opacity: 0.55;
+    transform: scale(1.05);
+  }
+  52%, 100% {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+}
+
+@keyframes lg-fallback-logo {
+  0% {
+    opacity: 0;
+    transform: scale(1.75);
+    filter: blur(6px);
+  }
+  22% {
+    opacity: 1;
+    transform: scale(1.22);
+    filter: blur(0.5px);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(0.84);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.78);
+    filter: blur(5px);
+  }
+}
+
+@keyframes lg-fallback-sheen {
+  0%, 28% {
+    opacity: 0;
+    transform: translate(-120%, 120%) rotate(-35deg);
+  }
+  45% {
+    opacity: 0.7;
+  }
+  68% {
+    opacity: 0;
+    transform: translate(120%, -120%) rotate(-35deg);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* Right-Side Page Loading / Scroll Indicator (Minimalist Frameless Ruler) */
 .scroll-indicator {
   position: fixed;
