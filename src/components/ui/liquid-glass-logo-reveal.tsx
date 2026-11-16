@@ -380,6 +380,7 @@ uniform float uKeep;       // 1 = the glass settles into a flat plate instead of
 uniform float uSheen;      // strength of the light band crossing the face
 uniform float uSweep;      // where that band is, plate sizes along its diagonal
 uniform float uLightAng;   // how far the rim light has turned, radians
+uniform float uPurple;     // 1 = purple/violet dispersion spectrum, 0 = classic cyan/gold
 
 uniform vec3 uBg;
 uniform vec3 uPlateCol;
@@ -448,7 +449,17 @@ float band(float x, float a, float b, float w) { return smoothstep(a - w, a, x) 
 // Visible spectrum, red (0) to violet (1).
 float bump(float x, float c, float w) { float d = (x - c) / w; return exp(-0.5 * d * d); }
 vec3 spectrum(float x) {
-  return vec3(bump(x, 0.34, 0.2) + 0.08 * bump(x, 0.93, 0.05), bump(x, 0.58, 0.1), bump(x, 0.8, 0.11));
+  vec3 classic = vec3(
+    bump(x, 0.34, 0.2) + 0.08 * bump(x, 0.93, 0.05),
+    bump(x, 0.58, 0.1),
+    bump(x, 0.8, 0.11)
+  );
+  vec3 purple = vec3(
+    bump(x, 0.28, 0.16) + 0.72 * bump(x, 0.78, 0.14),
+    bump(x, 0.48, 0.12),
+    bump(x, 0.80, 0.14) + 0.35 * bump(x, 0.24, 0.12)
+  );
+  return mix(classic, purple, uPurple);
 }
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
@@ -856,6 +867,7 @@ export interface LiquidGlassLogoRevealProps extends Omit<React.HTMLAttributes<HT
   time?: number
   tuning?: Partial<LiquidGlassSettings>
   label?: string
+  palette?: 'classic' | 'purple'
   replayOnClick?: boolean
   onComplete?: () => void
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
@@ -881,6 +893,7 @@ export function LiquidGlassLogoReveal({
   time,
   tuning,
   label = 'AIR Lab Logo',
+  palette = 'classic',
   replayOnClick = false,
   onComplete,
   className,
@@ -945,6 +958,7 @@ export function LiquidGlassLogoReveal({
     playOutroOnEnd,
     speed,
     time,
+    palette,
     onComplete,
   })
   stateRef.current = {
@@ -953,6 +967,7 @@ export function LiquidGlassLogoReveal({
     playOutroOnEnd,
     speed,
     time,
+    palette,
     onComplete,
   }
 
@@ -1002,6 +1017,7 @@ export function LiquidGlassLogoReveal({
         playOutroOnEnd: shouldOutro,
         speed: spd,
         time: fixedTime,
+        palette: pal,
         onComplete: handleComplete,
       } = stateRef.current
       const end = endOf(cfg)
@@ -1061,7 +1077,11 @@ export function LiquidGlassLogoReveal({
           canvas.height = h
         }
         const tileCss = Math.min(cfg.tileSize, Math.min(cw, ch) / 1.75)
-        renderer.render(frameAt(Math.min(currentTime, end), cfg, outroProgress), w, h, tileCss * dpr)
+        const frame = {
+          ...frameAt(Math.min(currentTime, end), cfg, outroProgress),
+          uPurple: pal === 'purple' ? 1 : 0,
+        }
+        renderer.render(frame, w, h, tileCss * dpr)
         dirty = false
       }
 
@@ -1160,7 +1180,7 @@ export function LiquidGlassLogoReveal({
 
   useEffect(() => {
     engineRef.current?.invalidate()
-  }, [settings, loop, playOutroOnEnd, speed, time])
+  }, [settings, loop, playOutroOnEnd, speed, time, palette])
 
   useEffect(() => {
     let cancelled = false

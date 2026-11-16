@@ -89,7 +89,7 @@ export default function Preloader() {
       // Failsafe: never trap the user if WebGL or RAF is throttled in background tab
       const failsafeId = window.setTimeout(() => {
         finishReveal()
-      }, 6200)
+      }, 4500)
       timersRef.current.push(failsafeId)
     }
 
@@ -118,7 +118,7 @@ export default function Preloader() {
       id="preloader"
       aria-hidden="true"
       style={{
-        backgroundColor: '#e9e9eb',
+        backgroundColor: '#F6F3FA',
         opacity: dissolving ? 0 : 1,
         pointerEvents: dissolving ? 'none' : 'auto',
         transition: dissolving
@@ -131,11 +131,13 @@ export default function Preloader() {
         logo={airLabMark}
         label="AIR Lab Logo Reveal"
         look="light"
-        background="#e9e9eb"
-        logoColor="#0e0062"
+        palette="purple"
+        background="#F6F3FA"
+        logoColor="#7B2CBF"
         logoScale={0.62}
         finalScale={0.8}
-        hold={0.35}
+        speed={1.55}
+        hold={0.18}
         loop={false}
         playOutroOnEnd={true}
         tuning={{ startZoom: 2.3 }}
