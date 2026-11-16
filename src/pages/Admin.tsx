@@ -2207,6 +2207,82 @@ export default function AdminDashboard() {
                                 </div>
                               </div>
                             </div>
+                          ) : fieldType === 'file' ? (
+                            <div className="space-y-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] bg-[var(--accent-orange)]/10 hover:bg-[var(--accent-orange)]/20 text-[var(--accent-orange)] text-xs font-medium cursor-pointer transition-colors border border-[var(--accent-orange)]/30">
+                                  <Upload className="w-3.5 h-3.5" />
+                                  <span>Upload PDF</span>
+                                  <input
+                                    type="file"
+                                    accept=".pdf,application/pdf"
+                                    className="hidden"
+                                    onChange={e => {
+                                      const file = e.target.files?.[0]
+                                      e.target.value = ''
+                                      if (!file) return
+                                      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                                        alert('Please select a PDF file.')
+                                        return
+                                      }
+                                      if (file.size > 5 * 1024 * 1024) {
+                                        alert('PDF must be 5 MB or smaller.')
+                                        return
+                                      }
+                                      const reader = new FileReader()
+                                      reader.onload = () => {
+                                        if (typeof reader.result === 'string') {
+                                          setEditingItem((prev: any) => ({ ...prev, [field]: reader.result }))
+                                        }
+                                      }
+                                      reader.onerror = () => alert('Failed to read PDF file.')
+                                      reader.readAsDataURL(file)
+                                    }}
+                                  />
+                                </label>
+                                {editingItem[field] && (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--bg-page)] border border-[var(--border-hairline)] text-[11px] text-[var(--text-primary)]">
+                                    <FileText className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
+                                    <span>
+                                      {String(editingItem[field]).startsWith('data:application/pdf')
+                                        ? 'PDF attached'
+                                        : 'File / URL linked'}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEditingItem((prev: any) => ({ ...prev, [field]: '' }))
+                                      }
+                                      className="text-[var(--text-subtle)] hover:text-red-500 cursor-pointer ml-1"
+                                      title="Remove"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </span>
+                                )}
+                                <span className="text-[11px] text-[var(--text-subtle)]">
+                                  or enter link below
+                                </span>
+                              </div>
+                              <input
+                                type="text"
+                                required={def?.required}
+                                value={
+                                  String(editingItem[field] ?? '').startsWith('data:application/pdf')
+                                    ? ''
+                                    : (editingItem[field] ?? '')
+                                }
+                                onChange={e =>
+                                  setEditingItem({ ...editingItem, [field]: e.target.value })
+                                }
+                                placeholder={
+                                  String(editingItem[field] ?? '').startsWith('data:application/pdf')
+                                    ? 'Uploaded PDF attached (paste URL here to replace)'
+                                    : (def?.placeholder || 'https://... or upload a PDF above')
+                                }
+                                className="w-full px-3 py-2 text-xs rounded border border-[var(--border-hairline)] bg-[var(--bg-page)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-orange)]"
+                              />
+                            </div>
                           ) : (
                             <input
                               type="text"

@@ -30,7 +30,9 @@ export function externalizeImages<T extends Record<string, any>>(slug: string, i
 
   const walk = (value: any, path: string): any => {
     if (typeof value === 'string') {
-      return value.startsWith('data:image') ? mediaUrl(slug, oid, path, version) : value
+      return value.startsWith('data:image') || value.startsWith('data:application/pdf')
+        ? mediaUrl(slug, oid, path, version)
+        : value
     }
     if (Array.isArray(value)) return value.map((v, i) => walk(v, `${path}.${i}`))
     if (value && typeof value === 'object' && !(value instanceof Date) && !(value instanceof mongoose.Types.ObjectId)) {
