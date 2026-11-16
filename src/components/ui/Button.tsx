@@ -14,7 +14,7 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
   size = 'md',
-  arrow,
+  arrow: _arrow,
   to,
   href,
   icon,
@@ -38,19 +38,12 @@ export const Button: React.FC<ButtonProps> = ({
       'bg-transparent hover:bg-[var(--surface-alt)] text-[var(--text-primary)] font-medium transition-colors duration-150',
   }
 
-  const showArrow = Boolean(arrow)
-
   const sharedClasses = `group inline-flex items-center justify-center gap-2 rounded-full tracking-tight font-sans transition-all active:translate-y-[1px] active:scale-[0.98] select-none cursor-pointer whitespace-nowrap ${sizeStyles[size]} ${variantStyles[variant]} ${className}`
 
   const content = (
     <>
       {icon && <span className="shrink-0">{icon}</span>}
       <span>{children}</span>
-      {showArrow && (
-        <span className="text-[12px] leading-none transition-transform duration-150 group-hover:translate-x-0.5 group-hover:translate-y-0.5 font-sans shrink-0">
-          ↳
-        </span>
-      )}
     </>
   )
 

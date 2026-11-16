@@ -6,7 +6,6 @@ import {
   Calendar,
   User,
   Tag,
-  ArrowRight,
   X,
 } from 'lucide-react'
 import TitleReveal from '../components/ui/TitleReveal'
@@ -314,15 +313,13 @@ export default function Blogs() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={e => e.stopPropagation()}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline group-hover:translate-x-0.5 transition-transform"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] hover:underline transition-colors"
                     >
                       <span>Read Article</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:translate-x-0.5 transition-transform">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] transition-colors">
                       <span>Read Article</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   )}
                 </div>
@@ -410,7 +407,6 @@ export default function Blogs() {
                     className="px-5 py-2 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
                   >
                     <span>Read Full Article</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 )}
                 <button

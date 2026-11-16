@@ -8,8 +8,6 @@ import {
   Users,
   Search,
   Mail,
-  ArrowUpRight,
-  ArrowRight,
 } from 'lucide-react'
 import type { ProjectItem, TeamMemberData } from '../types/data'
 import { getMemberAvatar } from '../lib/placeholders'
@@ -182,7 +180,6 @@ export default function QuickDrawer({
                     >
                       <span className="hidden sm:inline">Go to {tab === 'projects' ? 'Projects' : 'Team'}</span>
                       <span className="sm:hidden">Full Page</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
                     </Link>
 
                     <button
@@ -289,9 +286,8 @@ export default function QuickDrawer({
                             </span>
                           </div>
 
-                          <h4 className="font-head font-bold text-base text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-1.5 flex items-center justify-between">
+                          <h4 className="font-head font-bold text-base text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-1.5">
                             <span>{proj.title}</span>
-                            <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 text-[var(--accent-orange)] transition-opacity shrink-0 ml-1.5" />
                           </h4>
 
                           <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-3 line-clamp-2">
@@ -300,9 +296,8 @@ export default function QuickDrawer({
 
                           <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[var(--border-hairline)] text-[11px] font-sans text-[var(--text-subtle)]">
                             <span>Status: <strong className="text-[var(--text-primary)]">{proj.status}</strong></span>
-                            <span className="text-[var(--accent-orange)] font-medium group-hover:underline flex items-center gap-1">
+                            <span className="text-[var(--accent-orange)] font-medium group-hover:underline">
                               <span>View in Projects</span>
-                              <span>&rarr;</span>
                             </span>
                           </div>
                         </Link>
@@ -342,9 +337,8 @@ export default function QuickDrawer({
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <h4 className="font-head font-bold text-base text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-tight flex items-center gap-1.5">
+                              <h4 className="font-head font-bold text-base text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-tight">
                                 <span>{member.name}</span>
-                                <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                               </h4>
                               {member.isLead && (
                                 <span className="px-2 py-0.5 text-[9px] font-sans font-bold bg-[var(--accent-orange)] text-white rounded-full">
@@ -370,9 +364,8 @@ export default function QuickDrawer({
                                   {member.email}
                                 </span>
                               ) : <span />}
-                              <span className="text-[var(--text-primary)] font-semibold group-hover:underline flex items-center gap-1">
+                              <span className="text-[var(--text-primary)] font-semibold group-hover:underline">
                                 <span>Directory profile</span>
-                                <span>&rarr;</span>
                               </span>
                             </div>
                           </div>
@@ -392,7 +385,6 @@ export default function QuickDrawer({
                     className="w-full h-12 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
                   >
                     <span>Open Full Projects Page</span>
-                    <ArrowRight className="w-4 h-4" />
                   </Link>
                 ) : (
                   <Link
@@ -401,7 +393,6 @@ export default function QuickDrawer({
                     className="w-full h-12 rounded-full bg-[var(--ink-dark)] hover:bg-black text-white text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
                   >
                     <span>Open Full Members Directory</span>
-                    <ArrowRight className="w-4 h-4" />
                   </Link>
                 )}
               </div>

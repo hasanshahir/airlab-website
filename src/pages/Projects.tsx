@@ -9,7 +9,6 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
-  ArrowUpRight,
 } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getFacultyPriority } from '../lib/utils'
@@ -467,7 +466,6 @@ export default function Projects() {
                   </span>
                   <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1 group-hover:underline">
                     <span>View Details</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </span>
                 </div>
               </motion.div>

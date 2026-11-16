@@ -15,7 +15,6 @@ import {
   Terminal,
   LayoutGrid,
   SlidersHorizontal,
-  ArrowUpRight,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
 import TitleReveal from '../components/ui/TitleReveal'
@@ -532,7 +531,6 @@ export default function Home() {
             className="group px-3 py-1 rounded-full bg-[var(--bg-surface)]/70 hover:bg-[var(--bg-surface)] text-[var(--accent-orange)] font-semibold flex items-center gap-1.5 border border-[var(--border-hairline)] transition-all"
           >
             <span>All Projects</span>
-            <span className="transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
           </Link>
           <span className="text-[var(--border-hairline)] hidden sm:inline">•</span>
           <Link
@@ -541,7 +539,6 @@ export default function Home() {
           >
             <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
             <span>Active Grants</span>
-            <span className="transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
           </Link>
           <span className="text-[var(--border-hairline)] hidden sm:inline">•</span>
           <Link
@@ -549,7 +546,6 @@ export default function Home() {
             className="group px-3 py-1 rounded-full hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] font-medium flex items-center gap-1.5 transition-all"
           >
             <span>All Team Members</span>
-            <span className="transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
           </Link>
         </div>
       </section>
@@ -651,7 +647,6 @@ export default function Home() {
                       className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:underline transition-colors cursor-pointer"
                     >
                       <span>{item.actionText}</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </button>
                   ) : (
                     <Link
@@ -660,7 +655,6 @@ export default function Home() {
                       className="inline-flex items-center gap-1 text-xs font-bold text-[var(--accent-orange)] group-hover:underline transition-colors"
                     >
                       <span>{item.actionText}</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </Link>
                   )}
                 </div>
