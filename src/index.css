@@ -173,6 +173,7 @@
   html {
     scroll-behavior: smooth;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overflow-x: clip;
   }
 
   body {
@@ -184,6 +185,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    overflow-x: clip;
     transition: background-color 220ms ease, color 220ms ease;
   }
 

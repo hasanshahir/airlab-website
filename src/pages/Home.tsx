@@ -401,7 +401,7 @@ export default function Home() {
       />
 
       <h1
-        className="max-w-2xl text-center text-3xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight text-zinc-900 font-head select-none pointer-events-auto"
+        className="max-w-2xl text-center text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-zinc-900 font-head select-none pointer-events-auto"
         style={{
           textShadow: '0 2px 18px rgba(255, 255, 255, 0.95)',
         }}
@@ -455,7 +455,7 @@ export default function Home() {
                 axis={50}
                 gap={4}
                 curve={72}
-                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+                className="h-[400px] sm:h-[520px] md:h-[600px] lg:h-[640px] w-full bg-transparent"
               >
                 {heroOverlay}
               </TiltedGridHero>
@@ -476,7 +476,7 @@ export default function Home() {
                 cardWidth="min(80cqh, 74cqw)"
                 gap={-0.06}
                 label="AIR Lab Hero Coverflow Carousel"
-                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+                className="h-[400px] sm:h-[520px] md:h-[600px] lg:h-[640px] w-full bg-transparent"
               >
                 {heroOverlay}
               </CoverflowCarousel>
@@ -611,7 +611,7 @@ export default function Home() {
                     navigate(item.link)
                   }
                 }}
-                className="min-w-[290px] sm:min-w-[340px] max-w-[360px] p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors shrink-0 flex flex-col justify-between group cursor-pointer"
+                className="min-w-[260px] sm:min-w-[320px] md:min-w-[340px] max-w-[85vw] sm:max-w-[360px] p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors shrink-0 flex flex-col justify-between group cursor-pointer"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">

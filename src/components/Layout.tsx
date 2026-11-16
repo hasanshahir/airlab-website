@@ -262,7 +262,7 @@ export default function Layout() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 440, damping: 30 }}
-                    className="absolute top-full left-0 mt-2 w-[530px] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
+                    className="absolute top-full left-0 mt-2 w-[530px] max-w-[calc(100vw-2rem)] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
                   >
                     <div>
                       <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
@@ -376,7 +376,7 @@ export default function Layout() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 440, damping: 30 }}
-                    className="absolute top-full left-0 mt-2 w-[560px] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
+                    className="absolute top-full left-0 mt-2 w-[560px] max-w-[calc(100vw-2rem)] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
                   >
                     <div>
                       <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
@@ -489,7 +489,7 @@ export default function Layout() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 440, damping: 30 }}
-                    className="absolute top-full left-0 mt-2 w-[520px] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
+                    className="absolute top-full left-0 mt-2 w-[520px] max-w-[calc(100vw-2rem)] bg-[var(--bg-surface-elevated)]/98 backdrop-blur-xl border border-[var(--border-hairline)] rounded-3xl p-6 shadow-[0_24px_48px_-12px_rgba(16,0,43,0.16),inset_0_1px_0_rgba(255,255,255,0.9)] grid grid-cols-2 gap-6 z-50 before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
                   >
                     <div>
                       <div className="text-[11px] font-sans uppercase tracking-wider text-[var(--accent-orange)] font-bold mb-3 px-2.5">
@@ -561,12 +561,12 @@ export default function Layout() {
           </nav>
 
           {/* Right Action CTA: Apply Now */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <motion.button
               whileHover={{ y: -1.5 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setApplyModalOpen(true)}
-              className="inline-flex items-center justify-center h-10 px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-[13.5px] font-semibold tracking-tight transition-colors duration-150 cursor-pointer shadow-[0_2px_10px_-2px_rgba(123,44,191,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] hover:shadow-[0_6px_18px_-3px_rgba(123,44,191,0.55),inset_0_1px_0_rgba(255,255,255,0.3)]"
+              className="inline-flex items-center justify-center h-9 sm:h-10 px-3.5 sm:px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs sm:text-[13.5px] font-semibold tracking-tight transition-colors duration-150 cursor-pointer shadow-[0_2px_10px_-2px_rgba(123,44,191,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] hover:shadow-[0_6px_18px_-3px_rgba(123,44,191,0.55),inset_0_1px_0_rgba(255,255,255,0.3)] whitespace-nowrap"
             >
               <span>Apply Now</span>
             </motion.button>

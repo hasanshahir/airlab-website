@@ -186,7 +186,7 @@ export default function Publications() {
                   </div>
 
                   {/* Action Buttons: Read Link, PDF, BibTeX Cite */}
-                  <div className="flex sm:flex-col items-center sm:items-end gap-2.5 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--border-hairline)]">
+                  <div className="flex flex-wrap sm:flex-col items-center sm:items-end gap-2.5 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--border-hairline)]">
                     {pub.link && (
                       <a
                         href={pub.link}
