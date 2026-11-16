@@ -1,5 +1,7 @@
 import React from 'react'
 import { Mail, MapPin, Phone } from 'lucide-react'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 
 export const ContactSection: React.FC = () => {
   return (
@@ -19,9 +21,11 @@ export const ContactSection: React.FC = () => {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <a
-              href="mailto:contact@airlab.neduet.edu.pk"
-              className="p-5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/50 transition-colors flex items-start gap-4 group"
+            <OptimizedTiltCard
+              onClick={() => {
+                window.location.href = 'mailto:contact@airlab.neduet.edu.pk'
+              }}
+              className="p-5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/50 transition-colors flex items-start gap-4 cursor-pointer"
             >
               <div className="w-10 h-10 rounded-xl bg-[var(--accent-orange-light)] text-[var(--accent-orange)] flex items-center justify-center shrink-0">
                 <Mail className="w-5 h-5" />
@@ -32,9 +36,9 @@ export const ContactSection: React.FC = () => {
                   contact@airlab.neduet.edu.pk
                 </div>
               </div>
-            </a>
+            </OptimizedTiltCard>
 
-            <div className="p-5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-start gap-4">
+            <OptimizedTiltCard className="p-5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-[var(--ink-dark)]/10 text-[var(--ink-dark)] flex items-center justify-center shrink-0">
                 <Phone className="w-5 h-5" />
               </div>
@@ -44,9 +48,9 @@ export const ContactSection: React.FC = () => {
                   9221-99261261 Ext: 2399
                 </div>
               </div>
-            </div>
+            </OptimizedTiltCard>
 
-            <div className="sm:col-span-2 p-5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <OptimizedTiltCard className="sm:col-span-2 p-5 rounded-2xl bg-[var(--bg-page)] border border-[var(--border-hairline)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-[var(--accent-orange-light)] text-[var(--accent-orange)] flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5" />
@@ -58,15 +62,14 @@ export const ContactSection: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <a
+              <InteractiveHoverButton
                 href="https://cct.neduet.edu.pk/AIR"
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs font-sans text-[var(--accent-orange)] hover:underline inline-flex items-center gap-1.5 shrink-0 font-semibold"
-              >
-                <span>NED University Website</span>
-              </a>
-            </div>
+                variant="secondary"
+                size="xs"
+                text="NED University Website"
+                className="text-[var(--accent-orange)] shrink-0"
+              />
+            </OptimizedTiltCard>
           </div>
         </div>
       </div>

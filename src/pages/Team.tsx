@@ -8,6 +8,8 @@ import { normalizeLinkedInUrl } from '../lib/utils'
 import { TeamMemberEntity } from '../entities/TeamMemberEntity'
 import TitleReveal from '../components/ui/TitleReveal'
 import StudentApplicationModal from '../components/StudentApplicationModal'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -241,10 +243,10 @@ export default function Team() {
                 const raw = allMembersRaw.find(m => m.id === f.id)
                 const isHighlighted = highlightedMemberId === f.id
                 return (
-                  <div
+                  <OptimizedTiltCard
                     id={`member-${f.id}`}
                     key={f.id}
-                    className={`p-8 sm:p-10 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden group transition-all duration-200 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg ${
+                    className={`p-8 sm:p-10 flex flex-col md:flex-row gap-8 items-start transition-colors duration-200 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg ${
                       isHighlighted ? 'ring-2 ring-[var(--accent-orange)] shadow-xl' : ''
                     }`}
                   >
@@ -294,15 +296,14 @@ export default function Team() {
                       {/* Action buttons: LinkedIn, Email, Resume */}
                       <div className="pt-4 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-2.5 text-xs font-sans">
                         {f.hasLinkedIn() ? (
-                          <a
+                          <InteractiveHoverButton
                             href={f.getLinkedInUrl()!}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-8.5 px-3.5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold inline-flex items-center gap-2 shadow-xs transition-colors"
-                          >
-                            <Linkedin className="w-3.5 h-3.5" />
-                            <span>LinkedIn</span>
-                          </a>
+                            variant="primary"
+                            size="sm"
+                            icon={<Linkedin className="w-3.5 h-3.5" />}
+                            text="LinkedIn"
+                            className="h-8.5"
+                          />
                         ) : (
                           <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
                             <Linkedin className="w-3.5 h-3.5" />
@@ -311,13 +312,14 @@ export default function Team() {
                         )}
 
                         {f.hasEmail() ? (
-                          <a
+                          <InteractiveHoverButton
                             href={`mailto:${f.email}`}
-                            className="h-8.5 px-3.5 rounded-full bg-[var(--bg-page)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] text-xs font-medium inline-flex items-center gap-2 border border-[var(--border-hairline)] transition-colors truncate max-w-[220px]"
-                          >
-                            <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)] shrink-0" />
-                            <span className="truncate">{f.email}</span>
-                          </a>
+                            variant="secondary"
+                            size="sm"
+                            icon={<Mail className="w-3.5 h-3.5 text-[var(--accent-orange)] shrink-0" />}
+                            text={f.email}
+                            className="h-8.5 bg-[var(--bg-page)] font-medium max-w-[220px]"
+                          />
                         ) : (
                           <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
                             <Mail className="w-3.5 h-3.5 shrink-0" />
@@ -326,15 +328,14 @@ export default function Team() {
                         )}
 
                         {f.hasResume() ? (
-                          <a
+                          <InteractiveHoverButton
                             href={f.cvUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-8.5 px-3.5 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:bg-black transition-colors"
-                          >
-                            <FileText className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                            <span>Resume</span>
-                          </a>
+                            variant="dark"
+                            size="sm"
+                            icon={<FileText className="w-3.5 h-3.5 text-[var(--accent-orange)]" />}
+                            text="Resume"
+                            className="h-8.5"
+                          />
                         ) : (
                           <span className="h-8.5 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
                             <FileText className="w-3.5 h-3.5" />
@@ -343,7 +344,7 @@ export default function Team() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </OptimizedTiltCard>
                 )
               })}
             </div>
@@ -381,10 +382,10 @@ export default function Team() {
                 const primaryUrl = intern.getPrimaryActionUrl()
 
                 return (
-                  <div
+                  <OptimizedTiltCard
                     id={`member-${intern.id}`}
                     key={intern.id}
-                    className={`p-6 sm:p-7 rounded-2xl flex flex-col justify-between group hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 bg-[var(--bg-surface)] border border-[var(--border-hairline)] ${
+                    className={`p-6 sm:p-7 rounded-2xl flex flex-col justify-between hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-colors duration-200 bg-[var(--bg-surface)] border border-[var(--border-hairline)] ${
                       isHighlighted ? 'ring-2 ring-[var(--accent-orange)] shadow-xl' : ''
                     }`}
                   >
@@ -441,15 +442,14 @@ export default function Team() {
                     {/* Action buttons: LinkedIn, Email, Resume */}
                     <div className="pt-3 border-t border-[var(--border-hairline)] flex flex-wrap items-center gap-2 text-xs font-sans">
                       {intern.hasLinkedIn() ? (
-                        <a
+                        <InteractiveHoverButton
                           href={intern.getLinkedInUrl()!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="h-8 px-3 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white font-semibold inline-flex items-center gap-1.5 shadow-xs transition-all"
-                        >
-                          <Linkedin className="w-3 h-3" />
-                          <span>LinkedIn</span>
-                        </a>
+                          variant="primary"
+                          size="sm"
+                          icon={<Linkedin className="w-3 h-3" />}
+                          text="LinkedIn"
+                          className="h-8"
+                        />
                       ) : (
                         <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
                           <Linkedin className="w-3 h-3" />
@@ -458,13 +458,14 @@ export default function Team() {
                       )}
 
                       {intern.hasEmail() ? (
-                        <a
+                        <InteractiveHoverButton
                           href={`mailto:${intern.email}`}
-                          className="h-8 px-3 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--border-hairline)] text-[var(--text-primary)] font-medium inline-flex items-center gap-1.5 transition-colors truncate max-w-[190px]"
-                        >
-                          <Mail className="w-3 h-3 text-[var(--accent-orange)] shrink-0" />
-                          <span className="truncate">{intern.email}</span>
-                        </a>
+                          variant="secondary"
+                          size="sm"
+                          icon={<Mail className="w-3 h-3 text-[var(--accent-orange)] shrink-0" />}
+                          text={intern.email}
+                          className="h-8 bg-[var(--bg-page)] font-medium max-w-[190px]"
+                        />
                       ) : (
                         <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
                           <Mail className="w-3 h-3 shrink-0" />
@@ -473,15 +474,14 @@ export default function Team() {
                       )}
 
                       {intern.hasResume() ? (
-                        <a
+                        <InteractiveHoverButton
                           href={intern.cvUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="h-8 px-3 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs hover:bg-black transition-colors"
-                        >
-                          <FileText className="w-3 h-3 text-[var(--accent-orange)]" />
-                          <span>Resume</span>
-                        </a>
+                          variant="dark"
+                          size="sm"
+                          icon={<FileText className="w-3 h-3 text-[var(--accent-orange)]" />}
+                          text="Resume"
+                          className="h-8"
+                        />
                       ) : (
                         <span className="h-8 px-3 rounded-full bg-[var(--bg-page)] text-[var(--text-subtle)] text-xs inline-flex items-center gap-1.5 border border-[var(--border-hairline)] opacity-50 cursor-not-allowed select-none">
                           <FileText className="w-3 h-3" />
@@ -489,7 +489,7 @@ export default function Team() {
                         </span>
                       )}
                     </div>
-                  </div>
+                  </OptimizedTiltCard>
                 )
               })}
             </div>
@@ -560,15 +560,14 @@ export default function Team() {
                             </a>
                           </td>
                           <td className="py-4 px-6 text-right">
-                            <a
+                            <InteractiveHoverButton
                               href={p.linkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--bg-page)] text-[var(--ink-dark)] hover:bg-[var(--ink-dark)] hover:text-white transition-all text-xs font-sans border border-[var(--border-hairline)] font-medium"
-                            >
-                              <Linkedin className="w-3.5 h-3.5" />
-                              <span>LinkedIn</span>
-                            </a>
+                              variant="secondary"
+                              size="xs"
+                              icon={<Linkedin className="w-3.5 h-3.5" />}
+                              text="LinkedIn"
+                              className="bg-[var(--bg-page)] text-[var(--ink-dark)] font-medium"
+                            />
                           </td>
                         </tr>
                       )})}

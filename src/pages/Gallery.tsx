@@ -5,6 +5,7 @@ import { X, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { GalleryItem, PerformerItem } from '../types/data'
 import { extractPerformerPhotos, normalizeDbPerformers } from '../lib/performers'
 import TitleReveal from '../components/ui/TitleReveal'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 
 const GALLERY_FILTERS = ['All', 'Events', 'Session', 'Mentoring', 'Lab'] as const
 type GalleryFilter = (typeof GALLERY_FILTERS)[number]
@@ -281,9 +282,9 @@ export default function Gallery() {
               key={card.key}
               className={`${card.span || BENTO_SPANS[i % BENTO_SPANS.length]} h-full`}
             >
-              <div
+              <OptimizedTiltCard
                 onClick={() => setSelectedIndex(i)}
-                className="h-full relative rounded-3xl overflow-hidden border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer group shadow-sm hover:border-[var(--accent-orange)]/50 hover:shadow-lg transition-all duration-300"
+                className="h-full rounded-3xl border border-[var(--border-hairline)] bg-[var(--bg-surface)] cursor-pointer shadow-sm hover:border-[var(--accent-orange)]/50 hover:shadow-lg transition-colors duration-300"
                 style={{ transitionDelay: `${i * 30}ms` }}
               >
                 <img
@@ -314,7 +315,7 @@ export default function Gallery() {
                     <p className="text-xs text-white/80 line-clamp-1">{card.caption}</p>
                   )}
                 </div>
-              </div>
+              </OptimizedTiltCard>
             </div>
           ))
         )}

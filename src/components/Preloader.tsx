@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import airLabMark from '../assets/air-lab-mark.png'
+import {
+  LiquidGlassLogoReveal,
+  preloadLiquidGlassLogo,
+} from './ui/liquid-glass-logo-reveal'
 
 declare global {
   interface Window {
@@ -8,28 +12,28 @@ declare global {
   }
 }
 
-/**
- * Continuous centerline path in the 467x467 coordinate space of `src/assets/air-lab-mark.png`:
- * 1. Right leg of 'a': (412, 435) -> (343, 285) -> (242, 170)
- * 2. Top arch of 'a': curves through (206, 98) -> (158, 155)
- * 3. Left leg of 'a': (158, 155) -> (60, 340)
- * 4. Bottom U-bend of 'a': curves through (62, 412) -> (131, 418) -> (204, 365)
- * 5. Diagonal stem of 'i': (204, 365) -> (342, 120)
- */
-const RIBBON_MASK_PATH =
-  'M 412 435 L 343 285 L 242 170 C 222 132 190 100 158 155 L 60 340 C 38 388 85 432 135 415 C 168 404 190 385 204 365 L 342 120'
-
-const RIBBON_PATH_LENGTH = 1180
+// Pre-compute the 1024x1024 texture and Euclidean Signed Distance Field (SDF)
+// for AIR Lab's logo mark as soon as the module loads.
+if (typeof window !== 'undefined') {
+  preloadLiquidGlassLogo(airLabMark).catch(() => {})
+}
 
 /**
- * Fluid Logo-Only Page Reveal & Preloader Component
- * Uses ONLY the official repository logo (`src/assets/air-lab-mark.png`) with zero text.
+ * Initial Website Load Liquid Glass Logo Reveal Preloader
  *
- * Animates on initial website open:
- * - Liquid SVG mask traces the exact ribbon geometry of `air-lab-mark.png`
- * - Elastic dot bloom at (387, 48)
- * - Fluid gradient sheen masked strictly inside the logo's alpha channel
- * - Smooth optical screen dissolve (`opacity` + `blur` + gentle scale) on completion
+ * Applies the WebGL2 Liquid Glass Logo Reveal animation onto AIR Lab's official
+ * logo mark (`src/assets/air-lab-mark.png`), running once when the user opens
+ * the website for the first time:
+ * - In animation: Milky droplet condenses, swells, lands with a radial surface
+ *   ripple & soft shadow, and spreads into a rounded liquid-glass squircle tile
+ *   that refracts the magnified AIR Lab mark at its bevel rim with Snell's law
+ *   optics, corner pull/smear, 20-band chromatic dispersion (cyan & warm
+ *   gold/orange/red fringes), double-bevel specular highlights, and a sweeping
+ *   diagonal light sheen.
+ * - Out animation: The liquid-glass tile expands slightly, narrows its bevel
+ *   into corner arcs, and releases/dissolves off the bare AIR Lab mark as it
+ *   settles to `finalScale`, holds briefly, and then blurs & fades out (`outro`)
+ *   before dissolving the preloader overlay to reveal the page.
  */
 export default function Preloader() {
   const location = useLocation()
@@ -43,72 +47,28 @@ export default function Preloader() {
   }
 
   const [visible, setVisible] = useState(() => !isAdmin && !isAlreadyRevealed())
-  const [phase, setPhase] = useState<'initial' | 'drawing' | 'dissolving'>('initial')
+  const [dissolving, setDissolving] = useState(false)
+  const [runKey, setRunKey] = useState(0)
+  const timersRef = useRef<number[]>([])
 
-  const runRevealSequence = () => {
-    if (isAdmin || isAlreadyRevealed()) {
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach(id => window.clearTimeout(id))
+    timersRef.current = []
+  }, [])
+
+  const finishReveal = useCallback(() => {
+    clearTimers()
+    window.__PRELOADER_REVEALED__ = true
+    document.body.classList.remove('is-loading')
+    window.dispatchEvent(new Event('preloader-reveal'))
+    setDissolving(true)
+
+    const doneId = window.setTimeout(() => {
       setVisible(false)
-      document.body.classList.remove('is-loading')
-      if (typeof window !== 'undefined') {
-        window.__PRELOADER_REVEALED__ = true
-        window.dispatchEvent(new Event('preloader-reveal'))
-      }
-      return () => { }
-    }
+    }, 340)
+    timersRef.current.push(doneId)
+  }, [clearTimers])
 
-    setVisible(true)
-    setPhase('initial')
-    document.body.classList.add('is-loading')
-    window.dispatchEvent(new Event('preloader-start'))
-
-    const drawDuration = 750
-    const holdDuration = 220
-    const dissolveDuration = 420
-
-    const markRevealed = () => {
-      window.__PRELOADER_REVEALED__ = true
-    }
-
-    const startTimer = window.setTimeout(() => {
-      setPhase('drawing')
-    }, 30)
-
-    const revealEventTime = 30 + drawDuration
-    const revealEventTimer = window.setTimeout(() => {
-      markRevealed()
-      window.dispatchEvent(new Event('preloader-reveal'))
-    }, revealEventTime)
-
-    const dissolveStartTime = revealEventTime + holdDuration
-    const dissolveTimer = window.setTimeout(() => {
-      setPhase('dissolving')
-      document.body.classList.remove('is-loading')
-    }, dissolveStartTime)
-
-    const doneTimer = window.setTimeout(() => {
-      markRevealed()
-      setVisible(false)
-    }, dissolveStartTime + dissolveDuration + 30)
-
-    // Robust failsafe: NEVER trap the user on a blank screen under any circumstance
-    const failsafeTimer = window.setTimeout(() => {
-      document.body.classList.remove('is-loading')
-      markRevealed()
-      window.dispatchEvent(new Event('preloader-reveal'))
-      setVisible(false)
-    }, 2200)
-
-    return () => {
-      window.clearTimeout(startTimer)
-      window.clearTimeout(revealEventTimer)
-      window.clearTimeout(dissolveTimer)
-      window.clearTimeout(doneTimer)
-      window.clearTimeout(failsafeTimer)
-      document.body.classList.remove('is-loading')
-    }
-  }
-
-  // Initial website load reveal only (once per session)
   useEffect(() => {
     if (isAdmin || isAlreadyRevealed()) {
       setVisible(false)
@@ -118,23 +78,39 @@ export default function Preloader() {
       return
     }
 
-    const cleanup = runRevealSequence()
+    const startSequence = () => {
+      clearTimers()
+      setVisible(true)
+      setDissolving(false)
+      setRunKey(prev => prev + 1)
+      document.body.classList.add('is-loading')
+      window.dispatchEvent(new Event('preloader-start'))
+
+      // Failsafe: never trap the user if WebGL or RAF is throttled in background tab
+      const failsafeId = window.setTimeout(() => {
+        finishReveal()
+      }, 6200)
+      timersRef.current.push(failsafeId)
+    }
+
+    startSequence()
+
     const handleCustomTrigger = () => {
-      runRevealSequence()
+      window.__PRELOADER_REVEALED__ = false
+      startSequence()
     }
     window.addEventListener('airlab-trigger-preloader', handleCustomTrigger)
+
     return () => {
-      cleanup()
+      clearTimers()
+      document.body.classList.remove('is-loading')
       window.removeEventListener('airlab-trigger-preloader', handleCustomTrigger)
     }
-  }, [])
+  }, [isAdmin, clearTimers, finishReveal])
 
   if (isAdmin || !visible) return null
 
-  const drawMs = 750
-  const dotDelayMs = 320
-  const dissolveMs = 420
-  const isDissolving = phase === 'dissolving'
+  const dissolveMs = 320
 
   return (
     <div
@@ -142,148 +118,30 @@ export default function Preloader() {
       id="preloader"
       aria-hidden="true"
       style={{
-        opacity: isDissolving ? 0 : 1,
-        filter: isDissolving ? 'blur(10px)' : 'blur(0px)',
-        pointerEvents: isDissolving ? 'none' : 'auto',
-        transition: isDissolving
-          ? `opacity ${dissolveMs}ms cubic-bezier(0.22, 1, 0.36, 1), filter ${dissolveMs}ms cubic-bezier(0.22, 1, 0.36, 1)`
+        backgroundColor: '#e9e9eb',
+        opacity: dissolving ? 0 : 1,
+        pointerEvents: dissolving ? 'none' : 'auto',
+        transition: dissolving
+          ? `opacity ${dissolveMs}ms cubic-bezier(0.22, 1, 0.36, 1)`
           : 'none',
       }}
     >
-      <div className="preloader-bg">
-        <div className="page-bg-gradient-wrap" />
-        <div className="page-bg-pattern" />
-      </div>
-
-      <div className="preloader-content">
-        <div
-          className="preloader-fluid-mark-wrap"
-          style={{
-            transform:
-              phase === 'initial'
-                ? 'scale(0.84) translateY(14px)'
-                : phase === 'drawing'
-                  ? 'scale(1) translateY(0px)'
-                  : 'scale(1.06)',
-            filter:
-              phase === 'initial'
-                ? 'blur(6px)'
-                : 'blur(0px)',
-            transition: isDissolving
-              ? `transform ${dissolveMs}ms cubic-bezier(0.22, 1, 0.36, 1)`
-              : `transform ${drawMs}ms cubic-bezier(0.22, 1, 0.36, 1), filter 420ms ease-out`,
-          }}
-        >
-          <svg
-            viewBox="0 0 467 467"
-            className="preloader-fluid-svg"
-            aria-hidden="true"
-          >
-            <defs>
-              {/* Soft liquid edge filter for the reveal mask */}
-              <filter id="airlab-fluid-soft" x="-10%" y="-10%" width="120%" height="120%">
-                <feGaussianBlur stdDeviation="3.5" />
-              </filter>
-
-              {/* Mask that traces the exact ribbon geometry of air-lab-mark.png */}
-              <mask id="airlab-ribbon-reveal-mask">
-                <rect width="467" height="467" fill="black" />
-                <path
-                  d={RIBBON_MASK_PATH}
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="92"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  filter="url(#airlab-fluid-soft)"
-                  style={{
-                    strokeDasharray: RIBBON_PATH_LENGTH,
-                    strokeDashoffset:
-                      phase === 'initial' ? RIBBON_PATH_LENGTH : 0,
-                    transition:
-                      phase === 'initial'
-                        ? 'none'
-                        : `stroke-dashoffset ${drawMs}ms cubic-bezier(0.43, 0.98, 0.87, 1)`,
-                  }}
-                />
-                {/* Top-right dot of the 'i' at (387, 48) */}
-                <circle
-                  cx="387"
-                  cy="48"
-                  r="42"
-                  fill="white"
-                  style={{
-                    transformOrigin: '387px 48px',
-                    transform:
-                      phase === 'initial' ? 'scale(0)' : 'scale(1)',
-                    transition:
-                      phase === 'initial'
-                        ? 'none'
-                        : `transform 460ms cubic-bezier(0.34, 1.56, 0.64, 1) ${dotDelayMs}ms`,
-                  }}
-                />
-              </mask>
-
-              {/* Alpha mask from the actual repository logo image for the liquid sheen */}
-              <mask id="airlab-logo-alpha-mask">
-                <image
-                  href={airLabMark}
-                  width="467"
-                  height="467"
-                  preserveAspectRatio="xMidYMid meet"
-                />
-              </mask>
-
-              {/* Liquid gradient wave that sweeps across the logo as it draws */}
-              <linearGradient
-                id="airlab-liquid-sheen"
-                x1="0%"
-                y1="100%"
-                x2="100%"
-                y2="0%"
-              >
-                <stop offset="0%" stopColor="rgba(251, 131, 232, 0)" />
-                <stop offset="35%" stopColor="rgba(251, 131, 232, 0.55)" />
-                <stop offset="55%" stopColor="rgba(254, 179, 136, 0.65)" />
-                <stop offset="75%" stopColor="rgba(97, 96, 230, 0.55)" />
-                <stop offset="100%" stopColor="rgba(97, 96, 230, 0)" />
-              </linearGradient>
-            </defs>
-
-            {/* Actual GitHub Repository Logo (`src/assets/air-lab-mark.png`) revealed fluidly */}
-            <g mask="url(#airlab-ribbon-reveal-mask)">
-              <image
-                href={airLabMark}
-                width="467"
-                height="467"
-                preserveAspectRatio="xMidYMid meet"
-              />
-
-              {/* Fluid iridescent sheen sweeping through the logo ribbon */}
-              <g mask="url(#airlab-logo-alpha-mask)">
-                <rect
-                  x="-467"
-                  y="-467"
-                  width="1401"
-                  height="1401"
-                  fill="url(#airlab-liquid-sheen)"
-                  style={{
-                    mixBlendMode: 'screen',
-                    transform:
-                      phase === 'initial'
-                        ? 'translate3d(-35%, 35%, 0)'
-                        : 'translate3d(35%, -35%, 0)',
-                    transition:
-                      phase === 'initial'
-                        ? 'none'
-                        : `transform ${drawMs + 180}ms cubic-bezier(0.22, 1, 0.36, 1)`,
-                  }}
-                />
-              </g>
-            </g>
-          </svg>
-        </div>
-      </div>
+      <LiquidGlassLogoReveal
+        key={runKey}
+        logo={airLabMark}
+        label="AIR Lab Logo Reveal"
+        look="light"
+        background="#e9e9eb"
+        logoColor="#0e0062"
+        logoScale={0.62}
+        finalScale={0.8}
+        hold={0.35}
+        loop={false}
+        playOutroOnEnd={true}
+        tuning={{ startZoom: 2.3 }}
+        onComplete={finishReveal}
+        className="w-full h-full"
+      />
     </div>
   )
 }

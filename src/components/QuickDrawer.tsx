@@ -12,6 +12,7 @@ import {
 import type { ProjectItem, TeamMemberData } from '../types/data'
 import { getMemberAvatar } from '../lib/placeholders'
 import { getFacultyPriority } from '../lib/utils'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 interface QuickDrawerProps {
   isOpen: boolean
@@ -172,15 +173,16 @@ export default function QuickDrawer({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Link
+                    <InteractiveHoverButton
                       to={tab === 'projects' ? '/projects' : '/team'}
+                      variant="primary"
+                      size="sm"
                       onClick={onClose}
-                      className="h-9 px-4 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-sans font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
                       title={tab === 'projects' ? 'Go to full Projects page' : 'Go to full Members page'}
                     >
                       <span className="hidden sm:inline">Go to {tab === 'projects' ? 'Projects' : 'Team'}</span>
                       <span className="sm:hidden">Full Page</span>
-                    </Link>
+                    </InteractiveHoverButton>
 
                     <button
                       onClick={onClose}
@@ -379,21 +381,23 @@ export default function QuickDrawer({
               {/* ── Drawer Footer Link ── */}
               <div className="p-5 border-t border-[var(--border-hairline)] bg-[var(--bg-surface-elevated)] shrink-0">
                 {tab === 'projects' ? (
-                  <Link
+                  <InteractiveHoverButton
                     to="/projects"
+                    variant="primary"
+                    size="lg"
                     onClick={onClose}
-                    className="w-full h-12 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
-                  >
-                    <span>Open Full Projects Page</span>
-                  </Link>
+                    text="Open Full Projects Page"
+                    className="w-full h-12 font-bold"
+                  />
                 ) : (
-                  <Link
+                  <InteractiveHoverButton
                     to="/team"
+                    variant="dark"
+                    size="lg"
                     onClick={onClose}
-                    className="w-full h-12 rounded-full bg-[var(--ink-dark)] hover:bg-black text-white text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
-                  >
-                    <span>Open Full Members Directory</span>
-                  </Link>
+                    text="Open Full Members Directory"
+                    className="w-full h-12 font-bold"
+                  />
                 )}
               </div>
             </motion.div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 export interface RibbonStopItem {
   num: string
@@ -897,12 +897,13 @@ export default function AboutRibbon() {
           <p className="rt-caption-line font-semibold">
             What do the people of Pakistan need?
           </p>
-          <Link
+          <InteractiveHoverButton
             to="/projects"
-            className="rt-pill inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--ink-dark)] text-white text-sm font-medium hover:bg-[var(--accent-orange)] transition-colors shadow-sm"
-          >
-            <span>Explore Our Projects</span>
-          </Link>
+            variant="dark"
+            size="md"
+            text="Explore Our Projects"
+            className="rt-pill text-sm font-medium shadow-sm"
+          />
         </div>
       </div>
     </section>

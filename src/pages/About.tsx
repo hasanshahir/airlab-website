@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import TitleReveal from '../components/ui/TitleReveal'
 import BlurReveal from '../components/ui/blur-reveal'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 
 const AIMS = [
   'Advance AI research in security, language, speech, and vision, with a focus on problems that matter locally.',
@@ -21,7 +22,7 @@ const OBJECTIVES = [
 /** Geometric SVG: Neural Research-to-Deployment Flow */
 function ResearchFlowVisual() {
   return (
-    <div className="w-full rounded-2xl bg-white/[0.04] border border-white/12 p-6 sm:p-8 flex items-center justify-center">
+    <OptimizedTiltCard className="w-full rounded-2xl bg-white/[0.04] border border-white/12 p-6 sm:p-8 flex items-center justify-center">
       <svg viewBox="0 0 360 170" fill="none" aria-hidden="true" className="w-full max-w-[340px] h-auto">
         <defs>
           <linearGradient id="spineFlowGrad" x1="0" y1="0" x2="360" y2="0" gradientUnits="userSpaceOnUse">
@@ -55,14 +56,14 @@ function ResearchFlowVisual() {
           </g>
         ))}
       </svg>
-    </div>
+    </OptimizedTiltCard>
   )
 }
 
 /** Geometric SVG: Orbital Vision */
 function VisionOrbitVisual() {
   return (
-    <div className="w-full rounded-2xl bg-white text-[var(--ink-dark)] p-6 sm:p-8 flex items-center justify-center shadow-xl">
+    <OptimizedTiltCard className="w-full rounded-2xl bg-white text-[var(--ink-dark)] p-6 sm:p-8 flex items-center justify-center shadow-xl">
       <svg viewBox="0 0 260 180" fill="none" aria-hidden="true" className="w-full max-w-[260px] h-auto">
         <circle cx="130" cy="90" r="72" stroke="rgba(123,44,191,0.18)" strokeWidth="1.25" strokeDasharray="4 4" />
         <circle cx="130" cy="90" r="50" stroke="rgba(123,44,191,0.35)" strokeWidth="1.5" />
@@ -91,14 +92,14 @@ function VisionOrbitVisual() {
         <circle cx="204" cy="60" r="4.5" fill="#7B2CBF" />
         <circle cx="58" cy="122" r="4" fill="#9D4EDD" />
       </svg>
-    </div>
+    </OptimizedTiltCard>
   )
 }
 
 /** Geometric SVG: Mission Convergence */
 function MissionConvergenceVisual() {
   return (
-    <div className="w-full rounded-2xl bg-white/[0.04] border border-white/12 p-6 sm:p-8 flex items-center justify-center">
+    <OptimizedTiltCard className="w-full rounded-2xl bg-white/[0.04] border border-white/12 p-6 sm:p-8 flex items-center justify-center">
       <svg viewBox="0 0 280 160" fill="none" aria-hidden="true" className="w-full max-w-[280px] h-auto">
         {[28, 62, 98, 132].map((y, idx) => (
           <path
@@ -115,7 +116,7 @@ function MissionConvergenceVisual() {
         <circle cx="236" cy="80" r="11" fill="#C77DFF" />
         <circle cx="236" cy="80" r="4" fill="#FFFFFF" />
       </svg>
-    </div>
+    </OptimizedTiltCard>
   )
 }
 
@@ -312,13 +313,18 @@ export default function About() {
               {AIMS.map((aim, idx) => {
                 const isSelected = selectedAim === idx
                 return (
-                  <motion.button
+                  <OptimizedTiltCard
                     key={aim}
-                    type="button"
-                    whileHover={{ x: 6 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setSelectedAim(idx)}
-                    className={`w-full text-left p-5 sm:p-6 rounded-2xl border transition-all cursor-pointer flex items-start gap-3.5 ${
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setSelectedAim(idx)
+                      }
+                    }}
+                    className={`w-full text-left p-5 sm:p-6 rounded-2xl border transition-colors cursor-pointer flex items-start gap-3.5 ${
                       isSelected
                         ? 'bg-white text-[var(--ink-dark)] border-white shadow-xl'
                         : 'bg-white/[0.04] text-white/85 border-white/12 hover:bg-white/[0.08] hover:border-[#C77DFF]/50'
@@ -338,7 +344,7 @@ export default function About() {
                     >
                       {aim}
                     </BlurReveal>
-                  </motion.button>
+                  </OptimizedTiltCard>
                 )
               })}
             </div>
@@ -357,13 +363,18 @@ export default function About() {
               {OBJECTIVES.map((obj, idx) => {
                 const isSelected = selectedObjective === idx
                 return (
-                  <motion.button
+                  <OptimizedTiltCard
                     key={obj}
-                    type="button"
-                    whileHover={{ x: -6 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setSelectedObjective(idx)}
-                    className={`w-full text-left p-5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3.5 ${
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setSelectedObjective(idx)
+                      }
+                    }}
+                    className={`w-full text-left p-5 rounded-2xl border transition-colors cursor-pointer flex items-start gap-3.5 ${
                       isSelected
                         ? 'bg-white text-[var(--ink-dark)] border-white shadow-xl'
                         : 'bg-white/[0.04] text-white/85 border-white/12 hover:bg-white/[0.08] hover:border-[#C77DFF]/50'
@@ -383,7 +394,7 @@ export default function About() {
                     >
                       {obj}
                     </BlurReveal>
-                  </motion.button>
+                  </OptimizedTiltCard>
                 )
               })}
             </div>

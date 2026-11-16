@@ -23,6 +23,7 @@ import Preloader from './Preloader'
 import ScrollIndicator from './ScrollIndicator'
 import StudentApplicationModal from './StudentApplicationModal'
 import { useVacancySettings } from '../lib/vacancy'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -562,14 +563,14 @@ export default function Layout() {
 
           {/* Right Action CTA: Apply Now */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <motion.button
-              whileHover={{ y: -1.5 }}
-              whileTap={{ scale: 0.97 }}
+            <InteractiveHoverButton
+              type="button"
+              variant="primary"
+              size="md"
+              text="Apply Now"
               onClick={() => setApplyModalOpen(true)}
-              className="inline-flex items-center justify-center h-9 sm:h-10 px-3.5 sm:px-5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs sm:text-[13.5px] font-semibold tracking-tight transition-colors duration-150 cursor-pointer shadow-[0_2px_10px_-2px_rgba(123,44,191,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] hover:shadow-[0_6px_18px_-3px_rgba(123,44,191,0.55),inset_0_1px_0_rgba(255,255,255,0.3)] whitespace-nowrap"
-            >
-              <span>Apply Now</span>
-            </motion.button>
+              className="h-9 sm:h-10 text-xs sm:text-[13.5px]"
+            />
 
             {/* Mobile Menu Button */}
             <button
@@ -723,15 +724,17 @@ export default function Layout() {
                   <Mail className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
                   <span>contact@airlab.neduet.edu.pk</span>
                 </a>
-                <button
+                <InteractiveHoverButton
+                  type="button"
+                  variant="primary"
+                  size="md"
+                  text="Apply Now"
                   onClick={() => {
                     setMobileMenuOpen(false)
                     setApplyModalOpen(true)
                   }}
-                  className="w-full sm:w-auto h-10 px-6 rounded-full bg-[var(--accent-orange)] text-white text-xs font-semibold cursor-pointer"
-                >
-                  Apply Now
-                </button>
+                  className="w-full sm:w-auto text-xs"
+                />
               </div>
             </motion.div>
           )}
@@ -777,23 +780,25 @@ export default function Layout() {
               </div>
 
               <div className="pt-1">
-                <a
+                <InteractiveHoverButton
                   href="https://www.linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  variant="outline"
+                  size="sm"
                   aria-label="Follow AIR Lab on LinkedIn for latest updates"
-                  className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-medium text-white transition-colors"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-4 h-4 shrink-0"
-                    aria-hidden="true"
-                  >
-                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
-                  </svg>
-                  <span>Follow us on LinkedIn</span>
-                </a>
+                  icon={
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-4 h-4 shrink-0"
+                      aria-hidden="true"
+                    >
+                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+                    </svg>
+                  }
+                  text="Follow us on LinkedIn"
+                  className="bg-white/10 border-white/15 text-white hover:border-[var(--accent-orange)] font-medium"
+                  dotClassName="bg-[#C77DFF] group-hover:bg-[var(--accent-orange)]"
+                />
               </div>
             </div>
 

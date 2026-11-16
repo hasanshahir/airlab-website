@@ -34,6 +34,7 @@ import {
   invalidateVacancyCache,
   type VacancySettings,
 } from '../lib/vacancy'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 type FieldType =
   | 'string'
@@ -1005,14 +1006,15 @@ export default function AdminDashboard() {
               />
             </div>
 
-            <button
+            <InteractiveHoverButton
               type="submit"
+              variant="primary"
+              size="md"
               disabled={loggingIn}
-              className="w-full h-10 mt-2 rounded-[4px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
-            >
-              <Shield className="w-3.5 h-3.5" />
-              <span>{loggingIn ? 'Authenticating...' : 'Sign In'}</span>
-            </button>
+              icon={<Shield className="w-3.5 h-3.5" />}
+              text={loggingIn ? 'Authenticating...' : 'Sign In'}
+              className="w-full mt-2"
+            />
           </form>
         </div>
       </div>
@@ -1114,7 +1116,10 @@ export default function AdminDashboard() {
           </div>
 
           {!['applications', 'vacancy-settings', 'security'].includes(activeTab) && (
-            <button
+            <InteractiveHoverButton
+              type="button"
+              variant="primary"
+              size="sm"
               onClick={() => {
                 setModalError(null)
                 setNewImageUrl('')
@@ -1124,11 +1129,9 @@ export default function AdminDashboard() {
                 setEditingItem(buildDefaultItem(activeTab, items.length))
                 setIsNew(true)
               }}
-              className="inline-flex items-center gap-1.5 px-4 h-9 rounded-[4px] bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-medium transition-colors cursor-pointer shadow-xs"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add New Entry</span>
-            </button>
+              icon={<Plus className="w-3.5 h-3.5" />}
+              text="Add New Entry"
+            />
           )}
         </header>
 
@@ -1238,13 +1241,13 @@ export default function AdminDashboard() {
             </div>
 
             <div className="pt-3 border-t border-[var(--border-hairline)] flex justify-end">
-              <button
+              <InteractiveHoverButton
                 type="submit"
+                variant="primary"
+                size="sm"
                 disabled={savingVacancy}
-                className="px-5 h-9 rounded bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {savingVacancy ? 'Saving...' : 'Save Vacancy & Ribbon Settings'}
-              </button>
+                text={savingVacancy ? 'Saving...' : 'Save Vacancy & Ribbon Settings'}
+              />
             </div>
           </form>
         ) : activeTab === 'security' ? (
@@ -1305,13 +1308,13 @@ export default function AdminDashboard() {
             </div>
 
             <div className="pt-2">
-              <button
+              <InteractiveHoverButton
                 type="submit"
+                variant="primary"
+                size="sm"
                 disabled={changingPassword}
-                className="px-5 h-9 rounded bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {changingPassword ? 'Updating Password...' : 'Update Password'}
-              </button>
+                text={changingPassword ? 'Updating Password...' : 'Update Password'}
+              />
             </div>
           </form>
         ) : activeTab === 'applications' ? (
@@ -2297,20 +2300,20 @@ export default function AdminDashboard() {
                     })}
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border-hairline)]">
-                      <button
+                      <InteractiveHoverButton
                         type="button"
+                        variant="secondary"
+                        size="sm"
                         onClick={() => setEditingItem(null)}
-                        className="px-4 py-2 rounded text-xs border border-[var(--border-hairline)] hover:bg-[var(--bg-page)] cursor-pointer"
-                      >
-                        Cancel
-                      </button>
-                      <button
+                        text="Cancel"
+                      />
+                      <InteractiveHoverButton
                         type="submit"
+                        variant="primary"
+                        size="sm"
                         disabled={saving}
-                        className="px-5 py-2 rounded bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
-                      >
-                        {saving ? 'Saving...' : 'Save to Database'}
-                      </button>
+                        text={saving ? 'Saving...' : 'Save to Database'}
+                      />
                     </div>
                   </form>
                 </div>

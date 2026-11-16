@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, Award, FileText, Download, Search, X } from 'lucide-react'
 import { getPublications } from '../lib/data'
 import TitleReveal from '../components/ui/TitleReveal'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 
 export default function Publications() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -109,9 +111,9 @@ export default function Publications() {
             {filtered.map((pub, i) => {
               const isJournal = pub.type === 'Journal'
               return (
-                <div
+                <OptimizedTiltCard
                   key={pub.id}
-                  className="p-8 sm:p-10 flex flex-col md:flex-row md:items-start justify-between gap-6 group hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 text-left bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl"
+                  className="p-8 sm:p-10 flex flex-col md:flex-row md:items-start justify-between gap-6 hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-colors duration-200 text-left bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl"
                   style={{ transitionDelay: `${i * 20}ms` }}
                 >
                   <div className="space-y-3.5 flex-1">
@@ -188,47 +190,46 @@ export default function Publications() {
                   {/* Action Buttons: Read Link, PDF, BibTeX Cite */}
                   <div className="flex flex-wrap sm:flex-col items-center sm:items-end gap-2.5 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--border-hairline)]">
                     {pub.link && (
-                      <a
+                      <InteractiveHoverButton
                         href={pub.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-9 px-4 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                      >
-                        <span>Read Paper</span>
-                      </a>
+                        variant="primary"
+                        size="sm"
+                        text="Read Paper"
+                      />
                     )}
 
                     {pub.pdf && (
-                      <a
+                      <InteractiveHoverButton
                         href={pub.pdf}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-9 px-4 rounded-full bg-[var(--ink-dark)] hover:bg-black text-white text-xs font-semibold shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download PDF</span>
-                      </a>
+                        variant="dark"
+                        size="sm"
+                        icon={<Download className="w-3.5 h-3.5" />}
+                        text="Download PDF"
+                      />
                     )}
 
-                    <button
+                    <InteractiveHoverButton
+                      type="button"
+                      variant="secondary"
+                      size="sm"
                       onClick={() => copyBibtex(pub)}
-                      className="h-9 px-4 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-page)] hover:bg-[var(--bg-surface)] text-xs font-sans flex items-center gap-1.5 transition-colors cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] whitespace-nowrap font-medium"
                       title="Copy BibTeX Citation"
-                    >
-                      {copiedId === pub.id ? (
-                        <>
+                      icon={
+                        copiedId === pub.id ? (
                           <Check className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-                          <span className="text-[var(--accent-orange)] font-semibold">Citation Copied!</span>
-                        </>
-                      ) : (
-                        <>
+                        ) : (
                           <Copy className="w-3.5 h-3.5 text-[var(--text-subtle)]" />
-                          <span>Copy Citation</span>
-                        </>
-                      )}
-                    </button>
+                        )
+                      }
+                      text={copiedId === pub.id ? 'Citation Copied!' : 'Copy Citation'}
+                      className={
+                        copiedId === pub.id
+                          ? 'bg-[var(--bg-page)] border-[var(--accent-orange)] text-[var(--accent-orange)]'
+                          : 'bg-[var(--bg-page)] text-[var(--text-muted)] font-medium'
+                      }
+                    />
                   </div>
-                </div>
+                </OptimizedTiltCard>
               )
             })}
           </motion.div>

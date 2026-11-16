@@ -45,7 +45,7 @@ export function useFirstReveal(
 
     window.addEventListener('preloader-start', onStart)
     window.addEventListener('preloader-reveal', onReveal)
-    const fallback = window.setTimeout(() => setPreloaderReady(true), 2200)
+    const fallback = window.setTimeout(() => setPreloaderReady(true), 6200)
     return () => {
       window.removeEventListener('preloader-start', onStart)
       window.removeEventListener('preloader-reveal', onReveal)

@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 interface Props {
   children: ReactNode
@@ -41,22 +42,25 @@ export default class ErrorBoundary extends Component<Props, State> {
               </pre>
             )}
             <div className="flex items-center justify-center gap-3">
-              <button
+              <InteractiveHoverButton
+                type="button"
+                variant="primary"
+                size="sm"
                 onClick={() => window.location.reload()}
-                className="px-5 py-2.5 rounded-full bg-orange-600 hover:bg-orange-500 text-white text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Reload Page
-              </button>
-              <a
+                text="Reload Page"
+                className="bg-orange-600"
+              />
+              <InteractiveHoverButton
                 href="#/"
+                variant="dark"
+                size="sm"
                 onClick={() => {
                   this.setState({ hasError: false, error: null })
                   window.location.hash = '#/'
                 }}
-                className="px-5 py-2.5 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Go Home
-              </a>
+                text="Go Home"
+                className="bg-neutral-800 text-neutral-200"
+              />
             </div>
           </div>
         </div>

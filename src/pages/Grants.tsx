@@ -6,6 +6,7 @@ import type { Grant } from '../types/data'
 import TitleReveal from '../components/ui/TitleReveal'
 import BlurReveal from '../components/ui/blur-reveal'
 import PlaceholderBadge from '../components/ui/PlaceholderBadge'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 
 function parseGrantDateScore(durationStr?: string): number {
   if (!durationStr) return 0
@@ -175,9 +176,9 @@ export default function Grants() {
           {sortedGrants.map(grant => {
               const isActive = grant.status === 'Active'
               return (
-                <div
+                <OptimizedTiltCard
                   key={grant.id}
-                  className="relative overflow-hidden group p-9 sm:p-12 lg:p-14 min-h-[380px] sm:min-h-[420px] rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
+                  className="p-9 sm:p-12 lg:p-14 min-h-[380px] sm:min-h-[420px] rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-colors duration-200 flex flex-col justify-between"
                 >
                   {/* Visible background image with directional gradient overlay for text contrast */}
                   {grant.image && (
@@ -279,7 +280,7 @@ export default function Grants() {
                       </div>
                     )}
                   </div>
-                </div>
+                </OptimizedTiltCard>
               )
             })}
         </div>

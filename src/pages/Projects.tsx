@@ -16,6 +16,8 @@ import { getProjects } from '../lib/data'
 import type { ProjectItem } from '../types/data'
 import { getProjectCover, DEFAULT_PROJECT_COVER } from '../lib/placeholders'
 import TitleReveal from '../components/ui/TitleReveal'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 function parseDateScore(dateStr?: string): number {
   if (!dateStr) return 0
@@ -362,13 +364,14 @@ export default function Projects() {
             <span className="font-semibold text-[var(--accent-orange)] text-sm">{activeArea}</span>
             <span className="text-[var(--text-subtle)] text-[11px]">({filtered.length} projects)</span>
           </div>
-          <button
+          <InteractiveHoverButton
+            type="button"
+            variant="outline"
+            size="xs"
             onClick={() => handleCategoryChange('All')}
-            className="text-[11px] font-semibold text-[var(--accent-orange)] hover:underline flex items-center gap-1 cursor-pointer"
-          >
-            <span>Show all projects</span>
-            <X className="w-3.5 h-3.5" />
-          </button>
+            text="Show all projects"
+            className="border-[var(--accent-orange)]/40 text-[var(--accent-orange)]"
+          />
         </div>
       )}
 
@@ -391,83 +394,86 @@ export default function Projects() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.32, delay: Math.min(idx * 0.04, 0.24), ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ y: -4 }}
-                onClick={() => {
-                  setSelectedProject(proj)
-                  setActiveGalleryIndex(0)
-                }}
-                className="group bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl p-6 flex flex-col justify-between hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors duration-200 cursor-pointer relative"
+                className="h-full"
               >
-                <div>
-                  {/* Image Cover Banner */}
-                  <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] mb-5 border border-[var(--border-hairline)]">
-                    <img
-                      src={getProjectCover(proj.coverImage || proj.images?.[0])}
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_PROJECT_COVER
-                      }}
-                      alt={proj.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                <OptimizedTiltCard
+                  onClick={() => {
+                    setSelectedProject(proj)
+                    setActiveGalleryIndex(0)
+                  }}
+                  className="h-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl p-6 flex flex-col justify-between hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors duration-200 cursor-pointer"
+                >
+                  <div>
+                    {/* Image Cover Banner */}
+                    <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-[var(--bg-page)] mb-5 border border-[var(--border-hairline)]">
+                      <img
+                        src={getProjectCover(proj.coverImage || proj.images?.[0])}
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_PROJECT_COVER
+                        }}
+                        alt={proj.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
-                    {/* Status badge (Ongoing / Finished) */}
-                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[11px] font-sans font-semibold text-[var(--text-primary)] shadow-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)]" />
-                        {proj.category}
-                      </span>
+                      {/* Status badge (Ongoing / Finished) */}
+                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[11px] font-sans font-semibold text-[var(--text-primary)] shadow-xs">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)]" />
+                          {proj.category}
+                        </span>
 
-                      <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-sans font-semibold flex items-center gap-1.5 ${isOngoing
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-[var(--ink-dark)] text-white'
-                          }`}
-                      >
-                        {isOngoing ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
-                        {proj.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Title & Description */}
-                  <h3 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2.5 font-head line-clamp-2">
-                    {proj.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed mb-5 line-clamp-3 font-normal">
-                    {proj.description}
-                  </p>
-
-                  {/* Metadata Specs */}
-                  <div className="space-y-1.5 mb-5 text-[12px] font-sans text-[var(--text-muted)] bg-[var(--bg-page)] p-3.5 rounded-2xl border border-[var(--border-hairline)]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[var(--text-subtle)]">Timeline:</span>
-                      <span className="font-semibold text-[var(--text-primary)]">
-                        {proj.startDate || proj.timeTaken}
-                      </span>
-                    </div>
-                    {proj.funding && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-[var(--text-subtle)]">Funding:</span>
-                        <span className="font-semibold text-[var(--accent-orange)] truncate max-w-[180px]">
-                          {proj.funding}
+                        <span
+                          className={`px-3 py-1 rounded-full text-[10px] font-sans font-semibold flex items-center gap-1.5 ${isOngoing
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-[var(--ink-dark)] text-white'
+                            }`}
+                        >
+                          {isOngoing ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
+                          {proj.status}
                         </span>
                       </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
 
-                {/* Bottom Action Footer */}
-                <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans">
-                  <span className="text-[var(--text-subtle)] uppercase tracking-wider text-[11px] font-medium">
-                    {proj.category}
-                  </span>
-                  <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1 group-hover:underline">
-                    <span>View Details</span>
-                  </span>
-                </div>
+                    {/* Title & Description */}
+                    <h3 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-orange)] transition-colors leading-snug mb-2.5 font-head line-clamp-2">
+                      {proj.title}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed mb-5 line-clamp-3 font-normal">
+                      {proj.description}
+                    </p>
+
+                    {/* Metadata Specs */}
+                    <div className="space-y-1.5 mb-5 text-[12px] font-sans text-[var(--text-muted)] bg-[var(--bg-page)] p-3.5 rounded-2xl border border-[var(--border-hairline)]">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[var(--text-subtle)]">Timeline:</span>
+                        <span className="font-semibold text-[var(--text-primary)]">
+                          {proj.startDate || proj.timeTaken}
+                        </span>
+                      </div>
+                      {proj.funding && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-[var(--text-subtle)]">Funding:</span>
+                          <span className="font-semibold text-[var(--accent-orange)] truncate max-w-[180px]">
+                            {proj.funding}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Bottom Action Footer */}
+                  <div className="pt-4 border-t border-[var(--border-hairline)] flex items-center justify-between text-xs font-sans">
+                    <span className="text-[var(--text-subtle)] uppercase tracking-wider text-[11px] font-medium">
+                      {proj.category}
+                    </span>
+                    <span className="text-[var(--accent-orange)] font-semibold inline-flex items-center gap-1 group-hover:underline">
+                      <span>View Details</span>
+                    </span>
+                  </div>
+                </OptimizedTiltCard>
               </motion.div>
             )
           })}
@@ -648,13 +654,15 @@ export default function Projects() {
                   </div>
 
                   <div className="px-6 py-4 bg-[var(--bg-surface)] border-t border-[var(--border-hairline)] flex items-center justify-end">
-                    <button
+                    <InteractiveHoverButton
+                      type="button"
+                      variant="primary"
+                      size="sm"
                       onClick={() => setSelectedProject(null)}
-                      className="px-6 py-2.5 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:translate-y-[1px]"
-                    >
-                      <X className="w-4 h-4" />
-                      <span>Close</span>
-                    </button>
+                      icon={<X className="w-4 h-4" />}
+                      text="Close"
+                      className="font-bold"
+                    />
                   </div>
                 </motion.div>
               </div>

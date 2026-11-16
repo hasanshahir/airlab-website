@@ -10,6 +10,8 @@ import {
 } from 'lucide-react'
 import TitleReveal from '../components/ui/TitleReveal'
 import rawBlogs from '../data/blogs.json'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 
 export interface BlogPost {
   _id?: string
@@ -249,10 +251,10 @@ export default function Blogs() {
             }
 
             return (
-              <article
+              <OptimizedTiltCard
                 key={itemKey}
                 onClick={handleCardClick}
-                className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group cursor-pointer overflow-hidden"
+                className="rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-colors duration-200 flex flex-col justify-between cursor-pointer"
               >
                 <div>
                   {blog.image && (
@@ -323,7 +325,7 @@ export default function Blogs() {
                     </span>
                   )}
                 </div>
-              </article>
+              </OptimizedTiltCard>
             )
           })}
         </div>
@@ -400,21 +402,20 @@ export default function Blogs() {
 
               <div className="mt-8 pt-6 border-t border-[var(--border-hairline)] flex items-center justify-end gap-3">
                 {activePost.link && (
-                  <a
+                  <InteractiveHoverButton
                     href={activePost.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-5 py-2 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
-                  >
-                    <span>Read Full Article</span>
-                  </a>
+                    variant="primary"
+                    size="sm"
+                    text="Read Full Article"
+                  />
                 )}
-                <button
+                <InteractiveHoverButton
+                  type="button"
+                  variant="dark"
+                  size="sm"
                   onClick={() => setActivePost(null)}
-                  className="px-5 py-2 rounded-full bg-[var(--ink-dark)] text-white text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
-                >
-                  Close
-                </button>
+                  text="Close"
+                />
               </div>
             </motion.div>
           </div>

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check, GraduationCap, FileText, User, Mail, BookOpen, Phone, Loader2, Briefcase, Upload } from 'lucide-react'
 import { useVacancySettings } from '../lib/vacancy'
 import airLabMark from '../assets/air-lab-mark.png'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 interface StudentApplicationModalProps {
   isOpen: boolean
@@ -228,12 +229,14 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                 </div>
 
                 <div className="p-4 sm:p-5 border-t border-[var(--border-hairline)] bg-[var(--bg-backdrop)] flex justify-end shrink-0">
-                  <button
+                  <InteractiveHoverButton
+                    type="button"
+                    variant="primary"
+                    size="md"
                     onClick={handleReset}
-                    className="h-11 px-8 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs font-bold shadow-sm cursor-pointer transition-colors"
-                  >
-                    Done
-                  </button>
+                    text="Done"
+                    className="h-11 text-xs font-bold"
+                  />
                 </div>
               </div>
             ) : (
@@ -514,27 +517,23 @@ export default function StudentApplicationModal({ isOpen, onClose }: StudentAppl
                   </div>
 
                   <div className="flex items-center gap-2.5 w-full sm:w-auto">
-                    <button
+                    <InteractiveHoverButton
                       type="button"
+                      variant="secondary"
+                      size="md"
                       onClick={onClose}
-                      className="h-10 sm:h-11 px-5 rounded-full border border-[var(--border-hairline-dark)] bg-white hover:bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xs font-semibold transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
+                      text="Cancel"
+                      className="h-10 sm:h-11 bg-white border-[var(--border-hairline-dark)] text-[var(--text-muted)] text-xs"
+                    />
+                    <InteractiveHoverButton
                       type="submit"
+                      variant="primary"
+                      size="md"
                       disabled={loading || isClosed}
-                      className="flex-1 sm:flex-initial h-10 sm:h-11 px-7 rounded-full bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-[0_2px_10px_-2px_rgba(123,44,191,0.45)] hover:shadow-[0_6px_18px_-3px_rgba(123,44,191,0.55)] transition-all cursor-pointer active:translate-y-[1px] disabled:opacity-50"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Submitting...</span>
-                        </>
-                      ) : (
-                        <span>Submit Application</span>
-                      )}
-                    </button>
+                      icon={loading ? <Loader2 className="w-4 h-4 animate-spin" /> : undefined}
+                      text={loading ? 'Submitting...' : 'Submit Application'}
+                      className="flex-1 sm:flex-initial h-10 sm:h-11 text-xs sm:text-sm font-bold"
+                    />
                   </div>
                 </div>
               </form>

@@ -6,10 +6,12 @@ import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 import { TextReveal } from '../components/ui/cascade-text'
 import BlurReveal from '../components/ui/blur-reveal'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 import { getMemberAvatar, DEFAULT_AVATAR } from '../lib/placeholders'
 import { extractPerformerPhotos, normalizeDbPerformers } from '../lib/performers'
 import { normalizeLinkedInUrl } from '../lib/utils'
 import type { PerformerItem, CoAwardeeInfo } from '../types/data'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 
 const Linkedin = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -173,7 +175,7 @@ export default function Performers() {
         </div>
       ) : (
         <SectionReveal delay={0.15} blur={false}>
-          <div className="p-5 sm:p-7 relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-5xl mx-auto transition-all duration-300 hover:border-[var(--accent-orange)]/40 text-left">
+          <OptimizedTiltCard className="p-5 sm:p-7 bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-5xl mx-auto transition-colors duration-300 hover:border-[var(--accent-orange)]/40 text-left">
             {/* Month Selector (Most recent first: October to July) */}
             <div className="flex flex-wrap items-center justify-center gap-2 pb-4 border-b border-[var(--border-hairline)] mb-5">
               {performersList.map((p, idx) => {
@@ -389,35 +391,34 @@ export default function Performers() {
                         {(cleanLinkedin || cleanCv || person.email) && (
                           <div className="flex flex-wrap items-center gap-1.5">
                             {cleanLinkedin && (
-                              <a
+                              <InteractiveHoverButton
                                 href={cleanLinkedin}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                              >
-                                <Linkedin className="w-3 h-3" />
-                                <span>LinkedIn</span>
-                              </a>
+                                variant="secondary"
+                                size="xs"
+                                icon={<Linkedin className="w-3 h-3" />}
+                                text="LinkedIn"
+                                className="font-medium"
+                              />
                             )}
                             {cleanCv && (
-                              <a
+                              <InteractiveHoverButton
                                 href={cleanCv}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                              >
-                                <FileText className="w-3 h-3" />
-                                <span>Resume</span>
-                              </a>
+                                variant="secondary"
+                                size="xs"
+                                icon={<FileText className="w-3 h-3" />}
+                                text="Resume"
+                                className="font-medium"
+                              />
                             )}
                             {person.email && (
-                              <a
+                              <InteractiveHoverButton
                                 href={`mailto:${person.email}`}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[var(--border-hairline)] bg-[var(--bg-surface)] text-[11px] font-sans font-medium text-[var(--text-primary)] hover:border-[var(--accent-orange)] hover:text-[var(--accent-orange)] transition-colors"
-                              >
-                                <Mail className="w-3 h-3" />
-                                <span>Email</span>
-                              </a>
+                                variant="secondary"
+                                size="xs"
+                                icon={<Mail className="w-3 h-3" />}
+                                text="Email"
+                                className="font-medium"
+                              />
                             )}
                           </div>
                         )}
@@ -458,16 +459,17 @@ export default function Performers() {
                 )}
 
                 <div className="flex items-center justify-end">
-                  <Link
+                  <InteractiveHoverButton
                     to={awardees.length > 1 ? `/team?tab=${primaryAwardee?.categoryTab || 'interns'}` : teamRedirectUrl}
-                    className="w-full sm:w-auto px-5 py-2 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white hover:bg-[var(--accent-orange)] hover:text-white transition-all inline-flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-                  >
-                    <span>{awardees.length > 1 ? 'View Members' : 'View Member'}</span>
-                  </Link>
+                    variant="dark"
+                    size="sm"
+                    text={awardees.length > 1 ? 'View Members' : 'View Member'}
+                    className="w-full sm:w-auto"
+                  />
                 </div>
               </div>
             </div>
-          </div>
+          </OptimizedTiltCard>
         </SectionReveal>
       )}
     </div>

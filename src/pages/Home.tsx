@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain,
@@ -14,12 +14,14 @@ import {
   SlidersHorizontal,
 } from 'lucide-react'
 import Button from '../components/ui/Button'
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button'
 import TitleReveal from '../components/ui/TitleReveal'
 import BlurReveal from '../components/ui/blur-reveal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
 import { CoverflowCarousel } from '@/components/ui/coverflow-carousel'
 import { HandwritingText } from '@/components/ui/handwriting-text'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 import {
   HoverSlider,
   HoverSliderImage,
@@ -99,11 +101,9 @@ function ActiveResearchAreaCaption({
   const active = coreResearchAreas[activeSlide] ?? coreResearchAreas[0]
 
   return (
-    <motion.div
-      whileHover={{ y: -2 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+    <OptimizedTiltCard
       onClick={() => onSelectArea(active.title)}
-      className="group mt-3 px-4 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-card)] cursor-pointer transition-colors text-left"
+      className="mt-3 px-4 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-card)] cursor-pointer transition-colors text-left"
     >
       <AnimatePresence mode="wait">
         <motion.p
@@ -117,7 +117,7 @@ function ActiveResearchAreaCaption({
           {active.desc}
         </motion.p>
       </AnimatePresence>
-    </motion.div>
+    </OptimizedTiltCard>
   )
 }
 
@@ -200,13 +200,14 @@ export default function Home() {
 
       {/* Tactile Action Button centered directly below the text */}
       <div className="mt-5 sm:mt-6 flex flex-wrap items-center justify-center gap-3.5 pointer-events-auto">
-        <Link
+        <InteractiveHoverButton
           to="/projects"
-          className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/40 shadow-[0_10px_28px_rgba(123,44,191,0.34)] hover:shadow-[0_14px_34px_rgba(123,44,191,0.48)] hover:-translate-y-0.5 active:translate-y-0.5 transition-all duration-200 flex items-center gap-2 cursor-pointer group"
-        >
-          <Layers className="w-4 h-4 shrink-0" />
-          <span>Explore Projects</span>
-        </Link>
+          variant="primary"
+          size="lg"
+          icon={<Layers className="w-4 h-4 shrink-0" />}
+          text="Explore Projects"
+          className="border-white/40 shadow-[0_10px_28px_rgba(123,44,191,0.34)] hover:shadow-[0_14px_34px_rgba(123,44,191,0.48)]"
+        />
       </div>
     </div>
   )
@@ -302,28 +303,31 @@ export default function Home() {
         </div>
 
         {/* ── MINIMAL CLEAN QUICK LINKS STRIP ── */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-5 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
-          <Link
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-3.5 text-xs sm:text-sm font-sans text-[var(--text-muted)] border-b border-[var(--border-hairline)]">
+          <InteractiveHoverButton
             to="/projects"
-            className="group px-3 py-1 rounded-full bg-[var(--bg-surface)]/70 hover:bg-[var(--bg-surface)] text-[var(--accent-orange)] font-semibold flex items-center gap-1.5 border border-[var(--border-hairline)] transition-all"
-          >
-            <span>All Projects</span>
-          </Link>
+            variant="secondary"
+            size="sm"
+            text="All Projects"
+            className="text-[var(--accent-orange)]"
+          />
           <span className="text-[var(--border-hairline)] hidden sm:inline">•</span>
-          <Link
+          <InteractiveHoverButton
             to="/grants"
-            className="group px-3 py-1 rounded-full hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] font-medium flex items-center gap-1.5 transition-all"
-          >
-            <Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />
-            <span>Active Grants</span>
-          </Link>
+            variant="ghost"
+            size="sm"
+            icon={<Award className="w-3.5 h-3.5 text-[var(--accent-orange)]" />}
+            text="Active Grants"
+            className="text-[var(--text-muted)]"
+          />
           <span className="text-[var(--border-hairline)] hidden sm:inline">•</span>
-          <Link
+          <InteractiveHoverButton
             to="/team"
-            className="group px-3 py-1 rounded-full hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] font-medium flex items-center gap-1.5 transition-all"
-          >
-            <span>All Team Members</span>
-          </Link>
+            variant="ghost"
+            size="sm"
+            text="All Team Members"
+            className="text-[var(--text-muted)]"
+          />
         </div>
       </section>
 
@@ -361,7 +365,7 @@ export default function Home() {
                   to="/about"
                   variant="secondary"
                   size="md"
-                  className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
+                  className="bg-white text-[var(--ink-dark)] border-transparent font-semibold"
                 >
                   <span>About AIR Lab</span>
                 </Button>
@@ -374,15 +378,17 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group"
+              className="lg:col-span-7"
             >
-              <img
-                src="/about-lab.jpg"
-                alt="AIR Lab NED University Team"
-                className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                loading="lazy"
-              />
-              <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15 rounded-3xl" />
+              <OptimizedTiltCard className="rounded-3xl border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5">
+                <img
+                  src="/about-lab.jpg"
+                  alt="AIR Lab NED University Team"
+                  className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                  loading="lazy"
+                />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15 rounded-3xl" />
+              </OptimizedTiltCard>
             </motion.div>
           </div>
         </div>
@@ -440,7 +446,7 @@ export default function Home() {
               to="/projects"
               size="sm"
               arrow
-              className="inline-flex items-center gap-2 font-semibold px-5 shrink-0"
+              className="font-semibold shrink-0"
             >
               <span>See Projects</span>
             </Button>
@@ -463,33 +469,36 @@ export default function Home() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: idx * 0.04, ease: [0.16, 1, 0.3, 1] }}
-                  whileHover={{ y: -4 }}
-                  onClick={() =>
-                    navigate(`/projects?area=${encodeURIComponent(area.title)}`)
-                  }
-                  className="group rounded-2xl bg-[var(--bg-surface)]/90 border border-[var(--border-hairline)] overflow-hidden hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors duration-200 cursor-pointer flex flex-col text-left"
+                  className="h-full"
                 >
-                  <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[var(--ink-dark)]">
-                    <img
-                      src={area.image}
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder-project.svg'
-                      }}
-                      alt={area.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent pointer-events-none" />
-                    <h3 className="absolute bottom-2.5 left-3.5 right-3.5 font-head text-base sm:text-lg font-bold text-white leading-snug drop-shadow-sm">
-                      {area.title}
-                    </h3>
-                  </div>
-                  <div className="px-4 py-3 flex-1 flex items-center">
-                    <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-snug font-normal line-clamp-3">
-                      {area.desc}
-                    </p>
-                  </div>
+                  <OptimizedTiltCard
+                    onClick={() =>
+                      navigate(`/projects?area=${encodeURIComponent(area.title)}`)
+                    }
+                    className="h-full rounded-2xl bg-[var(--bg-surface)]/90 border border-[var(--border-hairline)] hover:border-[var(--accent-orange)]/45 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-colors duration-200 cursor-pointer flex flex-col text-left"
+                  >
+                    <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[var(--ink-dark)]">
+                      <img
+                        src={area.image}
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder-project.svg'
+                        }}
+                        alt={area.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent pointer-events-none" />
+                      <h3 className="absolute bottom-2.5 left-3.5 right-3.5 font-head text-base sm:text-lg font-bold text-white leading-snug drop-shadow-sm">
+                        {area.title}
+                      </h3>
+                    </div>
+                    <div className="px-4 py-3 flex-1 flex items-center">
+                      <p className="text-xs sm:text-[13px] text-[var(--text-muted)] leading-snug font-normal line-clamp-3">
+                        {area.desc}
+                      </p>
+                    </div>
+                  </OptimizedTiltCard>
                 </motion.div>
               ))}
             </motion.div>
@@ -583,7 +592,7 @@ export default function Home() {
                   to="/team"
                   variant="secondary"
                   size="md"
-                  className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
+                  className="bg-white text-[var(--ink-dark)] border-transparent font-semibold"
                 >
                   <span>Meet the Team</span>
                 </Button>
@@ -596,15 +605,17 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5 group"
+              className="lg:col-span-7"
             >
-              <img
-                src="/team-group.jpg"
-                alt="AIR Lab Research Team"
-                className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                loading="lazy"
-              />
-              <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15 rounded-3xl" />
+              <OptimizedTiltCard className="rounded-3xl border border-white/15 shadow-2xl min-h-[340px] sm:min-h-[440px] lg:min-h-[500px] bg-white/5">
+                <img
+                  src="/team-group.jpg"
+                  alt="AIR Lab Research Team"
+                  className="w-full h-full absolute inset-0 object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                  loading="lazy"
+                />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15 rounded-3xl" />
+              </OptimizedTiltCard>
             </motion.div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import Button from '../components/ui/Button'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 import BlurReveal from '../components/ui/blur-reveal'
+import OptimizedTiltCard from '@/components/ui/optimized-tilt-card'
 
 export default function Interns() {
   const [interns, setInterns] = useState<InternItem[]>([])
@@ -66,8 +67,8 @@ export default function Interns() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 text-left">
           {interns.map((intern, index) => (
             <SectionReveal key={intern.id} staggerIndex={index}>
-              <div
-                className="p-8 sm:p-10 flex flex-col justify-between group h-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-all"
+              <OptimizedTiltCard
+                className="p-8 sm:p-10 flex flex-col justify-between h-full bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl hover:border-[var(--accent-orange)]/40 hover:shadow-lg transition-colors"
                 style={{ transitionDelay: `${index * 50}ms` }}
               >
                 <div>
@@ -153,7 +154,7 @@ export default function Interns() {
                     Alumni Verification Verified
                   </span>
                 </div>
-              </div>
+              </OptimizedTiltCard>
             </SectionReveal>
           ))}
         </div>
