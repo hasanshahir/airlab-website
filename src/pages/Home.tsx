@@ -72,7 +72,7 @@ const coreResearchAreas = [
   },
   {
     icon: ShieldCheck,
-    title: 'Cyber',
+    title: 'Cyber Security',
     image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1000&auto=format&fit=crop&q=80',
     desc: 'Autonomous cyber defense, encrypted traffic analysis, zero-trust infrastructure, and automated vulnerability intelligence to safeguard digital ecosystems.',
   },
