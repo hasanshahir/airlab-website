@@ -347,8 +347,31 @@ export default function Home() {
     return () => cancelAnimationFrame(rafId)
   }, [recentUpdates.length])
 
-  const handleUpdatesMouseEnter = () => {
-    updatesTargetVelocityRef.current = 0
+  const updateRibbonHoverVelocity = (
+    e: React.MouseEvent<HTMLDivElement>,
+    targetVelocityRef: React.MutableRefObject<number>
+  ) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    if (rect.width <= 0) return
+    const relX = (e.clientX - rect.left) / rect.width
+    const edgeZone = 0.25 // Outer 25% on each edge controls scrolling direction & speed
+
+    if (relX < edgeZone) {
+      // Hovering left side -> scrolls right (reverse)
+      const intensity = 1 - relX / edgeZone
+      targetVelocityRef.current = -(140 + intensity * 200)
+    } else if (relX > 1 - edgeZone) {
+      // Hovering right side -> scrolls left (forward)
+      const intensity = (relX - (1 - edgeZone)) / edgeZone
+      targetVelocityRef.current = 140 + intensity * 200
+    } else {
+      // Center area -> pause/standby so users can easily read or click cards
+      targetVelocityRef.current = 0
+    }
+  }
+
+  const handleUpdatesMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    updateRibbonHoverVelocity(e, updatesTargetVelocityRef)
   }
 
   const handleUpdatesMouseLeave = () => {
@@ -371,10 +394,10 @@ export default function Home() {
       {/* Clean high-visibility radial light scrim behind the text so the carousel stays visible without visual clutter */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[96%] max-w-3xl h-72 sm:h-80 -z-10 rounded-full blur-md"
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-2xl h-64 -z-10 rounded-full blur-md"
         style={{
           background:
-            'radial-gradient(closest-side, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.9) 52%, rgba(255, 255, 255, 0.55) 78%, transparent 100%)',
+            'radial-gradient(closest-side, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.45) 55%, transparent 100%)',
         }}
       />
 
@@ -416,7 +439,7 @@ export default function Home() {
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
       {/* ── 1. FULL-WIDTH HERO SHOWCASE (V1 Curved / V2 Coverflow) ── */}
-      <section className="relative w-full z-10 bg-white">
+      <section className="relative w-full z-10">
         <AnimatePresence mode="wait" initial={false}>
           {carouselVersion === 'v1' ? (
             <motion.div
@@ -433,7 +456,7 @@ export default function Home() {
                 axis={50}
                 gap={4}
                 curve={72}
-                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-white"
+                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
               >
                 {heroOverlay}
               </TiltedGridHero>
@@ -454,7 +477,7 @@ export default function Home() {
                 cardWidth="min(80cqh, 74cqw)"
                 gap={-0.06}
                 label="AIR Lab Hero Coverflow Carousel"
-                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-white"
+                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
               >
                 {heroOverlay}
               </CoverflowCarousel>

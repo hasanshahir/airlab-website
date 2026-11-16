@@ -388,7 +388,7 @@ body.is-loading {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #FFFFFF;
+  background-color: transparent;
   pointer-events: none;
 }
 

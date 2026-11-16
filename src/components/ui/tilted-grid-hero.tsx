@@ -231,7 +231,7 @@ export function TiltedGridHero({
         aria-hidden
         className="pointer-events-none absolute inset-0 transition-opacity duration-500"
         style={{
-          opacity: layout ? 1 : 0,
+          opacity: 1,
           // A shared vanishing point on the row's centre line, so the ends
           // grow evenly above and below it as they come toward the viewer.
           perspective: `${+(r * CAMERA).toFixed(3)}cqw`,

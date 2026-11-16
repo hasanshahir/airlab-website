@@ -37,14 +37,27 @@ export default function Preloader() {
     location.pathname.includes('admin') ||
     (typeof window !== 'undefined' && window.location.hash.includes('admin'))
 
-  const [visible, setVisible] = useState(() => !isAdmin && !window.__PRELOADER_REVEALED__)
+  const isAlreadyRevealed = () => {
+    if (typeof window === 'undefined') return true
+    if (window.__PRELOADER_REVEALED__) return true
+    try {
+      return sessionStorage.getItem('airlab_preloader_revealed') === 'true'
+    } catch {
+      return false
+    }
+  }
+
+  const [visible, setVisible] = useState(() => !isAdmin && !isAlreadyRevealed())
   const [phase, setPhase] = useState<'initial' | 'drawing' | 'dissolving'>('initial')
 
   const runRevealSequence = () => {
-    if (isAdmin || window.__PRELOADER_REVEALED__) {
+    if (isAdmin || isAlreadyRevealed()) {
       setVisible(false)
       document.body.classList.remove('is-loading')
-      window.__PRELOADER_REVEALED__ = true
+      if (typeof window !== 'undefined') {
+        window.__PRELOADER_REVEALED__ = true
+        window.dispatchEvent(new Event('preloader-reveal'))
+      }
       return () => { }
     }
 
@@ -53,9 +66,18 @@ export default function Preloader() {
     document.body.classList.add('is-loading')
     window.dispatchEvent(new Event('preloader-start'))
 
-    const drawDuration = 480
-    const holdDuration = 120
-    const dissolveDuration = 460
+    const drawDuration = 380
+    const holdDuration = 100
+    const dissolveDuration = 360
+
+    const markRevealed = () => {
+      window.__PRELOADER_REVEALED__ = true
+      try {
+        sessionStorage.setItem('airlab_preloader_revealed', 'true')
+      } catch {
+        // ignore
+      }
+    }
 
     const startTimer = window.setTimeout(() => {
       setPhase('drawing')
@@ -63,7 +85,7 @@ export default function Preloader() {
 
     const revealEventTime = 20 + drawDuration
     const revealEventTimer = window.setTimeout(() => {
-      window.__PRELOADER_REVEALED__ = true
+      markRevealed()
       window.dispatchEvent(new Event('preloader-reveal'))
     }, revealEventTime)
 
@@ -74,16 +96,17 @@ export default function Preloader() {
     }, dissolveStartTime)
 
     const doneTimer = window.setTimeout(() => {
+      markRevealed()
       setVisible(false)
     }, dissolveStartTime + dissolveDuration + 20)
 
-    // Failsafe timer so it NEVER traps the user on a white screen
+    // Robust failsafe: NEVER trap the user on a blank screen under any circumstance
     const failsafeTimer = window.setTimeout(() => {
       document.body.classList.remove('is-loading')
-      window.__PRELOADER_REVEALED__ = true
+      markRevealed()
       window.dispatchEvent(new Event('preloader-reveal'))
       setVisible(false)
-    }, 1200)
+    }, 900)
 
     return () => {
       window.clearTimeout(startTimer)
@@ -92,12 +115,21 @@ export default function Preloader() {
       window.clearTimeout(doneTimer)
       window.clearTimeout(failsafeTimer)
       document.body.classList.remove('is-loading')
-      window.__PRELOADER_REVEALED__ = true
+      markRevealed()
+      setVisible(false)
     }
   }
 
   // Initial website load reveal only (once per session)
   useEffect(() => {
+    if (isAdmin || isAlreadyRevealed()) {
+      setVisible(false)
+      document.body.classList.remove('is-loading')
+      window.__PRELOADER_REVEALED__ = true
+      window.dispatchEvent(new Event('preloader-reveal'))
+      return
+    }
+
     const cleanup = runRevealSequence()
     const handleCustomTrigger = () => {
       runRevealSequence()
@@ -111,9 +143,9 @@ export default function Preloader() {
 
   if (isAdmin || !visible) return null
 
-  const drawMs = 480
-  const dotDelayMs = 240
-  const dissolveMs = 460
+  const drawMs = 380
+  const dotDelayMs = 180
+  const dissolveMs = 360
   const isDissolving = phase === 'dissolving'
 
   return (
@@ -130,7 +162,6 @@ export default function Preloader() {
           : 'none',
       }}
     >
-      <div className="preloader-white" />
       <div className="preloader-bg">
         <div className="page-bg-gradient-wrap" />
         <div className="page-bg-pattern" />

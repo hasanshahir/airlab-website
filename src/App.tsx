@@ -25,8 +25,14 @@ function lazyRetry<T extends ComponentType<any>>(factory: () => Promise<{ defaul
         if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
           sessionStorage.setItem('airlab_chunk_reload', now.toString())
           window.location.reload()
-          // Return a placeholder while reloading
-          return { default: (() => null) as unknown as T }
+          // Return a reloading placeholder with visible indicator
+          const ReloadingView = () => (
+            <div className="min-h-screen bg-[var(--bg-page)] flex flex-col items-center justify-center p-6 text-center">
+              <div className="w-10 h-10 border-3 border-[var(--accent-orange)] border-t-transparent rounded-full animate-spin mb-4" />
+              <p className="text-sm font-medium text-[var(--text-muted)]">Updating to latest version...</p>
+            </div>
+          )
+          return { default: ReloadingView as unknown as T }
         }
       }
       throw error
@@ -50,7 +56,13 @@ export default function App() {
   return (
     <ThemeProvider>
       <HashRouter>
-        <Suspense fallback={<div className="min-h-screen bg-[var(--bg-page)]" />}>
+        <Suspense
+          fallback={
+            <div className="min-h-screen bg-[var(--bg-page)] flex flex-col items-center justify-center">
+              <div className="w-8 h-8 border-2 border-[var(--accent-orange)] border-t-transparent rounded-full animate-spin opacity-70" />
+            </div>
+          }
+        >
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />

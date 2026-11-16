@@ -8,10 +8,20 @@ export function useFirstReveal(
   ref: RefObject<HTMLElement | null>,
   waitForPreloader = false
 ): boolean {
+  const isRevealedSession = () => {
+    if (typeof window === 'undefined') return true
+    if (window.__PRELOADER_REVEALED__) return true
+    try {
+      return sessionStorage.getItem('airlab_preloader_revealed') === 'true'
+    } catch {
+      return false
+    }
+  }
+
   const [inView, setInView] = useState(false)
   const [preloaderReady, setPreloaderReady] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
-    if (window.__PRELOADER_REVEALED__) return true
+    if (isRevealedSession()) return true
     if (!document.body.classList.contains('is-loading') && !waitForPreloader) {
       return true
     }
@@ -20,7 +30,7 @@ export function useFirstReveal(
 
   useEffect(() => {
     const checkState = () => {
-      if (window.__PRELOADER_REVEALED__ && !document.body.classList.contains('is-loading')) {
+      if (isRevealedSession() && !document.body.classList.contains('is-loading')) {
         setPreloaderReady(true)
       } else if (waitForPreloader || document.body.classList.contains('is-loading')) {
         setPreloaderReady(false)
