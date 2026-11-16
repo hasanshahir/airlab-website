@@ -704,7 +704,6 @@ export default function Home() {
                   to="/about"
                   variant="secondary"
                   size="md"
-                  arrow
                   className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
                 >
                   <span>About AIR Lab</span>
@@ -928,7 +927,6 @@ export default function Home() {
                   to="/team"
                   variant="secondary"
                   size="md"
-                  arrow
                   className="bg-white text-[var(--ink-dark)] hover:bg-[var(--surface-alt)] border-transparent font-semibold inline-flex items-center gap-2"
                 >
                   <span>Meet the Team</span>
