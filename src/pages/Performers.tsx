@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Medal, Mail, FileText, ChevronLeft, ChevronRight, ArrowUpRight, Loader2, Sparkles } from 'lucide-react'
+import { Medal, Mail, FileText, ChevronLeft, ChevronRight, Loader2, Sparkles } from 'lucide-react'
 import SectionReveal from '../components/ui/SectionReveal'
 import TitleReveal from '../components/ui/TitleReveal'
 import { TextReveal } from '../components/ui/cascade-text'
@@ -183,8 +183,8 @@ export default function Performers() {
       ) : (
         <SectionReveal delay={0.2} blur={false}>
           <div className="p-6 sm:p-10 lg:p-12 relative overflow-hidden bg-[var(--bg-surface)] border border-[var(--border-hairline)] rounded-3xl shadow-lg max-w-5xl mx-auto transition-all duration-300 hover:border-[var(--accent-orange)]/40 text-left">
-            {/* Top Month Selector */}
-            <div className="flex flex-wrap items-center gap-2.5 pb-6 sm:pb-8 border-b border-[var(--border-hairline)] mb-8">
+            {/* Month Selector (Most recent first: October to July) */}
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pb-6 sm:pb-8 border-b border-[var(--border-hairline)] mb-8">
               {performersList.map((p, idx) => (
                 <button
                   key={`${p._id || p.id || 'item'}-${p.month || idx}-${idx}`}
@@ -204,11 +204,11 @@ export default function Performers() {
               ))}
             </div>
 
-            {/* Member Profile Showcase with Interactive Photo Slideshow */}
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 sm:gap-10 mb-8">
-              {/* Main Image Slideshow */}
+            {/* Centerpiece Image Slideshow + Awardee Details */}
+            <div className="flex flex-col gap-8 mb-8">
+              {/* Centered Hero Photo Showcase */}
               <div
-                className="w-full lg:w-[460px] shrink-0"
+                className="w-full max-w-[740px] mx-auto"
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
                 onFocus={() => setIsPaused(true)}
@@ -219,7 +219,7 @@ export default function Performers() {
                 }}
                 tabIndex={0}
               >
-                <div className="relative w-full aspect-[4/3] sm:h-80 lg:h-[320px] rounded-2xl sm:rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-md group bg-[var(--bg-page)]">
+                <div className="relative w-full aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden border border-[var(--border-hairline)] shadow-lg group bg-[var(--bg-page)]">
                   <Link
                     to={teamRedirectUrl}
                     title={`Click to view ${featuredPerformer.name} on Research Interns page`}
@@ -240,14 +240,14 @@ export default function Performers() {
                             opacity: { duration: 0.3 },
                           }}
                           alt={`${featuredPerformer.name} — ${featuredPerformer.month} photo ${safeSlideIndex + 1}`}
-                          className="absolute inset-0 w-full h-full object-cover"
+                          className="absolute inset-0 w-full h-full object-cover object-center"
                           onError={e => {
                             e.currentTarget.src = DEFAULT_AVATAR
                           }}
                         />
                       </AnimatePresence>
                     </div>
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
                   </Link>
 
                   {slides.length > 1 && (
@@ -260,7 +260,7 @@ export default function Performers() {
                         type="button"
                         onClick={goToPrevSlide}
                         aria-label="Previous photo"
-                        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/55 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-sm"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2.5 rounded-full bg-black/55 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-sm"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
@@ -269,7 +269,7 @@ export default function Performers() {
                         type="button"
                         onClick={goToNextSlide}
                         aria-label="Next photo"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/55 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-sm"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2.5 rounded-full bg-black/55 hover:bg-black/80 text-white backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-sm"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -288,7 +288,7 @@ export default function Performers() {
 
                 {/* Slideshow Dots & Thumbnails */}
                 {slides.length > 1 && (
-                  <div className="mt-3 flex items-center justify-between gap-3">
+                  <div className="mt-3.5 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       {slides.map((slideUrl, sIdx) => (
                         <button
@@ -296,7 +296,7 @@ export default function Performers() {
                           type="button"
                           onClick={() => goToSlide(sIdx)}
                           aria-label={`View photo ${sIdx + 1}`}
-                          className={`relative w-14 h-10 rounded-lg overflow-hidden border transition-all cursor-pointer ${
+                          className={`relative w-16 h-11 rounded-lg overflow-hidden border transition-all cursor-pointer ${
                             safeSlideIndex === sIdx
                               ? 'border-[var(--accent-orange)] ring-2 ring-[var(--accent-orange)]/30 opacity-100'
                               : 'border-[var(--border-hairline)] opacity-60 hover:opacity-90'
@@ -333,10 +333,10 @@ export default function Performers() {
                 )}
               </div>
 
-              {/* Performer Details: Clickable Name(s), Department, Research Focus, Links */}
-              <div className="flex-1 w-full space-y-4 text-left">
+              {/* Performer Details Below Centerpiece Image */}
+              <div className="w-full max-w-4xl mx-auto space-y-5 text-center">
                 <div>
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <div className="flex items-center justify-center gap-2 mb-2.5 flex-wrap">
                     <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold bg-[var(--ink-dark)] text-white inline-block">
                       {featuredPerformer.role || 'Research Intern'}
                     </span>
@@ -362,14 +362,20 @@ export default function Performers() {
                   </h2>
 
                   {featuredPerformer.department && (
-                    <p className="text-xs sm:text-sm text-[var(--text-muted)] font-sans mt-1">
+                    <p className="text-xs sm:text-sm text-[var(--text-muted)] font-sans mt-1.5">
                       {featuredPerformer.department}
                     </p>
                   )}
                 </div>
 
-                {/* Awardee Detail Cards (pulled from database for every selected performer) */}
-                <div className="space-y-2.5">
+                {/* Awardee Detail Cards (clean name without arrows + links, identical treatment for every member) */}
+                <div
+                  className={
+                    awardees.length > 1
+                      ? 'grid grid-cols-1 md:grid-cols-2 gap-3 text-left'
+                      : 'max-w-xl mx-auto text-left'
+                  }
+                >
                   {awardees.map((person, idx) => {
                     const cleanLinkedin = normalizeLinkedInUrl(person.linkedin)
                     const cleanCv =
@@ -396,26 +402,13 @@ export default function Performers() {
                               }}
                             />
                           )}
-                          <div className="flex flex-wrap items-center gap-2 min-w-0">
-                            <Link
-                              to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
-                              title={`View ${person.name} profile`}
-                              className="inline-flex items-center gap-1 text-sm font-bold font-head text-[var(--text-primary)] hover:text-[var(--accent-orange)] transition-colors"
-                            >
-                              <span>{person.name}</span>
-                              <ArrowUpRight className="w-3.5 h-3.5 shrink-0 opacity-60" />
-                            </Link>
-                            {person.role && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-hairline)]">
-                                {person.role}
-                              </span>
-                            )}
-                            {person.note && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[var(--bg-surface)] text-[var(--text-subtle)] border border-[var(--border-hairline)]">
-                                {person.note}
-                              </span>
-                            )}
-                          </div>
+                          <Link
+                            to={`/team?tab=${person.categoryTab || 'interns'}&member=${person.id}`}
+                            title={`View ${person.name} profile`}
+                            className="text-sm font-bold font-head text-[var(--text-primary)] hover:text-[var(--accent-orange)] transition-colors"
+                          >
+                            {person.name}
+                          </Link>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-1.5">

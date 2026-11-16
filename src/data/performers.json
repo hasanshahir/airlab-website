@@ -1,53 +1,65 @@
 [
   {
-    "id": "ri-areeba-zehra-jafri",
+    "id": "ri-syed-muhammed-ahmed",
     "memberIds": [
-      "ri-areeba-zehra-jafri",
-      "ri-muhammad-hammad-khan"
+      "ri-syed-muhammed-ahmed"
     ],
-    "memberNotes": {
-      "ri-muhammad-hammad-khan": "Absent during photo ceremony"
-    },
-    "name": "Areeba Zehra Jafri & Muhammad Hammad Khan",
-    "role": "Research Interns",
+    "name": "Syed Muhammed Ahmed",
+    "role": "Research Intern",
     "department": "Department of CSIT · NED University",
-    "month": "July 2026",
+    "month": "October 2026",
     "rank": 1,
-    "title": "Co-Performers of the Month — Cybersecurity, Adversarial ML & Agentic AI",
-    "achievement": "Recognized by AIR Lab faculty for outstanding research execution in cybersecurity, adversarial machine learning, RAG systems, and agentic AI engineering during July 2026.",
-    "researchFocus": "Cybersecurity, Adversarial ML, Machine Learning · Data Science, RAG Systems, Agentic AI, AI Engineering",
+    "title": "Outstanding Research & Scientific Excellence — Generative AI & RAG Systems",
+    "achievement": "Recognized by AIR Lab faculty for exemplary milestone execution, landmark AI model evaluations, and applied data science and generative AI contributions during October 2026.",
+    "researchFocus": "Data Science, Machine Learning, RAG Systems, Generative AI",
+    "email": "ahmed4605214@cloud.neduet.edu.pk",
+    "linkedin": "https://www.linkedin.com/in/syedmuhammedahmed/",
+    "cvUrl": "https://www.linkedin.com/in/syedmuhammedahmed/",
+    "avatar": "/pfp/muhammed-ahmed.jpeg",
     "tags": [
-      "Cybersecurity",
-      "Adversarial ML",
       "Data Science",
+      "Machine Learning",
       "RAG Systems",
-      "Agentic AI",
+      "Generative AI",
       "AIR Lab Fellow"
     ],
-    "image": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg",
+    "image": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
     "categoryTab": "interns",
     "photos": [
-      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg",
-      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.28.jpeg"
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg"
+    ]
+  },
+  {
+    "id": "ri-roshaan-tahir",
+    "memberIds": [
+      "ri-roshaan-tahir"
     ],
-    "coAwardees": [
-      {
-        "id": "ri-areeba-zehra-jafri",
-        "name": "Areeba Zehra Jafri",
-        "researchFocus": "Cybersecurity, Adversarial ML, Machine Learning",
-        "email": "jafrri4603155@cloud.neduet.edu.pk",
-        "linkedin": "https://www.linkedin.com/in/areeba-zehra-jafri",
-        "categoryTab": "interns"
-      },
-      {
-        "id": "ri-muhammad-hammad-khan",
-        "name": "Muhammad Hammad Khan",
-        "researchFocus": "Data Science, RAG Systems, Agentic AI, AI Engineering",
-        "email": "khan4600572@cloud.neduet.edu.pk",
-        "linkedin": "https://www.linkedin.com/in/hammad-khan-308395286/",
-        "categoryTab": "interns",
-        "note": "Absent during photo ceremony"
-      }
+    "name": "Roshaan Tahir",
+    "role": "Research Intern",
+    "department": "Department of CSIT · NED University",
+    "month": "September 2026",
+    "rank": 2,
+    "title": "Distinguished Research Delivery — Multi-Agent & Distributed Systems",
+    "achievement": "Recognized by AIR Lab faculty for exemplary milestone execution in deep learning, multi-agent coordination, and distributed system architectures during September 2026.",
+    "researchFocus": "Deep Learning, Multi-Agent Systems, Distributed Systems",
+    "email": "tahir4600051@cloud.neduet.edu.pk",
+    "linkedin": "https://www.linkedin.com/in/roshaantahir/",
+    "cvUrl": "https://www.linkedin.com/in/roshaantahir/",
+    "avatar": "/pfp/roshaan.jpg",
+    "tags": [
+      "Deep Learning",
+      "Multi-Agent Systems",
+      "Distributed Systems",
+      "AIR Lab Fellow"
+    ],
+    "image": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
+    "categoryTab": "interns",
+    "photos": [
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg",
+      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg"
     ]
   },
   {
@@ -60,7 +72,7 @@
     "role": "Research Interns",
     "department": "Department of CSIT · NED University",
     "month": "August 2026",
-    "rank": 2,
+    "rank": 3,
     "title": "Co-Performers of the Month — Multimodal RAG, NLP & Edge Computer Vision",
     "achievement": "Commended by principal investigators for pioneering applied machine learning benchmarks, multimodal RAG embedding pipelines, and dedicated laboratory engineering leadership during August 2026.",
     "researchFocus": "NLP & LLMs, Computer Vision · Computer Vision, RAG Systems, Embedding Models, AI Automation",
@@ -98,66 +110,50 @@
     ]
   },
   {
-    "id": "ri-roshaan-tahir",
+    "id": "ri-areeba-zehra-jafri",
     "memberIds": [
-      "ri-roshaan-tahir"
+      "ri-areeba-zehra-jafri",
+      "ri-muhammad-hammad-khan"
     ],
-    "name": "Roshaan Tahir",
-    "role": "Research Intern",
+    "name": "Areeba Zehra Jafri & Muhammad Hammad Khan",
+    "role": "Research Interns",
     "department": "Department of CSIT · NED University",
-    "month": "September 2026",
-    "rank": 3,
-    "title": "Distinguished Research Delivery — Multi-Agent & Distributed Systems",
-    "achievement": "Recognized by AIR Lab faculty for exemplary milestone execution in deep learning, multi-agent coordination, and distributed system architectures during September 2026.",
-    "researchFocus": "Deep Learning, Multi-Agent Systems, Distributed Systems",
-    "email": "tahir4600051@cloud.neduet.edu.pk",
-    "linkedin": "https://www.linkedin.com/in/roshaantahir/",
-    "cvUrl": "https://www.linkedin.com/in/roshaantahir/",
-    "avatar": "/pfp/roshaan.jpg",
-    "tags": [
-      "Deep Learning",
-      "Multi-Agent Systems",
-      "Distributed Systems",
-      "AIR Lab Fellow"
-    ],
-    "image": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
-    "categoryTab": "interns",
-    "photos": [
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.12.jpeg",
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg",
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg"
-    ]
-  },
-  {
-    "id": "ri-syed-muhammed-ahmed",
-    "memberIds": [
-      "ri-syed-muhammed-ahmed"
-    ],
-    "name": "Syed Muhammed Ahmed",
-    "role": "Research Intern",
-    "department": "Department of CSIT · NED University",
-    "month": "October 2026",
+    "month": "July 2026",
     "rank": 4,
-    "title": "Outstanding Research & Scientific Excellence — Generative AI & RAG Systems",
-    "achievement": "Recognized by AIR Lab faculty for exemplary milestone execution, landmark AI model evaluations, and applied data science and generative AI contributions during October 2026.",
-    "researchFocus": "Data Science, Machine Learning, RAG Systems, Generative AI",
-    "email": "ahmed4605214@cloud.neduet.edu.pk",
-    "linkedin": "https://www.linkedin.com/in/syedmuhammedahmed/",
-    "cvUrl": "https://www.linkedin.com/in/syedmuhammedahmed/",
-    "avatar": "/pfp/muhammed-ahmed.jpeg",
+    "title": "Co-Performers of the Month — Cybersecurity, Adversarial ML & Agentic AI",
+    "achievement": "Recognized by AIR Lab faculty for outstanding research execution in cybersecurity, adversarial machine learning, RAG systems, and agentic AI engineering during July 2026.",
+    "researchFocus": "Cybersecurity, Adversarial ML, Machine Learning · Data Science, RAG Systems, Agentic AI, AI Engineering",
     "tags": [
+      "Cybersecurity",
+      "Adversarial ML",
       "Data Science",
-      "Machine Learning",
       "RAG Systems",
-      "Generative AI",
+      "Agentic AI",
       "AIR Lab Fellow"
     ],
-    "image": "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
+    "image": "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg",
     "categoryTab": "interns",
     "photos": [
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.11.jpeg",
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.16.jpeg",
-      "/gallery/pom-september-october-whatsapp-image-2026-11-11-at-18.22.14.jpeg"
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.34.jpeg",
+      "/gallery/pom-july-august-whatsapp-image-2026-11-11-at-18.21.28.jpeg"
+    ],
+    "coAwardees": [
+      {
+        "id": "ri-areeba-zehra-jafri",
+        "name": "Areeba Zehra Jafri",
+        "researchFocus": "Cybersecurity, Adversarial ML, Machine Learning",
+        "email": "jafrri4603155@cloud.neduet.edu.pk",
+        "linkedin": "https://www.linkedin.com/in/areeba-zehra-jafri",
+        "categoryTab": "interns"
+      },
+      {
+        "id": "ri-muhammad-hammad-khan",
+        "name": "Muhammad Hammad Khan",
+        "researchFocus": "Data Science, RAG Systems, Agentic AI, AI Engineering",
+        "email": "khan4600572@cloud.neduet.edu.pk",
+        "linkedin": "https://www.linkedin.com/in/hammad-khan-308395286/",
+        "categoryTab": "interns"
+      }
     ]
   }
 ]

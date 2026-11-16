@@ -30,7 +30,7 @@ export function isLegacyDateRangeItem(item: Partial<PerformerItem>): boolean {
 export function getMonthSortIndex(month?: string): number {
   const lower = String(month || '').toLowerCase()
   const monthIdx = MONTHS.findIndex(m => lower.includes(m) || lower.includes(m.slice(0, 3)))
-  if (monthIdx < 0) return Number.MAX_SAFE_INTEGER
+  if (monthIdx < 0) return -1
   const yearMatch = lower.match(/\b(20\d{2})\b/)
   const year = yearMatch ? Number(yearMatch[1]) : 2026
   return year * 12 + monthIdx
@@ -112,21 +112,23 @@ export function mergePerformersWithLocal(
   )
 
   const combined = [...mergedLocal, ...addedFromAdmin]
-  combined.sort((a, b) => getMonthSortIndex(a.month) - getMonthSortIndex(b.month))
+  // Most recent month first
+  combined.sort((a, b) => getMonthSortIndex(b.month) - getMonthSortIndex(a.month))
   return combined
 }
 
 /**
- * Filters out legacy placeholder records and sorts database performers by display order / month.
+ * Filters out legacy placeholder records and sorts database performers most recent month first.
  */
 export function normalizeDbPerformers(apiItems: PerformerItem[]): PerformerItem[] {
   return apiItems
     .filter(item => !isLegacyDateRangeItem(item))
     .slice()
     .sort((a, b) => {
-      const orderA = typeof (a as any).order === 'number' ? (a as any).order : getMonthSortIndex(a.month)
-      const orderB = typeof (b as any).order === 'number' ? (b as any).order : getMonthSortIndex(b.month)
-      if (orderA !== orderB) return orderA - orderB
-      return getMonthSortIndex(a.month) - getMonthSortIndex(b.month)
+      const scoreDiff = getMonthSortIndex(b.month) - getMonthSortIndex(a.month)
+      if (scoreDiff !== 0) return scoreDiff
+      const orderA = typeof (a as any).order === 'number' ? (a as any).order : 99
+      const orderB = typeof (b as any).order === 'number' ? (b as any).order : 99
+      return orderA - orderB
     })
 }
