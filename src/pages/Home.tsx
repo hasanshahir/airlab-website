@@ -594,7 +594,7 @@ export default function Home() {
 
         {/* Dynamic Looping Ribbon of Cards */}
         <div
-          onMouseEnter={handleUpdatesMouseEnter}
+          onMouseMove={handleUpdatesMouseMove}
           onMouseLeave={handleUpdatesMouseLeave}
           onWheel={handleUpdatesWheel}
           className="relative overflow-hidden py-3 -my-3 select-none ribbon-edge-mask"
