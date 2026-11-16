@@ -78,26 +78,28 @@ export default function Preloader() {
       return
     }
 
-    const startSequence = () => {
+    const startSequence = (incrementKey = false) => {
       clearTimers()
       setVisible(true)
       setDissolving(false)
-      setRunKey(prev => prev + 1)
+      if (incrementKey) {
+        setRunKey(prev => prev + 1)
+      }
       document.body.classList.add('is-loading')
       window.dispatchEvent(new Event('preloader-start'))
 
       // Failsafe: never trap the user if WebGL or RAF is throttled in background tab
       const failsafeId = window.setTimeout(() => {
         finishReveal()
-      }, 4500)
+      }, 6000)
       timersRef.current.push(failsafeId)
     }
 
-    startSequence()
+    startSequence(false)
 
     const handleCustomTrigger = () => {
       window.__PRELOADER_REVEALED__ = false
-      startSequence()
+      startSequence(true)
     }
     window.addEventListener('airlab-trigger-preloader', handleCustomTrigger)
 
