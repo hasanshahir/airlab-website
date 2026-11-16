@@ -24,6 +24,7 @@ import StudentApplicationModal from '../components/StudentApplicationModal'
 import SponsorsGrid from '../components/SponsorsGrid'
 import { TiltedGridHero } from '@/components/ui/tilted-grid-hero'
 import { CoverflowCarousel } from '@/components/ui/coverflow-carousel'
+import { HandwritingText } from '@/components/ui/handwriting-text'
 import {
   HoverSlider,
   HoverSliderImage,
@@ -367,35 +368,37 @@ export default function Home() {
 
   const heroOverlay = (
     <div className="relative z-10 flex h-full w-full max-w-4xl mx-auto flex-col items-center justify-center px-6 text-center pointer-events-none">
-      {/* Soft, edge-less shadow behind the text only (carousel photos remain 100% full brightness) */}
+      {/* Clean high-visibility radial light scrim behind the text so the carousel stays visible without visual clutter */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-2xl h-64 -z-10"
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[96%] max-w-3xl h-72 sm:h-80 -z-10 rounded-full blur-md"
         style={{
           background:
-            'radial-gradient(closest-side, rgba(10, 0, 28, 0.58) 0%, rgba(10, 0, 28, 0.26) 55%, transparent 100%)',
+            'radial-gradient(closest-side, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.9) 52%, rgba(255, 255, 255, 0.55) 78%, transparent 100%)',
         }}
       />
 
-      {/* Clean centered 3D extruded slogan */}
-      <TitleReveal
-        as="h1"
-        waitForPreloader
-        hoverColor="#C77DFF"
-        className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-head text-white tracking-[-0.02em] leading-[1.12] select-none max-w-2xl pointer-events-auto"
+      <h1
+        className="max-w-2xl text-center text-3xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight text-zinc-900 font-head select-none pointer-events-auto"
         style={{
-          textShadow:
-            '0 1px 0 rgba(16, 0, 43, 0.95), 0 2px 0 rgba(16, 0, 43, 0.9), 0 3px 0 rgba(16, 0, 43, 0.85), 0 4px 0 rgba(16, 0, 43, 0.75), 0 8px 20px rgba(0, 0, 0, 0.95), 0 18px 42px rgba(0, 0, 0, 0.8)',
+          textShadow: '0 2px 18px rgba(255, 255, 255, 0.95)',
         }}
       >
-        Where Intelligence Meets Engineering.
-      </TitleReveal>
+        Where Intelligence Meets
+        <br />
+        <HandwritingText
+          text="Engineering."
+          className="text-[var(--accent-orange)] mt-1"
+          height="1.18em"
+          strokeWidth={1.8}
+        />
+      </h1>
 
-      {/* Tactile 3D Action Button centered directly below the text */}
+      {/* Tactile Action Button centered directly below the text */}
       <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center gap-3.5 pointer-events-auto">
         <Link
           to="/projects"
-          className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/25 shadow-[0_4px_0_rgba(16,0,43,0.55),0_12px_28px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_0_rgba(16,0,43,0.55),0_16px_34px_rgba(0,0,0,0.65)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_2px_0_rgba(16,0,43,0.55),0_6px_14px_rgba(0,0,0,0.5)] transition-all duration-200 flex items-center gap-2 cursor-pointer group"
+          className="h-11 sm:h-12 px-7 bg-[var(--accent-orange)] hover:bg-[var(--accent-orange-hover)] text-white text-sm font-semibold rounded-full border border-white/40 shadow-[0_10px_28px_rgba(123,44,191,0.38)] hover:shadow-[0_14px_34px_rgba(123,44,191,0.5)] hover:-translate-y-0.5 active:translate-y-0.5 transition-all duration-200 flex items-center gap-2 cursor-pointer group"
         >
           <Layers className="w-4 h-4 shrink-0" />
           <span>Explore Projects</span>
@@ -407,7 +410,7 @@ export default function Home() {
   return (
     <div className="w-full relative font-sans text-[var(--text-primary)] bg-transparent overflow-hidden">
       {/* ── 1. FULL-WIDTH HERO SHOWCASE (V1 Curved / V2 Coverflow) ── */}
-      <section className="relative w-full z-10">
+      <section className="relative w-full z-10 bg-white">
         <AnimatePresence mode="wait" initial={false}>
           {carouselVersion === 'v1' ? (
             <motion.div
@@ -424,7 +427,7 @@ export default function Home() {
                 axis={50}
                 gap={4}
                 curve={72}
-                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-white"
               >
                 {heroOverlay}
               </TiltedGridHero>
@@ -445,7 +448,7 @@ export default function Home() {
                 cardWidth="min(80cqh, 74cqw)"
                 gap={-0.06}
                 label="AIR Lab Hero Coverflow Carousel"
-                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-transparent"
+                className="h-[460px] sm:h-[580px] md:h-[640px] w-full bg-white"
               >
                 {heroOverlay}
               </CoverflowCarousel>
